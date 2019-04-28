@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmdao.mapeer.AccentMapper" >
+    <select id="doLogin" resultType="String" parameterType="com.modcreater.tmbeans.vo.LoginVo">
+        select id from account where userCode=#{userCode}
+    </select>
+    <insert id="register" parameterType="com.modcreater.tmbeans.vo.AccountVo">
+        insert into account
+            (userCode
+            ,userPassword
+            ,userName
+            ,userType)
+        values (#{userCode}
+            ,#{userPassword}
+            ,#{userName}
+            ,#{userType})
+    </insert>
+    <select id="checkCode" parameterType="String" resultType="int">
+        select count(1) from account where userCode=#{userCode}
+    </select>
+</mapper>
