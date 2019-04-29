@@ -1,36 +1,46 @@
 package com.modcreater.tmbiz.dao;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
-import com.modcreater.tmbeans.vo.QueryEventVo;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
+/**
+ * Created with IntelliJ IDEA.
+ * Description:
+ *
+ * @Author: Goku_yi
+ * @Date: 2019-04-29
+ * Time: 9:20
+ */
 @Mapper
 public interface EventMapper {
     /**
-     * 查询事件
-     * @param queryEventVo
+     * 上传新事件
+     * @param singleEvents 事件
      * @return
      */
-    SingleEvent queryEvent(QueryEventVo queryEventVo);
+    int uploadingEvents(SingleEvent singleEvents);
 
     /**
-     * 添加事件
-     * @param singleEvent
+     * 根据用户Id撤销事件
+     * @param userId 用户Id
      * @return
      */
-    int addEvent(SingleEvent singleEvent);
+    int withdrawEventsByUserId(String userId);
 
     /**
-     * 删除事件
-     * @param eventId
+     * 根据用户Id更新事件
+     * @param singleEvent 事件
      * @return
      */
-    int deleteEvent(String eventId);
+    int alterEventsByUserId(SingleEvent singleEvent);
 
     /**
-     * 修改事件
-     * @param eventId
+     * 同步事件
+     * @param userId 用户Id
      * @return
      */
-    int updateEvent(String eventId);
+    List<SingleEvent> synchronizeEvents(String userId);
+
 }
