@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmbiz.dao.EventMapper">
+
+    <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
+        insert into singleevent values
+        (null,
+        1,
+        "测试事件",
+        "2019-04-29 12:00:00",
+        "2019-04-29 13:00:00",
+        "湖州文创中心",
+        1,
+        1,
+        "1",
+        "Test",
+        "10"
+        ,0,
+        "2019-04-29 12:00:00",
+        2019,
+        04,
+        29)
+    </insert>
+
+    <delete id="withdrawEventsByUserId" parameterType="java.lang.Integer">
+
+    </delete>
+
+</mapper>
