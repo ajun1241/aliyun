@@ -18,7 +18,7 @@ public class SingleEvent implements Serializable {
   private long flag;
   private String person;
   private String remarks;
-  private long repeaTtime;
+  private long repeatTime;
   private long isOverdue;
   private Date remindTime;
   private long day;
