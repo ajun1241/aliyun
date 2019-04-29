@@ -11,7 +11,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
-@ComponentScan("com.modcreater.tmbiz.controller")
+@ComponentScan("com.modcreater.tmbiz.*")
 @Component
 public class SwaggerConfig {
     @Bean

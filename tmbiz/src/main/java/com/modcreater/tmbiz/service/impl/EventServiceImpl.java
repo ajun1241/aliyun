@@ -6,6 +6,7 @@ import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmbiz.dao.EventMapper;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -26,9 +27,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(SingleEvent singleEvent) {
-        if (!StringUtils.isEmpty(singleEvent)) {
-            if (eventMapper.uploadingEvents(singleEvent) > 0) {
-                return DtoUtil.getSuccesDto("事件上传成功", "21000");
+        if (!ObjectUtils.isEmpty(singleEvent)) {
+            if (eventMapper.uploadingEvents(singleEvent)> 0) {
+                return DtoUtil.getSuccessDto("事件上传成功", 100000);
             }else {
                 return DtoUtil.getFalseDto("事件上传失败",21001);
             }
