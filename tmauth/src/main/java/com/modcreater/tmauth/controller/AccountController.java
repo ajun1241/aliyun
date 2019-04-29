@@ -1,8 +1,7 @@
 package com.modcreater.tmauth.controller;
 
-import com.modcreater.tmauth.service.AccentService;
+import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import io.swagger.annotations.ApiOperation;
@@ -12,9 +11,9 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/auth/")
-public class AccentController {
+public class AccountController {
     @Resource
-    private AccentService userService;
+    private AccountService userService;
 
     @PostMapping("dologin")
     @ApiOperation("登录")
@@ -22,10 +21,18 @@ public class AccentController {
         System.out.println(loginVo.toString());
         return userService.doLogin(loginVo);
     }
-    @PostMapping("updateaccent")
+
+    @PostMapping("queryaccount")
+    @ApiOperation("查询账户信息")
+    public Dto queryAccount(@RequestBody String id){
+        System.out.println(id);
+        return userService.queryAccount(id);
+    }
+
+    @PostMapping("updateaccount")
     @ApiOperation("修改账户信息")
-    public Dto updateAccent(@RequestBody AccountVo accountVo){
-        System.out.println(accountVo.toString());
-        return userService.updateAccent(accountVo);
+    public Dto updateAccount(@RequestBody AccountVo accountVo){
+//        System.out.println(accountVo.toString());
+        return userService.updateAccount(accountVo);
     }
 }

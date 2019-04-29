@@ -7,7 +7,7 @@ import com.modcreater.tmbeans.vo.LoginVo;
 
 import java.util.List;
 
-public interface AccentService {
+public interface AccountService {
     /**
      * 登录
      * @return
@@ -19,7 +19,12 @@ public interface AccentService {
      * @param accountVo
      * @return
      */
-    Dto updateAccent(AccountVo accountVo);
+    Dto updateAccount(AccountVo accountVo);
 
-//    List<Account> queryAll();
+    /**
+     * 查看用户详情
+     * @param id
+     * @return
+     */
+    Dto queryAccount(String id);
 }

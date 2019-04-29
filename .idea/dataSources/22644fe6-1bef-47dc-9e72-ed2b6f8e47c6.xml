@@ -848,7 +848,7 @@
     </column>
     <column id="212" parent="206" name="gender">
       <Position>5</Position>
-      <Comment>性别</Comment>
+      <Comment>性别(0:未修改；1：男；2：女)</Comment>
       <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
@@ -877,7 +877,7 @@
       <DataType>timestamp|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="217" parent="206" name="OfflineTime">
+    <column id="217" parent="206" name="offlineTime">
       <Position>10</Position>
       <Comment>下线时间(下线时修改)</Comment>
       <DataType>timestamp|0s</DataType>
@@ -975,7 +975,7 @@
     <column id="232" parent="207" name="repeaTtime">
       <Position>11</Position>
       <Comment>重复次数</Comment>
-      <DataType>int(11)|0s</DataType>
+      <DataType>varchar(100)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="233" parent="207" name="isOverdue">

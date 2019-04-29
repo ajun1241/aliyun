@@ -10,13 +10,13 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 @Mapper
-public interface AccentMapper {
+public interface AccountMapper {
 
     /**
      * 登录
      * @return
      */
-    int doLogin(LoginVo loginVo);
+    String doLogin(LoginVo loginVo);
 
     /**
      * 注册
@@ -30,7 +30,20 @@ public interface AccentMapper {
      * @param userCode
      * @return
      */
-    int checkCode(@Param("userCode") String userCode);
+    String checkCode(@Param("userCode") String userCode);
 
-//    List<Account> queryAll();
+    /**
+     * 查看用户详情
+     * @param id
+     * @return
+     */
+    Account queryAccount(String id);
+
+    /**
+     * 修改用户信息
+     * @param accountVo
+     * @return
+     */
+    int updateAccount(AccountVo accountVo);
+
 }

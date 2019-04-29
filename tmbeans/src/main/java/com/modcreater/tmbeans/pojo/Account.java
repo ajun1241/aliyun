@@ -2,21 +2,24 @@ package com.modcreater.tmbeans.pojo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+import java.util.Date;
+
 @Data
-public class Account {
+public class Account implements Serializable {
 
   private long id;
   private String userCode;
   private String verificationCode;
   private String userName;
   private long gender;
-  private java.sql.Timestamp birthday;
+  private Date birthday;
   private String IDcard;
-  private java.sql.Timestamp createDate;
-  private java.sql.Timestamp modifyDate;
-  private java.sql.Timestamp offlineTime;
+  private Date createDate;
+  private Date modifyDate;
+  private Date offlineTime;
   private long userType;
   private String headImgUrl;
-  private java.sql.Timestamp time;
+  private Date time;
 
 }
