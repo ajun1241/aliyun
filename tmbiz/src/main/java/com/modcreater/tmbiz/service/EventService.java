@@ -12,6 +12,7 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
  * Time: 11:32
  */
 public interface EventService {
+
     /**
      * 添加新的事件
      * @param singleEvent 事件
