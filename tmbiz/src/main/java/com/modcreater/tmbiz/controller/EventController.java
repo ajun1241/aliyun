@@ -1,4 +1,4 @@
-package com.modcreater.tmbiz;
+package com.modcreater.tmbiz.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;

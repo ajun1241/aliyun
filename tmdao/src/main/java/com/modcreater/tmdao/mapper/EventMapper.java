@@ -1,4 +1,4 @@
-package com.modcreater.tmbiz.dao;
+package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import org.apache.ibatis.annotations.Mapper;

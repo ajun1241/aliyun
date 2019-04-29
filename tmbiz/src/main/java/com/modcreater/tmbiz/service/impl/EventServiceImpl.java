@@ -3,11 +3,10 @@ package com.modcreater.tmbiz.service.impl;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbiz.service.EventService;
-import com.modcreater.tmbiz.dao.EventMapper;
+import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 
