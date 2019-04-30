@@ -9,17 +9,17 @@ import java.util.Date;
 @Data
 public class Account implements Serializable {
 
-  private long id;
+  private Long id;
   private String userCode;
   private String verificationCode;
   private String userName;
-  private long gender;
+  private Long gender;
   private Date birthday;
   private String IDcard;
   private Date createDate;
   private Date modifyDate;
   private Date offlineTime;
-  private long userType;
+  private Long userType;
   private String headImgUrl;
   private Date time;
 

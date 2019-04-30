@@ -4,6 +4,7 @@ import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.LoginVo;
+import com.modcreater.tmbeans.vo.QueryUserVo;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +25,9 @@ public class AccountController {
 
     @PostMapping("queryaccount")
     @ApiOperation("查询账户信息")
-    public Dto queryAccount(@RequestBody String id){
+    public Dto queryAccount(@RequestBody QueryUserVo queryUserVo){
 //        System.out.println(id);
-        return userService.queryAccount(id);
+        return userService.queryAccount(queryUserVo);
     }
 
     @PostMapping("updateaccount")

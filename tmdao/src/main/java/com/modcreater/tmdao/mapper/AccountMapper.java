@@ -26,11 +26,11 @@ public interface AccountMapper {
     int register(Account account);
 
     /**
-     * 判断用户名
+     * 根据账号查询用户信息
      * @param userCode
      * @return
      */
-    String checkCode(@Param("userCode") String userCode);
+    Account checkCode(@Param("userCode") String userCode);
 
     /**
      * 查看用户详情

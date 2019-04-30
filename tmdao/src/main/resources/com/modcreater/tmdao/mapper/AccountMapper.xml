@@ -26,8 +26,8 @@
             ,#{headImgUrl}
             ,#{time})
     </insert>
-    <select id="checkCode" parameterType="String" resultType="String">
-        select id from account where userCode=#{userCode}
+    <select id="checkCode" parameterType="String" resultType="com.modcreater.tmbeans.pojo.Account">
+        select * from account where userCode=#{userCode}
     </select>
 
     <select id="queryAccount" resultType="com.modcreater.tmbeans.pojo.Account">

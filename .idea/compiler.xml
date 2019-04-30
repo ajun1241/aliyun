@@ -9,6 +9,7 @@
         <module name="tmauth" />
         <module name="tmbeans" />
         <module name="tmbiz" />
+        <module name="tmchat" />
         <module name="tmdao" />
         <module name="tmutils" />
       </profile>
@@ -20,6 +21,7 @@
       <module name="tmauth" options="-parameters" />
       <module name="tmbeans" options="-parameters" />
       <module name="tmbiz" options="-parameters" />
+      <module name="tmchat" options="-parameters" />
       <module name="tmdao" options="-parameters" />
       <module name="tmutils" options="-parameters" />
     </option>
