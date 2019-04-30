@@ -34,7 +34,7 @@
         select * from account where id=#{id}
     </select>
 
-    <update id="updateAccount" parameterType="com.modcreater.tmbeans.vo.AccountVo" >
+    <update id="updateAccount" parameterType="com.modcreater.tmbeans.pojo.Account" >
         update account
         <set>
             <if test="userName != null and userName!=''" >

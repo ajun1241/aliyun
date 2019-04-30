@@ -6,10 +6,12 @@ import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmdao.mapper.AccountMapper;
+import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +66,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("用户id接收失败",12001);
         }
         Account account= accountMapper.queryAccount(id);
+        System.out.println(account.toString());
         if (ObjectUtils.isEmpty(account)){
             return DtoUtil.getFalseDto("查询用户信息失败",200000);
         }
@@ -72,7 +75,11 @@ public class AccountServiceImpl implements AccountService {
         accountVo.setUserCode(account.getUserCode());
         accountVo.setUserName(account.getUserName());
         accountVo.setGender(account.getGender());
-        accountVo.setBirthday(new Date());
+        try {
+            accountVo.setBirthday(DateUtil.dateToStamp(account.getBirthday()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 //        accountVo.setHeadImgUrl("");
         accountVo.setUserType(account.getUserType());
         return DtoUtil.getSuccesWithDataDto("查询用户信息成功",accountVo,100000);
@@ -83,10 +90,17 @@ public class AccountServiceImpl implements AccountService {
         if (ObjectUtils.isEmpty(accountVo)){
             return DtoUtil.getFalseDto("用户信息接收失败",13001);
         }
-        int result=accountMapper.updateAccount(accountVo);
+        Account account=new Account();
+        account.setId(accountVo.getId());
+        account.setUserCode(accountVo.getUserCode());
+        account.setUserName(accountVo.getUserName());
+        account.setGender(accountVo.getGender());
+        account.setUserType(accountVo.getUserType());
+        account.setBirthday(DateUtil.stampToDate(accountVo.getBirthday()));
+        int result=accountMapper.updateAccount(account);
         if (result<=0){
             return DtoUtil.getFalseDto("用户信息修改失败",13002);
         }
-            return DtoUtil.getSuccessDto("用户信息修改成功",100000);
+        return DtoUtil.getSuccessDto("用户信息修改成功",100000);
     }
 }

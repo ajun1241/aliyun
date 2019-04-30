@@ -18,14 +18,14 @@ public class AccountController {
     @PostMapping("dologin")
     @ApiOperation("登录")
     public Dto dologin(@RequestBody LoginVo loginVo){
-        System.out.println(loginVo.toString());
+//        System.out.println(loginVo.toString());
         return userService.doLogin(loginVo);
     }
 
     @PostMapping("queryaccount")
     @ApiOperation("查询账户信息")
     public Dto queryAccount(@RequestBody String id){
-        System.out.println(id);
+//        System.out.println(id);
         return userService.queryAccount(id);
     }
 

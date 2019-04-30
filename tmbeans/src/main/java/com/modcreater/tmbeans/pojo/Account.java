@@ -3,6 +3,7 @@ package com.modcreater.tmbeans.pojo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Data

@@ -3,6 +3,7 @@ package com.modcreater.tmbeans.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -14,7 +15,7 @@ public class AccountVo implements Serializable {
     private String userCode;
     private String userName;
     private long gender;
-    private Date birthday;
+    private String birthday;
     private long userType;
 //    private String headImgUrl;
 }

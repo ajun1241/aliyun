@@ -41,9 +41,9 @@ public interface AccountMapper {
 
     /**
      * 修改用户信息
-     * @param accountVo
+     * @param account
      * @return
      */
-    int updateAccount(AccountVo accountVo);
+    int updateAccount(Account account);
 
 }
