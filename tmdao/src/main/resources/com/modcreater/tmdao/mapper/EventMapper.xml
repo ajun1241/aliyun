@@ -2,28 +2,78 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.EventMapper">
 
-    <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
-        insert into singleevent values
-        (null,
-        1,
-        "测试事件",
-        "2019-04-29 12:00:00",
-        "2019-04-29 13:00:00",
-        "湖州文创中心",
-        1,
-        1,
-        "1",
-        "Test",
-        "10"
-        ,0,
-        "2019-04-29 12:00:00",
-        2019,
-        04,
-        29)
+    <sql id="Base_Column_List">
+        id,userId,eventName,startTime,endTime,address,level,flag,
+        person,person,repeatTime,isOverdue,remindTime,day,month,year
+    </sql>
+    
+    <insert id="uploadingEvents">
+        insert into singleevent values 
+            (null,
+            #{item.userId},
+            #{item.eventName},
+            #{item.startTime},
+            #{item.endTime},
+            #{item.address},
+            #{item.level},
+            #{item.flag},
+            #{item.person},
+            #{item.remarks},
+            #{item.repeatTime},
+            #{item.isOverdue},
+            #{item.remindTime},
+            #{item.day},
+            #{item.month},
+            #{item.year})
     </insert>
 
-    <delete id="withdrawEventsByUserId" parameterType="java.lang.Integer">
-
+    <delete id="withdrawEventsByUserId">
+        delete from singleevent where id =
     </delete>
+
+    <update id="alterEventsByUserId">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update singleevent
+            <set>
+                userId = #{item.userId},
+                eventName = #{item.eventName},
+                startTime = #{item.startTime},
+                endTime = #{item.endTime},
+                address = #{item.address},
+                level = #{item.level},
+                flag = #{item.flag},
+                person = #{item.person},
+                remarks = #{item.remarks},
+                repeatTime = #{item.repeatTime},
+                isOverdue = #{item.isOverdue},
+                remindTime = #{item.remindTime},
+                day = #{item.day},
+                month = #{item.month},
+                year = #{item.year}
+            </set>
+            where id = ${item.id}
+        </foreach>
+    </update>
+
+    <select id="queryEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select <include refid="Base_Column_List"/> from singleevent
+        <where>
+            <if test="id != null">
+                id = #{id}
+            </if>
+            <if test="userId != null">
+                userId = #{userId}
+            </if>
+            <if test="day != null">
+                day = #{day}
+            </if>
+            <if test="month != null">
+                month = #{month}
+            </if>
+            <if test="year != null">
+                year = #{year}
+            </if>
+        </where>
+    </select>
 
 </mapper>

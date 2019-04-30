@@ -2,6 +2,8 @@ package com.modcreater.tmbiz.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.vo.DayEvents;
+import com.modcreater.tmbeans.vo.UploadingEventVo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,31 +16,38 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
 public interface EventService {
 
     /**
-     * 添加新的事件
-     * @param singleEvent 事件
+     * 添加新的事件(线上操作)
+     * @param uploadingEventVo
      * @return
      */
-    Dto addNewEvents(SingleEvent singleEvent);
+    Dto addNewEvents(UploadingEventVo uploadingEventVo);
 
     /**
-     * 根据用户的ID删除事件
-     * @param userId 用户ID
+     * 删除事件
+     * @param dayEvents
      * @return
      */
-    Dto deleteEvents(String userId);
+    Dto deleteEvents(DayEvents dayEvents);
 
     /**
      * 修改事件
-     * @param singleEvent 事件
+     * @param dayEvents
      * @return
      */
-    Dto updateEvents(SingleEvent singleEvent);
+    Dto updateEvents(DayEvents dayEvents);
 
     /**
-     * 根据用户ID查询事件
-     * @param userId
+     * 查询事件
+     * @param dayEvents
      * @return
      */
-    Dto searchEvents(String userId);
+    Dto searchEvents(DayEvents dayEvents);
+
+    /**
+     * 同步本地数据到线上
+     * @param dayEvents
+     * @return
+     */
+    Dto synchronousUpdate(DayEvents dayEvents);
 
 }

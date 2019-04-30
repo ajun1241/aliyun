@@ -17,30 +17,37 @@ import java.util.List;
 public interface EventMapper {
     /**
      * 上传新事件
-     * @param singleEvents 事件
+     * @param singleEventsList
      * @return
      */
-    int uploadingEvents(SingleEvent singleEvents);
+    int uploadingEvents(List<SingleEvent> singleEventsList);
 
     /**
-     * 根据用户Id撤销事件
-     * @param userId 用户Id
+     * 撤销事件
+     * @param singleEventsList
      * @return
      */
-    int withdrawEventsByUserId(String userId);
+    int withdrawEventsByUserId(List<SingleEvent> singleEventsList);
 
     /**
-     * 根据用户Id更新事件
-     * @param singleEvent 事件
+     * 更新事件
+     * @param singleEventsList
      * @return
      */
-    int alterEventsByUserId(SingleEvent singleEvent);
+    int alterEventsByUserId(List<SingleEvent> singleEventsList);
 
     /**
-     * 同步事件
-     * @param userId 用户Id
+     * 查询事件
+     * @param singleEvents
      * @return
      */
-    List<SingleEvent> synchronizeEvents(String userId);
+    List<SingleEvent> queryEvents(SingleEvent singleEvents);
+
+    /**
+     * 删除事件(在同步更新接口下)
+     * @param singleEvent
+     * @return
+     */
+    int deleteEventsBySynchronousUpdate(SingleEvent singleEvent);
 
 }
