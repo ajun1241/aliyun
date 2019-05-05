@@ -34,6 +34,8 @@ public class EventController {
      */
     @RequestMapping(value = "upl", method = RequestMethod.POST)
     public Dto uploadingEvents(@RequestBody UploadingEventVo uploadingEventVo) {
+
+
         return eventService.addNewEvents(uploadingEventVo);
     }
 
