@@ -22,7 +22,12 @@ public class AccountController {
 //        System.out.println(loginVo.toString());
         return userService.doLogin(loginVo);
     }
-
+    @PostMapping("registered")
+    @ApiOperation("注册")
+    public Dto registered(@RequestBody LoginVo loginVo){
+//        System.out.println(loginVo.toString());
+        return userService.registered(loginVo);
+    }
     @PostMapping("queryaccount")
     @ApiOperation("查询账户信息")
     public Dto queryAccount(@RequestBody QueryUserVo queryUserVo){

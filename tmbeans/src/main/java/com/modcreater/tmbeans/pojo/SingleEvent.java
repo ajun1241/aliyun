@@ -27,5 +27,5 @@ public class SingleEvent implements Serializable {
   private Long year;       //年
   private Long month;      //月
   private Long day;        //日
-
+  private Long type;    //事件分类
 }

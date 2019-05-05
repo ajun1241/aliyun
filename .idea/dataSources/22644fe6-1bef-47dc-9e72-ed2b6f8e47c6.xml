@@ -834,98 +834,103 @@
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="210" parent="206" name="verificationCode">
+    <column id="210" parent="206" name="userPassword">
       <Position>3</Position>
+      <Comment>密码</Comment>
+      <DataType>varchar(20)|0s</DataType>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <column id="211" parent="206" name="verificationCode">
+      <Position>4</Position>
       <Comment>验证码</Comment>
       <DataType>varchar(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="211" parent="206" name="userName">
-      <Position>4</Position>
+    <column id="212" parent="206" name="userName">
+      <Position>5</Position>
       <Comment>用户昵称</Comment>
       <DataType>varchar(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="212" parent="206" name="gender">
-      <Position>5</Position>
+    <column id="213" parent="206" name="gender">
+      <Position>6</Position>
       <Comment>性别(0:未修改；1：男；2：女)</Comment>
       <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="213" parent="206" name="birthday">
-      <Position>6</Position>
+    <column id="214" parent="206" name="birthday">
+      <Position>7</Position>
       <Comment>生日</Comment>
       <DataType>timestamp|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="214" parent="206" name="IDcard">
-      <Position>7</Position>
+    <column id="215" parent="206" name="IDcard">
+      <Position>8</Position>
       <Comment>身份证号</Comment>
       <DataType>varchar(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="215" parent="206" name="createDate">
-      <Position>8</Position>
+    <column id="216" parent="206" name="createDate">
+      <Position>9</Position>
       <Comment>创建时间</Comment>
       <DataType>timestamp|0s</DataType>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="216" parent="206" name="modifyDate">
-      <Position>9</Position>
+    <column id="217" parent="206" name="modifyDate">
+      <Position>10</Position>
       <Comment>修改时间</Comment>
       <DataType>timestamp|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="217" parent="206" name="offlineTime">
-      <Position>10</Position>
+    <column id="218" parent="206" name="offlineTime">
+      <Position>11</Position>
       <Comment>下线时间(下线时修改)</Comment>
       <DataType>timestamp|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="218" parent="206" name="userType">
-      <Position>11</Position>
+    <column id="219" parent="206" name="userType">
+      <Position>12</Position>
       <Comment>用户类型(0：未登录；1：极简版；2：企业版；3：专业版；4：大众版；5：商户版；6：农产版；)</Comment>
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="219" parent="206" name="headImgUrl">
-      <Position>12</Position>
+    <column id="220" parent="206" name="headImgUrl">
+      <Position>13</Position>
       <Comment>用户头像</Comment>
       <DataType>varchar(100)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="220" parent="206" name="time">
-      <Position>13</Position>
+    <column id="221" parent="206" name="time">
+      <Position>14</Position>
       <Comment>事件修改时间</Comment>
       <DataType>timestamp|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <key id="221" parent="206" name="PRIMARY">
+    <key id="222" parent="206" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="222" parent="207" name="id">
+    <column id="223" parent="207" name="eventId">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
-      <SequenceIdentity>1</SequenceIdentity>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="223" parent="207" name="userId">
+    <column id="224" parent="207" name="userId">
       <Position>2</Position>
       <Comment>关联的用户id</Comment>
       <DataType>bigint(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="224" parent="207" name="eventName">
+    <column id="225" parent="207" name="eventName">
       <Position>3</Position>
       <Comment>事件名称</Comment>
       <DataType>varchar(100)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="225" parent="207" name="startTime">
+    <column id="226" parent="207" name="startTime">
       <Position>4</Position>
       <Comment>事件开始时间</Comment>
       <DataType>timestamp|0s</DataType>
@@ -934,7 +939,7 @@
       <ColumnKind>normal</ColumnKind>
       <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
     </column>
-    <column id="226" parent="207" name="endTime">
+    <column id="227" parent="207" name="endTime">
       <Position>5</Position>
       <Comment>事件结束时间</Comment>
       <DataType>timestamp|0s</DataType>
@@ -942,76 +947,76 @@
       <DefaultExpression>&apos;0000-00-00 00:00:00&apos;</DefaultExpression>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="227" parent="207" name="address">
+    <column id="228" parent="207" name="address">
       <Position>6</Position>
       <Comment>地址</Comment>
       <DataType>varchar(100)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="228" parent="207" name="level">
+    <column id="229" parent="207" name="level">
       <Position>7</Position>
       <Comment>事件优先级</Comment>
       <DataType>bigint(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="229" parent="207" name="flag">
+    <column id="230" parent="207" name="flag">
       <Position>8</Position>
       <Comment>事件标识(0：空白事件，1：其他事件)</Comment>
       <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="230" parent="207" name="person">
+    <column id="231" parent="207" name="person">
       <Position>9</Position>
       <Comment>事件人物</Comment>
       <DataType>varchar(50)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="231" parent="207" name="remarks">
+    <column id="232" parent="207" name="remarks">
       <Position>10</Position>
       <Comment>备注</Comment>
       <DataType>text|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="232" parent="207" name="repeaTtime">
+    <column id="233" parent="207" name="repeatTime">
       <Position>11</Position>
       <Comment>重复次数</Comment>
       <DataType>varchar(100)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="233" parent="207" name="isOverdue">
+    <column id="234" parent="207" name="isOverdue">
       <Position>12</Position>
       <Comment>是否过期，即已经完成，1代表已经完成，0代表未完成</Comment>
       <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="234" parent="207" name="remindTime">
+    <column id="235" parent="207" name="remindTime">
       <Position>13</Position>
       <Comment>提醒时间</Comment>
       <DataType>timestamp|0s</DataType>
       <DefaultExpression>&apos;0000-00-00 00:00:00&apos;</DefaultExpression>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="235" parent="207" name="day">
+    <column id="236" parent="207" name="day">
       <Position>14</Position>
       <Comment>日</Comment>
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="236" parent="207" name="month">
+    <column id="237" parent="207" name="month">
       <Position>15</Position>
       <Comment>月</Comment>
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="237" parent="207" name="year">
+    <column id="238" parent="207" name="year">
       <Position>16</Position>
       <Comment>年</Comment>
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <key id="238" parent="207" name="PRIMARY">
+    <key id="239" parent="207" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
-      <ColNames>id</ColNames>
+      <ColNames>eventId</ColNames>
       <Primary>1</Primary>
     </key>
   </database-model>

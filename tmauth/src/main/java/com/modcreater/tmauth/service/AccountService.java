@@ -16,6 +16,13 @@ public interface AccountService {
     Dto doLogin(LoginVo loginVo);
 
     /**
+     * 注册
+     * @param loginVo
+     * @return
+     */
+    Dto registered(LoginVo loginVo);
+
+    /**
      * 修改账号信息
      * @param accountVo
      * @return

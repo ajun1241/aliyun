@@ -14,8 +14,6 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +31,7 @@ public class AccountServiceImpl implements AccountService {
         Account result= accountMapper.checkCode(loginVo.getUserCode());
         if (ObjectUtils.isEmpty(result)){
             //是新用户注册
-            Account account=new Account();
+           /* Account account=new Account();
             account.setUserCode(loginVo.getUserCode());
             account.setUserType(loginVo.getUserType());
             account.setUserName("未果新用户");
@@ -61,8 +59,8 @@ public class AccountServiceImpl implements AccountService {
                 e.printStackTrace();
             }
 //        accountVo.setHeadImgUrl("");
-            accountVo.setUserType(result.getUserType());
-            return DtoUtil.getSuccesWithDataDto("注册成功",accountVo,100000);
+            accountVo.setUserType(result.getUserType());*/
+            return DtoUtil.getFalseDto("用户未注册，请先注册",11002);
         }
         //老用户直接登录
         String id= accountMapper.doLogin(loginVo);
@@ -70,7 +68,6 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("登录失败!",200000);
         }
         Account account=accountMapper.queryAccount(id);
-        accountVo=new AccountVo();
         accountVo.setId(account.getId());
         accountVo.setUserCode(account.getUserCode());
         accountVo.setUserName(account.getUserName());
@@ -83,6 +80,48 @@ public class AccountServiceImpl implements AccountService {
 //        accountVo.setHeadImgUrl("");
         accountVo.setUserType(account.getUserType());
         return DtoUtil.getSuccesWithDataDto("登录成功!",accountVo,100000);
+    }
+
+    @Override
+    public Dto registered(LoginVo loginVo) {
+        if (ObjectUtils.isEmpty(loginVo)){
+            return DtoUtil.getFalseDto("注册信息接收失败",14001);
+        }
+        Account result=accountMapper.checkCode(loginVo.getUserCode());
+        if (!ObjectUtils.isEmpty(result)){
+            return DtoUtil.getFalseDto("用户已存在，请直接登录",14002);
+        }
+        Account account=new Account();
+        account.setUserCode(loginVo.getUserCode());
+        account.setUserType(loginVo.getUserType());
+        account.setUserName("未果新用户");
+        account.setGender(0L);
+        account.setBirthday(new Date());
+        account.setIDcard("");
+        account.setOfflineTime(null);
+        account.setHeadImgUrl("");
+        account.setTime(null);
+        int add= accountMapper.register(account);
+        if (add<=0){
+            return DtoUtil.getFalseDto("注册失败！",14003);
+        }
+        result= accountMapper.checkCode(loginVo.getUserCode());
+        if (ObjectUtils.isEmpty(result)){
+            return DtoUtil.getFalseDto("注册时查找用户失败",14004);
+        }
+        AccountVo accountVo=new AccountVo();
+        accountVo.setId(result.getId());
+        accountVo.setUserCode(result.getUserCode());
+        accountVo.setUserName(result.getUserName());
+        accountVo.setGender(result.getGender());
+        try {
+            accountVo.setBirthday(DateUtil.dateToStamp(result.getBirthday()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+//        accountVo.setHeadImgUrl("");
+        accountVo.setUserType(result.getUserType());
+        return DtoUtil.getSuccesWithDataDto("注册成功",accountVo,100000);
     }
 
     @Override
