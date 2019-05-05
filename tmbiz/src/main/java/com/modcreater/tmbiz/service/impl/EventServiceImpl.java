@@ -31,88 +31,107 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
-        /*if (!ObjectUtils.isEmpty(uploadingEventVo)) {
-            SingleEventForDatabase singleEventForDatabase = new SingleEventForDatabase();
-            singleEventForDatabase.setEventId(uploadingEventVo.getEventid());
-            singleEventForDatabase.setUserId(uploadingEventVo.getUserid());
-            singleEventForDatabase.setEventName(uploadingEventVo.getEventname());
-            singleEventForDatabase.setStartTime(uploadingEventVo.getStarttime());
-            singleEventForDatabase.setEndTime(uploadingEventVo.getEndtime());
-            singleEventForDatabase.setAddress(uploadingEventVo.getAddress());
-            singleEventForDatabase.setLevel(uploadingEventVo.getLevel());
-            singleEventForDatabase.setFlag(uploadingEventVo.getFlag());
-            singleEventForDatabase.setPerson(uploadingEventVo.getPerson());
-            singleEventForDatabase.setRemarks(uploadingEventVo.getRemarks());
-            singleEventForDatabase.setRepeatTime(uploadingEventVo.getRepeaTtime());
-            singleEventForDatabase.setIsOverdue(uploadingEventVo.getIsOverdue());
-            singleEventForDatabase.setRemindTime(uploadingEventVo.getRemindTime());
-            singleEventForDatabase.setDay(uploadingEventVo.getDay().intValue());
-            singleEventForDatabase.setMonth(uploadingEventVo.getMonth().intValue());
-            singleEventForDatabase.setYear(uploadingEventVo.getYear().intValue());
-            singleEventForDatabase.setType(uploadingEventVo.getType().intValue());
-            if (eventMapper.uploadingEvents(singleEventForDatabase) > 0) {
+        if (!ObjectUtils.isEmpty(uploadingEventVo)) {
+            SingleEvent singleEvent = new SingleEvent();
+            singleEvent.setEventid(uploadingEventVo.getEventid());
+            singleEvent.setUserid(uploadingEventVo.getUserid());
+            singleEvent.setEventname(uploadingEventVo.getEventname());
+            singleEvent.setStarttime(uploadingEventVo.getStarttime());
+            singleEvent.setEndtime(uploadingEventVo.getEndtime());
+            singleEvent.setAddress(uploadingEventVo.getAddress());
+            singleEvent.setLevel(uploadingEventVo.getLevel());
+            singleEvent.setFlag(uploadingEventVo.getFlag());
+            singleEvent.setPerson(uploadingEventVo.getPerson());
+            singleEvent.setRemarks(uploadingEventVo.getRemarks());
+            singleEvent.setRepeaTtime(uploadingEventVo.getRepeaTtime());
+            singleEvent.setIsOverdue(uploadingEventVo.getIsOverdue());
+            singleEvent.setRemindTime(uploadingEventVo.getRemindTime());
+            singleEvent.setDay(uploadingEventVo.getDay());
+            singleEvent.setMonth(uploadingEventVo.getMonth());
+            singleEvent.setYear(uploadingEventVo.getYear());
+            singleEvent.setType(uploadingEventVo.getType());
+            if (eventMapper.uploadingEvents(singleEvent) > 0) {
                 return DtoUtil.getSuccessDto("事件上传成功", 100000);
             }
             return DtoUtil.getFalseDto("事件上传失败", 21001);
         }
-        return DtoUtil.getFalseDto("没有可上传的事件", 21002);*/
-        if (eventMapper.uploadingEvents(get()) > 0) {
-            return DtoUtil.getSuccessDto("事件上传成功", 100000);
-        }
-        return DtoUtil.getFalseDto("事件上传失败", 21001);
+        return DtoUtil.getFalseDto("没有可上传的事件", 21002);
     }
 
     @Override
     public Dto deleteEvents(DeleteEventVo deleteEventVo) {
-        return null;
+        if (!ObjectUtils.isEmpty(deleteEventVo)) {
+            SingleEvent singleEvent = new SingleEvent();
+            singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
+            singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
+            if (eventMapper.withdrawEventsByUserId(singleEvent) > 0) {
+                return DtoUtil.getFalseDto("删除成功", 100000);
+            }
+            return DtoUtil.getFalseDto("删除事件失败", 21005);
+        }
+        return DtoUtil.getFalseDto("删除条件接收失败", 21006);
     }
 
     @Override
     public Dto updateEvents(UpdateEventVo updateEventVo) {
-        return null;
+        if (!ObjectUtils.isEmpty(updateEventVo)){
+            SingleEvent singleEvent = new SingleEvent();
+            singleEvent.setEventid(updateEventVo.getEventid());
+            singleEvent.setUserid(updateEventVo.getUserid());
+            singleEvent.setEventname(updateEventVo.getEventname());
+            singleEvent.setStarttime(updateEventVo.getStarttime());
+            singleEvent.setEndtime(updateEventVo.getEndtime());
+            singleEvent.setAddress(updateEventVo.getAddress());
+            singleEvent.setLevel(updateEventVo.getLevel());
+            singleEvent.setFlag(updateEventVo.getFlag());
+            singleEvent.setPerson(updateEventVo.getPerson());
+            singleEvent.setRemarks(updateEventVo.getRemarks());
+            singleEvent.setRepeaTtime(updateEventVo.getRepeaTtime());
+            singleEvent.setIsOverdue(updateEventVo.getIsOverdue());
+            singleEvent.setRemindTime(updateEventVo.getRemindTime());
+            singleEvent.setDay(updateEventVo.getDay());
+            singleEvent.setMonth(updateEventVo.getMonth());
+            singleEvent.setYear(updateEventVo.getYear());
+            singleEvent.setType(updateEventVo.getType());
+            if (eventMapper.alterEventsByUserId(singleEvent) > 0){
+                return DtoUtil.getSuccessDto("修改成功",100000);
+            }
+            return DtoUtil.getFalseDto("修改事件失败",21007);
+        }
+        return DtoUtil.getFalseDto("修改条件接收失败",21008);
     }
 
     @Override
     public Dto searchEvents(SearchEventVo searchEventVo) {
-        /*if (!ObjectUtils.isEmpty(searchEventVo)){
+        if (!ObjectUtils.isEmpty(searchEventVo)) {
             StringBuilder date = new StringBuilder(searchEventVo.getDayEventId());
             SingleEvent singleEvent = new SingleEvent();
-            singleEvent.setYear(Long.valueOf(date.substring(0,4)));
-            singleEvent.setMonth(Long.valueOf(date.substring(4,6)));
-            singleEvent.setDay(Long.valueOf(date.substring(6,8)));
+            singleEvent.setYear(Long.valueOf(date.substring(0, 4)));
+            singleEvent.setMonth(Long.valueOf(date.substring(4, 6)));
+            singleEvent.setDay(Long.valueOf(date.substring(6, 8)));
             singleEvent.setUserid(Long.valueOf(searchEventVo.getUserId()));
             List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
-            if (!ObjectUtils.isEmpty(singleEventList)){
-                return DtoUtil.getSuccesWithDataDto("查询成功",singleEventList,100000);
+            if (!ObjectUtils.isEmpty(singleEventList)) {
+                return DtoUtil.getSuccesWithDataDto("查询成功", singleEventList, 100000);
             }
-            return DtoUtil.getFalseDto("查询失败",21003);
+            return DtoUtil.getFalseDto("查询失败", 21003);
         }
-        return DtoUtil.getFalseDto("查询条件接收失败",21004);*/
-        SingleEvent singleEvent = new SingleEvent();
-        singleEvent.setYear(2019L);
-        singleEvent.setMonth(5L);
-        singleEvent.setDay(5L);
-        singleEvent.setUserid(1L);
-        List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
-        if (!ObjectUtils.isEmpty(singleEventList)){
-            return DtoUtil.getSuccesWithDataDto("查询成功",singleEventList,100000);
-        }
-        return DtoUtil.getFalseDto("查询失败",21003);
+        return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
 
     @Override
     public Dto synchronousUpdate(SynchronousUpdateVo synchronousUpdateVo) {
-        if (ObjectUtils.isEmpty(synchronousUpdateVo)){
-            return DtoUtil.getFalseDto("本地上传数据未获取到",25001);
+        if (ObjectUtils.isEmpty(synchronousUpdateVo)) {
+            return DtoUtil.getFalseDto("本地上传数据未获取到", 25001);
         }
-        if (synchronousUpdateVo.getDayEventsList().size()<=0){
-            return DtoUtil.getFalseDto("事件集未获取到",25002);
+        if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
+            return DtoUtil.getFalseDto("事件集未获取到", 25002);
         }
-         List<String> startTime=null;
-        for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()) {
-            for (SingleEvent s:dayEvents.getMySingleEventList()) {
-                if (ObjectUtils.isEmpty(s)){
-                    return DtoUtil.getFalseDto("单一事件为空",25003);
+        List<String> startTime = null;
+        for (DayEvents dayEvents : synchronousUpdateVo.getDayEventsList()) {
+            for (SingleEvent s : dayEvents.getMySingleEventList()) {
+                if (ObjectUtils.isEmpty(s)) {
+                    return DtoUtil.getFalseDto("单一事件为空", 25003);
                 }
                 startTime.add(s.getStarttime());
             }
@@ -128,78 +147,23 @@ public class EventServiceImpl implements EventService {
 
     private static SingleEvent get() {
         SingleEvent singleEvent = new SingleEvent();
-        singleEvent.setEventid(20L);
+        singleEvent.setEventid(22L);
         singleEvent.setUserid(1L);
-        singleEvent.setEventname("测试事件");
-        singleEvent.setStarttime("1557035561");
-        singleEvent.setEndtime("1557035562");
-        singleEvent.setAddress("测试地址");
+        singleEvent.setEventname("测试事件被修改");
+        singleEvent.setStarttime("1557035000");
+        singleEvent.setEndtime("1557035001");
+        singleEvent.setAddress("测试地址被修改");
         singleEvent.setLevel(1L);
         singleEvent.setFlag(1L);
-        singleEvent.setPerson("1");
+        singleEvent.setPerson("1,2,3,4,5,6,7");
         singleEvent.setRemarks("测试");
         singleEvent.setRepeaTtime("10");
-        singleEvent.setIsOverdue(1L);
-        singleEvent.setRemindTime("1557035561");
-        singleEvent.setDay(5L);
-        singleEvent.setMonth(5L);
-        singleEvent.setYear(2019L);
-        singleEvent.setType(1L);
+        singleEvent.setIsOverdue(2L);
+        singleEvent.setRemindTime("1557035000");
+        singleEvent.setDay(4L);
+        singleEvent.setMonth(4L);
+        singleEvent.setYear(2014L);
+        singleEvent.setType(2L);
         return singleEvent;
     }
-
-
-    /*@Override
-    public Dto synchronousUpdate(DayEvents dayEvents) {
-        return null;
-    }
-
-    @Override
-    public Dto addNewEvents(SingleEvent singleEvent) {
-        if (!ObjectUtils.isEmpty(singleEvent)) {
-            if (eventMapper.uploadingEvents(singleEvent.getAddress()) > 0) {
-                return DtoUtil.getSuccessDto("事件上传成功", 100000);
-            } else {
-                return DtoUtil.getFalseDto("事件上传失败", 21001);
-            }
-        }
-        return DtoUtil.getFalseDto("没有内容", 21002);
-    }
-
-    @Override
-    public Dto deleteEvents(DayEvents dayEvents) {
-        if (!ObjectUtils.isEmpty(dayEvents)) {
-            if (eventMapper.withdrawEventsByUserId(dayEvents.getMySingleEventList()) > 0) {
-                return DtoUtil.getSuccessDto("事件删除成功", 100000);
-            } else {
-                return DtoUtil.getFalseDto("事件删除失败", 21003);
-            }
-        }
-        return DtoUtil.getFalseDto("没有内容", 21002);
-    }
-
-    @Override
-    public Dto updateEvents(DayEvents dayEvents) {
-        if (!ObjectUtils.isEmpty(dayEvents)) {
-            if (eventMapper.alterEventsByUserId(dayEvents.getMySingleEventList()) > 0) {
-                return DtoUtil.getSuccessDto("事件修改成功", 100000);
-            } else {
-                return DtoUtil.getFalseDto("事件修改失败", 21004);
-            }
-        }
-        return DtoUtil.getFalseDto("没有内容", 21002);
-    }
-
-    @Override
-    public Dto searchEvents(DayEvents dayEvents) {
-        if (!ObjectUtils.isEmpty(dayEvents)){
-            List<SingleEvent> singleEventList = eventMapper.queryEvents();
-            if(!ObjectUtils.isEmpty(singleEventList)){
-                return DtoUtil.getSuccesWithDataDto("查询成功",singleEventList,100000);
-            }else {
-                return DtoUtil.getFalseDto("查询失败",21005);
-            }
-        }
-        return DtoUtil.getFalseDto("没有内容",21002);
-    }*/
 }

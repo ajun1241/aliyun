@@ -4,22 +4,22 @@
 
     <sql id="Base_Column_List">
         eventId,userId,eventName,startTime,endTime,address,level,flag,
-        person,person,repeatTime,isOverdue,remindTime,day,month,year
+        remarks,person,repeatTime,isOverdue,remindTime,day,month,year,type
     </sql>
 
-    <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.vo.SingleEventForDatabase">
+    <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
             insert into singleevent values
-            (#{eventId},
-            #{userId},
-            #{eventName},
-            #{startTime},
-            #{endTime},
+            (#{eventid},
+            #{userid},
+            #{eventname},
+            #{starttime},
+            #{endtime},
             #{address},
             #{level},
             #{flag},
             #{person},
             #{remarks},
-            #{repeatTime},
+            #{repeaTtime},
             #{isOverdue},
             #{remindTime},
             #{day},
@@ -29,31 +29,28 @@
     </insert>
 
     <delete id="withdrawEventsByUserId">
-        delete from singleevent where id =
+        delete from singleevent where eventId = #{eventid}
     </delete>
 
     <update id="alterEventsByUserId">
-        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
-            update singleevent
-            <set>
-                userId = #{item.userId},
-                eventName = #{item.eventName},
-                startTime = #{item.startTime},
-                endTime = #{item.endTime},
-                address = #{item.address},
-                level = #{item.level},
-                flag = #{item.flag},
-                person = #{item.person},
-                remarks = #{item.remarks},
-                repeatTime = #{item.repeatTime},
-                isOverdue = #{item.isOverdue},
-                remindTime = #{item.remindTime},
-                day = #{item.day},
-                month = #{item.month},
-                year = #{item.year}
-            </set>
-            where id = ${item.id}
-        </foreach>
+            update singleevent set
+                userId = #{userid},
+                eventName = #{eventname},
+                startTime = #{starttime},
+                endTime = #{endtime},
+                address = #{address},
+                level = #{level},
+                flag = #{flag},
+                person = #{person},
+                remarks = #{remarks},
+                repeatTime = #{repeaTtime},
+                isOverdue = #{isOverdue},
+                remindTime = #{remindTime},
+                day = #{day},
+                month = #{month},
+                year = #{year},
+                type = #{type}
+            where eventId = #{eventid}
     </update>
 
     <select id="queryEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
