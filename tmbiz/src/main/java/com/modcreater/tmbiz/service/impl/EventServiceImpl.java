@@ -12,6 +12,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -74,6 +75,22 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto synchronousUpdate(SynchronousUpdateVo synchronousUpdateVo) {
+        if (ObjectUtils.isEmpty(synchronousUpdateVo)){
+            return DtoUtil.getFalseDto("本地上传数据未获取到",25001);
+        }
+        if (synchronousUpdateVo.getDayEventsList().size()<=0){
+            return DtoUtil.getFalseDto("事件集未获取到",25002);
+        }
+         List<Long> startTime=null;
+        for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()) {
+            for (SingleEvent s:dayEvents.getMySingleEventList()) {
+                if (ObjectUtils.isEmpty(s)){
+                    return DtoUtil.getFalseDto("单一事件为空",25003);
+                }
+                startTime.add(s.getStarttime());
+            }
+        }
+
         return null;
     }
 

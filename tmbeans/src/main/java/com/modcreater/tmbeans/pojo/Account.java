@@ -15,13 +15,13 @@ public class Account implements Serializable {
   private String verificationCode;
   private String userName;
   private Long gender;
-  private Date birthday;
+  private String birthday;
   private String IDcard;
   private Date createDate;
   private Date modifyDate;
-  private Date offlineTime;
+  private String offlineTime;
   private Long userType;
   private String headImgUrl;
-  private Date time;
+  private String time;
 
 }

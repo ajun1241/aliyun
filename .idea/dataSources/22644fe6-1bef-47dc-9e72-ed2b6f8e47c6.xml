@@ -861,7 +861,7 @@
     <column id="214" parent="206" name="birthday">
       <Position>7</Position>
       <Comment>生日</Comment>
-      <DataType>timestamp|0s</DataType>
+      <DataType>varchar(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="215" parent="206" name="IDcard">
@@ -886,7 +886,7 @@
     <column id="218" parent="206" name="offlineTime">
       <Position>11</Position>
       <Comment>下线时间(下线时修改)</Comment>
-      <DataType>timestamp|0s</DataType>
+      <DataType>varchar(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="219" parent="206" name="userType">
@@ -904,7 +904,7 @@
     <column id="221" parent="206" name="time">
       <Position>14</Position>
       <Comment>事件修改时间</Comment>
-      <DataType>timestamp|0s</DataType>
+      <DataType>varchar(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <key id="222" parent="206" name="PRIMARY">
@@ -933,18 +933,15 @@
     <column id="226" parent="207" name="startTime">
       <Position>4</Position>
       <Comment>事件开始时间</Comment>
-      <DataType>timestamp|0s</DataType>
+      <DataType>varchar(20)|0s</DataType>
       <NotNull>1</NotNull>
-      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <ColumnKind>normal</ColumnKind>
-      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
     </column>
     <column id="227" parent="207" name="endTime">
       <Position>5</Position>
       <Comment>事件结束时间</Comment>
-      <DataType>timestamp|0s</DataType>
+      <DataType>varchar(20)|0s</DataType>
       <NotNull>1</NotNull>
-      <DefaultExpression>&apos;0000-00-00 00:00:00&apos;</DefaultExpression>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="228" parent="207" name="address">
@@ -992,8 +989,7 @@
     <column id="235" parent="207" name="remindTime">
       <Position>13</Position>
       <Comment>提醒时间</Comment>
-      <DataType>timestamp|0s</DataType>
-      <DefaultExpression>&apos;0000-00-00 00:00:00&apos;</DefaultExpression>
+      <DataType>varchar(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="236" parent="207" name="day">
@@ -1014,7 +1010,13 @@
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <key id="239" parent="207" name="PRIMARY">
+    <column id="239" parent="207" name="type">
+      <Position>17</Position>
+      <Comment>事件分类</Comment>
+      <DataType>bigint(10)|0s</DataType>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <key id="240" parent="207" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>eventId</ColNames>
       <Primary>1</Primary>

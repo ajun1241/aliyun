@@ -72,11 +72,7 @@ public class AccountServiceImpl implements AccountService {
         accountVo.setUserCode(account.getUserCode());
         accountVo.setUserName(account.getUserName());
         accountVo.setGender(account.getGender());
-        try {
-            accountVo.setBirthday(DateUtil.dateToStamp(account.getBirthday()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        account.setBirthday(account.getBirthday());
 //        accountVo.setHeadImgUrl("");
         accountVo.setUserType(account.getUserType());
         return DtoUtil.getSuccesWithDataDto("登录成功!",accountVo,100000);
@@ -97,7 +93,11 @@ public class AccountServiceImpl implements AccountService {
         account.setUserType(loginVo.getUserType());
         account.setUserName("未果新用户");
         account.setGender(0L);
-        account.setBirthday(new Date());
+        try {
+            account.setBirthday(DateUtil.dateToStamp(new Date()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         account.setIDcard("");
         account.setOfflineTime(null);
         account.setHeadImgUrl("");
@@ -115,11 +115,7 @@ public class AccountServiceImpl implements AccountService {
         accountVo.setUserCode(result.getUserCode());
         accountVo.setUserName(result.getUserName());
         accountVo.setGender(result.getGender());
-        try {
-            accountVo.setBirthday(DateUtil.dateToStamp(result.getBirthday()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        accountVo.setBirthday(result.getBirthday());
 //        accountVo.setHeadImgUrl("");
         accountVo.setUserType(result.getUserType());
         return DtoUtil.getSuccesWithDataDto("注册成功",accountVo,100000);
@@ -139,11 +135,7 @@ public class AccountServiceImpl implements AccountService {
         accountVo.setUserCode(account.getUserCode());
         accountVo.setUserName(account.getUserName());
         accountVo.setGender(account.getGender());
-        try {
-            accountVo.setBirthday(DateUtil.dateToStamp(account.getBirthday()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        accountVo.setBirthday(account.getBirthday());
 //        accountVo.setHeadImgUrl("");
         accountVo.setUserType(account.getUserType());
         return DtoUtil.getSuccesWithDataDto("查询用户信息成功",accountVo,100000);
@@ -166,7 +158,7 @@ public class AccountServiceImpl implements AccountService {
         account.setUserName(accountVo.getUserName());
         account.setGender(accountVo.getGender());
         account.setUserType(accountVo.getUserType());
-        account.setBirthday(DateUtil.stampToDate(accountVo.getBirthday()));
+        account.setBirthday(accountVo.getBirthday());
         int result=accountMapper.updateAccount(account);
         if (result<=0){
             return DtoUtil.getFalseDto("用户信息修改失败",13002);
