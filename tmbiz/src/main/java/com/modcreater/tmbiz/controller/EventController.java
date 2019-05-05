@@ -34,8 +34,6 @@ public class EventController {
      */
     @RequestMapping(value = "upl", method = RequestMethod.POST)
     public Dto uploadingEvents(@RequestBody UploadingEventVo uploadingEventVo) {
-
-
         return eventService.addNewEvents(uploadingEventVo);
     }
 
@@ -90,7 +88,7 @@ public class EventController {
 
     @RequestMapping(value = "test")
     public Dto test() {
-        return eventService.updateEvents(null);
+        return eventService.addNewEvents(null);
     }
 
 

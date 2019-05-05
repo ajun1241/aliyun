@@ -1,6 +1,8 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.vo.SingleEventForDatabase;
+import com.modcreater.tmbeans.vo.UploadingEventVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -18,10 +20,10 @@ public interface EventMapper {
     /**
      * 上传新事件
      *
-     * @param singleEvent
+     * @param singleEventForDatabase
      * @return
      */
-    int uploadingEvents(SingleEvent singleEvent);
+    int uploadingEvents(SingleEventForDatabase singleEventForDatabase);
 
     /**
      * 撤销事件

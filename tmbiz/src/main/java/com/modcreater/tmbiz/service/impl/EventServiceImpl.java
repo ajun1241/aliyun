@@ -5,14 +5,13 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.EventMapper;
+import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,7 +29,31 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
-        return null;
+        if (!ObjectUtils.isEmpty(uploadingEventVo)) {
+            SingleEventForDatabase singleEventForDatabase = new SingleEventForDatabase();
+            singleEventForDatabase.setEventId(uploadingEventVo.getEventid());
+            singleEventForDatabase.setUserId(uploadingEventVo.getUserid());
+            singleEventForDatabase.setEventName(uploadingEventVo.getEventname());
+            singleEventForDatabase.setStartTime(DateUtil.stampToDate(String.valueOf(uploadingEventVo.getStarttime())));
+            singleEventForDatabase.setEndTime(DateUtil.stampToDate(String.valueOf(uploadingEventVo.getEndtime())));
+            singleEventForDatabase.setAddress(uploadingEventVo.getAddress());
+            singleEventForDatabase.setLevel(uploadingEventVo.getLevel());
+            singleEventForDatabase.setFlag(uploadingEventVo.getFlag());
+            singleEventForDatabase.setPerson(uploadingEventVo.getPerson());
+            singleEventForDatabase.setRemarks(uploadingEventVo.getRemarks());
+            singleEventForDatabase.setRepeatTime(uploadingEventVo.getRepeaTtime());
+            singleEventForDatabase.setIsOverdue(uploadingEventVo.getIsOverdue());
+            singleEventForDatabase.setRemindTime(DateUtil.stampToDate(String.valueOf(uploadingEventVo.getRemindTime())));
+            singleEventForDatabase.setDay(uploadingEventVo.getDay().intValue());
+            singleEventForDatabase.setMonth(uploadingEventVo.getMonth().intValue());
+            singleEventForDatabase.setYear(uploadingEventVo.getYear().intValue());
+            singleEventForDatabase.setType(uploadingEventVo.getType().intValue());
+            if (eventMapper.uploadingEvents(singleEventForDatabase) > 0) {
+                return DtoUtil.getSuccessDto("事件上传成功", 100000);
+            }
+            return DtoUtil.getFalseDto("事件上传失败", 21001);
+        }
+        return DtoUtil.getFalseDto("没有可上传的事件", 21002);
     }
 
     @Override
@@ -56,6 +79,28 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo) {
         return null;
+    }
+
+    private static SingleEventForDatabase get() {
+        SingleEventForDatabase singleEventForDatabase = new SingleEventForDatabase();
+        singleEventForDatabase.setEventId(20L);
+        singleEventForDatabase.setUserId(1L);
+        singleEventForDatabase.setEventName("测试事件");
+        singleEventForDatabase.setStartTime(new Date());
+        singleEventForDatabase.setEndTime(new Date());
+        singleEventForDatabase.setAddress("测试地址");
+        singleEventForDatabase.setLevel(1L);
+        singleEventForDatabase.setFlag(1L);
+        singleEventForDatabase.setPerson("1");
+        singleEventForDatabase.setRemarks("测试");
+        singleEventForDatabase.setRepeatTime("10");
+        singleEventForDatabase.setIsOverdue(1L);
+        singleEventForDatabase.setRemindTime(new Date());
+        singleEventForDatabase.setDay(5);
+        singleEventForDatabase.setMonth(5);
+        singleEventForDatabase.setYear(2019);
+        singleEventForDatabase.setType(1);
+        return singleEventForDatabase;
     }
 
 

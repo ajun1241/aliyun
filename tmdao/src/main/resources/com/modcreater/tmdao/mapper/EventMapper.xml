@@ -7,23 +7,25 @@
         person,person,repeatTime,isOverdue,remindTime,day,month,year
     </sql>
 
-    <insert id="uploadingEvents">
-            (null,
-            #{item.userId},
-            #{item.eventName},
-            #{item.startTime},
-            #{item.endTime},
-            #{item.address},
-            #{item.level},
-            #{item.flag},
-            #{item.person},
-            #{item.remarks},
-            #{item.repeatTime},
-            #{item.isOverdue},
-            #{item.remindTime},
-            #{item.day},
-            #{item.month},
-            #{item.year})
+    <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.vo.SingleEventForDatabase">
+            insert into singleevent values
+            (#{eventId},
+            #{userId},
+            #{eventName},
+            #{startTime},
+            #{endTime},
+            #{address},
+            #{level},
+            #{flag},
+            #{person},
+            #{remarks},
+            #{repeatTime},
+            #{isOverdue},
+            #{remindTime},
+            #{day},
+            #{month},
+            #{year},
+            #{type})
     </insert>
 
     <delete id="withdrawEventsByUserId">
