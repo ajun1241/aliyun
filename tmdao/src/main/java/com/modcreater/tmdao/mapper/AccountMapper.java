@@ -54,4 +54,10 @@ public interface AccountMapper {
      */
     int updateTimestampUnderAccount(String id ,String time);
 
+    /**
+     * 查询时间戳
+     * @param id
+     * @return
+     */
+    String queryTime(String id);
 }

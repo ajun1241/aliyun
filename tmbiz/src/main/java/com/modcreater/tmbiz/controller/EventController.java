@@ -83,7 +83,7 @@ public class EventController {
 
     @RequestMapping(value = "ctime",method = RequestMethod.POST)
     public Dto contrastTimestamp(@RequestBody ContrastTimestampVo contrastTimestampVo){
-        return null;
+        return eventService.contrastTimestamp(contrastTimestampVo);
     }
 
     @RequestMapping(value = "test")

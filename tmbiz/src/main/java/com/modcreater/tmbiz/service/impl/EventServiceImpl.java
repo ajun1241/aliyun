@@ -10,13 +10,11 @@ import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -151,7 +149,7 @@ public class EventServiceImpl implements EventService {
         if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
             return DtoUtil.getFalseDto("事件集未获取到", 25002);
         }
-        List<Integer> dayEventIds=null;
+        List<Integer> dayEventIds=new ArrayList<>();
         for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()){
             dayEventIds.add(dayEvents.getDayEventId());
         }
@@ -160,9 +158,10 @@ public class EventServiceImpl implements EventService {
         String year=null;
         String month=null;
         String day=null;
-        List<SingleEvent> singleEvents=null;
+        List<SingleEvent> singleEvents=new ArrayList<>();
         for (int i = 0; i <dayEventIds.size() ; i++) {
-            stringBuffer=new StringBuffer(dayEventIds.get(i));
+            stringBuffer=new StringBuffer(dayEventIds.get(i).toString());
+//            System.out.println(stringBuffer);
             year=stringBuffer.substring(0,4);
             month=stringBuffer.substring(4, 6);
             day=stringBuffer.substring(6, 8);
@@ -192,12 +191,30 @@ public class EventServiceImpl implements EventService {
                 }
             }
         }
+        //修改时间戳
+        try {
+            int i=accountMapper.updateTimestampUnderAccount(synchronousUpdateVo.getUserId(),DateUtil.dateToStamp(new Date()));
+            if (i<=0){
+                return DtoUtil.getFalseDto("同步数据时修改时间戳失败",25006);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return DtoUtil.getSuccessDto("数据同步成功",100000);
     }
 
     @Override
     public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo) {
-        return null;
+        if (ObjectUtils.isEmpty(contrastTimestampVo)){
+            return DtoUtil.getFalseDto("时间戳获取失败",24001);
+        }
+        String time=accountMapper.queryTime(contrastTimestampVo.getUserId());
+        if (StringUtils.isEmpty(time)){
+            return DtoUtil.getFalseDto("查询时间戳失败",200000);
+        }
+        Map map=new HashMap();
+        map.put("time",time);
+        return DtoUtil.getSuccesWithDataDto("查询时间戳成功",map,100000);
     }
 
     private static SingleEvent get() {
