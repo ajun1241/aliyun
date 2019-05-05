@@ -29,6 +29,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
+
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
             SingleEventForDatabase singleEventForDatabase = new SingleEventForDatabase();
             singleEventForDatabase.setEventId(uploadingEventVo.getEventid());
