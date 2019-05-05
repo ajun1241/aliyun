@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.modcreater.tmdao.mapper.AccountMapper" >
-    <select id="doLogin" parameterType="com.modcreater.tmbeans.vo.LoginVo" resultType="com.modcreater.tmbeans.pojo.Account">
+<mapper namespace="com.modcreater.tmdao.mapper.AccountMapper">
+    <select id="doLogin" parameterType="com.modcreater.tmbeans.vo.LoginVo"
+            resultType="com.modcreater.tmbeans.pojo.Account">
         select * from account where userCode=#{userCode} and userPassword=#{userPassword}
     </select>
 
@@ -36,22 +37,32 @@
         select * from account where id=#{id}
     </select>
 
-    <update id="updateAccount" parameterType="com.modcreater.tmbeans.pojo.Account" >
+    <update id="updateAccount" parameterType="com.modcreater.tmbeans.pojo.Account">
         update account
         <set>
-            <if test="userName != null and userName!=''" >
+            <if test="userName != null and userName!=''">
                 userName = #{userName},
             </if>
-            <if test="gender > 0 " >
+            <if test="gender > 0 ">
                 gender = #{gender},
             </if>
-            <if test="birthday != null" >
+            <if test="birthday != null">
                 birthday = #{birthday},
             </if>
-            <if test="modifyDate != null" >
+            <if test="modifyDate != null">
                 modifyDate = #{modifyDate},
             </if>
         </set>
         where id=#{id}
+    </update>
+
+    <update id="updateTimestampUnderAccount">
+        update account
+        <set>
+            <if test="time != null and time != ''">
+                time = #{time}
+            </if>
+        </set>
+        where id = #{id}
     </update>
 </mapper>

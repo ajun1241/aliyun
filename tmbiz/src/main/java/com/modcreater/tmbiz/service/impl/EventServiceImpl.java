@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbiz.service.EventService;
+import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -29,6 +31,9 @@ public class EventServiceImpl implements EventService {
 
     @Resource
     private EventMapper eventMapper;
+
+    @Resource
+    private AccountMapper accountMapper;
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
@@ -52,7 +57,13 @@ public class EventServiceImpl implements EventService {
             singleEvent.setYear(uploadingEventVo.getYear());
             singleEvent.setType(uploadingEventVo.getType());
             if (eventMapper.uploadingEvents(singleEvent) > 0) {
-                return DtoUtil.getSuccessDto("事件上传成功", 100000);
+                try {
+                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
+                        return DtoUtil.getSuccessDto("事件上传成功", 100000);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
             return DtoUtil.getFalseDto("事件上传失败", 21001);
         }
@@ -66,7 +77,13 @@ public class EventServiceImpl implements EventService {
             singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
             singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
             if (eventMapper.withdrawEventsByUserId(singleEvent) > 0) {
-                return DtoUtil.getFalseDto("删除成功", 100000);
+                try {
+                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
+                        return DtoUtil.getFalseDto("删除成功", 100000);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
             return DtoUtil.getFalseDto("删除事件失败", 21005);
         }
@@ -75,7 +92,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto updateEvents(UpdateEventVo updateEventVo) {
-        if (!ObjectUtils.isEmpty(updateEventVo)){
+        if (!ObjectUtils.isEmpty(updateEventVo)) {
             SingleEvent singleEvent = new SingleEvent();
             singleEvent.setEventid(updateEventVo.getEventid());
             singleEvent.setUserid(updateEventVo.getUserid());
@@ -94,12 +111,18 @@ public class EventServiceImpl implements EventService {
             singleEvent.setMonth(updateEventVo.getMonth());
             singleEvent.setYear(updateEventVo.getYear());
             singleEvent.setType(updateEventVo.getType());
-            if (eventMapper.alterEventsByUserId(singleEvent) > 0){
-                return DtoUtil.getSuccessDto("修改成功",100000);
+            if (eventMapper.alterEventsByUserId(singleEvent) > 0) {
+                try {
+                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
+                        return DtoUtil.getSuccessDto("修改成功", 100000);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
-            return DtoUtil.getFalseDto("修改事件失败",21007);
+            return DtoUtil.getFalseDto("修改事件失败", 21007);
         }
-        return DtoUtil.getFalseDto("修改条件接收失败",21008);
+        return DtoUtil.getFalseDto("修改条件接收失败", 21008);
     }
 
     @Override
@@ -137,11 +160,11 @@ public class EventServiceImpl implements EventService {
                 startTime.add(s.getStarttime());
             }
         }*/
-        Iterator<DayEvents> dayEventsIterator=synchronousUpdateVo.getDayEventsList().iterator();
-        while (dayEventsIterator.hasNext()){
+        Iterator<DayEvents> dayEventsIterator = synchronousUpdateVo.getDayEventsList().iterator();
+        while (dayEventsIterator.hasNext()) {
             System.out.println(dayEventsIterator.next().toString());
-            Iterator singleEvents=dayEventsIterator.next().getMySingleEventList().iterator();
-            while (singleEvents.hasNext()){
+            Iterator singleEvents = dayEventsIterator.next().getMySingleEventList().iterator();
+            while (singleEvents.hasNext()) {
                 System.out.println(singleEvents.next().toString());
             }
         }
@@ -157,15 +180,15 @@ public class EventServiceImpl implements EventService {
     private static SingleEvent get() {
         SingleEvent singleEvent = new SingleEvent();
         singleEvent.setEventid(22L);
-        singleEvent.setUserid(1L);
-        singleEvent.setEventname("测试事件被修改");
+        singleEvent.setUserid(100019L);
+        singleEvent.setEventname("测试事件修改时间戳");
         singleEvent.setStarttime("1557035000");
         singleEvent.setEndtime("1557035001");
-        singleEvent.setAddress("测试地址被修改");
+        singleEvent.setAddress("测试地址修改时间戳");
         singleEvent.setLevel(1L);
         singleEvent.setFlag(1L);
         singleEvent.setPerson("1,2,3,4,5,6,7");
-        singleEvent.setRemarks("测试");
+        singleEvent.setRemarks("测试修改时间戳");
         singleEvent.setRepeaTtime("10");
         singleEvent.setIsOverdue(2L);
         singleEvent.setRemindTime("1557035000");

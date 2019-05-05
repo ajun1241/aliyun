@@ -46,4 +46,12 @@ public interface AccountMapper {
      */
     int updateAccount(Account account);
 
+    /**
+     * 修改用户表下的时间戳
+     * @param id 用户ID
+     * @param time 时间戳
+     * @return
+     */
+    int updateTimestampUnderAccount(String id ,String time);
+
 }
