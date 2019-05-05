@@ -16,7 +16,7 @@ public interface AccountMapper {
      * 登录
      * @return
      */
-    String doLogin(LoginVo loginVo);
+    Account doLogin(LoginVo loginVo);
 
     /**
      * 注册

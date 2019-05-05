@@ -63,11 +63,11 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("用户未注册，请先注册",11002);
         }
         //老用户直接登录
-        String id= accountMapper.doLogin(loginVo);
-        if (ObjectUtils.isEmpty(id)){
-            return DtoUtil.getFalseDto("登录失败!",200000);
+        Account account= accountMapper.doLogin(loginVo);
+        if (ObjectUtils.isEmpty(account)){
+            return DtoUtil.getFalseDto("登录失败,用户名或密码错误",200000);
         }
-        Account account=accountMapper.queryAccount(id);
+//        Account account=accountMapper.queryAccount(id);
         accountVo.setId(account.getId());
         accountVo.setUserCode(account.getUserCode());
         accountVo.setUserName(account.getUserName());
@@ -93,6 +93,7 @@ public class AccountServiceImpl implements AccountService {
         }
         Account account=new Account();
         account.setUserCode(loginVo.getUserCode());
+        account.setUserPassword(loginVo.getUserPassword());
         account.setUserType(loginVo.getUserType());
         account.setUserName("未果新用户");
         account.setGender(0L);
