@@ -20,10 +20,10 @@ public interface EventMapper {
     /**
      * 上传新事件
      *
-     * @param singleEventForDatabase
+     * @param singleEvent
      * @return
      */
-    int uploadingEvents(SingleEventForDatabase singleEventForDatabase);
+    int uploadingEvents(SingleEvent singleEvent);
 
     /**
      * 撤销事件
@@ -44,10 +44,10 @@ public interface EventMapper {
     /**
      * 查询事件
      *
-     * @param singleEvents
+     * @param singleEvent
      * @return
      */
-    List<SingleEvent> queryEvents(SingleEvent singleEvents);
+    List<SingleEvent> queryEvents(SingleEvent singleEvent);
 
 
 }

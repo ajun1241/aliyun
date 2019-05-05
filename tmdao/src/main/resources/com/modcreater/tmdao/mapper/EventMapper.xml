@@ -3,7 +3,7 @@
 <mapper namespace="com.modcreater.tmdao.mapper.EventMapper">
 
     <sql id="Base_Column_List">
-        id,userId,eventName,startTime,endTime,address,level,flag,
+        eventId,userId,eventName,startTime,endTime,address,level,flag,
         person,person,repeatTime,isOverdue,remindTime,day,month,year
     </sql>
 
@@ -61,20 +61,17 @@
         <include refid="Base_Column_List"/>
         from singleevent
         <where>
-            <if test="id != null">
-                id = #{id}
-            </if>
-            <if test="userId != null">
-                userId = #{userId}
+            <if test="userid != null">
+                userid = #{userid}
             </if>
             <if test="day != null">
-                day = #{day}
+                and day = #{day}
             </if>
             <if test="month != null">
-                month = #{month}
+                and month = #{month}
             </if>
             <if test="year != null">
-                year = #{year}
+                and year = #{year}
             </if>
         </where>
     </select>

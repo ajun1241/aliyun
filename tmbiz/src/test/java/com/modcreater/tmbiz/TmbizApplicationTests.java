@@ -22,4 +22,10 @@ public class TmbizApplicationTests {
         System.out.println(timeStamp);
     }
 
+    @Test
+    public void test1(){
+        StringBuilder stringBuilder = new StringBuilder("20190506");
+        System.out.println(stringBuilder.substring(6,8));
+    }
+
 }

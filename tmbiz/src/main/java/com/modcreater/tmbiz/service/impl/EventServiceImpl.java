@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,14 +31,13 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
-
-        if (!ObjectUtils.isEmpty(uploadingEventVo)) {
+        /*if (!ObjectUtils.isEmpty(uploadingEventVo)) {
             SingleEventForDatabase singleEventForDatabase = new SingleEventForDatabase();
             singleEventForDatabase.setEventId(uploadingEventVo.getEventid());
             singleEventForDatabase.setUserId(uploadingEventVo.getUserid());
             singleEventForDatabase.setEventName(uploadingEventVo.getEventname());
-            singleEventForDatabase.setStartTime(DateUtil.stampToDate(String.valueOf(uploadingEventVo.getStarttime())));
-            singleEventForDatabase.setEndTime(DateUtil.stampToDate(String.valueOf(uploadingEventVo.getEndtime())));
+            singleEventForDatabase.setStartTime(uploadingEventVo.getStarttime());
+            singleEventForDatabase.setEndTime(uploadingEventVo.getEndtime());
             singleEventForDatabase.setAddress(uploadingEventVo.getAddress());
             singleEventForDatabase.setLevel(uploadingEventVo.getLevel());
             singleEventForDatabase.setFlag(uploadingEventVo.getFlag());
@@ -45,7 +45,7 @@ public class EventServiceImpl implements EventService {
             singleEventForDatabase.setRemarks(uploadingEventVo.getRemarks());
             singleEventForDatabase.setRepeatTime(uploadingEventVo.getRepeaTtime());
             singleEventForDatabase.setIsOverdue(uploadingEventVo.getIsOverdue());
-            singleEventForDatabase.setRemindTime(DateUtil.stampToDate(String.valueOf(uploadingEventVo.getRemindTime())));
+            singleEventForDatabase.setRemindTime(uploadingEventVo.getRemindTime());
             singleEventForDatabase.setDay(uploadingEventVo.getDay().intValue());
             singleEventForDatabase.setMonth(uploadingEventVo.getMonth().intValue());
             singleEventForDatabase.setYear(uploadingEventVo.getYear().intValue());
@@ -55,7 +55,11 @@ public class EventServiceImpl implements EventService {
             }
             return DtoUtil.getFalseDto("事件上传失败", 21001);
         }
-        return DtoUtil.getFalseDto("没有可上传的事件", 21002);
+        return DtoUtil.getFalseDto("没有可上传的事件", 21002);*/
+        if (eventMapper.uploadingEvents(get()) > 0) {
+            return DtoUtil.getSuccessDto("事件上传成功", 100000);
+        }
+        return DtoUtil.getFalseDto("事件上传失败", 21001);
     }
 
     @Override
@@ -70,7 +74,30 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto searchEvents(SearchEventVo searchEventVo) {
-        return null;
+        /*if (!ObjectUtils.isEmpty(searchEventVo)){
+            StringBuilder date = new StringBuilder(searchEventVo.getDayEventId());
+            SingleEvent singleEvent = new SingleEvent();
+            singleEvent.setYear(Long.valueOf(date.substring(0,4)));
+            singleEvent.setMonth(Long.valueOf(date.substring(4,6)));
+            singleEvent.setDay(Long.valueOf(date.substring(6,8)));
+            singleEvent.setUserid(Long.valueOf(searchEventVo.getUserId()));
+            List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+            if (!ObjectUtils.isEmpty(singleEventList)){
+                return DtoUtil.getSuccesWithDataDto("查询成功",singleEventList,100000);
+            }
+            return DtoUtil.getFalseDto("查询失败",21003);
+        }
+        return DtoUtil.getFalseDto("查询条件接收失败",21004);*/
+        SingleEvent singleEvent = new SingleEvent();
+        singleEvent.setYear(2019L);
+        singleEvent.setMonth(5L);
+        singleEvent.setDay(5L);
+        singleEvent.setUserid(1L);
+        List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+        if (!ObjectUtils.isEmpty(singleEventList)){
+            return DtoUtil.getSuccesWithDataDto("查询成功",singleEventList,100000);
+        }
+        return DtoUtil.getFalseDto("查询失败",21003);
     }
 
     @Override
@@ -81,7 +108,7 @@ public class EventServiceImpl implements EventService {
         if (synchronousUpdateVo.getDayEventsList().size()<=0){
             return DtoUtil.getFalseDto("事件集未获取到",25002);
         }
-         List<Long> startTime=null;
+         List<String> startTime=null;
         for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()) {
             for (SingleEvent s:dayEvents.getMySingleEventList()) {
                 if (ObjectUtils.isEmpty(s)){
@@ -99,26 +126,26 @@ public class EventServiceImpl implements EventService {
         return null;
     }
 
-    private static SingleEventForDatabase get() {
-        SingleEventForDatabase singleEventForDatabase = new SingleEventForDatabase();
-        singleEventForDatabase.setEventId(20L);
-        singleEventForDatabase.setUserId(1L);
-        singleEventForDatabase.setEventName("测试事件");
-        singleEventForDatabase.setStartTime(new Date());
-        singleEventForDatabase.setEndTime(new Date());
-        singleEventForDatabase.setAddress("测试地址");
-        singleEventForDatabase.setLevel(1L);
-        singleEventForDatabase.setFlag(1L);
-        singleEventForDatabase.setPerson("1");
-        singleEventForDatabase.setRemarks("测试");
-        singleEventForDatabase.setRepeatTime("10");
-        singleEventForDatabase.setIsOverdue(1L);
-        singleEventForDatabase.setRemindTime(new Date());
-        singleEventForDatabase.setDay(5);
-        singleEventForDatabase.setMonth(5);
-        singleEventForDatabase.setYear(2019);
-        singleEventForDatabase.setType(1);
-        return singleEventForDatabase;
+    private static SingleEvent get() {
+        SingleEvent singleEvent = new SingleEvent();
+        singleEvent.setEventid(20L);
+        singleEvent.setUserid(1L);
+        singleEvent.setEventname("测试事件");
+        singleEvent.setStarttime("1557035561");
+        singleEvent.setEndtime("1557035562");
+        singleEvent.setAddress("测试地址");
+        singleEvent.setLevel(1L);
+        singleEvent.setFlag(1L);
+        singleEvent.setPerson("1");
+        singleEvent.setRemarks("测试");
+        singleEvent.setRepeaTtime("10");
+        singleEvent.setIsOverdue(1L);
+        singleEvent.setRemindTime("1557035561");
+        singleEvent.setDay(5L);
+        singleEvent.setMonth(5L);
+        singleEvent.setYear(2019L);
+        singleEvent.setType(1L);
+        return singleEvent;
     }
 
 

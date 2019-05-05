@@ -33,11 +33,11 @@ public class SingleEventForDatabase {
     /**
      * 开始时间
      */
-    private Date startTime;
+    private String startTime;
     /**
      * 结束时间
      */
-    private Date endTime;
+    private String endTime;
     /**
      * 地址
      */
@@ -73,7 +73,7 @@ public class SingleEventForDatabase {
     /**
      * 提醒时间
      */
-    private Date remindTime;
+    private String remindTime;
     /**
      * 年
      */
