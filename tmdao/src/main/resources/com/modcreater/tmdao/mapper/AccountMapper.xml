@@ -48,6 +48,9 @@
             <if test="birthday != null" >
                 birthday = #{birthday},
             </if>
+            <if test="modifyDate != null" >
+                modifyDate = #{modifyDate},
+            </if>
         </set>
         where id=#{id}
     </update>

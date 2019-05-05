@@ -72,7 +72,7 @@ public class AccountServiceImpl implements AccountService {
         accountVo.setUserCode(account.getUserCode());
         accountVo.setUserName(account.getUserName());
         accountVo.setGender(account.getGender());
-        account.setBirthday(account.getBirthday());
+        accountVo.setBirthday(account.getBirthday());
 //        accountVo.setHeadImgUrl("");
         accountVo.setUserType(account.getUserType());
         return DtoUtil.getSuccesWithDataDto("登录成功!",accountVo,100000);
@@ -154,11 +154,11 @@ public class AccountServiceImpl implements AccountService {
         }
         Account account=new Account();
         account.setId(accountVo.getId());
-        account.setUserCode(accountVo.getUserCode());
         account.setUserName(accountVo.getUserName());
         account.setGender(accountVo.getGender());
         account.setUserType(accountVo.getUserType());
         account.setBirthday(accountVo.getBirthday());
+        account.setModifyDate(new Date());
         int result=accountMapper.updateAccount(account);
         if (result<=0){
             return DtoUtil.getFalseDto("用户信息修改失败",13002);
