@@ -6,9 +6,8 @@
         id,userId,eventName,startTime,endTime,address,level,flag,
         person,person,repeatTime,isOverdue,remindTime,day,month,year
     </sql>
-    
+
     <insert id="uploadingEvents">
-        insert into singleevent values 
             (null,
             #{item.userId},
             #{item.eventName},
@@ -56,7 +55,9 @@
     </update>
 
     <select id="queryEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select <include refid="Base_Column_List"/> from singleevent
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
         <where>
             <if test="id != null">
                 id = #{id}

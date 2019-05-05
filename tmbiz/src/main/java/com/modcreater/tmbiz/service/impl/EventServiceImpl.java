@@ -2,7 +2,7 @@ package com.modcreater.tmbiz.service.impl;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
-import com.modcreater.tmbeans.vo.DayEvents;
+import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DtoUtil;
@@ -27,6 +27,36 @@ public class EventServiceImpl implements EventService {
 
     @Resource
     private EventMapper eventMapper;
+
+    @Override
+    public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
+        return null;
+    }
+
+    @Override
+    public Dto deleteEvents(DeleteEventVo deleteEventVo) {
+        return null;
+    }
+
+    @Override
+    public Dto updateEvents(UpdateEventVo updateEventVo) {
+        return null;
+    }
+
+    @Override
+    public Dto searchEvents(SearchEventVo searchEventVo) {
+        return null;
+    }
+
+    @Override
+    public Dto synchronousUpdate(SynchronousUpdateVo synchronousUpdateVo) {
+        return null;
+    }
+
+    @Override
+    public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo) {
+        return null;
+    }
 
 
     /*@Override
