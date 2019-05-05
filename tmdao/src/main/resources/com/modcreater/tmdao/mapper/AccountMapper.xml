@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.AccountMapper" >
-    <select id="doLogin" parameterType="com.modcreater.tmbeans.vo.LoginVo" resultType="String">
-        select id from account where userCode=#{userCode}
+    <select id="doLogin" parameterType="com.modcreater.tmbeans.vo.LoginVo" resultType="com.modcreater.tmbeans.pojo.Account">
+        select * from account where userCode=#{userCode} and userPassword=#{userPassword}
     </select>
 
     <insert id="register" parameterType="com.modcreater.tmbeans.pojo.Account">
         insert into account
             (userCode,
+            userPassword,
             userName,
             gender,
             birthday,
@@ -17,6 +18,7 @@
             headImgUrl,
             time)
         values (#{userCode}
+            ,#{userPassword}
             ,#{userName}
             ,#{gender}
             ,#{birthday}
