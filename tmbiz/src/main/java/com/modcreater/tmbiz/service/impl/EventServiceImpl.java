@@ -151,25 +151,48 @@ public class EventServiceImpl implements EventService {
         if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
             return DtoUtil.getFalseDto("事件集未获取到", 25002);
         }
-        /*List<String> startTime=null;
-        for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()) {
-            for (SingleEvent s:dayEvents.getMySingleEventList()) {
-                if (ObjectUtils.isEmpty(s)){
-                    return DtoUtil.getFalseDto("单一事件为空",25003);
-                }
-                startTime.add(s.getStarttime());
-            }
-        }*/
-        Iterator<DayEvents> dayEventsIterator = synchronousUpdateVo.getDayEventsList().iterator();
-        while (dayEventsIterator.hasNext()) {
-            System.out.println(dayEventsIterator.next().toString());
-            Iterator singleEvents = dayEventsIterator.next().getMySingleEventList().iterator();
-            while (singleEvents.hasNext()) {
-                System.out.println(singleEvents.next().toString());
+        List<Integer> dayEventIds=null;
+        for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()){
+            dayEventIds.add(dayEvents.getDayEventId());
+        }
+        //查询时间段内的事件
+        StringBuffer stringBuffer=null;
+        String year=null;
+        String month=null;
+        String day=null;
+        List<SingleEvent> singleEvents=null;
+        for (int i = 0; i <dayEventIds.size() ; i++) {
+            stringBuffer=new StringBuffer(dayEventIds.get(i));
+            year=stringBuffer.substring(0,4);
+            month=stringBuffer.substring(4, 6);
+            day=stringBuffer.substring(6, 8);
+            SingleEvent singleEvent=new SingleEvent();
+            singleEvent.setYear(Long.parseLong(year));
+            singleEvent.setMonth(Long.parseLong(month));
+            singleEvent.setDay(Long.parseLong(day));
+            singleEvents=eventMapper.queryEvents(singleEvent);
+            if (ObjectUtils.isEmpty(singleEvents)){
+                return DtoUtil.getFalseDto("该时间段内没有事件",25003);
             }
         }
-
-        return null;
+        //删除事件
+        for (int i = 0; i <singleEvents.size() ; i++) {
+            int delResult=eventMapper.withdrawEventsByUserId(singleEvents.get(i));
+            if (delResult<=0){
+                return DtoUtil.getFalseDto("删除失败",25004);
+            }
+        }
+       //上传事件
+        for (int i = 0; i < synchronousUpdateVo.getDayEventsList().size(); i++) {
+            DayEvents dayEvents=synchronousUpdateVo.getDayEventsList().get(i);
+            for (int j = 0; j < dayEvents.getMySingleEventList().size(); j++) {
+                int uplResult=eventMapper.uploadingEvents(dayEvents.getMySingleEventList().get(j));
+                if (uplResult<=0){
+                    return DtoUtil.getFalseDto("上传事件失败",25005);
+                }
+            }
+        }
+        return DtoUtil.getSuccessDto("数据同步成功",100000);
     }
 
     @Override
