@@ -17,5 +17,6 @@ public class AccountVo implements Serializable {
     private long gender;
     private String birthday;
     private long userType;
+    private String time;
 //    private String headImgUrl;
 }

@@ -73,6 +73,7 @@ public class AccountServiceImpl implements AccountService {
         accountVo.setUserName(account.getUserName());
         accountVo.setGender(account.getGender());
         accountVo.setBirthday(account.getBirthday());
+        accountVo.setTime(account.getTime());
 //        accountVo.setHeadImgUrl("");
         accountVo.setUserType(account.getUserType());
         return DtoUtil.getSuccesWithDataDto("登录成功!",accountVo,100000);
@@ -138,6 +139,7 @@ public class AccountServiceImpl implements AccountService {
         accountVo.setBirthday(account.getBirthday());
 //        accountVo.setHeadImgUrl("");
         accountVo.setUserType(account.getUserType());
+        accountVo.setTime(account.getTime());
         return DtoUtil.getSuccesWithDataDto("查询用户信息成功",accountVo,100000);
     }
 
