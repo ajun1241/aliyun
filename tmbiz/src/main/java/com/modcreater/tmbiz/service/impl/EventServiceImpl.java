@@ -8,6 +8,7 @@ import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.SingleUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -36,7 +37,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
-            SingleEvent singleEvent = get(uploadingEventVo);
+            SingleEvent singleEvent = SingleUtil.get(uploadingEventVo);
             if (eventMapper.uploadingEvents(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
@@ -76,7 +77,7 @@ public class EventServiceImpl implements EventService {
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (!ObjectUtils.isEmpty(updateEventVo)) {
 
-            SingleEvent singleEvent = get(updateEventVo);
+            SingleEvent singleEvent = SingleUtil.get(updateEventVo);
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
@@ -184,33 +185,5 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("不需要同步",24002);
         }
        return DtoUtil.getSuccessDto("需要同步",100000);
-    }
-
-    public static SingleEvent get(Object object) {
-        if (SingleEvent.class.isAssignableFrom(object.getClass())) {
-            SingleEvent singleEvent = new SingleEvent();
-            try {
-                singleEvent.setEventid((Long) object.getClass().getMethod("getEventid").invoke(object));
-                singleEvent.setUserid((Long) object.getClass().getMethod("getUserid").invoke(object));
-                singleEvent.setEventname((String) object.getClass().getMethod("getEventname").invoke(object));
-                singleEvent.setStarttime((String) object.getClass().getMethod("getStarttime").invoke(object));
-                singleEvent.setEndtime((String) object.getClass().getMethod("getEndtime").invoke(object));
-                singleEvent.setAddress((String) object.getClass().getMethod("getAddress").invoke(object));
-                singleEvent.setLevel((Long) object.getClass().getMethod("getLevel").invoke(object));
-                singleEvent.setFlag((Long) object.getClass().getMethod("getFlag").invoke(object));
-                singleEvent.setPerson((String) object.getClass().getMethod("getPerson").invoke(object));
-                singleEvent.setRemarks((String) object.getClass().getMethod("getRemarks").invoke(object));
-                singleEvent.setRepeaTtime((String) object.getClass().getMethod("getRepeaTtime").invoke(object));
-                singleEvent.setIsOverdue((Long) object.getClass().getMethod("getIsOverdue").invoke(object));
-                singleEvent.setRemindTime((String) object.getClass().getMethod("getRemindTime").invoke(object));
-                singleEvent.setDay((Long) object.getClass().getMethod("getDay").invoke(object));
-                singleEvent.setMonth((Long) object.getClass().getMethod("getMonth").invoke(object));
-                singleEvent.setYear((Long) object.getClass().getMethod("getYear").invoke(object));
-                singleEvent.setType((Long) object.getClass().getMethod("getType").invoke(object));
-            } catch (ReflectiveOperationException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 }
