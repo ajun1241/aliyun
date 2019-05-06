@@ -210,11 +210,12 @@ public class EventServiceImpl implements EventService {
         }
         String time=accountMapper.queryTime(contrastTimestampVo.getUserId());
         if (StringUtils.isEmpty(time)){
-            return DtoUtil.getFalseDto("查询时间戳失败",200000);
+            return DtoUtil.getFalseDto("查询时间戳失败",24003);
         }
-        Map map=new HashMap();
-        map.put("time",time);
-        return DtoUtil.getSuccesWithDataDto("查询时间戳成功",map,100000);
+        if(Long.parseLong(contrastTimestampVo.getTime())-Long.parseLong(time)<=3){
+            return DtoUtil.getFalseDto("不需要同步",24002);
+        }
+       return DtoUtil.getSuccessDto("需要同步",100000);
     }
 
     private static SingleEvent get() {
