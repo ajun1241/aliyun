@@ -116,72 +116,73 @@ public class EventServiceImpl implements EventService {
         if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
             return DtoUtil.getFalseDto("事件集未获取到", 25002);
         }
-        List<Integer> dayEventIds = new ArrayList<>();
-        for (DayEvents dayEvents : synchronousUpdateVo.getDayEventsList()) {
+        List<Integer> dayEventIds=new ArrayList<>();
+        for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()){
             dayEventIds.add(dayEvents.getDayEventId());
         }
         //查询时间段内的事件
-        StringBuffer stringBuffer = null;
-        String year = null;
-        String month = null;
-        String day = null;
-        List<SingleEvent> singleEvents = new ArrayList<>();
-        for (int i = 0; i < dayEventIds.size(); i++) {
-            stringBuffer = new StringBuffer(dayEventIds.get(i).toString());
+        StringBuffer stringBuffer=null;
+        String year=null;
+        String month=null;
+        String day=null;
+        List<SingleEvent> singleEvents=new ArrayList<>();
+        for (int i = 0; i <dayEventIds.size() ; i++) {
+            stringBuffer=new StringBuffer(dayEventIds.get(i).toString());
 //            System.out.println(stringBuffer);
-            year = stringBuffer.substring(0, 4);
-            month = stringBuffer.substring(4, 6);
-            day = stringBuffer.substring(6, 8);
-            SingleEvent singleEvent = new SingleEvent();
+            year=stringBuffer.substring(0,4);
+            month=stringBuffer.substring(4, 6);
+            day=stringBuffer.substring(6, 8);
+            SingleEvent singleEvent=new SingleEvent();
             singleEvent.setYear(Long.parseLong(year));
             singleEvent.setMonth(Long.parseLong(month));
             singleEvent.setDay(Long.parseLong(day));
-            singleEvents = eventMapper.queryEvents(singleEvent);
-            if (ObjectUtils.isEmpty(singleEvents)) {
-                return DtoUtil.getFalseDto("该时间段内没有事件", 25003);
+            singleEvents=eventMapper.queryEvents(singleEvent);
+            if (ObjectUtils.isEmpty(singleEvents)){
+                return DtoUtil.getFalseDto("该时间段内没有事件",25003);
             }
         }
         //删除事件
-        for (int i = 0; i < singleEvents.size(); i++) {
-            int delResult = eventMapper.withdrawEventsByUserId(singleEvents.get(i));
-            if (delResult <= 0) {
-                return DtoUtil.getFalseDto("删除失败", 25004);
+        for (int i = 0; i <singleEvents.size() ; i++) {
+            int delResult=eventMapper.withdrawEventsByUserId(singleEvents.get(i));
+            if (delResult<=0){
+                return DtoUtil.getFalseDto("删除失败",25004);
             }
         }
-        //上传事件
+       //上传事件
         for (int i = 0; i < synchronousUpdateVo.getDayEventsList().size(); i++) {
-            DayEvents dayEvents = synchronousUpdateVo.getDayEventsList().get(i);
+            DayEvents dayEvents=synchronousUpdateVo.getDayEventsList().get(i);
             for (int j = 0; j < dayEvents.getMySingleEventList().size(); j++) {
-                int uplResult = eventMapper.uploadingEvents(dayEvents.getMySingleEventList().get(j));
-                if (uplResult <= 0) {
-                    return DtoUtil.getFalseDto("上传事件失败", 25005);
+                int uplResult=eventMapper.uploadingEvents(dayEvents.getMySingleEventList().get(j));
+                if (uplResult<=0){
+                    return DtoUtil.getFalseDto("上传事件失败",25005);
                 }
             }
         }
         //修改时间戳
         try {
-            int i = accountMapper.updateTimestampUnderAccount(synchronousUpdateVo.getUserId(), DateUtil.dateToStamp(new Date()));
-            if (i <= 0) {
-                return DtoUtil.getFalseDto("同步数据时修改时间戳失败", 25006);
+            int i=accountMapper.updateTimestampUnderAccount(synchronousUpdateVo.getUserId(),DateUtil.dateToStamp(new Date()));
+            if (i<=0){
+                return DtoUtil.getFalseDto("同步数据时修改时间戳失败",25006);
             }
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return DtoUtil.getSuccessDto("数据同步成功", 100000);
+        return DtoUtil.getSuccessDto("数据同步成功",100000);
     }
 
     @Override
     public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo) {
-        if (ObjectUtils.isEmpty(contrastTimestampVo)) {
-            return DtoUtil.getFalseDto("时间戳获取失败", 24001);
+        if (ObjectUtils.isEmpty(contrastTimestampVo)){
+            return DtoUtil.getFalseDto("时间戳获取失败",24001);
         }
-        String time = accountMapper.queryTime(contrastTimestampVo.getUserId());
-        if (StringUtils.isEmpty(time)) {
-            return DtoUtil.getFalseDto("查询时间戳失败", 200000);
+        String time=accountMapper.queryTime(contrastTimestampVo.getUserId());
+        if (StringUtils.isEmpty(time)){
+            return DtoUtil.getFalseDto("查询时间戳失败",24003);
         }
-        Map map = new HashMap();
-        map.put("time", time);
-        return DtoUtil.getSuccesWithDataDto("查询时间戳成功", map, 100000);
+        if(Long.parseLong(contrastTimestampVo.getTime())-Long.parseLong(time)<=3){
+            return DtoUtil.getFalseDto("不需要同步",24002);
+        }
+       return DtoUtil.getSuccessDto("需要同步",100000);
     }
 
     public static SingleEvent get(Object object) {
