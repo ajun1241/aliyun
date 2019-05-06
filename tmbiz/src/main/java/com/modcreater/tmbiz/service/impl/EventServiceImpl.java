@@ -36,7 +36,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
-        /*if (!ObjectUtils.isEmpty(uploadingEventVo)) {
+        if (!ObjectUtils.isEmpty(uploadingEventVo)) {
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(uploadingEventVo);
             if (eventMapper.uploadingEvents(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
@@ -52,38 +52,7 @@ public class EventServiceImpl implements EventService {
             }
             return DtoUtil.getFalseDto("事件上传失败", 21001);
         }
-        return DtoUtil.getFalseDto("没有可上传的事件", 21002);*/
-        SingleEvent singleEvent = SingleEventUtil.getSingleEvent(uploadingEventVo);
-        singleEvent.setEventid(100L);
-        singleEvent.setUserid(10086L);
-        singleEvent.setEventname("测试名称");
-        singleEvent.setStarttime("1557109312");
-        singleEvent.setEndtime("1557109312");
-        singleEvent.setAddress("测试地址");
-        singleEvent.setLevel(1L);
-        singleEvent.setFlag(1L);
-        singleEvent.setPerson("测试人物");
-        singleEvent.setRemarks("测试备注");
-        singleEvent.setRepeaTtime("2");
-        singleEvent.setIsOverdue(0L);
-        singleEvent.setRemindTime("1557109312");
-        singleEvent.setDay(5L);
-        singleEvent.setMonth(5L);
-        singleEvent.setYear(2019L);
-        singleEvent.setType(1L);
-        if (eventMapper.uploadingEvents(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
-            try {
-                String time = DateUtil.dateToStamp(new Date());
-                if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
-                    Map<String,String> timestamp = new HashMap<>();
-                    timestamp.put("time",time);
-                    return DtoUtil.getSuccesWithDataDto("事件上传成功",timestamp, 100000);
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-        return DtoUtil.getFalseDto("事件上传失败", 21001);
+        return DtoUtil.getFalseDto("没有可上传的事件", 21002);
     }
 
     @Override

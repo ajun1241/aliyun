@@ -93,7 +93,7 @@ public class EventController {
 
     @RequestMapping(value = "test")
     public Dto test() {
-        return eventService.updateEvents(null);
+        return eventService.addNewEvents(null);
     }
 
 
