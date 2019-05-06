@@ -90,11 +90,4 @@ public class EventController {
     public Dto contrastTimestamp(@RequestBody ContrastTimestampVo contrastTimestampVo){
         return eventService.contrastTimestamp(contrastTimestampVo);
     }
-
-    @RequestMapping(value = "test")
-    public Dto test() {
-        return eventService.addNewEvents(null);
-    }
-
-
 }

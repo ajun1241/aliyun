@@ -82,7 +82,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (!ObjectUtils.isEmpty(updateEventVo)) {
-
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(updateEventVo);
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
