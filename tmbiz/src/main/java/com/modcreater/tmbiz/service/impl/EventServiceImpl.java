@@ -8,7 +8,7 @@ import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
-import com.modcreater.tmutils.SingleUtil;
+import com.modcreater.tmutils.SingleEventUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -37,7 +37,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
-            SingleEvent singleEvent = SingleUtil.get(uploadingEventVo);
+            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(uploadingEventVo);
             if (eventMapper.uploadingEvents(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
@@ -77,7 +77,7 @@ public class EventServiceImpl implements EventService {
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (!ObjectUtils.isEmpty(updateEventVo)) {
 
-            SingleEvent singleEvent = SingleUtil.get(updateEventVo);
+            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(updateEventVo);
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {

@@ -2,6 +2,9 @@ package com.modcreater.tmutils;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
 
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -10,13 +13,13 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
  * @Date: 2019-05-06
  * Time: 10:37
  */
-public class SingleUtil {
+public class SingleEventUtil {
     /**
      * 创建一个SingleEvent对象并根据参数对象类型是否为SingleEvent子类判断是否为SingleEvent赋值
      * @param object
      * @return
      */
-    public static SingleEvent get(Object object) {
+    public static SingleEvent getSingleEvent(Object object) {
         if (SingleEvent.class.isAssignableFrom(object.getClass())) {
             SingleEvent singleEvent = new SingleEvent();
             try {
@@ -40,6 +43,7 @@ public class SingleUtil {
             } catch (ReflectiveOperationException e) {
                 e.printStackTrace();
             }
+            return singleEvent;
         }
         return null;
     }
