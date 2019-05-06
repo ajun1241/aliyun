@@ -37,7 +37,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
-            SingleEvent singleEvent = SingleEventUtil.get(uploadingEventVo);
+            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(uploadingEventVo);
             if (eventMapper.uploadingEvents(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
@@ -77,7 +77,7 @@ public class EventServiceImpl implements EventService {
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (!ObjectUtils.isEmpty(updateEventVo)) {
 
-            SingleEvent singleEvent = SingleEventUtil.get(updateEventVo);
+            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(updateEventVo);
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {

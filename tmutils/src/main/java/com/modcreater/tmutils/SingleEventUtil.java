@@ -19,7 +19,7 @@ public class SingleEventUtil {
      * @param object
      * @return
      */
-    public static SingleEvent get(Object object) {
+    public static SingleEvent getSingleEvent(Object object) {
         if (SingleEvent.class.isAssignableFrom(object.getClass())) {
             SingleEvent singleEvent = new SingleEvent();
             try {
