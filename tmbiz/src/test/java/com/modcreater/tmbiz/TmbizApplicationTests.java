@@ -2,15 +2,13 @@ package com.modcreater.tmbiz;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.vo.UploadingEventVo;
-import com.modcreater.tmbiz.service.impl.EventServiceImpl;
+import com.modcreater.tmutils.SingleEventUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -53,7 +51,6 @@ public class TmbizApplicationTests {
         uploadingEventVo.setMonth(5L);
         uploadingEventVo.setYear(2019L);
         uploadingEventVo.setType(1L);
-        SingleEvent singleEvent = EventServiceImpl.get(uploadingEventVo);
-        System.out.println(singleEvent);
+        System.out.println(SingleEventUtil.get(uploadingEventVo));
     }
 }
