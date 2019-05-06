@@ -137,16 +137,20 @@ public class EventServiceImpl implements EventService {
         String month=null;
         String day=null;
         List<SingleEvent> singleEvents=new ArrayList<>();
+        SingleEvent singleEvent=new SingleEvent();
         for (int i = 0; i <dayEventIds.size() ; i++) {
-            stringBuffer=new StringBuffer(dayEventIds.get(i).toString());
+            try {
+                stringBuffer=new StringBuffer(dayEventIds.get(i).toString());
 //            System.out.println(stringBuffer);
-            year=stringBuffer.substring(0,4);
-            month=stringBuffer.substring(4, 6);
-            day=stringBuffer.substring(6, 8);
-            SingleEvent singleEvent=new SingleEvent();
-            singleEvent.setYear(Long.parseLong(year));
-            singleEvent.setMonth(Long.parseLong(month));
-            singleEvent.setDay(Long.parseLong(day));
+                year=stringBuffer.substring(0,4);
+                month=stringBuffer.substring(4, 6);
+                day=stringBuffer.substring(6, 8);
+                singleEvent.setYear(Long.parseLong(year));
+                singleEvent.setMonth(Long.parseLong(month));
+                singleEvent.setDay(Long.parseLong(day));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             singleEvents=eventMapper.queryEvents(singleEvent);
             if (ObjectUtils.isEmpty(singleEvents)){
                 return DtoUtil.getFalseDto("该时间段内没有事件",25003);
@@ -170,15 +174,18 @@ public class EventServiceImpl implements EventService {
             }
         }
         //修改时间戳
+        Map map=new HashMap();
         try {
-            int i=accountMapper.updateTimestampUnderAccount(synchronousUpdateVo.getUserId(),DateUtil.dateToStamp(new Date()));
+            String time=DateUtil.dateToStamp(new Date());
+            int i=accountMapper.updateTimestampUnderAccount(synchronousUpdateVo.getUserId(),time);
             if (i<=0){
                 return DtoUtil.getFalseDto("同步数据时修改时间戳失败",25006);
             }
+            map.put("time",time);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return DtoUtil.getSuccessDto("数据同步成功",100000);
+        return DtoUtil.getSuccesWithDataDto("数据同步成功",map,100000);
     }
 
     @Override
