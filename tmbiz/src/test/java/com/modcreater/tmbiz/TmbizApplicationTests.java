@@ -53,7 +53,7 @@ public class TmbizApplicationTests {
         uploadingEventVo.setMonth(5L);
         uploadingEventVo.setYear(2019L);
         uploadingEventVo.setType(1L);
-        SingleEvent singleEvent = EventServiceImpl.get(uploadingEventVo);
-        System.out.println(singleEvent);
+//        SingleEvent singleEvent = EventServiceImpl.get(uploadingEventVo);
+//        System.out.println(singleEvent);
     }
 }
