@@ -52,7 +52,7 @@ public interface AccountMapper {
      * @param time 时间戳
      * @return
      */
-    int updateTimestampUnderAccount(String id ,String time);
+    int updateTimestampUnderAccount(@Param("userId") String id ,@Param("timestamp") String time);
 
     /**
      * 查询时间戳

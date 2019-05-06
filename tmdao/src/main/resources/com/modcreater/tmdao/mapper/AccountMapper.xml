@@ -60,10 +60,10 @@
         update account
         <set>
             <if test="time != null and time != ''">
-                time = #{time}
+                time = #{timestamp}
             </if>
         </set>
-        where id = #{id}
+        where id = #{userId}
     </update>
     <select id="queryTime" resultType="String">
         select `time` from account where id=#{id}
