@@ -49,5 +49,11 @@ public interface EventMapper {
      */
     List<SingleEvent> queryEvents(SingleEvent singleEvent);
 
+    /**
+     * 同步修改
+     * @param singleEvent
+     * @return
+     */
+    int updOldEvent(SingleEvent singleEvent);
 
 }

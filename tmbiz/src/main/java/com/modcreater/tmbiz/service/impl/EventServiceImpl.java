@@ -136,7 +136,8 @@ public class EventServiceImpl implements EventService {
         String year=null;
         String month=null;
         String day=null;
-        List<SingleEvent> singleEvents=new ArrayList<>();
+//        List<SingleEvent> singleEvents=new ArrayList<>();
+        System.out.println(dayEventIds.toString());
         SingleEvent singleEvent=new SingleEvent();
         for (int i = 0; i <dayEventIds.size() ; i++) {
             try {
@@ -148,21 +149,27 @@ public class EventServiceImpl implements EventService {
                 singleEvent.setYear(Long.parseLong(year));
                 singleEvent.setMonth(Long.parseLong(month));
                 singleEvent.setDay(Long.parseLong(day));
+                singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            singleEvents=eventMapper.queryEvents(singleEvent);
+/*            singleEvents=eventMapper.queryEvents(singleEvent);
             if (ObjectUtils.isEmpty(singleEvents)){
                 return DtoUtil.getFalseDto("该时间段内没有事件",25003);
-            }
+            }*/
         }
         //删除事件
-        for (int i = 0; i <singleEvents.size() ; i++) {
+        /*for (int i = 0; i <singleEvents.size() ; i++) {
             int delResult=eventMapper.withdrawEventsByUserId(singleEvents.get(i));
             if (delResult<=0){
                 return DtoUtil.getFalseDto("删除失败",25004);
             }
-        }
+        }*/
+        System.out.println(singleEvent.toString());
+        int updResult=eventMapper.updOldEvent(singleEvent);
+        /*if (updResult<=0){
+            return DtoUtil.getFalseDto("云端删除失败",25004);
+        }*/
        //上传事件
         for (int i = 0; i < synchronousUpdateVo.getDayEventsList().size(); i++) {
             DayEvents dayEvents=synchronousUpdateVo.getDayEventsList().get(i);

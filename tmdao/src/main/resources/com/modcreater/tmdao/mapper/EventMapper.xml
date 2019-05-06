@@ -74,4 +74,9 @@
         </where>
     </select>
 
+    <update id="updOldEvent">
+            update singleevent set
+                isOverdue = 2
+            where userId = #{userid} and year =#{year} and month=#{month} and day=#{day}
+    </update>
 </mapper>
