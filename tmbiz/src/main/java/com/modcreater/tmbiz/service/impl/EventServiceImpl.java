@@ -71,6 +71,7 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("删除条件接收失败", 21006);
     }
 
+
     @Override
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (!ObjectUtils.isEmpty(updateEventVo)) {
