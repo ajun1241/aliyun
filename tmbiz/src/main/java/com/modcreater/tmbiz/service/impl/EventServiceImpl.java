@@ -40,7 +40,8 @@ public class EventServiceImpl implements EventService {
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(uploadingEventVo);
             if (eventMapper.uploadingEvents(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
-                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
+                    String time = DateUtil.dateToStamp(new Date());
+                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
                         return DtoUtil.getSuccessDto("事件上传成功", 100000);
                     }
                 } catch (ParseException e) {
@@ -60,8 +61,9 @@ public class EventServiceImpl implements EventService {
             singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
             if (eventMapper.withdrawEventsByUserId(singleEvent) > 0) {
                 try {
-                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
-                        return DtoUtil.getFalseDto("删除成功", 100000);
+                String time = DateUtil.dateToStamp(new Date());
+                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
+                        return DtoUtil.getSuccesWithDataDto("删除成功", time,100000);
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -80,7 +82,8 @@ public class EventServiceImpl implements EventService {
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(updateEventVo);
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
-                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), DateUtil.dateToStamp(new Date())) > 0) {
+                    String time = DateUtil.dateToStamp(new Date());
+                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
                         return DtoUtil.getSuccessDto("修改成功", 100000);
                     }
                 } catch (ParseException e) {
