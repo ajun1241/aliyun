@@ -81,6 +81,11 @@ public class EventController {
         return eventService.synchronousUpdate(synchronousUpdateVo);
     }
 
+    /**
+     * 对比时间戳
+     * @param contrastTimestampVo
+     * @return
+     */
     @RequestMapping(value = "ctime",method = RequestMethod.POST)
     public Dto contrastTimestamp(@RequestBody ContrastTimestampVo contrastTimestampVo){
         return eventService.contrastTimestamp(contrastTimestampVo);

@@ -34,8 +34,8 @@ public class TmbizApplicationTests {
     @Test
     public void test2() {
         UploadingEventVo uploadingEventVo = new UploadingEventVo();
-        uploadingEventVo.setEventid(1L);
-        uploadingEventVo.setUserid(1L);
+        uploadingEventVo.setEventid(100L);
+        uploadingEventVo.setUserid(10086L);
         uploadingEventVo.setEventname("测试名称");
         uploadingEventVo.setStarttime("1557109312");
         uploadingEventVo.setEndtime("1557109312");

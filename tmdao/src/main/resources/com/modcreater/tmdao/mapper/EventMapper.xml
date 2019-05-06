@@ -28,9 +28,9 @@
             #{type})
     </insert>
 
-    <delete id="withdrawEventsByUserId">
-        delete from singleevent where eventId = #{eventid}
-    </delete>
+    <update id="withdrawEventsByUserId">
+        update singleevent set isOverdue = 2 where eventId = #{eventid}
+    </update>
 
     <update id="alterEventsByUserId">
             update singleevent set
@@ -70,6 +70,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
+            and isOverdue &lt;&gt; 2
         </where>
     </select>
 
