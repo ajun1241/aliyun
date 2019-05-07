@@ -231,7 +231,7 @@ public class EventServiceImpl implements EventService {
                 for (SingleEvent singleEvent:synchronousUpdateVo.getLoopEventList().get(i)) {
                     //重复事件添加
                     loopEvent.setAddress(singleEvent.getAddress());
-                    loopEvent.setDay(singleEvent.getDay());
+                    loopEvent.setDay(singleEvent.getDay().toString());
                     loopEvent.setEventId(singleEvent.getEventid());
                     loopEvent.setEndTime(singleEvent.getEndtime());
                     loopEvent.setStartTime(singleEvent.getStarttime());

@@ -20,7 +20,7 @@ public class LoopEvent implements Serializable {
   private long isOverdue;
   private String remindTime;
   private long type;
-  private long day;
+  private String day;
   private String week;
 
 }
