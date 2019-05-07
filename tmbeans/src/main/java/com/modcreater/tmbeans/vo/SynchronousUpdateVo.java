@@ -1,5 +1,7 @@
 package com.modcreater.tmbeans.vo;
 
+import com.modcreater.tmbeans.pojo.LoopEvent;
+import com.modcreater.tmbeans.pojo.SingleEvent;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -23,5 +25,8 @@ public class SynchronousUpdateVo implements Serializable {
      * 事件集(单位:天)
      */
     private List<DayEvents> dayEventsList;
-
+    /**
+     * 重复事件
+     */
+    private List<List<SingleEvent>> loopEventList;
 }

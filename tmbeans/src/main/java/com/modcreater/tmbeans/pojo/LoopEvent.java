@@ -21,6 +21,6 @@ public class LoopEvent implements Serializable {
   private String remindTime;
   private long type;
   private long day;
-  private long week;
+  private String week;
 
 }

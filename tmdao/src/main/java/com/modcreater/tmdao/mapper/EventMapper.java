@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.LoopEvent;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.vo.DraftVo;
 import com.modcreater.tmbeans.vo.SingleEventForDatabase;
@@ -78,6 +79,11 @@ public interface EventMapper {
      */
     String queryDraftByPhone(String phone);
 
+    /**
+     * 第二次上传修改草稿
+     * @param draftVo
+     * @return
+     */
     int updateDraft(DraftVo draftVo);
     /**
      * 根据"日"查找事件并根据事件等级(level)排序
@@ -93,6 +99,10 @@ public interface EventMapper {
      */
     List<SingleEvent> queryByDayOrderByLevelAndDate(SingleEvent singleEvent);
 
+    /**
+     * 重复事件上传
+     */
+    int uplLoopEvent(LoopEvent loopEvent);
     /**
      * 根据"月"查找事件并根据事件等级(level)排序
      * @param singleEvent

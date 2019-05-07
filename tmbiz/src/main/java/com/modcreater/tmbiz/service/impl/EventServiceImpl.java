@@ -1,6 +1,7 @@
 package com.modcreater.tmbiz.service.impl;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.LoopEvent;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbiz.service.EventService;
@@ -218,6 +219,45 @@ public class EventServiceImpl implements EventService {
                 //上传
                 if (eventMapper.uploadingEvents(singleEvent)<=0){
                     return DtoUtil.getFalseDto("同步上传失败",26002);
+                }
+            }
+        }
+        LoopEvent loopEvent=new LoopEvent();
+        List<String> list=new ArrayList();
+        list.add("0");
+        if (synchronousUpdateVo.getLoopEventList().size()>0){
+            for (int i = 0; i < synchronousUpdateVo.getLoopEventList().size(); i++) {
+                for (SingleEvent singleEvent:synchronousUpdateVo.getLoopEventList().get(i)) {
+                    //重复事件添加
+                    loopEvent.setAddress(singleEvent.getAddress());
+                    loopEvent.setDay(singleEvent.getDay());
+                    loopEvent.setEventId(singleEvent.getEventid());
+                    loopEvent.setEndTime(singleEvent.getEndtime());
+                    loopEvent.setStartTime(singleEvent.getStarttime());
+                    loopEvent.setEventName(singleEvent.getEventname());
+                    loopEvent.setFlag(singleEvent.getFlag());
+                    loopEvent.setIsOverdue(singleEvent.getIsOverdue());
+                    loopEvent.setLevel(singleEvent.getLevel());
+                    loopEvent.setPerson(singleEvent.getPerson());
+                    loopEvent.setRemarks(singleEvent.getRemarks());
+                    loopEvent.setRemindTime(singleEvent.getRemindTime());
+                    loopEvent.setType(singleEvent.getType());
+                    loopEvent.setUserId(singleEvent.getUserid());
+                    loopEvent.setWeek(singleEvent.getRepeaTtime());
+                    if (i!=0){
+                        for (String eventId:list) {
+                            if (!eventId.equals(singleEvent.getEventid().toString())){
+                                if(eventMapper.uplLoopEvent(loopEvent)<=0){
+                                    return DtoUtil.getFalseDto("重复事件上传失败",26004);
+                                }
+                            }
+                        }
+                    }else {
+                        if(eventMapper.uplLoopEvent(loopEvent)<=0){
+                            return DtoUtil.getFalseDto("重复事件上传失败",26004);
+                        }
+                    }
+                    list.add(singleEvent.getEventid().toString());
                 }
             }
         }

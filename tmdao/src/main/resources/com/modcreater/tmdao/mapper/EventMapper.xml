@@ -183,4 +183,23 @@
         update draft set `data`=concat(`data`,#{data})
         where phoneNum=#{phoneNum}
     </update>
+
+    <insert id="uplLoopEvent" parameterType="com.modcreater.tmbeans.pojo.LoopEvent">
+        insert  into  loopevent values
+        (#{eventId},
+        #{userId},
+        #{eventName},
+        #{startTime},
+        #{endTime},
+        #{address},
+        #{level},
+        #{flag},
+        #{person},
+        #{remarks},
+        #{isOverdue},
+        #{remindTime},
+        #{type},
+        #{day},
+        #{week})
+    </insert>
 </mapper>
