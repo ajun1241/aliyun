@@ -263,4 +263,23 @@ public class EventServiceImpl implements EventService {
         }
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
+
+    @Override
+    public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo) {
+        if (!ObjectUtils.isEmpty(searchEventVo)) {
+            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
+            //只根据level升序
+            List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByMonthOrderByLevel(singleEvent);
+            //根据level和事件升序
+            List<SingleEvent> singleEventListOrderByLevelAndDate = eventMapper.queryByMonthOrderByLevelAndDate(singleEvent);
+            Map<String,List<SingleEvent>> result = new HashMap<>();
+            result.put("singleEventListOrderByLevel",singleEventListOrderByLevel);
+            result.put("singleEventListOrderByLevelAndDate",singleEventListOrderByLevelAndDate);
+            if (!ObjectUtils.isEmpty(result)) {
+                return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+            }
+            return DtoUtil.getFalseDto("查询失败", 21003);
+        }
+        return DtoUtil.getFalseDto("查询条件接收失败", 21004);
+    }
 }

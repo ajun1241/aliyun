@@ -117,6 +117,45 @@
         </where>
         order by level asc , startTime asc
     </select>
+    <select id="queryByMonthOrderByLevel" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
+        <where>
+            <if test="userid != null">
+                userid = #{userid}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            and isOverdue &lt;&gt; 2
+        </where>
+        order by level asc
+    </select>
+    <select id="queryByMonthOrderByLevelAndDate" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
+        <where>
+            <if test="userid != null">
+                userid = #{userid}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            and isOverdue &lt;&gt; 2
+        </where>
+        order by level asc , startTime asc
+    </select>
 
     <update id="updOldEvent">
             update singleevent set

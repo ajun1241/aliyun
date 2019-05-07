@@ -120,4 +120,9 @@ public class EventController {
     public Dto searchByDay(@RequestBody SearchEventVo searchEventVo){
         return eventService.searchByDayEventIds(searchEventVo);
     }
+
+    @RequestMapping(value = "seabymon",method = RequestMethod.POST)
+    public Dto searchByMonth(@RequestBody SearchEventVo searchEventVo){
+        return eventService.searchByDayEventIdsInMonth(searchEventVo);
+    }
 }

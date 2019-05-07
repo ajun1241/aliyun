@@ -77,10 +77,16 @@ public interface EventService {
      */
     Dto uplDraft(DraftVo draftVo);
     /**
-     * 根据日期查询事件并排序
+     * 根据日期查询事件并排序(单位:日)
      * @param searchEventVo
      * @return
      */
     Dto searchByDayEventIds(SearchEventVo searchEventVo);
 
+    /**
+     * 根据日期查询事件并排序(单位:月)
+     * @param searchEventVo
+     * @return
+     */
+    Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo);
 }
