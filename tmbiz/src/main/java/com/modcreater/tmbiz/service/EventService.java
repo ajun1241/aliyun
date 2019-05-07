@@ -96,4 +96,11 @@ public interface EventService {
      * @return
      */
     Dto addNewLoopEvents(UploadingEventVo uploadingEventVo);
+
+    /**
+     * 根据日期查询事件并排序(单位:周)
+     * @param searchEventVo
+     * @return
+     */
+    Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo);
 }

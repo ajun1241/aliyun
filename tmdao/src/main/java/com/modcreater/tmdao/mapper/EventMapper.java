@@ -7,6 +7,7 @@ import com.modcreater.tmbeans.vo.SingleEventForDatabase;
 import com.modcreater.tmbeans.vo.UploadingEventVo;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -119,9 +120,39 @@ public interface EventMapper {
 
     /**
      * 添加一个重复事件
+     * @param singleEvent
+     * @return
+     */
+    int uploadingLoopEvents(SingleEvent singleEvent);
+
+    /**
+     * 撤销一个重复事件
+     *
      * @param loopEvent
      * @return
      */
-    int uploadingLoopEvents(LoopEvent loopEvent);
+    int withdrawLoopEventsByUserId(LoopEvent loopEvent);
 
+    /**
+     * 更新一个重复事件
+     *
+     * @param loopEvent
+     * @return
+     */
+    int alterLoopEventsByUserId(LoopEvent loopEvent);
+
+    /**
+     * 查询重复事件
+     *
+     * @param loopEvent
+     * @return
+     */
+    List<LoopEvent> queryLoopEvents(LoopEvent loopEvent);
+
+    /**
+     * 根据"周"查找事件并根据事件开始时间(startTime)排序
+     * @param singleEvent
+     * @return
+     */
+    ArrayList<SingleEvent> queryByWeekOrderByStartTime(SingleEvent singleEvent);
 }

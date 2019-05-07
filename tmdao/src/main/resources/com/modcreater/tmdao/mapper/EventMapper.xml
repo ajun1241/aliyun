@@ -28,13 +28,37 @@
             #{type})
     </insert>
 
+    <insert id="uploadingLoopEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
+            insert into loopevent values
+            (#{eventid} ,
+            #{userid},
+            #{eventname},
+            #{starttime},
+            #{endtime},
+            #{address},
+            #{level},
+            #{flag},
+            #{person},
+            #{remarks},
+            #{repeaTtime},
+            #{isOverdue},
+            #{remindTime},
+            #{day},
+            #{month},
+            #{year},
+            #{type})
+    </insert>
+
     <update id="withdrawEventsByUserId">
-        update singleevent set isOverdue = 2 where eventId = #{eventid}
+        update singleevent set isOverdue = 2 where eventId = #{eventid} and userId = #{userid}
+    </update>
+
+    <update id="withdrawLoopEventsByUserId">
+        update loopevent set isOverdue = 2 where eventId = #{eventid} and userId = #{userid}
     </update>
 
     <update id="alterEventsByUserId">
             update singleevent set
-                userId = #{userid},
                 eventName = #{eventname},
                 startTime = #{starttime},
                 endTime = #{endtime},
@@ -50,7 +74,27 @@
                 month = #{month},
                 year = #{year},
                 type = #{type}
-            where eventId = #{eventid}
+            where eventId = #{eventid} and userId = #{userid}
+    </update>
+
+    <update id="alterLoopEventsByUserId">
+            update loopevent set
+                eventName = #{eventname},
+                startTime = #{starttime},
+                endTime = #{endtime},
+                address = #{address},
+                level = #{level},
+                flag = #{flag},
+                person = #{person},
+                remarks = #{remarks},
+                repeatTime = #{repeaTtime},
+                isOverdue = #{isOverdue},
+                remindTime = #{remindTime},
+                day = #{day},
+                month = #{month},
+                year = #{year},
+                type = #{type}
+            where eventId = #{eventid} and userId = #{userId}
     </update>
 
     <select id="queryEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
@@ -177,6 +221,48 @@
 
     <select id="queryDraftByPhone" parameterType="String" resultType="String">
         select data from draft where phoneNum=#{phoneNum}
+    </select>
+
+    <select id="queryLoopEvents" resultType="com.modcreater.tmbeans.pojo.LoopEvent">
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
+        <where>
+            <if test="userid != null">
+                userid = #{userid}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            and isOverdue &lt;&gt; 2
+        </where>
+    </select>
+    <select id="queryByWeekOrderByStartTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
+        <where>
+            <if test="userid != null">
+                userid = #{userid}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            and isOverdue &lt;&gt; 2
+        </where>
+        order by startTime asc
     </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.DraftVo" >

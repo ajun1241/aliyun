@@ -329,9 +329,28 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewLoopEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)){
-
-
+            if (eventMapper.uploadingLoopEvents(SingleEventUtil.getSingleEvent(uploadingEventVo)) > 0){
+                return DtoUtil.getSuccessDto("上传重复事件成功",100000);
+            }
+            return DtoUtil.getFalseDto("上传重复事件失败",21009);
         }
-        return DtoUtil.getFalseDto("添加重复时间失败",21009);
+        return DtoUtil.getFalseDto("没有可上传的重复事件",21010);
+    }
+
+    @Override
+    public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
+        if (!ObjectUtils.isEmpty(searchEventVo)){
+            SingleEvent singleEvent;
+            List<DayEvents> dayEventsList = new ArrayList<>();
+            for (int i = 0; i <= 6; i++){
+                DayEvents dayEvents = new DayEvents();
+                singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), String.valueOf(Integer.valueOf(searchEventVo.getDayEventId()) + i));
+                dayEvents.setMySingleEventList(eventMapper.queryByWeekOrderByStartTime(singleEvent));
+                System.out.println(singleEvent);
+                dayEventsList.add(dayEvents);
+            }
+            return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
+        }
+        return DtoUtil.getFalseDto("查询条件接收失败",21004);
     }
 }
