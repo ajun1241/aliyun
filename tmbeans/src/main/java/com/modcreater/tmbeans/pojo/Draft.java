@@ -11,5 +11,4 @@ public class Draft implements Serializable {
   private String phoneNum;
   private String data;
 
-
 }
