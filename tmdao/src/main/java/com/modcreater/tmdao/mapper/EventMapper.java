@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.vo.DraftVo;
 import com.modcreater.tmbeans.vo.SingleEventForDatabase;
 import com.modcreater.tmbeans.vo.UploadingEventVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -56,6 +57,28 @@ public interface EventMapper {
      */
     int updOldEvent(SingleEvent singleEvent);
 
+    /**
+     * 根据用户id查询事件
+     * @param userId
+     * @return
+     */
+    int queryEventByUserId(String userId);
+
+    /**
+     * 上传草稿
+     * @param draftVo
+     * @return
+     */
+    int uplDraft(DraftVo draftVo);
+
+    /**
+     * 查询草稿
+     * @param phone
+     * @return
+     */
+    String queryDraftByPhone(String phone);
+
+    int updateDraft(DraftVo draftVo);
     /**
      * 根据日查找事件并根据事件等级(level)排序
      * @param singleEvent

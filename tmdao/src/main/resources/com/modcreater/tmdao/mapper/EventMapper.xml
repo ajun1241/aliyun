@@ -123,4 +123,25 @@
                 isOverdue = 2
             where userId = #{userid} and year =#{year} and month=#{month} and day=#{day}
     </update>
+
+    <select id="queryEventByUserId" resultType="int">
+        select count(1) from singleevent where userId=#{userId}
+    </select>
+
+    <insert id="uplDraft" parameterType="com.modcreater.tmbeans.vo.DraftVo">
+        insert into draft values
+        (null ,
+        #{phoneNum},
+        #{data}
+        )
+    </insert>
+
+    <select id="queryDraftByPhone" parameterType="String" resultType="String">
+        select data from draft where phoneNum=#{phoneNum}
+    </select>
+
+    <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.DraftVo" >
+        update draft set `data`=concat(`data`,#{data})
+        where phoneNum=#{phoneNum}
+    </update>
 </mapper>

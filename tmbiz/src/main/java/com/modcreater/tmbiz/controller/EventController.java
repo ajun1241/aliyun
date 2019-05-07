@@ -92,6 +92,26 @@ public class EventController {
     }
 
     /**
+     * 第一次登录事件数据同步
+     * @param synchronousUpdateVo
+     * @return
+     */
+    @RequestMapping(value = "firupl",method = RequestMethod.POST)
+    public Dto firstUplEvent(@RequestBody SynchronousUpdateVo synchronousUpdateVo){
+        return eventService.firstUplEvent(synchronousUpdateVo);
+    }
+    /**
+     * 草稿上传
+     * @param draftVo
+     * @return
+     */
+    @RequestMapping(value = "upldraft",method = RequestMethod.POST)
+    public Dto uplDraft(@RequestBody DraftVo draftVo){
+        return eventService.uplDraft(draftVo);
+    }
+
+
+    /**
      * 根据日查找事件
      * @param searchEventVo
      * @return

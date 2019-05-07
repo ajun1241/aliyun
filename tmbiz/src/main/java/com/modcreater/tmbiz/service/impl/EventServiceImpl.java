@@ -205,6 +205,47 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public Dto firstUplEvent(SynchronousUpdateVo synchronousUpdateVo) {
+        if (ObjectUtils.isEmpty(synchronousUpdateVo)){
+            return DtoUtil.getFalseDto("同步数据未获取到",26001);
+        }
+        if (eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId())>0){
+            return DtoUtil.getFalseDto("该用户已经上传过了",26003);
+        }
+        //遍历拆分
+        for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()) {
+            for (SingleEvent singleEvent:dayEvents.getMySingleEventList()) {
+                //上传
+                if (eventMapper.uploadingEvents(singleEvent)<=0){
+                    return DtoUtil.getFalseDto("同步上传失败",26002);
+                }
+            }
+        }
+        return DtoUtil.getSuccessDto("数据同步成功",100000);
+    }
+
+    @Override
+    public Dto uplDraft(DraftVo draftVo) {
+        if (ObjectUtils.isEmpty(draftVo)){
+            return DtoUtil.getFalseDto("上传草稿未获取到",27001);
+        }
+        //查看草稿是否已存在
+        String data=eventMapper.queryDraftByPhone(draftVo.getPhoneNum());
+        if (StringUtils.isEmpty(data)){
+            //第一次上传草稿
+            if (eventMapper.uplDraft(draftVo)<=0){
+                return DtoUtil.getFalseDto("第一次上传草稿失败",27002);
+            }
+        }else {
+            //不是第一次上传
+            if (eventMapper.updateDraft(draftVo)<=0){
+                return DtoUtil.getFalseDto("非第一次上传草稿失败",27003);
+            }
+        }
+        return DtoUtil.getSuccessDto("上传草稿成功",100000);
+    }
+
+    @Override
     public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());

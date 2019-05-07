@@ -64,6 +64,19 @@ public interface EventService {
     Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo);
 
     /**
+     * 第一次同步
+     * @param synchronousUpdateVo
+     * @return
+     */
+    Dto firstUplEvent(SynchronousUpdateVo synchronousUpdateVo);
+
+    /**
+     * 上传草稿
+     * @param draftVo
+     * @return
+     */
+    Dto uplDraft(DraftVo draftVo);
+    /**
      * 根据日期查询事件并排序
      * @param searchEventVo
      * @return
