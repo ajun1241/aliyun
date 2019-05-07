@@ -9,5 +9,6 @@ public class LoginVo implements Serializable {
     private String userCode;
     private String userPassword;
 //    private String verificationCode;
+    private String type;
     private long userType;
 }

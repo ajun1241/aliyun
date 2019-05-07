@@ -122,6 +122,7 @@ public class EventServiceImpl implements EventService {
         if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
             return DtoUtil.getFalseDto("事件集未获取到", 25002);
         }
+        System.out.println(synchronousUpdateVo.toString());
         List<Integer> dayEventIds=new ArrayList<>();
         for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()){
             dayEventIds.add(dayEvents.getDayEventId());
