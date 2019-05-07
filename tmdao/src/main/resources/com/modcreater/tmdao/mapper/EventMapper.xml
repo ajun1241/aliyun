@@ -186,7 +186,7 @@
 
     <insert id="uplLoopEvent" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
         insert  into  loopevent values
-          (#{eventid} ,
+          (#{eventid},
             #{userid},
             #{eventname},
             #{starttime},
