@@ -23,5 +23,9 @@ public class DeleteEventVo implements Serializable {
      * 事件ID(1904301700)
      */
     private String eventId;
+    /**
+     *
+     */
+    private String type;
 
 }

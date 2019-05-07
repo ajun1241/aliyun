@@ -21,6 +21,10 @@ public class UploadingEventVo extends SingleEvent implements Serializable {
      * 用户ID
      */
     private String userId;
+    /**
+     *
+     */
+    private String type;
 
 
 }

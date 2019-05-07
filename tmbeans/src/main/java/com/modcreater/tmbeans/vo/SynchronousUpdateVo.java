@@ -29,4 +29,8 @@ public class SynchronousUpdateVo implements Serializable {
      * 重复事件
      */
     private List<List<SingleEvent>> loopEventList;
+    /**
+     *
+     */
+    private String type;
 }

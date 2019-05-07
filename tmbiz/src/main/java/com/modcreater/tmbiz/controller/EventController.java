@@ -112,7 +112,7 @@ public class EventController {
 
 
     /**
-     * 根据日查找事件
+     * 根据"日"查找事件
      * @param searchEventVo
      * @return
      */
@@ -121,6 +121,11 @@ public class EventController {
         return eventService.searchByDayEventIds(searchEventVo);
     }
 
+    /**
+     * 根据"月"查找事件
+     * @param searchEventVo
+     * @return
+     */
     @RequestMapping(value = "seabymon",method = RequestMethod.POST)
     public Dto searchByMonth(@RequestBody SearchEventVo searchEventVo){
         return eventService.searchByDayEventIdsInMonth(searchEventVo);

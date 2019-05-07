@@ -9,7 +9,28 @@
 
     <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
             insert into singleevent values
-            (null ,
+            (#{eventid} ,
+            #{userid},
+            #{eventname},
+            #{starttime},
+            #{endtime},
+            #{address},
+            #{level},
+            #{flag},
+            #{person},
+            #{remarks},
+            #{repeaTtime},
+            #{isOverdue},
+            #{remindTime},
+            #{day},
+            #{month},
+            #{year},
+            #{type})
+    </insert>
+
+    <insert id="uploadingLoopEvents" parameterType="com.modcreater.tmbeans.pojo.LoopEvent">
+            insert into singleevent values
+            (#{eventid} ,
             #{userid},
             #{eventname},
             #{starttime},

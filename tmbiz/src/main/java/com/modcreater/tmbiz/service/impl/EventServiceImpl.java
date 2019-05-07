@@ -322,4 +322,12 @@ public class EventServiceImpl implements EventService {
         }
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
+
+    @Override
+    public Dto addNewLoopEvents(UploadingEventVo uploadingEventVo) {
+        if (!ObjectUtils.isEmpty(uploadingEventVo)){
+
+        }
+        return DtoUtil.getFalseDto("添加重复时间失败",21009);
+    }
 }

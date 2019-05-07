@@ -22,5 +22,9 @@ public class SearchEventVo implements Serializable {
      * 事件的时间(20190430)
      */
     private String dayEventId;
+    /**
+     *
+     */
+    private String type;
 
 }
