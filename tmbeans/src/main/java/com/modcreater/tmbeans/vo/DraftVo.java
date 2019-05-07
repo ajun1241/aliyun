@@ -7,4 +7,5 @@ import java.io.Serializable;
 public class DraftVo implements Serializable {
     private String phoneNum;
     private String data;
+    private String type;
 }
