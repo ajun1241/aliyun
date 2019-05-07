@@ -184,22 +184,24 @@
         where phoneNum=#{phoneNum}
     </update>
 
-    <insert id="uplLoopEvent" parameterType="com.modcreater.tmbeans.pojo.LoopEvent">
+    <insert id="uplLoopEvent" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
         insert  into  loopevent values
-        (#{eventId},
-        #{userId},
-        #{eventName},
-        #{startTime},
-        #{endTime},
-        #{address},
-        #{level},
-        #{flag},
-        #{person},
-        #{remarks},
-        #{isOverdue},
-        #{remindTime},
-        #{type},
-        #{day},
-        #{week})
+          (#{eventid} ,
+            #{userid},
+            #{eventname},
+            #{starttime},
+            #{endtime},
+            #{address},
+            #{level},
+            #{flag},
+            #{person},
+            #{remarks},
+            #{repeaTtime},
+            #{isOverdue},
+            #{remindTime},
+            #{day},
+            #{month},
+            #{year},
+            #{type})
     </insert>
 </mapper>

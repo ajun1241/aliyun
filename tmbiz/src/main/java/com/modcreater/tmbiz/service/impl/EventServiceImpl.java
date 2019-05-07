@@ -223,14 +223,14 @@ public class EventServiceImpl implements EventService {
                 }
             }
         }
-        LoopEvent loopEvent=new LoopEvent();
+//        LoopEvent loopEvent=new LoopEvent();
         List<String> list=new ArrayList();
         list.add("0");
         if (synchronousUpdateVo.getLoopEventList().size()>0){
             for (int i = 0; i < synchronousUpdateVo.getLoopEventList().size(); i++) {
                 for (SingleEvent singleEvent:synchronousUpdateVo.getLoopEventList().get(i)) {
                     //重复事件添加
-                    loopEvent.setAddress(singleEvent.getAddress());
+                    /*loopEvent.setAddress(singleEvent.getAddress());
                     loopEvent.setDay(singleEvent.getDay().toString());
                     loopEvent.setEventId(singleEvent.getEventid());
                     loopEvent.setEndTime(singleEvent.getEndtime());
@@ -244,17 +244,17 @@ public class EventServiceImpl implements EventService {
                     loopEvent.setRemindTime(singleEvent.getRemindTime());
                     loopEvent.setType(singleEvent.getType());
                     loopEvent.setUserId(singleEvent.getUserid());
-                    loopEvent.setWeek(singleEvent.getRepeaTtime());
+                    loopEvent.setWeek(singleEvent.getRepeaTtime());*/
                     if (i!=0){
                         for (String eventId:list) {
                             if (!eventId.equals(singleEvent.getEventid().toString())){
-                                if(eventMapper.uplLoopEvent(loopEvent)<=0){
+                                if(eventMapper.uplLoopEvent(singleEvent)<=0){
                                     return DtoUtil.getFalseDto("重复事件上传失败",26004);
                                 }
                             }
                         }
                     }else {
-                        if(eventMapper.uplLoopEvent(loopEvent)<=0){
+                        if(eventMapper.uplLoopEvent(singleEvent)<=0){
                             return DtoUtil.getFalseDto("重复事件上传失败",26004);
                         }
                     }

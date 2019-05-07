@@ -102,7 +102,7 @@ public interface EventMapper {
     /**
      * 重复事件上传
      */
-    int uplLoopEvent(LoopEvent loopEvent);
+    int uplLoopEvent(SingleEvent singleEvent);
     /**
      * 根据"月"查找事件并根据事件等级(level)排序
      * @param singleEvent

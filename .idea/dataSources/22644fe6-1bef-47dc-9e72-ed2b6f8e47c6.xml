@@ -997,22 +997,22 @@
       <DataType>varchar(255)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="238" parent="207" name="isOverdue">
+    <column id="238" parent="207" name="repeatTime">
       <Position>11</Position>
+      <Comment>重复次数</Comment>
+      <DataType>varchar(100)|0s</DataType>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <column id="239" parent="207" name="isOverdue">
+      <Position>12</Position>
       <Comment>是否过期，即已经完成，1代表已经完成，0代表未完成</Comment>
       <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="239" parent="207" name="remindTime">
-      <Position>12</Position>
+    <column id="240" parent="207" name="remindTime">
+      <Position>13</Position>
       <Comment>提醒时间</Comment>
       <DataType>varchar(20)|0s</DataType>
-      <ColumnKind>normal</ColumnKind>
-    </column>
-    <column id="240" parent="207" name="type">
-      <Position>13</Position>
-      <Comment>事件分类</Comment>
-      <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="241" parent="207" name="day">
@@ -1021,122 +1021,134 @@
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="242" parent="207" name="week">
+    <column id="242" parent="207" name="month">
       <Position>15</Position>
-      <Comment>周</Comment>
+      <Comment>月</Comment>
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <key id="243" parent="207" name="PRIMARY">
+    <column id="243" parent="207" name="year">
+      <Position>16</Position>
+      <Comment>年</Comment>
+      <DataType>bigint(10)|0s</DataType>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <column id="244" parent="207" name="type">
+      <Position>17</Position>
+      <Comment>事件分类</Comment>
+      <DataType>bigint(10)|0s</DataType>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <key id="245" parent="207" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>eventId</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="244" parent="208" name="eventId">
+    <column id="246" parent="208" name="eventId">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="245" parent="208" name="userId">
+    <column id="247" parent="208" name="userId">
       <Position>2</Position>
       <Comment>关联的用户id</Comment>
       <DataType>bigint(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="246" parent="208" name="eventName">
+    <column id="248" parent="208" name="eventName">
       <Position>3</Position>
       <Comment>事件名称</Comment>
       <DataType>varchar(100)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="247" parent="208" name="startTime">
+    <column id="249" parent="208" name="startTime">
       <Position>4</Position>
       <Comment>事件开始时间</Comment>
       <DataType>varchar(20)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="248" parent="208" name="endTime">
+    <column id="250" parent="208" name="endTime">
       <Position>5</Position>
       <Comment>事件结束时间</Comment>
       <DataType>varchar(20)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="249" parent="208" name="address">
+    <column id="251" parent="208" name="address">
       <Position>6</Position>
       <Comment>地址</Comment>
       <DataType>varchar(100)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="250" parent="208" name="level">
+    <column id="252" parent="208" name="level">
       <Position>7</Position>
       <Comment>事件优先级</Comment>
       <DataType>bigint(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="251" parent="208" name="flag">
+    <column id="253" parent="208" name="flag">
       <Position>8</Position>
       <Comment>事件标识(0：空白事件，1：其他事件)</Comment>
       <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="252" parent="208" name="person">
+    <column id="254" parent="208" name="person">
       <Position>9</Position>
       <Comment>事件人物</Comment>
       <DataType>varchar(50)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="253" parent="208" name="remarks">
+    <column id="255" parent="208" name="remarks">
       <Position>10</Position>
       <Comment>备注</Comment>
       <DataType>varchar(255)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="254" parent="208" name="repeatTime">
+    <column id="256" parent="208" name="repeatTime">
       <Position>11</Position>
       <Comment>重复次数</Comment>
       <DataType>varchar(100)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="255" parent="208" name="isOverdue">
+    <column id="257" parent="208" name="isOverdue">
       <Position>12</Position>
       <Comment>是否过期，即已经完成，1代表已经完成，0代表未完成</Comment>
       <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="256" parent="208" name="remindTime">
+    <column id="258" parent="208" name="remindTime">
       <Position>13</Position>
       <Comment>提醒时间</Comment>
       <DataType>varchar(20)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="257" parent="208" name="day">
+    <column id="259" parent="208" name="day">
       <Position>14</Position>
       <Comment>日</Comment>
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="258" parent="208" name="month">
+    <column id="260" parent="208" name="month">
       <Position>15</Position>
       <Comment>月</Comment>
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="259" parent="208" name="year">
+    <column id="261" parent="208" name="year">
       <Position>16</Position>
       <Comment>年</Comment>
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="260" parent="208" name="type">
+    <column id="262" parent="208" name="type">
       <Position>17</Position>
       <Comment>事件分类</Comment>
       <DataType>bigint(10)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <key id="261" parent="208" name="PRIMARY">
+    <key id="263" parent="208" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>eventId</ColNames>
       <Primary>1</Primary>
