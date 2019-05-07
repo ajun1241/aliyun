@@ -90,4 +90,14 @@ public class EventController {
     public Dto contrastTimestamp(@RequestBody ContrastTimestampVo contrastTimestampVo){
         return eventService.contrastTimestamp(contrastTimestampVo);
     }
+
+    /**
+     * 根据日查找事件
+     * @param searchEventVo
+     * @return
+     */
+    @RequestMapping(value = "seabyday",method = RequestMethod.POST)
+    public Dto searchByDay(@RequestBody SearchEventVo searchEventVo){
+        return eventService.searchByDayEventIds(searchEventVo);
+    }
 }

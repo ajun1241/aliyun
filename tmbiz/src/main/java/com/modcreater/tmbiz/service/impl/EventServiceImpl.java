@@ -103,12 +103,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchEvents(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
-            StringBuilder date = new StringBuilder(searchEventVo.getDayEventId());
-            SingleEvent singleEvent = new SingleEvent();
-            singleEvent.setYear(Long.valueOf(date.substring(0, 4)));
-            singleEvent.setMonth(Long.valueOf(date.substring(4, 6)));
-            singleEvent.setDay(Long.valueOf(date.substring(6, 8)));
-            singleEvent.setUserid(Long.valueOf(searchEventVo.getUserId()));
+            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
             List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
             if (!ObjectUtils.isEmpty(singleEventList)) {
                 return DtoUtil.getSuccesWithDataDto("查询成功", singleEventList, 100000);
@@ -207,5 +202,24 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("不需要同步",24002);
         }
        return DtoUtil.getSuccessDto("需要同步",100000);
+    }
+
+    @Override
+    public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
+        if (!ObjectUtils.isEmpty(searchEventVo)) {
+            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
+            //只根据level升序
+            List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByDayOrderByLevel(singleEvent);
+            //根据level和事件升序
+            List<SingleEvent> singleEventListOrderByLevelAndDate = eventMapper.queryByDayOrderByLevelAndDate(singleEvent);
+            Map<String,List<SingleEvent>> result = new HashMap<>();
+            result.put("singleEventListOrderByLevel",singleEventListOrderByLevel);
+            result.put("singleEventListOrderByLevelAndDate",singleEventListOrderByLevelAndDate);
+            if (!ObjectUtils.isEmpty(result)) {
+                return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+            }
+            return DtoUtil.getFalseDto("查询失败", 21003);
+        }
+        return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
 }

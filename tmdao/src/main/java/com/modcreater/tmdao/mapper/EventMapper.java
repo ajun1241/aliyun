@@ -56,4 +56,18 @@ public interface EventMapper {
      */
     int updOldEvent(SingleEvent singleEvent);
 
+    /**
+     * 根据日查找事件并根据事件等级(level)排序
+     * @param singleEvent
+     * @return
+     */
+    List<SingleEvent> queryByDayOrderByLevel(SingleEvent singleEvent);
+
+    /**
+     * 根据日查找事件并根据事件等级(level)和事件开始时间(startTime)排序
+     * @param singleEvent
+     * @return
+     */
+    List<SingleEvent> queryByDayOrderByLevelAndDate(SingleEvent singleEvent);
+
 }

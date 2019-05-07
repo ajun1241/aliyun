@@ -9,8 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -52,5 +54,18 @@ public class TmbizApplicationTests {
         uploadingEventVo.setYear(2019L);
         uploadingEventVo.setType(1L);
         System.out.println(SingleEventUtil.getSingleEvent(uploadingEventVo));
+    }
+
+    @Test
+    public void test3(){
+        List<String> list = new ArrayList<>();
+        list.add("4");
+        list.add("5");
+        list.add("1");
+        list.add("3");
+        list.add("2");
+        for (String s : list){
+            System.out.println(s);
+        }
     }
 }

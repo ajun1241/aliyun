@@ -3,6 +3,8 @@ package com.modcreater.tmbiz.service;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.*;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -60,5 +62,12 @@ public interface EventService {
      * @return
      */
     Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo);
+
+    /**
+     * 根据日期查询事件并排序
+     * @param searchEventVo
+     * @return
+     */
+    Dto searchByDayEventIds(SearchEventVo searchEventVo);
 
 }

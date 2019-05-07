@@ -9,7 +9,7 @@
 
     <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
             insert into singleevent values
-            (#{eventid},
+            (null ,
             #{userid},
             #{eventname},
             #{starttime},
@@ -72,6 +72,50 @@
             </if>
             and isOverdue &lt;&gt; 2
         </where>
+    </select>
+
+    <select id="queryByDayOrderByLevel" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
+        <where>
+            <if test="userid != null">
+                userid = #{userid}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            and isOverdue &lt;&gt; 2
+        </where>
+        order by level asc
+    </select>
+
+    <select id="queryByDayOrderByLevelAndDate" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
+        <where>
+            <if test="userid != null">
+                userid = #{userid}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            and isOverdue &lt;&gt; 2
+        </where>
+        order by level asc , startTime asc
     </select>
 
     <update id="updOldEvent">

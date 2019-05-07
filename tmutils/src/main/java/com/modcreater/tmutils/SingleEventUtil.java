@@ -48,4 +48,20 @@ public class SingleEventUtil {
         return null;
     }
 
+    /**
+     * 创建一个SingleEvent对象并仅赋值day,month,year和userId
+     * @param userId
+     * @param dayEventId
+     * @return
+     */
+    public static SingleEvent getSingleEvent(String userId,String dayEventId){
+        StringBuilder date = new StringBuilder(dayEventId);
+        SingleEvent singleEvent = new SingleEvent();
+        singleEvent.setYear(Long.valueOf(date.substring(0, 4)));
+        singleEvent.setMonth(Long.valueOf(date.substring(4, 6)));
+        singleEvent.setDay(Long.valueOf(date.substring(6, 8)));
+        singleEvent.setUserid(Long.valueOf(userId));
+        return singleEvent;
+    }
+
 }
