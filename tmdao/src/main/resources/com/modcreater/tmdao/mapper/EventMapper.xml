@@ -9,7 +9,7 @@
 
     <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
             insert into singleevent values
-            (null ,
+            (#{eventid} ,
             #{userid},
             #{eventname},
             #{starttime},
