@@ -117,4 +117,11 @@ public interface EventMapper {
      */
     List<SingleEvent> queryByMonthOrderByLevelAndDate(SingleEvent singleEvent);
 
+    /**
+     * 添加一个重复事件
+     * @param loopEvent
+     * @return
+     */
+    int uploadingLoopEvents(LoopEvent loopEvent);
+
 }

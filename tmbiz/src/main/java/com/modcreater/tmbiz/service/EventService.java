@@ -89,4 +89,11 @@ public interface EventService {
      * @return
      */
     Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo);
+
+    /**
+     * 添加一个重复事件
+     * @param uploadingEventVo
+     * @return
+     */
+    Dto addNewLoopEvents(UploadingEventVo uploadingEventVo);
 }
