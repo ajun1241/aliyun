@@ -28,6 +28,7 @@ import java.util.*;
  * Time: 11:32
  */
 @Service
+@Transactional
 public class EventServiceImpl implements EventService {
 
     @Resource

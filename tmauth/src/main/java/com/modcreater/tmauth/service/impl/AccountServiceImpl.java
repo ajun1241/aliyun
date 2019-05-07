@@ -10,6 +10,7 @@ import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
 import java.text.ParseException;
@@ -18,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Transactional
 public class AccountServiceImpl implements AccountService {
     @Resource
     private AccountMapper accountMapper;
