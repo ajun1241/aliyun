@@ -144,10 +144,10 @@ public interface EventMapper {
     /**
      * 查询重复事件
      *
-     * @param loopEvent
+     * @param userId
      * @return
      */
-    List<LoopEvent> queryLoopEvents(LoopEvent loopEvent);
+    List<LoopEvent> queryLoopEvents(String userId);
 
     /**
      * 根据"周"查找事件并根据事件开始时间(startTime)排序

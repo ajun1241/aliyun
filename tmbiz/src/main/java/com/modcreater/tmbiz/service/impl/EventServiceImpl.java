@@ -344,10 +344,43 @@ public class EventServiceImpl implements EventService {
             List<DayEvents> dayEventsList = new ArrayList<>();
             for (int i = 0; i <= 6; i++){
                 DayEvents dayEvents = new DayEvents();
-                singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), String.valueOf(Integer.valueOf(searchEventVo.getDayEventId()) + i));
+                String dayEventId = String.valueOf(Integer.valueOf(searchEventVo.getDayEventId()) + i);
+                singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),dayEventId);
                 dayEvents.setMySingleEventList(eventMapper.queryByWeekOrderByStartTime(singleEvent));
-                System.out.println(singleEvent);
+                dayEvents.setTotalNum(dayEvents.getMySingleEventList().size());
+                dayEvents.setUserId(Integer.valueOf(searchEventVo.getUserId()));
+                dayEvents.setDayEventId(Integer.valueOf(dayEventId));
                 dayEventsList.add(dayEvents);
+            }
+            List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            Map<String,List<LoopEvent>> result = new HashMap<>();
+            List<LoopEvent> monLoopEventList = new ArrayList<>();
+            List<LoopEvent> tueLoopEventList = new ArrayList<>();
+            List<LoopEvent> wedLoopEventList = new ArrayList<>();
+            List<LoopEvent> thuLoopEventList = new ArrayList<>();
+            List<LoopEvent> friLoopEventList = new ArrayList<>();
+            List<LoopEvent> satLoopEventList = new ArrayList<>();
+            List<LoopEvent> sunLoopEventList = new ArrayList<>();
+            for (LoopEvent loopEvent : loopEventListInDataBase){
+                SingleEvent event = new SingleEvent();
+                event.setEventid(loopEvent.getEventId());
+                event.setUserid(loopEvent.getUserId());
+                event.setEventname(loopEvent.getEventName());
+                event.setStarttime(loopEvent.getStartTime());
+                event.setEndtime(loopEvent.getEndTime());
+                event.setAddress(loopEvent.getAddress());
+                event.setLevel(loopEvent.getLevel());
+                event.setFlag(loopEvent.getFlag());
+                event.setPerson(loopEvent.getPerson());
+                event.setRemarks(loopEvent.getRemarks());
+                event.setRepeaTtime(loopEvent.getRepeatTime());
+                event.setIsOverdue(loopEvent.getIsOverdue());
+                event.setRemindTime(loopEvent.getRemindTime());
+                event.setDay(loopEvent.getDay());
+                event.setMonth(loopEvent.getMonth());
+                event.setYear(loopEvent.getYear());
+                event.setType(loopEvent.getType());
+
             }
             return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
         }
