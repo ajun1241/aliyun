@@ -39,17 +39,34 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
-        System.out.println(uploadingEventVo.toString());
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
-            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(uploadingEventVo);
-            System.out.println("*********************=="+singleEvent.toString());
-            if (eventMapper.uploadingEvents(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
+            SingleEvent singleEvent = new SingleEvent();
+            singleEvent.setEventid(uploadingEventVo.getSingleEvent().getEventid());
+            singleEvent.setUserid(uploadingEventVo.getSingleEvent().getUserid());
+            singleEvent.setEventname(uploadingEventVo.getSingleEvent().getEventname());
+            singleEvent.setStarttime(uploadingEventVo.getSingleEvent().getStarttime());
+            singleEvent.setEndtime(uploadingEventVo.getSingleEvent().getEndtime());
+            singleEvent.setAddress(uploadingEventVo.getSingleEvent().getAddress());
+            singleEvent.setLevel(uploadingEventVo.getSingleEvent().getLevel());
+            singleEvent.setFlag(uploadingEventVo.getSingleEvent().getFlag());
+            singleEvent.setPerson(uploadingEventVo.getSingleEvent().getPerson());
+            singleEvent.setRemarks(uploadingEventVo.getSingleEvent().getRemarks());
+            singleEvent.setRepeaTtime(uploadingEventVo.getSingleEvent().getRepeaTtime());
+            singleEvent.setIsOverdue(uploadingEventVo.getSingleEvent().getIsOverdue());
+            singleEvent.setRemindTime(uploadingEventVo.getSingleEvent().getRemindTime());
+            singleEvent.setDay(uploadingEventVo.getSingleEvent().getDay());
+            singleEvent.setMonth(uploadingEventVo.getSingleEvent().getMonth());
+            singleEvent.setYear(uploadingEventVo.getSingleEvent().getYear());
+            singleEvent.setType(uploadingEventVo.getSingleEvent().getType());
+            if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
                 try {
                     String time = DateUtil.dateToStamp(new Date());
                     if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
                         Map<String,String> timestamp = new HashMap<>();
                         timestamp.put("time",time);
                         return DtoUtil.getSuccesWithDataDto("事件上传成功",timestamp, 100000);
+                    }else {
+                        return DtoUtil.getSuccessDto("事件上传成功,时间戳添加失败", 100000);
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();

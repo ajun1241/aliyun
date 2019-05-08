@@ -22,7 +22,24 @@ public class SingleEventUtil {
     public static SingleEvent getSingleEvent(Object object) {
             SingleEvent singleEvent = new SingleEvent();
             try {
-                singleEvent.setEventid((Long) object.getClass().getMethod("getEventid").invoke(object));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getEventid").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getUserid").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getEventname").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getStarttime").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getEndtime").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getAddress").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getLevel").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getFlag").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getPerson").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getRemarks").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getRepeaTtime").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getIsOverdue").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getRemindTime").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getDay").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getMonth").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getYear").invoke(object)));
+                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getType").invoke(object)));
+                /*singleEvent.setEventid((Long) object.getClass().getMethod("getEventid").invoke(object));
                 singleEvent.setUserid((Long) object.getClass().getMethod("getUserid").invoke(object));
                 singleEvent.setEventname((String) object.getClass().getMethod("getEventname").invoke(object));
                 singleEvent.setStarttime((String) object.getClass().getMethod("getStarttime").invoke(object));
@@ -38,7 +55,7 @@ public class SingleEventUtil {
                 singleEvent.setDay((Long) object.getClass().getMethod("getDay").invoke(object));
                 singleEvent.setMonth((Long) object.getClass().getMethod("getMonth").invoke(object));
                 singleEvent.setYear((Long) object.getClass().getMethod("getYear").invoke(object));
-                singleEvent.setType((Long) object.getClass().getMethod("getType").invoke(object));
+                singleEvent.setType((Long) object.getClass().getMethod("getType").invoke(object));*/
             } catch (ReflectiveOperationException e) {
                 e.printStackTrace();
             }

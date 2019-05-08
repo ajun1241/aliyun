@@ -30,7 +30,7 @@ public class SingleEvent implements Serializable {
   private Long type;    //事件分类
 
   public SingleEvent() {
-      System.out.println(toString());
+
   }
 
   @Override
