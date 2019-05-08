@@ -121,7 +121,7 @@ public class EventServiceImpl implements EventService {
                     Boolean[] booleans = new Boolean[7];
                     String[] s = singleEvent1.getRepeaTtime().split(",");
                     for (int i = 0; i <= 6; i++) {
-                        booleans[i] = "true".equals(s);
+                        booleans[i] = "true".equals(s[i]);
                     }
                     ShowSingleEvent showSingleEvent = new ShowSingleEvent();
                     showSingleEvent.setUserid(singleEvent1.getUserid());
@@ -344,7 +344,7 @@ public class EventServiceImpl implements EventService {
                     Boolean[] booleans = new Boolean[7];
                     String[] s = singleEvent1.getRepeaTtime().split(",");
                     for (int i = 0; i <= 6; i++) {
-                        booleans[i] = "true".equals(s);
+                        booleans[i] = "true".equals(s[i]);
                     }
                     ShowSingleEvent showSingleEvent = new ShowSingleEvent();
                     showSingleEvent.setUserid(singleEvent1.getUserid());
@@ -370,7 +370,7 @@ public class EventServiceImpl implements EventService {
                     Boolean[] booleans = new Boolean[7];
                     String[] s = singleEvent1.getRepeaTtime().split(",");
                     for (int i = 0; i <= 6; i++) {
-                        booleans[i] = "true".equals(s);
+                        booleans[i] = "true".equals(s[i]);
                     }
                     ShowSingleEvent showSingleEvent = new ShowSingleEvent();
                     showSingleEvent.setUserid(singleEvent1.getUserid());
@@ -396,7 +396,7 @@ public class EventServiceImpl implements EventService {
                     Boolean[] booleans = new Boolean[7];
                     String[] s = singleEvent1.getRepeaTtime().split(",");
                     for (int i = 0; i <= 6; i++) {
-                        booleans[i] = "true".equals(s);
+                        booleans[i] = "true".equals(s[i]);
                     }
                     ShowSingleEvent showSingleEvent = new ShowSingleEvent();
                     showSingleEvent.setUserid(singleEvent1.getUserid());
@@ -453,7 +453,7 @@ public class EventServiceImpl implements EventService {
                     Boolean[] booleans = new Boolean[7];
                     String[] s = singleEvent1.getRepeaTtime().split(",");
                     for (int i = 0; i <= 6; i++) {
-                        booleans[i] = "true".equals(s);
+                        booleans[i] = "true".equals(s[i]);
                     }
                     ShowSingleEvent showSingleEvent = new ShowSingleEvent();
                     showSingleEvent.setUserid(singleEvent1.getUserid());
@@ -479,7 +479,7 @@ public class EventServiceImpl implements EventService {
                     Boolean[] booleans = new Boolean[7];
                     String[] s = singleEvent1.getRepeaTtime().split(",");
                     for (int i = 0; i <= 6; i++) {
-                        booleans[i] = "true".equals(s);
+                        booleans[i] = "true".equals(s[i]);
                     }
                     ShowSingleEvent showSingleEvent = new ShowSingleEvent();
                     showSingleEvent.setUserid(singleEvent1.getUserid());
@@ -543,7 +543,7 @@ public class EventServiceImpl implements EventService {
                     Boolean[] booleans = new Boolean[7];
                     String[] s = singleEvent1.getRepeaTtime().split(",");
                     for (int j = 0; j <= 6; j++) {
-                        booleans[j] = "true".equals(s);
+                        booleans[j] = "true".equals(s[j]);
                     }
                     ShowSingleEvent showSingleEvent = new ShowSingleEvent();
                     showSingleEvent.setUserid(singleEvent1.getUserid());
@@ -575,69 +575,72 @@ public class EventServiceImpl implements EventService {
             //按周查询重复事件
             List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
             Map result = new HashMap<>();
-            List<List<SingleEvent>> loopEventList = new ArrayList<>();
+            List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
             //创建七个几个代表一周七天
-            List<SingleEvent> monLoopEventList = new ArrayList<>();
-            List<SingleEvent> tueLoopEventList = new ArrayList<>();
-            List<SingleEvent> wedLoopEventList = new ArrayList<>();
-            List<SingleEvent> thuLoopEventList = new ArrayList<>();
-            List<SingleEvent> friLoopEventList = new ArrayList<>();
-            List<SingleEvent> satLoopEventList = new ArrayList<>();
-            List<SingleEvent> sunLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> monShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> tueShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> wedShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
             for (LoopEvent loopEvent : loopEventListInDataBase){
-                SingleEvent event = new SingleEvent();
-                String repeatTime = loopEvent.getRepeatTime();
-                event.setEventid(loopEvent.getEventId());
-                event.setUserid(loopEvent.getUserId());
-                event.setEventname(loopEvent.getEventName());
-                event.setStarttime(loopEvent.getStartTime());
-                event.setEndtime(loopEvent.getEndTime());
-                event.setAddress(loopEvent.getAddress());
-                event.setLevel(loopEvent.getLevel());
-                event.setFlag(loopEvent.getFlag());
-                event.setPerson(loopEvent.getPerson());
-                event.setRemarks(loopEvent.getRemarks());
-                event.setRepeaTtime(repeatTime);
-                event.setIsOverdue(loopEvent.getIsOverdue());
-                event.setRemindTime(loopEvent.getRemindTime());
-                event.setDay(loopEvent.getDay());
-                event.setMonth(loopEvent.getMonth());
-                event.setYear(loopEvent.getYear());
-                event.setType(loopEvent.getType());
-                //将字符串通过","拆分成String数组
-                String[] s = repeatTime.split(",");
-                //根据拆分出来的字符串数组进行判断并添加到一周的各个天数中
+                ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+                Boolean[] booleans = new Boolean[7];
+                String[] s = loopEvent.getRepeatTime().split(",");
+                for (int i = 0; i <= 6; i++) {
+                    booleans[i] = "true".equals(s[i]);
+                }
+                showSingleEvent.setEventid(loopEvent.getEventId());
+                showSingleEvent.setUserid(loopEvent.getUserId());
+                showSingleEvent.setEventname(loopEvent.getEventName());
+                showSingleEvent.setStarttime(loopEvent.getStartTime());
+                showSingleEvent.setEndtime(loopEvent.getEndTime());
+                showSingleEvent.setAddress(loopEvent.getAddress());
+                showSingleEvent.setLevel(loopEvent.getLevel());
+                showSingleEvent.setFlag(loopEvent.getFlag());
+                showSingleEvent.setPerson(loopEvent.getPerson());
+                showSingleEvent.setRemarks(loopEvent.getRemarks());
+                showSingleEvent.setRepeaTtime(booleans);
+                showSingleEvent.setIsOverdue(loopEvent.getIsOverdue());
+                showSingleEvent.setRemindTime(loopEvent.getRemindTime());
+                showSingleEvent.setDay(loopEvent.getDay());
+                showSingleEvent.setMonth(loopEvent.getMonth());
+                showSingleEvent.setYear(loopEvent.getYear());
+                showSingleEvent.setType(loopEvent.getType());
+                System.out.println(showSingleEvent);
+                //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
                 for (int i = 0; i <= 6; i++){
-                    if (i == 0 && s[i].equals("true")){
-                        monLoopEventList.add(event);
+                    if (i == 0 && booleans[i]){
+                        sunShowLoopEventList.add(showSingleEvent);
                     }
-                    if (i == 1 && s[i].equals("true")){
-                        tueLoopEventList.add(event);
+                    if (i == 1 && booleans[i]){
+                        monShowLoopEventList.add(showSingleEvent);
                     }
-                    if (i == 2 && s[i].equals("true")){
-                        wedLoopEventList.add(event);
+                    if (i == 2 && booleans[i]){
+                        tueShowLoopEventList.add(showSingleEvent);
                     }
-                    if (i == 3 && s[i].equals("true")){
-                        thuLoopEventList.add(event);
+                    if (i == 3 && booleans[i]){
+                        wedShowLoopEventList.add(showSingleEvent);
                     }
-                    if (i == 4 && s[i].equals("true")){
-                        friLoopEventList.add(event);
+                    if (i == 4 && booleans[i]){
+                        thuShowLoopEventList.add(showSingleEvent);
                     }
-                    if (i == 5 && s[i].equals("true")){
-                        satLoopEventList.add(event);
+                    if (i == 5 && booleans[i]){
+                        friShowLoopEventList.add(showSingleEvent);
                     }
-                    if (i == 6 && s[i].equals("true")){
-                        sunLoopEventList.add(event);
+                    if (i == 6 && booleans[i]){
+                        satShowLoopEventList.add(showSingleEvent);
                     }
                 }
             }
-            loopEventList.add(monLoopEventList);
-            loopEventList.add(tueLoopEventList);
-            loopEventList.add(wedLoopEventList);
-            loopEventList.add(thuLoopEventList);
-            loopEventList.add(friLoopEventList);
-            loopEventList.add(satLoopEventList);
-            loopEventList.add(sunLoopEventList);
+            loopEventList.add(sunShowLoopEventList);
+            loopEventList.add(monShowLoopEventList);
+            loopEventList.add(tueShowLoopEventList);
+            loopEventList.add(wedShowLoopEventList);
+            loopEventList.add(thuShowLoopEventList);
+            loopEventList.add(friShowLoopEventList);
+            loopEventList.add(satShowLoopEventList);
             result.put("dayEventsList",dayEventsList);
             result.put("loopEventList",loopEventList);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);

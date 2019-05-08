@@ -224,10 +224,7 @@
         select
         <include refid="Base_Column_List"/>
         from loopevent
-        <where>
-                userid = #{userId}
-            and isOverdue &lt;&gt; 2
-        </where>
+        where userid = #{userId} and isOverdue &lt;&gt; 2
     </select>
     <select id="queryByWeekOrderByStartTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
