@@ -19,7 +19,7 @@ public class SingleEventUtil {
      * @param object
      * @return
      */
-    public static SingleEvent getSingleEvent(Object object) {
+    /*public static SingleEvent getSingleEvent(Object object) {
             SingleEvent singleEvent = new SingleEvent();
             try {
                 singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getEventid").invoke(object)));
@@ -39,7 +39,7 @@ public class SingleEventUtil {
                 singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getMonth").invoke(object)));
                 singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getYear").invoke(object)));
                 singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getType").invoke(object)));
-                /*singleEvent.setEventid((Long) object.getClass().getMethod("getEventid").invoke(object));
+                *//*singleEvent.setEventid((Long) object.getClass().getMethod("getEventid").invoke(object));
                 singleEvent.setUserid((Long) object.getClass().getMethod("getUserid").invoke(object));
                 singleEvent.setEventname((String) object.getClass().getMethod("getEventname").invoke(object));
                 singleEvent.setStarttime((String) object.getClass().getMethod("getStarttime").invoke(object));
@@ -55,13 +55,13 @@ public class SingleEventUtil {
                 singleEvent.setDay((Long) object.getClass().getMethod("getDay").invoke(object));
                 singleEvent.setMonth((Long) object.getClass().getMethod("getMonth").invoke(object));
                 singleEvent.setYear((Long) object.getClass().getMethod("getYear").invoke(object));
-                singleEvent.setType((Long) object.getClass().getMethod("getType").invoke(object));*/
+                singleEvent.setType((Long) object.getClass().getMethod("getType").invoke(object));*//*
             } catch (ReflectiveOperationException e) {
                 e.printStackTrace();
             }
             System.out.println(singleEvent.toString());
             return singleEvent;
-    }
+    }*/
 
     /**
      * 创建一个SingleEvent对象并仅赋值day,month,year和userId

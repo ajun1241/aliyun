@@ -104,7 +104,24 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (!ObjectUtils.isEmpty(updateEventVo)) {
-            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(updateEventVo);
+            SingleEvent singleEvent = new SingleEvent();
+            singleEvent.setEventid(updateEventVo.getSingleEvent().getEventid());
+            singleEvent.setUserid(updateEventVo.getSingleEvent().getUserid());
+            singleEvent.setEventname(updateEventVo.getSingleEvent().getEventname());
+            singleEvent.setStarttime(updateEventVo.getSingleEvent().getStarttime());
+            singleEvent.setEndtime(updateEventVo.getSingleEvent().getEndtime());
+            singleEvent.setAddress(updateEventVo.getSingleEvent().getAddress());
+            singleEvent.setLevel(updateEventVo.getSingleEvent().getLevel());
+            singleEvent.setFlag(updateEventVo.getSingleEvent().getFlag());
+            singleEvent.setPerson(updateEventVo.getSingleEvent().getPerson());
+            singleEvent.setRemarks(updateEventVo.getSingleEvent().getRemarks());
+            singleEvent.setRepeaTtime(updateEventVo.getSingleEvent().getRepeaTtime());
+            singleEvent.setIsOverdue(updateEventVo.getSingleEvent().getIsOverdue());
+            singleEvent.setRemindTime(updateEventVo.getSingleEvent().getRemindTime());
+            singleEvent.setDay(updateEventVo.getSingleEvent().getDay());
+            singleEvent.setMonth(updateEventVo.getSingleEvent().getMonth());
+            singleEvent.setYear(updateEventVo.getSingleEvent().getYear());
+            singleEvent.setType(updateEventVo.getSingleEvent().getType());
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     String time = DateUtil.dateToStamp(new Date());
@@ -356,7 +373,25 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewLoopEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)){
-            if (eventMapper.uploadingLoopEvents(SingleEventUtil.getSingleEvent(uploadingEventVo)) > 0){
+            SingleEvent singleEvent = new SingleEvent();
+            singleEvent.setEventid(uploadingEventVo.getSingleEvent().getEventid());
+            singleEvent.setUserid(uploadingEventVo.getSingleEvent().getUserid());
+            singleEvent.setEventname(uploadingEventVo.getSingleEvent().getEventname());
+            singleEvent.setStarttime(uploadingEventVo.getSingleEvent().getStarttime());
+            singleEvent.setEndtime(uploadingEventVo.getSingleEvent().getEndtime());
+            singleEvent.setAddress(uploadingEventVo.getSingleEvent().getAddress());
+            singleEvent.setLevel(uploadingEventVo.getSingleEvent().getLevel());
+            singleEvent.setFlag(uploadingEventVo.getSingleEvent().getFlag());
+            singleEvent.setPerson(uploadingEventVo.getSingleEvent().getPerson());
+            singleEvent.setRemarks(uploadingEventVo.getSingleEvent().getRemarks());
+            singleEvent.setRepeaTtime(uploadingEventVo.getSingleEvent().getRepeaTtime());
+            singleEvent.setIsOverdue(uploadingEventVo.getSingleEvent().getIsOverdue());
+            singleEvent.setRemindTime(uploadingEventVo.getSingleEvent().getRemindTime());
+            singleEvent.setDay(uploadingEventVo.getSingleEvent().getDay());
+            singleEvent.setMonth(uploadingEventVo.getSingleEvent().getMonth());
+            singleEvent.setYear(uploadingEventVo.getSingleEvent().getYear());
+            singleEvent.setType(uploadingEventVo.getSingleEvent().getType());
+            if (eventMapper.uploadingLoopEvents(singleEvent) > 0){
                 return DtoUtil.getSuccessDto("上传重复事件成功",100000);
             }
             return DtoUtil.getFalseDto("上传重复事件失败",21009);
