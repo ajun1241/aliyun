@@ -428,7 +428,9 @@ public class EventServiceImpl implements EventService {
 
 
             List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
-            Map<String,List<LoopEvent>> result = new HashMap<>();
+            System.out.println(loopEventListInDataBase.size());
+            Map result = new HashMap<>();
+            List<List<SingleEvent>> loopEventList = new ArrayList<>();
             List<SingleEvent> monLoopEventList = new ArrayList<>();
             List<SingleEvent> tueLoopEventList = new ArrayList<>();
             List<SingleEvent> wedLoopEventList = new ArrayList<>();
@@ -437,6 +439,7 @@ public class EventServiceImpl implements EventService {
             List<SingleEvent> satLoopEventList = new ArrayList<>();
             List<SingleEvent> sunLoopEventList = new ArrayList<>();
             for (LoopEvent loopEvent : loopEventListInDataBase){
+                System.out.println(loopEvent.toString());
                 SingleEvent event = new SingleEvent();
                 String repeatTime = loopEvent.getRepeatTime();
                 event.setEventid(loopEvent.getEventId());
@@ -481,7 +484,16 @@ public class EventServiceImpl implements EventService {
                     }
                 }
             }
-            return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
+            loopEventList.add(monLoopEventList);
+            loopEventList.add(tueLoopEventList);
+            loopEventList.add(wedLoopEventList);
+            loopEventList.add(thuLoopEventList);
+            loopEventList.add(friLoopEventList);
+            loopEventList.add(satLoopEventList);
+            loopEventList.add(sunLoopEventList);
+            result.put("dayEventsList",dayEventsList);
+            result.put("loopEventList",loopEventList);
+            return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         }
         return DtoUtil.getFalseDto("查询条件接收失败",21004);
     }
