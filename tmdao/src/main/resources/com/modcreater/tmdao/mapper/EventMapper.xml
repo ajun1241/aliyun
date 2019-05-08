@@ -169,9 +169,6 @@
             <if test="userid != null">
                 userid = #{userid}
             </if>
-            <if test="day != null">
-                and day = #{day}
-            </if>
             <if test="month != null">
                 and month = #{month}
             </if>

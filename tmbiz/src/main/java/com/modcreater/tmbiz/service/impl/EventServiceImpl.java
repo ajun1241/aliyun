@@ -443,15 +443,73 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
+            boolean b = false;
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
             //只根据level升序
             List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByMonthOrderByLevel(singleEvent);
+            List<ShowSingleEvent> showSingleEventListOrderByLevel = new ArrayList<>();
             //根据level和事件升序
             List<SingleEvent> singleEventListOrderByLevelAndDate = eventMapper.queryByMonthOrderByLevelAndDate(singleEvent);
-            Map<String,List<SingleEvent>> result = new HashMap<>();
-            result.put("singleEventListOrderByLevel",singleEventListOrderByLevel);
-            result.put("singleEventListOrderByLevelAndDate",singleEventListOrderByLevelAndDate);
-            if (!ObjectUtils.isEmpty(result)) {
+            List<ShowSingleEvent> showSingleEventListOrderByLevelAndDate = new ArrayList<>();
+            if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0){
+                for (SingleEvent singleEvent1 : singleEventListOrderByLevel) {
+                    Boolean[] booleans = new Boolean[7];
+                    String[] s = singleEvent1.getRepeaTtime().split(",");
+                    for (int i = 0; i <= 6; i++) {
+                        booleans[i] = "true".equals(s);
+                    }
+                    ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+                    showSingleEvent.setUserid(singleEvent1.getUserid());
+                    showSingleEvent.setEventid(singleEvent1.getEventid());
+                    showSingleEvent.setEventname(singleEvent1.getEventname());
+                    showSingleEvent.setStarttime(singleEvent1.getStarttime());
+                    showSingleEvent.setEndtime(singleEvent1.getEndtime());
+                    showSingleEvent.setFlag(singleEvent1.getFlag());
+                    showSingleEvent.setLevel(singleEvent1.getLevel());
+                    showSingleEvent.setPerson(singleEvent1.getPerson());
+                    showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
+                    showSingleEvent.setRemarks(singleEvent1.getRemarks());
+                    showSingleEvent.setDay(singleEvent1.getDay());
+                    showSingleEvent.setMonth(singleEvent1.getMonth());
+                    showSingleEvent.setYear(singleEvent1.getYear());
+                    showSingleEvent.setType(singleEvent1.getType());
+                    showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
+                    showSingleEvent.setAddress(singleEvent1.getAddress());
+                    showSingleEvent.setRepeaTtime(booleans);
+                    showSingleEventListOrderByLevel.add(showSingleEvent);
+                }
+                for (SingleEvent singleEvent1 : singleEventListOrderByLevelAndDate) {
+                    Boolean[] booleans = new Boolean[7];
+                    String[] s = singleEvent1.getRepeaTtime().split(",");
+                    for (int i = 0; i <= 6; i++) {
+                        booleans[i] = "true".equals(s);
+                    }
+                    ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+                    showSingleEvent.setUserid(singleEvent1.getUserid());
+                    showSingleEvent.setEventid(singleEvent1.getEventid());
+                    showSingleEvent.setEventname(singleEvent1.getEventname());
+                    showSingleEvent.setStarttime(singleEvent1.getStarttime());
+                    showSingleEvent.setEndtime(singleEvent1.getEndtime());
+                    showSingleEvent.setFlag(singleEvent1.getFlag());
+                    showSingleEvent.setLevel(singleEvent1.getLevel());
+                    showSingleEvent.setPerson(singleEvent1.getPerson());
+                    showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
+                    showSingleEvent.setRemarks(singleEvent1.getRemarks());
+                    showSingleEvent.setDay(singleEvent1.getDay());
+                    showSingleEvent.setMonth(singleEvent1.getMonth());
+                    showSingleEvent.setYear(singleEvent1.getYear());
+                    showSingleEvent.setType(singleEvent1.getType());
+                    showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
+                    showSingleEvent.setAddress(singleEvent1.getAddress());
+                    showSingleEvent.setRepeaTtime(booleans);
+                    showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
+                }
+                b = true;
+            }
+            Map<String, Object> result = new HashMap<>();
+            result.put("showSingleEventListOrderByLevel",showSingleEventListOrderByLevel);
+            result.put("showSingleEventListOrderByLevelAndDate",showSingleEventListOrderByLevelAndDate);
+            if (b) {
                 return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
             }
             return DtoUtil.getFalseDto("查询失败", 21003);
