@@ -39,8 +39,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
-        System.out.println(uploadingEventVo.toString());
-
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(uploadingEventVo);
             if (eventMapper.uploadingEvents(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
@@ -151,7 +149,7 @@ public class EventServiceImpl implements EventService {
                 singleEvent.setDay(Long.parseLong(day));
                 singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
             } catch (Exception e) {
-                return DtoUtil.getFalseDto("dayEventId格式不正确",25004);
+                e.printStackTrace();
             }
 /*            singleEvents=eventMapper.queryEvents(singleEvent);
             if (ObjectUtils.isEmpty(singleEvents)){
@@ -176,7 +174,7 @@ public class EventServiceImpl implements EventService {
             for (int j = 0; j < dayEvents.getMySingleEventList().size(); j++) {
                 int uplResult=eventMapper.uploadingEvents(dayEvents.getMySingleEventList().get(j));
                 if (uplResult<=0){
-                    return DtoUtil.getFalseDto("上传事件失败,eventId为"+dayEvents.getMySingleEventList().get(j).getEventid(),25005);
+                    return DtoUtil.getFalseDto("上传事件失败",25005);
                 }
             }
         }
