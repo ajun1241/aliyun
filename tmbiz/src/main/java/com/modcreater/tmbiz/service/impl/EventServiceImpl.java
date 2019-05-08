@@ -39,8 +39,10 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
+        System.out.println(uploadingEventVo.toString());
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(uploadingEventVo);
+            System.out.println("*********************=="+singleEvent.toString());
             if (eventMapper.uploadingEvents(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     String time = DateUtil.dateToStamp(new Date());

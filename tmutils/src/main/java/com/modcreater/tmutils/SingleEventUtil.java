@@ -20,7 +20,6 @@ public class SingleEventUtil {
      * @return
      */
     public static SingleEvent getSingleEvent(Object object) {
-        if (SingleEvent.class.isAssignableFrom(object.getClass())) {
             SingleEvent singleEvent = new SingleEvent();
             try {
                 singleEvent.setEventid((Long) object.getClass().getMethod("getEventid").invoke(object));
@@ -33,7 +32,7 @@ public class SingleEventUtil {
                 singleEvent.setFlag((Long) object.getClass().getMethod("getFlag").invoke(object));
                 singleEvent.setPerson((String) object.getClass().getMethod("getPerson").invoke(object));
                 singleEvent.setRemarks((String) object.getClass().getMethod("getRemarks").invoke(object));
-                singleEvent.setRepeaTtime((Boolean[]) object.getClass().getMethod("getRepeaTtime").invoke(object));
+                singleEvent.setRepeaTtime((String) object.getClass().getMethod("getRepeaTtime").invoke(object));
                 singleEvent.setIsOverdue((Long) object.getClass().getMethod("getIsOverdue").invoke(object));
                 singleEvent.setRemindTime((String) object.getClass().getMethod("getRemindTime").invoke(object));
                 singleEvent.setDay((Long) object.getClass().getMethod("getDay").invoke(object));
@@ -43,9 +42,8 @@ public class SingleEventUtil {
             } catch (ReflectiveOperationException e) {
                 e.printStackTrace();
             }
+            System.out.println(singleEvent.toString());
             return singleEvent;
-        }
-        return null;
     }
 
     /**
