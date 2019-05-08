@@ -28,4 +28,32 @@ public class SingleEvent implements Serializable {
   private Long month;      //月
   private Long day;        //日
   private Long type;    //事件分类
+
+  public SingleEvent() {
+      System.out.println(toString());
+  }
+
+  @Override
+  public String toString() {
+    return "SingleEvent{" +
+            "userid=" + userid +
+            ", eventid=" + eventid +
+            ", eventname='" + eventname + '\'' +
+            ", starttime='" + starttime + '\'' +
+            ", endtime='" + endtime + '\'' +
+            ", address='" + address + '\'' +
+            ", level=" + level +
+            ", duration=" + duration +
+            ", flag=" + flag +
+            ", person='" + person + '\'' +
+            ", remarks='" + remarks + '\'' +
+            ", repeaTtime='" + repeaTtime + '\'' +
+            ", isOverdue=" + isOverdue +
+            ", remindTime='" + remindTime + '\'' +
+            ", year=" + year +
+            ", month=" + month +
+            ", day=" + day +
+            ", type=" + type +
+            '}';
+  }
 }

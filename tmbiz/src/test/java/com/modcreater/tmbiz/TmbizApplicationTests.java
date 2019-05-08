@@ -36,7 +36,7 @@ public class TmbizApplicationTests {
     @Test
     public void test2() {
         UploadingEventVo uploadingEventVo = new UploadingEventVo();
-        uploadingEventVo.setEventid(100L);
+      /*  uploadingEventVo.setEventid(100L);
         uploadingEventVo.setUserid(10086L);
         uploadingEventVo.setEventname("测试名称");
         uploadingEventVo.setStarttime("1557109312");
@@ -52,7 +52,7 @@ public class TmbizApplicationTests {
         uploadingEventVo.setDay(5L);
         uploadingEventVo.setMonth(5L);
         uploadingEventVo.setYear(2019L);
-        uploadingEventVo.setType(1L);
+        uploadingEventVo.setType(1L);*/
         System.out.println(SingleEventUtil.getSingleEvent(uploadingEventVo));
     }
 
