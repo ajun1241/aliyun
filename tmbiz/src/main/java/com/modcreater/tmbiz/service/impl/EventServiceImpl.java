@@ -347,6 +347,7 @@ public class EventServiceImpl implements EventService {
             dayEvents.setTotalNum(singleEventList.size());
             dayEvents.setDayEventId(Integer.valueOf(searchEventVo.getDayEventId()));
             dayEvents.setMySingleEventList(singleEventList);
+            System.out.println(singleEventList.toString());
             Map<String,Object> result = new HashMap<>();
             result.put("singleEventListOrderByLevel",singleEventListOrderByLevel);
             result.put("singleEventListOrderByLevelAndDate",singleEventListOrderByLevelAndDate);

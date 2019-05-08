@@ -239,8 +239,8 @@
         <include refid="Base_Column_List"/>
         from singleevent
         <where>
-            <if test="userid != null">
-                userid = #{userid}
+            <if test="userId != null">
+                userid = #{userId}
             </if>
             <if test="day != null">
                 and day = #{day}
