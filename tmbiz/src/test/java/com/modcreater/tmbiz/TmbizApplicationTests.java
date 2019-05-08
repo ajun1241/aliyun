@@ -57,7 +57,12 @@ public class TmbizApplicationTests {
     }
 
     @Test
-    public void test3(){
-
+    public void test3() {
+        String s = "1,2,3,4,5,6,7";
+        String[] strings = s.split(",");
+        for (String s1 : strings){
+            System.out.println(s1);
+        }
     }
+
 }

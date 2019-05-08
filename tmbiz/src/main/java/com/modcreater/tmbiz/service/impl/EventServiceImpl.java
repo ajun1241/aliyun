@@ -60,6 +60,7 @@ public class EventServiceImpl implements EventService {
             singleEvent.setMonth(uploadingEventVo.getMonth());
             singleEvent.setYear(uploadingEventVo.getYear());
             singleEvent.setType(uploadingEventVo.getType());*/
+            singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
             if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
                 try {
                     String time = DateUtil.dateToStamp(new Date());
@@ -421,17 +422,20 @@ public class EventServiceImpl implements EventService {
                 dayEvents.setDayEventId(Integer.valueOf(dayEventId));
                 dayEventsList.add(dayEvents);
             }
+
+
             List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
             Map<String,List<LoopEvent>> result = new HashMap<>();
-            List<LoopEvent> monLoopEventList = new ArrayList<>();
-            List<LoopEvent> tueLoopEventList = new ArrayList<>();
-            List<LoopEvent> wedLoopEventList = new ArrayList<>();
-            List<LoopEvent> thuLoopEventList = new ArrayList<>();
-            List<LoopEvent> friLoopEventList = new ArrayList<>();
-            List<LoopEvent> satLoopEventList = new ArrayList<>();
-            List<LoopEvent> sunLoopEventList = new ArrayList<>();
+            List<SingleEvent> monLoopEventList = new ArrayList<>();
+            List<SingleEvent> tueLoopEventList = new ArrayList<>();
+            List<SingleEvent> wedLoopEventList = new ArrayList<>();
+            List<SingleEvent> thuLoopEventList = new ArrayList<>();
+            List<SingleEvent> friLoopEventList = new ArrayList<>();
+            List<SingleEvent> satLoopEventList = new ArrayList<>();
+            List<SingleEvent> sunLoopEventList = new ArrayList<>();
             for (LoopEvent loopEvent : loopEventListInDataBase){
                 SingleEvent event = new SingleEvent();
+                String repeatTime = loopEvent.getRepeatTime();
                 event.setEventid(loopEvent.getEventId());
                 event.setUserid(loopEvent.getUserId());
                 event.setEventname(loopEvent.getEventName());
@@ -442,14 +446,37 @@ public class EventServiceImpl implements EventService {
                 event.setFlag(loopEvent.getFlag());
                 event.setPerson(loopEvent.getPerson());
                 event.setRemarks(loopEvent.getRemarks());
-                event.setRepeaTtime(loopEvent.getRepeatTime());
+                event.setRepeaTtime(repeatTime);
                 event.setIsOverdue(loopEvent.getIsOverdue());
                 event.setRemindTime(loopEvent.getRemindTime());
                 event.setDay(loopEvent.getDay());
                 event.setMonth(loopEvent.getMonth());
                 event.setYear(loopEvent.getYear());
                 event.setType(loopEvent.getType());
-
+                String[] s = repeatTime.split(",");
+                for (int i = 0; i <= 6; i++){
+                    if (i == 0 && s[i].equals("true")){
+                        monLoopEventList.add(event);
+                    }
+                    if (i == 1 && s[i].equals("true")){
+                        tueLoopEventList.add(event);
+                    }
+                    if (i == 2 && s[i].equals("true")){
+                        wedLoopEventList.add(event);
+                    }
+                    if (i == 3 && s[i].equals("true")){
+                        thuLoopEventList.add(event);
+                    }
+                    if (i == 4 && s[i].equals("true")){
+                        friLoopEventList.add(event);
+                    }
+                    if (i == 5 && s[i].equals("true")){
+                        satLoopEventList.add(event);
+                    }
+                    if (i == 6 && s[i].equals("true")){
+                        sunLoopEventList.add(event);
+                    }
+                }
             }
             return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
         }
