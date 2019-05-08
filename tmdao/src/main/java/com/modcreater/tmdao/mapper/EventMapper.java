@@ -50,7 +50,7 @@ public interface EventMapper {
      * @param singleEvent
      * @return
      */
-    List<SingleEvent> queryEvents(SingleEvent singleEvent);
+    ArrayList<SingleEvent> queryEvents(SingleEvent singleEvent);
 
     /**
      * 同步修改

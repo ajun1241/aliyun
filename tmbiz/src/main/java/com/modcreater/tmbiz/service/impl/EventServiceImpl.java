@@ -296,9 +296,17 @@ public class EventServiceImpl implements EventService {
             List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByDayOrderByLevel(singleEvent);
             //根据level和事件升序
             List<SingleEvent> singleEventListOrderByLevelAndDate = eventMapper.queryByDayOrderByLevelAndDate(singleEvent);
-            Map<String,List<SingleEvent>> result = new HashMap<>();
+            //添加一个未排序的结果集到dayEvents中
+            DayEvents dayEvents = new DayEvents();
+            ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+            dayEvents.setUserId(singleEvent.getUserid().intValue());
+            dayEvents.setTotalNum(singleEventList.size());
+            dayEvents.setDayEventId(Integer.valueOf(searchEventVo.getDayEventId()));
+            dayEvents.setMySingleEventList(singleEventList);
+            Map<String,Object> result = new HashMap<>();
             result.put("singleEventListOrderByLevel",singleEventListOrderByLevel);
             result.put("singleEventListOrderByLevelAndDate",singleEventListOrderByLevelAndDate);
+            result.put("dayEvents",dayEvents);
             if (!ObjectUtils.isEmpty(result)) {
                 return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
             }
