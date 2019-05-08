@@ -125,11 +125,25 @@ public class EventServiceImpl implements EventService {
                     for (int i = 0; i <= 6; i++) {
                         booleans[i] = "true".equals(s);
                     }
-                    String text = JSONObject.toJSONString(singleEvent1);
-                    ///////////////////////////
-                    System.out.println(text);
-                    ///////////////////////////
-                    showSingleEventList.add(JSONObject.parseObject(text, ShowSingleEvent.class));
+                    ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+                    showSingleEvent.setUserid(singleEvent1.getUserid());
+                    showSingleEvent.setEventid(singleEvent1.getEventid());
+                    showSingleEvent.setEventname(singleEvent1.getEventname());
+                    showSingleEvent.setStarttime(singleEvent1.getStarttime());
+                    showSingleEvent.setEndtime(singleEvent1.getEndtime());
+                    showSingleEvent.setFlag(singleEvent1.getFlag());
+                    showSingleEvent.setLevel(singleEvent1.getLevel());
+                    showSingleEvent.setPerson(singleEvent1.getPerson());
+                    showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
+                    showSingleEvent.setRemarks(singleEvent1.getRemarks());
+                    showSingleEvent.setDay(singleEvent1.getDay());
+                    showSingleEvent.setMonth(singleEvent1.getMonth());
+                    showSingleEvent.setYear(singleEvent1.getYear());
+                    showSingleEvent.setType(singleEvent1.getType());
+                    showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
+                    showSingleEvent.setAddress(singleEvent1.getAddress());
+                    showSingleEvent.setRepeaTtime(booleans);
+                    showSingleEventList.add(showSingleEvent);
 
                 }
                 return DtoUtil.getSuccesWithDataDto("查询成功", showSingleEventList, 100000);
@@ -315,6 +329,7 @@ public class EventServiceImpl implements EventService {
     public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
             System.out.println(searchEventVo.toString());
+            boolean b = false;
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
             //只根据level升序
             List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByDayOrderByLevel(singleEvent);
@@ -323,16 +338,20 @@ public class EventServiceImpl implements EventService {
             //添加一个未排序的结果集到dayEvents中
             DayEvents dayEvents = new DayEvents();
             ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+            if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0 && singleEventList.size() != 0){
+                b = true;
+            }
             dayEvents.setUserId(singleEvent.getUserid().intValue());
             dayEvents.setTotalNum(singleEventList.size());
             dayEvents.setDayEventId(Integer.valueOf(searchEventVo.getDayEventId()));
             dayEvents.setMySingleEventList(singleEventList);
             System.out.println(singleEventList.toString());
             Map<String,Object> result = new HashMap<>();
+
             result.put("singleEventListOrderByLevel",singleEventListOrderByLevel);
             result.put("singleEventListOrderByLevelAndDate",singleEventListOrderByLevelAndDate);
             result.put("dayEvents",dayEvents);
-            if (!ObjectUtils.isEmpty(result)) {
+            if (b) {
                 return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
             }
             return DtoUtil.getFalseDto("查询失败", 21003);
