@@ -82,6 +82,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto deleteEvents(DeleteEventVo deleteEventVo) {
         if (!ObjectUtils.isEmpty(deleteEventVo)) {
+            System.out.println(deleteEventVo.toString());
             SingleEvent singleEvent = new SingleEvent();
             singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
             singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
@@ -145,6 +146,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchEvents(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
+            System.out.println(searchEventVo.toString());
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
             List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
             if (!ObjectUtils.isEmpty(singleEventList)) {
@@ -330,6 +332,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
+            System.out.println(searchEventVo.toString());
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
             //只根据level升序
             List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByDayOrderByLevel(singleEvent);

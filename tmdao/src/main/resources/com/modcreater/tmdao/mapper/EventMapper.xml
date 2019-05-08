@@ -228,8 +228,8 @@
         <include refid="Base_Column_List"/>
         from singleevent
         <where>
-            <if test="userid != null">
-                userid = #{userid}
+            <if test="userId != null">
+                userid = #{userId}
             </if>
             and isOverdue &lt;&gt; 2
         </where>
