@@ -25,6 +25,6 @@ public class SearchEventVo implements Serializable {
     /**
      *
      */
-    private String type;
+    private String apptype;
 
 }

@@ -32,5 +32,5 @@ public class SynchronousUpdateVo implements Serializable {
     /**
      *
      */
-    private String type;
+    private String apptype;
 }

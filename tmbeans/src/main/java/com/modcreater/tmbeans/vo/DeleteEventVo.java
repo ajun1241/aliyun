@@ -26,6 +26,6 @@ public class DeleteEventVo implements Serializable {
     /**
      *
      */
-    private String type;
+    private String apptype;
 
 }

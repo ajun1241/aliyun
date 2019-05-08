@@ -16,13 +16,11 @@ import java.io.Serializable;
  * Time: 16:05
  */
 @Data
-public class UploadingEventVo  implements Serializable {
+public class UploadingEventVo implements Serializable {
     /**
      * 用户ID
      */
     private String userId;
-
-    private SingleEvent singleEvent;
-
-    private String type;
+    private String singleEvent;
+    private String apptype;
 }
