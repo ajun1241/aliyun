@@ -7,11 +7,11 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.ArrayList;
 @Data
-public class DayEvents implements Serializable {
+public class DayEvents<T> implements Serializable {
 
     private int userId;
     private int totalNum;
-    private ArrayList<SingleEvent> mySingleEventList ;
+    private ArrayList<T> mySingleEventList ;
     private int DayEventId;
 
 }
