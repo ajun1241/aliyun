@@ -127,6 +127,7 @@ public class EventServiceImpl implements EventService {
             singleEvent.setMonth(updateEventVo.getMonth());
             singleEvent.setYear(updateEventVo.getYear());
             singleEvent.setType(updateEventVo.getType());*/
+            singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     String time = DateUtil.dateToStamp(new Date());
@@ -399,6 +400,7 @@ public class EventServiceImpl implements EventService {
             singleEvent.setMonth(uploadingEventVo.getMonth());
             singleEvent.setYear(uploadingEventVo.getYear());
             singleEvent.setType(uploadingEventVo.getType());*/
+            singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
             if (eventMapper.uploadingLoopEvents(singleEvent) > 0){
                 return DtoUtil.getSuccessDto("上传重复事件成功",100000);
             }
