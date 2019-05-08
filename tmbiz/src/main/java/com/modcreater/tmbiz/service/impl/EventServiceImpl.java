@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.LoopEvent;
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.AccountMapper;
@@ -43,23 +44,6 @@ public class EventServiceImpl implements EventService {
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
             System.out.println("================"+uploadingEventVo.toString());
             SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(),SingleEvent.class);
-            /*singleEvent.setEventid(uploadingEventVo.getEventid());
-            singleEvent.setUserid(uploadingEventVo.getUserid());
-            singleEvent.setEventname(uploadingEventVo.getEventname());
-            singleEvent.setStarttime(uploadingEventVo.getStarttime());
-            singleEvent.setEndtime(uploadingEventVo.getEndtime());
-            singleEvent.setAddress(uploadingEventVo.getAddress());
-            singleEvent.setLevel(uploadingEventVo.getLevel());
-            singleEvent.setFlag(uploadingEventVo.getFlag());
-            singleEvent.setPerson(uploadingEventVo.getPerson());
-            singleEvent.setRemarks(uploadingEventVo.getRemarks());
-            singleEvent.setRepeaTtime(uploadingEventVo.getRepeaTtime());
-            singleEvent.setIsOverdue(uploadingEventVo.getIsOverdue());
-            singleEvent.setRemindTime(uploadingEventVo.getRemindTime());
-            singleEvent.setDay(uploadingEventVo.getDay());
-            singleEvent.setMonth(uploadingEventVo.getMonth());
-            singleEvent.setYear(uploadingEventVo.getYear());
-            singleEvent.setType(uploadingEventVo.getType());*/
             singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
             if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
                 try {
@@ -109,24 +93,6 @@ public class EventServiceImpl implements EventService {
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (!ObjectUtils.isEmpty(updateEventVo)) {
             SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(),SingleEvent.class);
-            /*SingleEvent singleEvent = new SingleEvent();
-            singleEvent.setEventid(updateEventVo.getEventid());
-            singleEvent.setUserid(updateEventVo.getUserid());
-            singleEvent.setEventname(updateEventVo.getEventname());
-            singleEvent.setStarttime(updateEventVo.getStarttime());
-            singleEvent.setEndtime(updateEventVo.getEndtime());
-            singleEvent.setAddress(updateEventVo.getAddress());
-            singleEvent.setLevel(updateEventVo.getLevel());
-            singleEvent.setFlag(updateEventVo.getFlag());
-            singleEvent.setPerson(updateEventVo.getPerson());
-            singleEvent.setRemarks(updateEventVo.getRemarks());
-            singleEvent.setRepeaTtime(updateEventVo.getRepeaTtime());
-            singleEvent.setIsOverdue(updateEventVo.getIsOverdue());
-            singleEvent.setRemindTime(updateEventVo.getRemindTime());
-            singleEvent.setDay(updateEventVo.getDay());
-            singleEvent.setMonth(updateEventVo.getMonth());
-            singleEvent.setYear(updateEventVo.getYear());
-            singleEvent.setType(updateEventVo.getType());*/
             singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
@@ -149,10 +115,24 @@ public class EventServiceImpl implements EventService {
     public Dto searchEvents(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
             System.out.println(searchEventVo.toString());
-            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
+            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
             List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+            List<ShowSingleEvent> showSingleEventList = new ArrayList<>();
             if (!ObjectUtils.isEmpty(singleEventList)) {
-                return DtoUtil.getSuccesWithDataDto("查询成功", singleEventList, 100000);
+                for (SingleEvent singleEvent1 : singleEventList) {
+                    Boolean[] booleans = new Boolean[7];
+                    String[] s = singleEvent1.getRepeaTtime().split(",");
+                    for (int i = 0; i <= 6; i++) {
+                        booleans[i] = "true".equals(s);
+                    }
+                    String text = JSONObject.toJSONString(singleEvent1);
+                    ///////////////////////////
+                    System.out.println(text);
+                    ///////////////////////////
+                    showSingleEventList.add(JSONObject.parseObject(text, ShowSingleEvent.class));
+
+                }
+                return DtoUtil.getSuccesWithDataDto("查询成功", showSingleEventList, 100000);
             }
             return DtoUtil.getFalseDto("查询失败", 21003);
         }
@@ -383,24 +363,6 @@ public class EventServiceImpl implements EventService {
     public Dto addNewLoopEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)){
             SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(),SingleEvent.class);
-            /*SingleEvent singleEvent = new SingleEvent();
-            singleEvent.setEventid(uploadingEventVo.getEventid());
-            singleEvent.setUserid(uploadingEventVo.getUserid());
-            singleEvent.setEventname(uploadingEventVo.getEventname());
-            singleEvent.setStarttime(uploadingEventVo.getStarttime());
-            singleEvent.setEndtime(uploadingEventVo.getEndtime());
-            singleEvent.setAddress(uploadingEventVo.getAddress());
-            singleEvent.setLevel(uploadingEventVo.getLevel());
-            singleEvent.setFlag(uploadingEventVo.getFlag());
-            singleEvent.setPerson(uploadingEventVo.getPerson());
-            singleEvent.setRemarks(uploadingEventVo.getRemarks());
-            singleEvent.setRepeaTtime(uploadingEventVo.getRepeaTtime());
-            singleEvent.setIsOverdue(uploadingEventVo.getIsOverdue());
-            singleEvent.setRemindTime(uploadingEventVo.getRemindTime());
-            singleEvent.setDay(uploadingEventVo.getDay());
-            singleEvent.setMonth(uploadingEventVo.getMonth());
-            singleEvent.setYear(uploadingEventVo.getYear());
-            singleEvent.setType(uploadingEventVo.getType());*/
             singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
             if (eventMapper.uploadingLoopEvents(singleEvent) > 0){
                 return DtoUtil.getSuccessDto("上传重复事件成功",100000);
