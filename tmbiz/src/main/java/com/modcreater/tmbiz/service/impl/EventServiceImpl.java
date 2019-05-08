@@ -12,6 +12,7 @@ import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.SingleEventUtil;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -42,7 +43,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
-            System.out.println("================"+uploadingEventVo.toString());
             SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(),SingleEvent.class);
             singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
             if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
@@ -67,7 +67,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto deleteEvents(DeleteEventVo deleteEventVo) {
         if (!ObjectUtils.isEmpty(deleteEventVo)) {
-            System.out.println(deleteEventVo.toString());
             SingleEvent singleEvent = new SingleEvent();
             singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
             singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
@@ -114,7 +113,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchEvents(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
-            System.out.println(searchEventVo.toString());
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
             List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
             if (!ObjectUtils.isEmpty(singleEventList)) {
@@ -148,7 +146,7 @@ public class EventServiceImpl implements EventService {
                 }
                 return DtoUtil.getSuccesWithDataDto("查询成功", showSingleEventList, 100000);
             }
-            return DtoUtil.getFalseDto("查询失败", 21003);
+            return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
         }
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
@@ -426,7 +424,6 @@ public class EventServiceImpl implements EventService {
             dayEvents.setTotalNum(singleEventList.size());
             dayEvents.setDayEventId(Integer.valueOf(searchEventVo.getDayEventId()));
             dayEvents.setMySingleEventList(showSingleEventList);
-            System.out.println(singleEventList.toString());
             Map<String, Object> result = new HashMap<>();
 
             result.put("ShowSingleEventListOrderByLevel", showSingleEventListOrderByLevel);
@@ -435,7 +432,7 @@ public class EventServiceImpl implements EventService {
             if (b) {
                 return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
             }
-            return DtoUtil.getFalseDto("查询失败", 21003);
+            return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
         }
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
@@ -512,7 +509,7 @@ public class EventServiceImpl implements EventService {
             if (b) {
                 return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
             }
-            return DtoUtil.getFalseDto("查询失败", 21003);
+            return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
         }
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
@@ -533,24 +530,53 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)){
+            //按周查询单一事件
             SingleEvent singleEvent;
             List<DayEvents> dayEventsList = new ArrayList<>();
             for (int i = 0; i <= 6; i++){
-                DayEvents dayEvents = new DayEvents();
+                DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
                 String dayEventId = String.valueOf(Integer.valueOf(searchEventVo.getDayEventId()) + i);
                 singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),dayEventId);
-                dayEvents.setMySingleEventList(eventMapper.queryByWeekOrderByStartTime(singleEvent));
+                List<SingleEvent> singleEventList = eventMapper.queryByWeekOrderByStartTime(singleEvent);
+                ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
+                for (SingleEvent singleEvent1 : singleEventList) {
+                    Boolean[] booleans = new Boolean[7];
+                    String[] s = singleEvent1.getRepeaTtime().split(",");
+                    for (int j = 0; j <= 6; j++) {
+                        booleans[j] = "true".equals(s);
+                    }
+                    ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+                    showSingleEvent.setUserid(singleEvent1.getUserid());
+                    showSingleEvent.setEventid(singleEvent1.getEventid());
+                    showSingleEvent.setEventname(singleEvent1.getEventname());
+                    showSingleEvent.setStarttime(singleEvent1.getStarttime());
+                    showSingleEvent.setEndtime(singleEvent1.getEndtime());
+                    showSingleEvent.setFlag(singleEvent1.getFlag());
+                    showSingleEvent.setLevel(singleEvent1.getLevel());
+                    showSingleEvent.setPerson(singleEvent1.getPerson());
+                    showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
+                    showSingleEvent.setRemarks(singleEvent1.getRemarks());
+                    showSingleEvent.setDay(singleEvent1.getDay());
+                    showSingleEvent.setMonth(singleEvent1.getMonth());
+                    showSingleEvent.setYear(singleEvent1.getYear());
+                    showSingleEvent.setType(singleEvent1.getType());
+                    showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
+                    showSingleEvent.setAddress(singleEvent1.getAddress());
+                    showSingleEvent.setRepeaTtime(booleans);
+                    showSingleEventList.add(showSingleEvent);
+                }
+                dayEvents.setMySingleEventList(showSingleEventList);
                 dayEvents.setTotalNum(dayEvents.getMySingleEventList().size());
                 dayEvents.setUserId(Integer.valueOf(searchEventVo.getUserId()));
                 dayEvents.setDayEventId(Integer.valueOf(dayEventId));
                 dayEventsList.add(dayEvents);
             }
 
-
+            //按周查询重复事件
             List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
-            System.out.println(loopEventListInDataBase.size());
             Map result = new HashMap<>();
             List<List<SingleEvent>> loopEventList = new ArrayList<>();
+            //创建七个几个代表一周七天
             List<SingleEvent> monLoopEventList = new ArrayList<>();
             List<SingleEvent> tueLoopEventList = new ArrayList<>();
             List<SingleEvent> wedLoopEventList = new ArrayList<>();
@@ -559,7 +585,6 @@ public class EventServiceImpl implements EventService {
             List<SingleEvent> satLoopEventList = new ArrayList<>();
             List<SingleEvent> sunLoopEventList = new ArrayList<>();
             for (LoopEvent loopEvent : loopEventListInDataBase){
-                System.out.println(loopEvent.toString());
                 SingleEvent event = new SingleEvent();
                 String repeatTime = loopEvent.getRepeatTime();
                 event.setEventid(loopEvent.getEventId());
@@ -579,7 +604,9 @@ public class EventServiceImpl implements EventService {
                 event.setMonth(loopEvent.getMonth());
                 event.setYear(loopEvent.getYear());
                 event.setType(loopEvent.getType());
+                //将字符串通过","拆分成String数组
                 String[] s = repeatTime.split(",");
+                //根据拆分出来的字符串数组进行判断并添加到一周的各个天数中
                 for (int i = 0; i <= 6; i++){
                     if (i == 0 && s[i].equals("true")){
                         monLoopEventList.add(event);
