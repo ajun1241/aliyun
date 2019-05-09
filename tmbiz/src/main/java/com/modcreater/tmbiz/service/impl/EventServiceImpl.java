@@ -374,9 +374,8 @@ public class EventServiceImpl implements EventService {
             if (StringUtils.isEmpty(searchEventVo.getUserId())) {
                 return DtoUtil.getFalseDto("请先登录", 21011);
             }
-            boolean b = false;
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
-            List<SingleEvent> singleEventList = eventMapper.queryByDayEventIdsInMonth(singleEvent);
+            /*List<SingleEvent> singleEventList = eventMapper.queryByDayEventIdsInMonth(singleEvent);
             List<DayEvents<ShowSingleEvent>> dayEventsList = new ArrayList<>();
             List<Integer> days = eventMapper.queryUserId(singleEvent);
             if (singleEventList.size() != 0) {
@@ -409,12 +408,27 @@ public class EventServiceImpl implements EventService {
                 dayEvents.setMySingleEventList(showSingleEventList);
                 dayEventsList.add(dayEvents);
 
-            }
+            }*/
+            List<Integer> days = eventMapper.queryDays(singleEvent);
+            List<DayEvents<ShowSingleEvent>> dayEventsList = new ArrayList<>();
+            if (days.size() != 0) {
+                for (Integer day : days) {
+                    singleEvent.setDay(day.longValue());
+                    ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+                    if (singleEventList.size() != 0) {
+                        ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
+                        DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
+                        dayEvents.setUserId(singleEvent.getUserid().intValue());
+                        dayEvents.setTotalNum(singleEventList.size());
+                        dayEvents.setDayEventId(Integer.valueOf(singleEvent.getYear().toString() + singleEvent.getMonth().toString() + singleEvent.getDay().toString()));
+                        dayEvents.setMySingleEventList(showSingleEventList);
+                        dayEventsList.add(dayEvents);
+                    }
 
-
-            if (b) {
+                }
                 return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
             }
+
             return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
         }
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);

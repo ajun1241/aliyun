@@ -116,6 +116,7 @@
             </if>
             and isOverdue &lt;&gt; 2
         </where>
+        order by day asc ,startTime asc
     </select>
 
     <select id="queryByDayOrderByLevel" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
@@ -229,7 +230,7 @@
         </where>
         order by startTime asc
     </select>
-    <select id="queryUserId" resultType="java.lang.Integer">
+    <select id="queryDays" resultType="java.lang.Integer">
         select day from singleevent where
         userId = #{userid}
         and month = #{month}

@@ -154,5 +154,5 @@ public interface EventMapper {
      * @param singleEvent
      * @return
      */
-    List<Integer> queryUserId(SingleEvent singleEvent);
+    List<Integer> queryDays(SingleEvent singleEvent);
 }
