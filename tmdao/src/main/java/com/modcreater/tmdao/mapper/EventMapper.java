@@ -121,18 +121,18 @@ public interface EventMapper {
     /**
      * 撤销一个重复事件
      *
-     * @param loopEvent
+     * @param singleEvent
      * @return
      */
-    int withdrawLoopEventsByUserId(LoopEvent loopEvent);
+    int withdrawLoopEventsByUserId(SingleEvent singleEvent);
 
     /**
      * 更新一个重复事件
      *
-     * @param loopEvent
+     * @param singleEvent
      * @return
      */
-    int alterLoopEventsByUserId(LoopEvent loopEvent);
+    int alterLoopEventsByUserId(SingleEvent singleEvent);
 
     /**
      * 查询重复事件

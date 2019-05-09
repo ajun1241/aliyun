@@ -54,7 +54,7 @@
     </update>
 
     <update id="withdrawLoopEventsByUserId">
-        update loopevent set isOverdue = 2 where eventId = #{eventid} and userId = #{userid}
+        update loopevent set isOverdue = 2 where eventId = #{eventid} and userId = #{userid} and isOverdue &lt;&gt; 2
     </update>
 
     <update id="alterEventsByUserId">

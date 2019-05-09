@@ -49,23 +49,24 @@ public class EventServiceImpl implements EventService {
             if (StringUtils.isEmpty(uploadingEventVo.getUserId())) {
                 return DtoUtil.getFalseDto("请先登录", 21011);
             }
-            System.out.println("这是孔庆一要的字符串****"+uploadingEventVo.getSingleEvent()+"****");
+            System.out.println("这是孔庆一要的字符串****" + uploadingEventVo.getSingleEvent() + "****");
             SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
             System.out.println("是不是空=" + singleEvent);
             singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
-            if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
-                try {
-                    String time = DateUtil.dateToStamp(new Date());
-                    /*if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
-                        Map<String, String> timestamp = new HashMap<>();
-                        timestamp.put("time", time);
-                        return DtoUtil.getSuccesWithDataDto("事件上传成功", timestamp, 100000);
-                    } else {
-                        return DtoUtil.getSuccessDto("事件上传成功,时间戳添加失败", 100000);
-                    }*/
-                    return DtoUtil.getSuccesWithDataDto("事件上传成功", time, 100000);
-                } catch (ParseException e) {
-                    e.printStackTrace();
+            //这里开始判断是否是一个重复事件
+            String[] repeatTime = singleEvent.getRepeaTtime().split(",");
+            boolean b = false;
+            for (String s : repeatTime) {
+                b = "true".equals(s);
+            }
+            //如果状态值为真,则该事件为重复事件
+            if (b) {
+                if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingLoopEvents(singleEvent) > 0) {
+                    return DtoUtil.getSuccessDto("事件上传成功", 100000);
+                }
+            } else {
+                if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
+                    return DtoUtil.getSuccessDto("事件上传成功", 100000);
                 }
             }
             return DtoUtil.getFalseDto("事件上传失败", 21001);
@@ -83,18 +84,8 @@ public class EventServiceImpl implements EventService {
             SingleEvent singleEvent = new SingleEvent();
             singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
             singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
-            if (eventMapper.withdrawEventsByUserId(singleEvent) > 0) {
-                try {
-                    String time = DateUtil.dateToStamp(new Date());
-                    /*if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
-                        Map<String, String> timestamp = new HashMap<>();
-                        timestamp.put("time", time);
-                        return DtoUtil.getSuccesWithDataDto("删除成功", timestamp, 100000);
-                    }*/
-                    return DtoUtil.getSuccesWithDataDto("删除成功", time, 100000);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+            if (eventMapper.withdrawEventsByUserId(singleEvent) > 0 || eventMapper.withdrawLoopEventsByUserId(singleEvent) > 0) {
+                return DtoUtil.getSuccessDto("删除成功", 100000);
             }
             return DtoUtil.getFalseDto("删除事件失败", 21005);
         }
@@ -111,17 +102,18 @@ public class EventServiceImpl implements EventService {
             }
             SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
             singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
-            if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
-                try {
-                    String time = DateUtil.dateToStamp(new Date());
-                    /*if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
-                        Map<String, String> timestamp = new HashMap<>();
-                        timestamp.put("time", time);
-                        return DtoUtil.getSuccesWithDataDto("修改成功", timestamp, 100000);
-                    }*/
-                    return DtoUtil.getSuccesWithDataDto("修改成功", time, 100000);
-                } catch (ParseException e) {
-                    e.printStackTrace();
+            String[] repeatTime = singleEvent.getRepeaTtime().split(",");
+            boolean b = false;
+            for (String s : repeatTime) {
+                b = "true".equals(s);
+            }
+            if (b) {
+                if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.alterLoopEventsByUserId(singleEvent) > 0) {
+                    return DtoUtil.getSuccessDto("修改成功", 100000);
+                }
+            } else {
+                if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.alterEventsByUserId(singleEvent) > 0) {
+                    return DtoUtil.getSuccessDto("修改成功", 100000);
                 }
             }
             return DtoUtil.getFalseDto("修改事件失败", 21007);
@@ -438,7 +430,7 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
 
-    @Override
+    /*@Override
     public Dto addNewLoopEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
             System.out.println("添加重复事件" + uploadingEventVo.toString());
@@ -453,7 +445,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("上传重复事件失败", 21009);
         }
         return DtoUtil.getFalseDto("没有可上传的重复事件", 21010);
-    }
+    }*/
 
     @Override
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {

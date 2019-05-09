@@ -95,7 +95,7 @@ public interface EventService {
      * @param uploadingEventVo
      * @return
      */
-    Dto addNewLoopEvents(UploadingEventVo uploadingEventVo);
+    /*Dto addNewLoopEvents(UploadingEventVo uploadingEventVo);*/
 
     /**
      * 根据日期查询事件并排序(单位:周)
