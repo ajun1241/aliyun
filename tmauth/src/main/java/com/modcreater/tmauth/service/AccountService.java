@@ -11,6 +11,7 @@ import java.util.List;
 public interface AccountService {
     /**
      * 登录
+     * @param loginVo
      * @return
      */
     Dto doLogin(LoginVo loginVo);

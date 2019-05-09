@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 public class AccountServiceImpl implements AccountService {
     @Resource
     private AccountMapper accountMapper;
+    private static Pattern pattern = Pattern.compile("[0-9]*");
     @Override
     public Dto doLogin(LoginVo loginVo) {
         if (ObjectUtils.isEmpty(loginVo)){
@@ -151,7 +152,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("用户信息接收失败",13001);
         }
         //判断日期格式
-        Pattern pattern = Pattern.compile("[0-9]*");
+
         Matcher isNum = pattern.matcher(accountVo.getBirthday());
         if(!isNum.matches()){
             return DtoUtil.getFalseDto("用户生日格式不正确",13004);

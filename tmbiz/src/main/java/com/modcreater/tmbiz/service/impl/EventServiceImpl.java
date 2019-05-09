@@ -41,6 +41,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
+            System.out.println("上传"+uploadingEventVo.toString());
             if (StringUtils.isEmpty(uploadingEventVo.getUserId())){
                 return DtoUtil.getFalseDto("请先登录",21011);
             }
@@ -68,6 +69,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto deleteEvents(DeleteEventVo deleteEventVo) {
         if (!ObjectUtils.isEmpty(deleteEventVo)) {
+            System.out.println("删除"+deleteEventVo.toString());
             if (StringUtils.isEmpty(deleteEventVo.getUserId())){
                 return DtoUtil.getFalseDto("请先登录",21011);
             }
@@ -95,6 +97,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (!ObjectUtils.isEmpty(updateEventVo)) {
+            System.out.println("修改"+updateEventVo.toString());
             if (StringUtils.isEmpty(updateEventVo.getUserId())){
                 return DtoUtil.getFalseDto("请先登录",21011);
             }
@@ -120,6 +123,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchEvents(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
+            System.out.println("查询单一"+searchEventVo.toString());
             if (StringUtils.isEmpty(searchEventVo.getUserId())){
                 return DtoUtil.getFalseDto("请先登录",21011);
             }
@@ -166,13 +170,13 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(synchronousUpdateVo)) {
             return DtoUtil.getFalseDto("本地上传数据未获取到", 25001);
         }
+        System.out.println("本地数据上传"+synchronousUpdateVo.toString());
         if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())){
             return DtoUtil.getFalseDto("请先登录",21011);
         }
         if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
             return DtoUtil.getFalseDto("事件集未获取到", 25002);
         }
-        System.out.println(synchronousUpdateVo.toString());
         List<Integer> dayEventIds=new ArrayList<>();
         for (DayEvents dayEvents:synchronousUpdateVo.getDayEventsList()){
             dayEventIds.add(dayEvents.getDayEventId());
@@ -185,13 +189,17 @@ public class EventServiceImpl implements EventService {
 //        List<SingleEvent> singleEvents=new ArrayList<>();
         System.out.println(dayEventIds.toString());
         SingleEvent singleEvent=new SingleEvent();
+        /*            singleEvents=eventMapper.queryEvents(singleEvent);
+            if (ObjectUtils.isEmpty(singleEvents)){
+                return DtoUtil.getFalseDto("该时间段内没有事件",25003);
+            }*/
         for (int i = 0; i <dayEventIds.size() ; i++) {
             try {
-                stringBuffer=new StringBuffer(dayEventIds.get(i).toString());
+                stringBuffer = new StringBuffer(dayEventIds.get(i).toString());
 //            System.out.println(stringBuffer);
-                year=stringBuffer.substring(0,4);
-                month=stringBuffer.substring(4, 6);
-                day=stringBuffer.substring(6, 8);
+                year = stringBuffer.substring(0, 4);
+                month = stringBuffer.substring(4, 6);
+                day = stringBuffer.substring(6, 8);
                 singleEvent.setYear(Long.parseLong(year));
                 singleEvent.setMonth(Long.parseLong(month));
                 singleEvent.setDay(Long.parseLong(day));
@@ -199,10 +207,6 @@ public class EventServiceImpl implements EventService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-/*            singleEvents=eventMapper.queryEvents(singleEvent);
-            if (ObjectUtils.isEmpty(singleEvents)){
-                return DtoUtil.getFalseDto("该时间段内没有事件",25003);
-            }*/
         }
         //删除事件
         /*for (int i = 0; i <singleEvents.size() ; i++) {
@@ -264,6 +268,7 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(synchronousUpdateVo)){
             return DtoUtil.getFalseDto("同步数据未获取到",26001);
         }
+        System.out.println("第一次上传"+synchronousUpdateVo.toString());
         if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())){
             return DtoUtil.getFalseDto("请先登录",21011);
         }
@@ -349,7 +354,7 @@ public class EventServiceImpl implements EventService {
             if (StringUtils.isEmpty(searchEventVo.getUserId())){
                 return DtoUtil.getFalseDto("请先登录",21011);
             }
-            System.out.println(searchEventVo.toString());
+            System.out.println("按天查"+searchEventVo.toString());
             boolean b = false;
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
             //只根据level升序
@@ -464,8 +469,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
-            if (StringUtils.isEmpty(searchEventVo.getUserId())) {
-                return DtoUtil.getFalseDto("请先登录", 21011);
+            System.out.println("按月查"+searchEventVo.toString());
+            if (StringUtils.isEmpty(searchEventVo.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
             }
             boolean b = false;
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
@@ -540,6 +546,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewLoopEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)){
+            System.out.println("添加重复事件"+uploadingEventVo.toString());
             if (StringUtils.isEmpty(uploadingEventVo.getUserId())){
                 return DtoUtil.getFalseDto("请先登录",21011);
             }
@@ -556,6 +563,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)){
+            System.out.println("按周查"+searchEventVo.toString());
             if (StringUtils.isEmpty(searchEventVo.getUserId())){
                 return DtoUtil.getFalseDto("请先登录",21011);
             }

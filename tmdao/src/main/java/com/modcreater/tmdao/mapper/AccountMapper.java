@@ -14,6 +14,7 @@ public interface AccountMapper {
 
     /**
      * 登录
+     * @param loginVo
      * @return
      */
     Account doLogin(LoginVo loginVo);
