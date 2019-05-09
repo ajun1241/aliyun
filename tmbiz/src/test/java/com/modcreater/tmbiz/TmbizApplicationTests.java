@@ -65,5 +65,11 @@ public class TmbizApplicationTests {
         testSingEvent.setSingleEvent(singleEvent);
         System.out.println(testSingEvent.getSingleEvent().getUserid());*/
     }
+    @Test
+    public void test4() {
+        UploadingEventVo uploadingEventVo=new UploadingEventVo();
+        uploadingEventVo.setUserId("10019");
+//        System.out.println(SingleEventUtil.checkLogin(uploadingEventVo).toString());
+    }
 
 }

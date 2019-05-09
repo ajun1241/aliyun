@@ -41,11 +41,15 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
+            if (StringUtils.isEmpty(uploadingEventVo.getSingleEvent())){
+                return DtoUtil.getFalseDto("上传事件列表为空",21012);
+            }
             System.out.println("上传"+uploadingEventVo.toString());
             if (StringUtils.isEmpty(uploadingEventVo.getUserId())){
                 return DtoUtil.getFalseDto("请先登录",21011);
             }
             SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(),SingleEvent.class);
+            System.out.println("是不是空="+singleEvent);
             singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
             if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
                 try {
@@ -684,4 +688,5 @@ public class EventServiceImpl implements EventService {
         }
         return DtoUtil.getFalseDto("查询条件接收失败",21004);
     }
+
 }
