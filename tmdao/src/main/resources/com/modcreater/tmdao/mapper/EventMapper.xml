@@ -161,7 +161,7 @@
         </where>
         order by level asc , startTime asc
     </select>
-    <select id="queryByMonthOrderByLevel" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+    <select id="queryByDayEventIdsInMonth" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
         <include refid="Base_Column_List"/>
         from singleevent
@@ -177,25 +177,7 @@
             </if>
             and isOverdue &lt;&gt; 2
         </where>
-        order by level asc
-    </select>
-    <select id="queryByMonthOrderByLevelAndDate" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select
-        <include refid="Base_Column_List"/>
-        from singleevent
-        <where>
-            <if test="userid != null">
-                userid = #{userid}
-            </if>
-            <if test="month != null">
-                and month = #{month}
-            </if>
-            <if test="year != null">
-                and year = #{year}
-            </if>
-            and isOverdue &lt;&gt; 2
-        </where>
-        order by level asc , startTime asc
+        order by day asc
     </select>
 
     <update id="updOldEvent">
@@ -246,6 +228,13 @@
             and isOverdue &lt;&gt; 2
         </where>
         order by startTime asc
+    </select>
+    <select id="queryUserId" resultType="java.lang.Integer">
+        select day from singleevent where
+        userId = #{userid}
+        and month = #{month}
+        and year = #{year}
+        group by day
     </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.DraftVo" >

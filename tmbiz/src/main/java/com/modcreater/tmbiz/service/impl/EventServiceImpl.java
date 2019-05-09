@@ -464,77 +464,73 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
-            if (StringUtils.isEmpty(searchEventVo.getUserId())){
-                return DtoUtil.getFalseDto("请先登录",21011);
+            if (StringUtils.isEmpty(searchEventVo.getUserId())) {
+                return DtoUtil.getFalseDto("请先登录", 21011);
             }
             boolean b = false;
-            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
-            //只根据level升序
-            List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByMonthOrderByLevel(singleEvent);
-            List<ShowSingleEvent> showSingleEventListOrderByLevel = new ArrayList<>();
-            //根据level和事件升序
-            List<SingleEvent> singleEventListOrderByLevelAndDate = eventMapper.queryByMonthOrderByLevelAndDate(singleEvent);
-            List<ShowSingleEvent> showSingleEventListOrderByLevelAndDate = new ArrayList<>();
-            if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0){
-                for (SingleEvent singleEvent1 : singleEventListOrderByLevel) {
-                    Boolean[] booleans = new Boolean[7];
-                    String[] s = singleEvent1.getRepeaTtime().split(",");
-                    for (int i = 0; i <= 6; i++) {
-                        booleans[i] = "true".equals(s[i]);
-                    }
-                    ShowSingleEvent showSingleEvent = new ShowSingleEvent();
-                    showSingleEvent.setUserid(singleEvent1.getUserid());
-                    showSingleEvent.setEventid(singleEvent1.getEventid());
-                    showSingleEvent.setEventname(singleEvent1.getEventname());
-                    showSingleEvent.setStarttime(singleEvent1.getStarttime());
-                    showSingleEvent.setEndtime(singleEvent1.getEndtime());
-                    showSingleEvent.setFlag(singleEvent1.getFlag());
-                    showSingleEvent.setLevel(singleEvent1.getLevel());
-                    showSingleEvent.setPerson(singleEvent1.getPerson());
-                    showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
-                    showSingleEvent.setRemarks(singleEvent1.getRemarks());
-                    showSingleEvent.setDay(singleEvent1.getDay());
-                    showSingleEvent.setMonth(singleEvent1.getMonth());
-                    showSingleEvent.setYear(singleEvent1.getYear());
-                    showSingleEvent.setType(singleEvent1.getType());
-                    showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
-                    showSingleEvent.setAddress(singleEvent1.getAddress());
-                    showSingleEvent.setRepeaTtime(booleans);
-                    showSingleEventListOrderByLevel.add(showSingleEvent);
-                }
-                for (SingleEvent singleEvent1 : singleEventListOrderByLevelAndDate) {
-                    Boolean[] booleans = new Boolean[7];
-                    String[] s = singleEvent1.getRepeaTtime().split(",");
-                    for (int i = 0; i <= 6; i++) {
-                        booleans[i] = "true".equals(s[i]);
-                    }
-                    ShowSingleEvent showSingleEvent = new ShowSingleEvent();
-                    showSingleEvent.setUserid(singleEvent1.getUserid());
-                    showSingleEvent.setEventid(singleEvent1.getEventid());
-                    showSingleEvent.setEventname(singleEvent1.getEventname());
-                    showSingleEvent.setStarttime(singleEvent1.getStarttime());
-                    showSingleEvent.setEndtime(singleEvent1.getEndtime());
-                    showSingleEvent.setFlag(singleEvent1.getFlag());
-                    showSingleEvent.setLevel(singleEvent1.getLevel());
-                    showSingleEvent.setPerson(singleEvent1.getPerson());
-                    showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
-                    showSingleEvent.setRemarks(singleEvent1.getRemarks());
-                    showSingleEvent.setDay(singleEvent1.getDay());
-                    showSingleEvent.setMonth(singleEvent1.getMonth());
-                    showSingleEvent.setYear(singleEvent1.getYear());
-                    showSingleEvent.setType(singleEvent1.getType());
-                    showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
-                    showSingleEvent.setAddress(singleEvent1.getAddress());
-                    showSingleEvent.setRepeaTtime(booleans);
-                    showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
-                }
+            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
+            List<SingleEvent> singleEventList = eventMapper.queryByDayEventIdsInMonth(singleEvent);
+            List<DayEvents<ShowSingleEvent>> dayEventsList = new ArrayList<>();
+            List<Integer> days = eventMapper.queryUserId(singleEvent);
+            if (singleEventList.size() != 0) {
                 b = true;
             }
-            Map<String, Object> result = new HashMap<>();
-            result.put("showSingleEventListOrderByLevel",showSingleEventListOrderByLevel);
-            result.put("showSingleEventListOrderByLevelAndDate",showSingleEventListOrderByLevelAndDate);
+
+            for (SingleEvent singleEvent1 : singleEventList) {
+                DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
+                ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
+                dayEvents.setUserId(singleEvent.getUserid().intValue());
+                StringBuilder dayEventId = new StringBuilder();
+                dayEventId.append(singleEvent1.getYear());
+                if (singleEvent1.getMonth() < 10){
+                    dayEventId.append(0);
+                }
+                dayEventId.append(singleEvent1.getMonth());
+                String day1 = "00";
+                for (Integer day : days) {
+                    if (singleEvent1.getDay().toString().equals(day.toString())) {
+                        if (day < 10){
+                            dayEventId.append(0);
+                        }
+                        day1 = day.toString();
+                        System.out.println("添加了一条事件");
+                        Boolean[] booleans = new Boolean[7];
+                        String[] s = singleEvent1.getRepeaTtime().split(",");
+                        for (int i = 0; i <= 6; i++) {
+                            booleans[i] = "true".equals(s[i]);
+                        }
+                        ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+                        showSingleEvent.setUserid(singleEvent1.getUserid());
+                        showSingleEvent.setEventid(singleEvent1.getEventid());
+                        showSingleEvent.setEventname(singleEvent1.getEventname());
+                        showSingleEvent.setStarttime(singleEvent1.getStarttime());
+                        showSingleEvent.setEndtime(singleEvent1.getEndtime());
+                        showSingleEvent.setFlag(singleEvent1.getFlag());
+                        showSingleEvent.setLevel(singleEvent1.getLevel());
+                        showSingleEvent.setPerson(singleEvent1.getPerson());
+                        showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
+                        showSingleEvent.setRemarks(singleEvent1.getRemarks());
+                        showSingleEvent.setDay(singleEvent1.getDay());
+                        showSingleEvent.setMonth(singleEvent1.getMonth());
+                        showSingleEvent.setYear(singleEvent1.getYear());
+                        showSingleEvent.setType(singleEvent1.getType());
+                        showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
+                        showSingleEvent.setAddress(singleEvent1.getAddress());
+                        showSingleEvent.setRepeaTtime(booleans);
+                        showSingleEventList.add(showSingleEvent);
+                    }
+                }
+                dayEventId.append(day1);
+                dayEvents.setDayEventId(Integer.valueOf(dayEventId.toString()));
+                dayEvents.setTotalNum(showSingleEventList.size());
+                dayEvents.setMySingleEventList(showSingleEventList);
+                dayEventsList.add(dayEvents);
+
+            }
+
+
             if (b) {
-                return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+                return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
             }
             return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
         }

@@ -105,18 +105,11 @@ public interface EventMapper {
      */
     int uplLoopEvent(SingleEvent singleEvent);
     /**
-     * 根据"月"查找事件并根据事件等级(level)排序
+     * 根据"月"查找事件并根据事件
      * @param singleEvent
      * @return
      */
-    List<SingleEvent> queryByMonthOrderByLevel(SingleEvent singleEvent);
-
-    /**
-     * 根据"月"查找事件并根据事件等级(level)和事件开始时间(startTime)排序
-     * @param singleEvent
-     * @return
-     */
-    List<SingleEvent> queryByMonthOrderByLevelAndDate(SingleEvent singleEvent);
+    List<SingleEvent> queryByDayEventIdsInMonth(SingleEvent singleEvent);
 
     /**
      * 添加一个重复事件
@@ -155,4 +148,11 @@ public interface EventMapper {
      * @return
      */
     ArrayList<SingleEvent> queryByWeekOrderByStartTime(SingleEvent singleEvent);
+
+    /**
+     * 根据用户ID查询用户当月有哪些天存在事件
+     * @param singleEvent
+     * @return
+     */
+    List<Integer> queryUserId(SingleEvent singleEvent);
 }
