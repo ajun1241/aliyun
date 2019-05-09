@@ -49,19 +49,21 @@ public class EventServiceImpl implements EventService {
             if (StringUtils.isEmpty(uploadingEventVo.getUserId())) {
                 return DtoUtil.getFalseDto("请先登录", 21011);
             }
+            System.out.println("这是孔庆一要的字符串****"+uploadingEventVo.getSingleEvent()+"****");
             SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
             System.out.println("是不是空=" + singleEvent);
             singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
             if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
                 try {
                     String time = DateUtil.dateToStamp(new Date());
-                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
+                    /*if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
                         Map<String, String> timestamp = new HashMap<>();
                         timestamp.put("time", time);
                         return DtoUtil.getSuccesWithDataDto("事件上传成功", timestamp, 100000);
                     } else {
                         return DtoUtil.getSuccessDto("事件上传成功,时间戳添加失败", 100000);
-                    }
+                    }*/
+                    return DtoUtil.getSuccesWithDataDto("事件上传成功", time, 100000);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -84,11 +86,12 @@ public class EventServiceImpl implements EventService {
             if (eventMapper.withdrawEventsByUserId(singleEvent) > 0) {
                 try {
                     String time = DateUtil.dateToStamp(new Date());
-                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
+                    /*if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
                         Map<String, String> timestamp = new HashMap<>();
                         timestamp.put("time", time);
                         return DtoUtil.getSuccesWithDataDto("删除成功", timestamp, 100000);
-                    }
+                    }*/
+                    return DtoUtil.getSuccesWithDataDto("删除成功", time, 100000);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -111,11 +114,12 @@ public class EventServiceImpl implements EventService {
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
                 try {
                     String time = DateUtil.dateToStamp(new Date());
-                    if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
+                    /*if (accountMapper.updateTimestampUnderAccount(singleEvent.getUserid().toString(), time) > 0) {
                         Map<String, String> timestamp = new HashMap<>();
                         timestamp.put("time", time);
                         return DtoUtil.getSuccesWithDataDto("修改成功", timestamp, 100000);
-                    }
+                    }*/
+                    return DtoUtil.getSuccesWithDataDto("修改成功", time, 100000);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

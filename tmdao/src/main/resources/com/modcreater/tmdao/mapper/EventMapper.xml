@@ -50,7 +50,7 @@
     </insert>
 
     <update id="withdrawEventsByUserId">
-        update singleevent set isOverdue = 2 where eventId = #{eventid} and userId = #{userid}
+        update singleevent set isOverdue = 2 where eventId = #{eventid} and userId = #{userid} and isOverdue &lt;&gt; 2
     </update>
 
     <update id="withdrawLoopEventsByUserId">
