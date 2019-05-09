@@ -548,5 +548,4 @@ public class EventServiceImpl implements EventService {
         }
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
-
 }
