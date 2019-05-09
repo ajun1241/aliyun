@@ -1,6 +1,5 @@
 package com.modcreater.tmbiz.service.impl;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.LoopEvent;
 import com.modcreater.tmbeans.pojo.SingleEvent;
@@ -12,7 +11,6 @@ import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.SingleEventUtil;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -43,6 +41,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)) {
+            if (StringUtils.isEmpty(uploadingEventVo.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
+            }
             SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(),SingleEvent.class);
             singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
             if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
@@ -67,6 +68,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto deleteEvents(DeleteEventVo deleteEventVo) {
         if (!ObjectUtils.isEmpty(deleteEventVo)) {
+            if (StringUtils.isEmpty(deleteEventVo.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
+            }
             SingleEvent singleEvent = new SingleEvent();
             singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
             singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
@@ -91,6 +95,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (!ObjectUtils.isEmpty(updateEventVo)) {
+            if (StringUtils.isEmpty(updateEventVo.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
+            }
             SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(),SingleEvent.class);
             singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
             if (eventMapper.alterEventsByUserId(singleEvent) > 0 && !ObjectUtils.isEmpty(singleEvent)) {
@@ -113,6 +120,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchEvents(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
+            if (StringUtils.isEmpty(searchEventVo.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
+            }
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
             List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
             if (!ObjectUtils.isEmpty(singleEventList)) {
@@ -155,6 +165,9 @@ public class EventServiceImpl implements EventService {
     public Dto synchronousUpdate(SynchronousUpdateVo synchronousUpdateVo) {
         if (ObjectUtils.isEmpty(synchronousUpdateVo)) {
             return DtoUtil.getFalseDto("本地上传数据未获取到", 25001);
+        }
+        if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
         }
         if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
             return DtoUtil.getFalseDto("事件集未获取到", 25002);
@@ -233,6 +246,9 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(contrastTimestampVo)){
             return DtoUtil.getFalseDto("时间戳获取失败",24001);
         }
+        if (StringUtils.isEmpty(contrastTimestampVo.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         String time=accountMapper.queryTime(contrastTimestampVo.getUserId());
         if (StringUtils.isEmpty(time)){
             return DtoUtil.getFalseDto("查询时间戳失败",24003);
@@ -247,6 +263,9 @@ public class EventServiceImpl implements EventService {
     public Dto firstUplEvent(SynchronousUpdateVo synchronousUpdateVo) {
         if (ObjectUtils.isEmpty(synchronousUpdateVo)){
             return DtoUtil.getFalseDto("同步数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
         }
         if (eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId())>0){
             return DtoUtil.getFalseDto("该用户已经上传过了",26003);
@@ -307,6 +326,7 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(draftVo)){
             return DtoUtil.getFalseDto("上传草稿未获取到",27001);
         }
+
         //查看草稿是否已存在
         String data=eventMapper.queryDraftByPhone(draftVo.getPhoneNum());
         if (StringUtils.isEmpty(data)){
@@ -326,6 +346,10 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
+            if (StringUtils.isEmpty(searchEventVo.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
+            }
+            System.out.println(searchEventVo.toString());
             boolean b = false;
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
             //只根据level升序
@@ -440,6 +464,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
+            if (StringUtils.isEmpty(searchEventVo.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
+            }
             boolean b = false;
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(),searchEventVo.getDayEventId());
             //只根据level升序
@@ -517,6 +544,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto addNewLoopEvents(UploadingEventVo uploadingEventVo) {
         if (!ObjectUtils.isEmpty(uploadingEventVo)){
+            if (StringUtils.isEmpty(uploadingEventVo.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
+            }
             SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(),SingleEvent.class);
             singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
             if (eventMapper.uploadingLoopEvents(singleEvent) > 0){
@@ -530,6 +560,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)){
+            if (StringUtils.isEmpty(searchEventVo.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
+            }
             //按周查询单一事件
             SingleEvent singleEvent;
             List<DayEvents> dayEventsList = new ArrayList<>();

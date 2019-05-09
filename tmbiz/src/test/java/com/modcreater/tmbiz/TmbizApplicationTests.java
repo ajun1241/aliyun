@@ -1,7 +1,7 @@
 package com.modcreater.tmbiz;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
-import com.modcreater.tmbeans.pojo.TestSingEvent;
+//import com.modcreater.tmbeans.pojo.TestSingEvent;
 import com.modcreater.tmbeans.vo.UploadingEventVo;
 import com.modcreater.tmutils.SingleEventUtil;
 import org.junit.Test;
@@ -58,12 +58,12 @@ public class TmbizApplicationTests {
     }
 
     @Test
-    public void test3() {
+    public void test3() {/*
         TestSingEvent testSingEvent = new TestSingEvent();
         SingleEvent singleEvent = new SingleEvent();
         singleEvent.setUserid(11111L);
         testSingEvent.setSingleEvent(singleEvent);
-        System.out.println(testSingEvent.getSingleEvent().getUserid());
+        System.out.println(testSingEvent.getSingleEvent().getUserid());*/
     }
 
 }
