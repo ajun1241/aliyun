@@ -1,9 +1,13 @@
 package com.modcreater.tmutils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.show.ShowSingleEvent;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,54 +18,6 @@ import java.lang.reflect.Field;
  * Time: 10:37
  */
 public class SingleEventUtil {
-    /**
-     * 创建一个SingleEvent对象并根据参数对象类型是否为SingleEvent子类判断是否为SingleEvent赋值
-     * @param object
-     * @return
-     */
-    /*public static SingleEvent getSingleEvent(Object object) {
-            SingleEvent singleEvent = new SingleEvent();
-            try {
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getEventid").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getUserid").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getEventname").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getStarttime").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getEndtime").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getAddress").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getLevel").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getFlag").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getPerson").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getRemarks").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getRepeaTtime").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getIsOverdue").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getRemindTime").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getDay").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getMonth").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getYear").invoke(object)));
-                singleEvent.setEventid((Long) object.getClass().getMethod("getSingleEvent").invoke(object.getClass().getMethod("getType").invoke(object)));
-                *//*singleEvent.setEventid((Long) object.getClass().getMethod("getEventid").invoke(object));
-                singleEvent.setUserid((Long) object.getClass().getMethod("getUserid").invoke(object));
-                singleEvent.setEventname((String) object.getClass().getMethod("getEventname").invoke(object));
-                singleEvent.setStarttime((String) object.getClass().getMethod("getStarttime").invoke(object));
-                singleEvent.setEndtime((String) object.getClass().getMethod("getEndtime").invoke(object));
-                singleEvent.setAddress((String) object.getClass().getMethod("getAddress").invoke(object));
-                singleEvent.setLevel((Long) object.getClass().getMethod("getLevel").invoke(object));
-                singleEvent.setFlag((Long) object.getClass().getMethod("getFlag").invoke(object));
-                singleEvent.setPerson((String) object.getClass().getMethod("getPerson").invoke(object));
-                singleEvent.setRemarks((String) object.getClass().getMethod("getRemarks").invoke(object));
-                singleEvent.setRepeaTtime((String) object.getClass().getMethod("getRepeaTtime").invoke(object));
-                singleEvent.setIsOverdue((Long) object.getClass().getMethod("getIsOverdue").invoke(object));
-                singleEvent.setRemindTime((String) object.getClass().getMethod("getRemindTime").invoke(object));
-                singleEvent.setDay((Long) object.getClass().getMethod("getDay").invoke(object));
-                singleEvent.setMonth((Long) object.getClass().getMethod("getMonth").invoke(object));
-                singleEvent.setYear((Long) object.getClass().getMethod("getYear").invoke(object));
-                singleEvent.setType((Long) object.getClass().getMethod("getType").invoke(object));*//*
-            } catch (ReflectiveOperationException e) {
-                e.printStackTrace();
-            }
-            System.out.println(singleEvent.toString());
-            return singleEvent;
-    }*/
 
     /**
      * 创建一个SingleEvent对象并仅赋值day,month,year和userId
@@ -79,4 +35,44 @@ public class SingleEventUtil {
         return singleEvent;
     }
 
+    /**
+     * 将传进来的singleEvent文本转换成SingleEvent对象
+     * @param singleEventText
+     * @param clazz
+     * @return
+     */
+    public static SingleEvent jsonToSingleEvent(String singleEventText ,Class<SingleEvent> clazz){
+        return JSONObject.parseObject(singleEventText,clazz);
+    }
+
+    public static List<ShowSingleEvent> getShowSingleEventList(List<SingleEvent> singleEventList){
+        List<ShowSingleEvent> showSingleEventList = new ArrayList<>();
+        for (SingleEvent singleEvent1 : singleEventList) {
+            Boolean[] booleans = new Boolean[7];
+            String[] s = singleEvent1.getRepeaTtime().split(",");
+            for (int i = 0; i <= 6; i++) {
+                booleans[i] = "true".equals(s[i]);
+            }
+            ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+            showSingleEvent.setUserid(singleEvent1.getUserid());
+            showSingleEvent.setEventid(singleEvent1.getEventid());
+            showSingleEvent.setEventname(singleEvent1.getEventname());
+            showSingleEvent.setStarttime(singleEvent1.getStarttime());
+            showSingleEvent.setEndtime(singleEvent1.getEndtime());
+            showSingleEvent.setFlag(singleEvent1.getFlag());
+            showSingleEvent.setLevel(singleEvent1.getLevel());
+            showSingleEvent.setPerson(singleEvent1.getPerson());
+            showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
+            showSingleEvent.setRemarks(singleEvent1.getRemarks());
+            showSingleEvent.setDay(singleEvent1.getDay());
+            showSingleEvent.setMonth(singleEvent1.getMonth());
+            showSingleEvent.setYear(singleEvent1.getYear());
+            showSingleEvent.setType(singleEvent1.getType());
+            showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
+            showSingleEvent.setAddress(singleEvent1.getAddress());
+            showSingleEvent.setRepeaTtime(booleans);
+            showSingleEventList.add(showSingleEvent);
+        }
+        return showSingleEventList;
+    }
 }
