@@ -342,9 +342,6 @@ public class EventServiceImpl implements EventService {
             DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
             ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
             ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
-
-            System.out.println(singleEventListOrderByLevel.size() +":"+ singleEventListOrderByLevelAndDate.size() +":"+ singleEventList.size());
-
             if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0 && singleEventList.size() != 0) {
                 showSingleEventListOrderByLevel = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevel);
                 showSingleEventListOrderByLevelAndDate = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevelAndDate);
@@ -384,7 +381,6 @@ public class EventServiceImpl implements EventService {
                     showSingleEvent.setIsOverdue(loopEvent.getIsOverdue());
                     showSingleEvent.setAddress(loopEvent.getAddress());
                     showSingleEvent.setRepeaTtime(booleans);
-
                     if (booleans[week]){
                         showSingleEventListOrderByLevel.add(showSingleEvent);
                         showSingleEventListOrderByLevelAndDate.add(showSingleEvent);

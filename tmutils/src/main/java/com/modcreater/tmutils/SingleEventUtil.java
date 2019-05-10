@@ -3,6 +3,7 @@ package com.modcreater.tmutils;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
+import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -55,6 +56,8 @@ public class SingleEventUtil {
 
     public static ShowSingleEvent getShowSingleEvent(SingleEvent singleEvent1){
         Boolean[] booleans = new Boolean[7];
+        if (StringUtils.hasText(singleEvent1.getRepeaTtime())){
+
         String[] s = singleEvent1.getRepeaTtime().split(",");
         for (int i = 0; i <= 6; i++) {
             booleans[i] = "true".equals(s[i]);
@@ -78,5 +81,7 @@ public class SingleEventUtil {
         showSingleEvent.setAddress(singleEvent1.getAddress());
         showSingleEvent.setRepeaTtime(booleans);
         return showSingleEvent;
+        }
+        return new ShowSingleEvent();
     }
 }
