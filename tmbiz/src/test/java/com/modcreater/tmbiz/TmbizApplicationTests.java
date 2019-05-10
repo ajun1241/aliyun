@@ -1,6 +1,8 @@
 package com.modcreater.tmbiz;
 
 //import com.modcreater.tmbeans.pojo.TestSingEvent;
+import com.alibaba.fastjson.JSONObject;
+import com.modcreater.tmbeans.vo.DayEvents;
 import com.modcreater.tmbeans.vo.UploadingEventVo;
 import com.modcreater.tmdao.mapper.EventMapper;
         import org.junit.Test;
@@ -10,7 +12,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
         import java.text.SimpleDateFormat;
-        import java.util.Calendar;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -85,7 +88,13 @@ public class TmbizApplicationTests {
 
     @Test
     public void test5(){
-
+        String a="[{\"dayEventId\":20190510,\"mySingleEventList\":[{\"address\":\"积极性\",\"day\":10,\"endtime\":1151,\"eventid\":1557468410,\"eventname\":\"普通事件\",\"flag\":1,\"isOverdue\":0,\"level\":5,\"month\":5,\"person\":\"我\",\"remarks\":\"\",\"remindTime\":10,\"repeaTtime\":[false,false,false,false,false,false,false],\"starttime\":971,\"type\":4,\"userid\":0,\"year\":2019}],\"totalNum\":1,\"userId\":100035},{\"dayEventId\":20190511,\"mySingleEventList\":[],\"totalNum\":0,\"userId\":100035},{\"dayEventId\":20190512,\"mySingleEventList\":[],\"totalNum\":0,\"userId\":100035},{\"dayEventId\":20190513,\"mySingleEventList\":[],\"totalNum\":0,\"userId\":100035},{\"dayEventId\":20190514,\"mySingleEventList\":[],\"totalNum\":0,\"userId\":100035},{\"dayEventId\":20190515,\"mySingleEventList\":[],\"totalNum\":0,\"userId\":100035},{\"dayEventId\":20190516,\"mySingleEventList\":[],\"totalNum\":0,\"userId\":100035}]";
+        ArrayList arrayList= (ArrayList) JSONObject.parseArray(a,ArrayList.class);
+        for (Object dayEvents:arrayList) {
+            DayEvents days= JSONObject.parseObject(dayEvents.toString(),DayEvents.class);
+           /* System.out.println("1"+dayEvents.toString());
+            System.out.println("2"+dayEvents.getMySingleEventList().toString());*/
+        }
     }
 
 }
