@@ -254,7 +254,6 @@ public class EventServiceImpl implements EventService {
         for (DayEvents<SingleEvent> dayEvents : synchronousUpdateVo.getDayEventsList()) {
             for (SingleEvent singleEvent : dayEvents.getMySingleEventList()) {
                 //上传
-                singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
                 if (eventMapper.uploadingEvents(singleEvent) <= 0) {
                     return DtoUtil.getFalseDto("同步上传失败", 26002);
                 }
@@ -285,7 +284,6 @@ public class EventServiceImpl implements EventService {
                     if (i != 0) {
                         for (String eventId : list) {
                             if (!eventId.equals(singleEvent.getEventid().toString())) {
-                                singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
                                 if (eventMapper.uplLoopEvent(singleEvent) <= 0) {
                                     return DtoUtil.getFalseDto("重复事件上传失败", 26004);
                                 }
@@ -344,6 +342,9 @@ public class EventServiceImpl implements EventService {
             DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
             ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
             ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
+
+            System.out.println(singleEventListOrderByLevel.size() +":"+ singleEventListOrderByLevelAndDate.size() +":"+ singleEventList.size());
+
             if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0 && singleEventList.size() != 0) {
                 showSingleEventListOrderByLevel = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevel);
                 showSingleEventListOrderByLevelAndDate = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevelAndDate);
@@ -357,14 +358,37 @@ public class EventServiceImpl implements EventService {
 
             //查询重复事件
             int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
-            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
-            if (loopEventListInDataBase.size() != 0){}
-            for (SingleEvent singleEvent1 : loopEventListInDataBase){
-                String[] repeatTime = singleEvent1.getRepeaTtime().split(",");
-                if ("true".equals(repeatTime[week])){
-                    ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
-                    showSingleEventListOrderByLevel.add(showSingleEvent);
-                    showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
+            List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            if (loopEventListInDataBase.size() != 0){
+                for (LoopEvent loopEvent : loopEventListInDataBase){
+                    Boolean[] booleans = new Boolean[7];
+                    String[] s = loopEvent.getRepeatTime().split(",");
+                    for (int i = 0; i <= 6; i++) {
+                        booleans[i] = "true".equals(s[i]);
+                    }
+                    ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+                    showSingleEvent.setUserid(loopEvent.getUserId());
+                    showSingleEvent.setEventid(loopEvent.getEventId());
+                    showSingleEvent.setEventname(loopEvent.getEventName());
+                    showSingleEvent.setStarttime(loopEvent.getStartTime());
+                    showSingleEvent.setEndtime(loopEvent.getEndTime());
+                    showSingleEvent.setFlag(loopEvent.getFlag());
+                    showSingleEvent.setLevel(loopEvent.getLevel());
+                    showSingleEvent.setPerson(loopEvent.getPerson());
+                    showSingleEvent.setRemindTime(loopEvent.getRemindTime());
+                    showSingleEvent.setRemarks(loopEvent.getRemarks());
+                    showSingleEvent.setDay(loopEvent.getDay());
+                    showSingleEvent.setMonth(loopEvent.getMonth());
+                    showSingleEvent.setYear(loopEvent.getYear());
+                    showSingleEvent.setType(loopEvent.getType());
+                    showSingleEvent.setIsOverdue(loopEvent.getIsOverdue());
+                    showSingleEvent.setAddress(loopEvent.getAddress());
+                    showSingleEvent.setRepeaTtime(booleans);
+
+                    if (booleans[week]){
+                        showSingleEventListOrderByLevel.add(showSingleEvent);
+                        showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
+                    }
                 }
             }
 
@@ -489,7 +513,7 @@ public class EventServiceImpl implements EventService {
                 dayEventsList.add(dayEvents);
             }
             //按周查询重复事件
-            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
             Map result = new HashMap<>();
             List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
             //创建七个几个代表一周七天
@@ -500,9 +524,31 @@ public class EventServiceImpl implements EventService {
             List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
             List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
             List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
-            for (SingleEvent singleEvent1 : loopEventListInDataBase) {
-                ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
-                Boolean[] booleans = showSingleEvent.getRepeaTtime();
+            for (LoopEvent loopEvent : loopEventListInDataBase) {
+                ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+                Boolean[] booleans = new Boolean[7];
+                String[] s = loopEvent.getRepeatTime().split(",");
+                for (int i = 0; i <= 6; i++) {
+                    booleans[i] = "true".equals(s[i]);
+                }
+                showSingleEvent.setEventid(loopEvent.getEventId());
+                showSingleEvent.setUserid(loopEvent.getUserId());
+                showSingleEvent.setEventname(loopEvent.getEventName());
+                showSingleEvent.setStarttime(loopEvent.getStartTime());
+                showSingleEvent.setEndtime(loopEvent.getEndTime());
+                showSingleEvent.setAddress(loopEvent.getAddress());
+                showSingleEvent.setLevel(loopEvent.getLevel());
+                showSingleEvent.setFlag(loopEvent.getFlag());
+                showSingleEvent.setPerson(loopEvent.getPerson());
+                showSingleEvent.setRemarks(loopEvent.getRemarks());
+                showSingleEvent.setRepeaTtime(booleans);
+                showSingleEvent.setIsOverdue(loopEvent.getIsOverdue());
+                showSingleEvent.setRemindTime(loopEvent.getRemindTime());
+                showSingleEvent.setDay(loopEvent.getDay());
+                showSingleEvent.setMonth(loopEvent.getMonth());
+                showSingleEvent.setYear(loopEvent.getYear());
+                showSingleEvent.setType(loopEvent.getType());
+                System.out.println(showSingleEvent);
                 //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
                 for (int i = 0; i <= 6; i++) {
                     if (i == 0 && booleans[i]) {

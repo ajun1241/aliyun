@@ -1,14 +1,18 @@
 package com.modcreater.tmbiz;
 
+import com.modcreater.tmbeans.pojo.LoopEvent;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 //import com.modcreater.tmbeans.pojo.TestSingEvent;
+import com.modcreater.tmbeans.vo.SearchEventVo;
 import com.modcreater.tmbeans.vo.UploadingEventVo;
+import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.SingleEventUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,6 +23,9 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class TmbizApplicationTests {
+
+    @Resource
+    private EventMapper eventMapper;
 
     @Test
     public void contextLoads() throws Exception {
@@ -80,6 +87,12 @@ public class TmbizApplicationTests {
         UploadingEventVo uploadingEventVo=new UploadingEventVo();
         uploadingEventVo.setUserId("10019");
 //        System.out.println(SingleEventUtil.checkLogin(uploadingEventVo).toString());
+    }
+
+    @Test
+    public void test5(){
+        List<LoopEvent> singleEvents = eventMapper.queryLoopEvents("10086");
+        System.out.println(singleEvents.size());
     }
 
 }
