@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -351,6 +352,21 @@ public class EventServiceImpl implements EventService {
             dayEvents.setTotalNum(singleEventList.size());
             dayEvents.setDayEventId(Integer.valueOf(searchEventVo.getDayEventId()));
             dayEvents.setMySingleEventList(showSingleEventList);
+
+            //查询重复事件
+            int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
+            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            if (loopEventListInDataBase.size() != 0){}
+            for (SingleEvent singleEvent1 : loopEventListInDataBase){
+                String[] repeatTime = singleEvent1.getRepeaTtime().split(",");
+                if ("true".equals(repeatTime[week])){
+                    ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+                    showSingleEventListOrderByLevel.add(showSingleEvent);
+                    showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
+                }
+            }
+
+
             Map<String, Object> result = new HashMap<>();
             result.put("ShowSingleEventListOrderByLevel", showSingleEventListOrderByLevel);
             result.put("ShowSingleEventListOrderByLevelAndDate", showSingleEventListOrderByLevelAndDate);
@@ -405,6 +421,7 @@ public class EventServiceImpl implements EventService {
                 dayEventsList.add(dayEvents);
 
             }*/
+            //查询在该月内存在事件的日的集合
             List<Integer> days = eventMapper.queryDays(singleEvent);
             List<DayEvents<ShowSingleEvent>> dayEventsList = new ArrayList<>();
             if (days.size() != 0) {

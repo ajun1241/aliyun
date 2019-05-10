@@ -2,6 +2,7 @@ package com.modcreater.tmutils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtil {
@@ -21,5 +22,22 @@ public class DateUtil {
         date.setTime(lt*1000);
         System.out.println(date);
         return date;
+    }
+
+    public static int stringToWeek(String s){
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        Date date = new Date();
+        try {
+            date = simpleDateFormat.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        calendar.setTime(date);
+        int week = calendar.get(Calendar.DAY_OF_WEEK)-1;
+        if (week < 0){
+            week = 0;
+        }
+        return week;
     }
 }

@@ -203,11 +203,11 @@
         select data from draft where phoneNum=#{phoneNum}
     </select>
 
-    <select id="queryLoopEvents" resultType="com.modcreater.tmbeans.pojo.LoopEvent">
+    <select id="queryLoopEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
         <include refid="Base_Column_List"/>
         from loopevent
-        where userid = #{userId} and isOverdue &lt;&gt; 2
+        where userid = #{userId} and isOverdue &lt;&gt; 2 order by startTime asc
     </select>
     <select id="queryByWeekOrderByStartTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select

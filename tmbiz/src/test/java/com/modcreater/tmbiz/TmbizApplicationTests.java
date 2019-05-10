@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,11 +22,20 @@ public class TmbizApplicationTests {
 
     @Test
     public void contextLoads() throws Exception {
-        Calendar calendar = Calendar.getInstance();
+        /*Calendar calendar = Calendar.getInstance();
         Long timeStamp = (calendar.getTimeInMillis()) / 1000;
         Date time = new Date(timeStamp);
         System.out.println(time);
-        System.out.println(timeStamp);
+        System.out.println(timeStamp);*/
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        Date date = simpleDateFormat.parse("20190511");
+        calendar.setTime(date);
+        int week = calendar.get(Calendar.DAY_OF_WEEK)-1;
+        if (week < 0){
+            week = 0;
+        }
+        System.out.println(week);
     }
 
     @Test

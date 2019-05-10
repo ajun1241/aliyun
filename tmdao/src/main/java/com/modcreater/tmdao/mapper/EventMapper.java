@@ -140,7 +140,7 @@ public interface EventMapper {
      * @param userId
      * @return
      */
-    List<LoopEvent> queryLoopEvents(String userId);
+    List<SingleEvent> queryLoopEvents(String userId);
 
     /**
      * 根据"周"查找事件并根据事件开始时间(startTime)排序
