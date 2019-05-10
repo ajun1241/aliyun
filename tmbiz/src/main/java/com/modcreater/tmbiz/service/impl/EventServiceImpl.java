@@ -89,14 +89,30 @@ public class EventServiceImpl implements EventService {
                 singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
                 //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
                 if (SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime())) {
-                    if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.deleteEventsByUserId(singleEvent) > 0) {
-                        if (eventMapper.uplLoopEvent(singleEvent) > 0) {
-                            return DtoUtil.getSuccessDto("修改成功", 100000);
+                    SingleEvent loopEvent2 = eventMapper.queryLoopSingleEvent(singleEvent);
+                    if (!ObjectUtils.isEmpty(loopEvent2)){
+                        if (eventMapper.alterLoopEventsByUserId(singleEvent) > 0){
+                            return DtoUtil.getSuccessDto("修改成功",100000);
+                        }
+                    }else {
+                        if (eventMapper.deleteEventsByUserId(singleEvent) > 0){
+                            if (eventMapper.uplLoopEvent(singleEvent) > 0){
+                                return DtoUtil.getSuccessDto("修改成功",100000);
+                            }
                         }
                     }
                 } else {
-                    if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.alterEventsByUserId(singleEvent) > 0) {
-                        return DtoUtil.getSuccessDto("修改成功", 100000);
+                    SingleEvent singleEvent1 = eventMapper.querySingleEvent(singleEvent);
+                    if (!ObjectUtils.isEmpty(singleEvent1)){
+                        if (eventMapper.alterEventsByUserId(singleEvent) > 0){
+                            return DtoUtil.getSuccessDto("修改成功",100000);
+                        }
+                    }else {
+                        if (eventMapper.deleteLoopEventsByUserId(singleEvent) > 0){
+                            if (eventMapper.uploadingEvents(singleEvent) > 0){
+                                return DtoUtil.getSuccessDto("修改成功",100000);
+                            }
+                        }
                     }
                 }
                 return DtoUtil.getFalseDto("修改事件失败", 21007);

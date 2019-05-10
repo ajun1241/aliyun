@@ -99,6 +99,9 @@
     <delete id="deleteEventsByUserId">
         delete from singleevent where eventId = #{eventid} and userId = #{userid}
     </delete>
+    <delete id="deleteLoopEventsByUserId">
+        delete from loopevent where eventId = #{eventid} and userId = #{userid}
+    </delete>
 
     <select id="queryEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
@@ -239,6 +242,12 @@
         and month = #{month}
         and year = #{year}
         group by day
+    </select>
+    <select id="querySingleEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select <include refid="Base_Column_List"/> from singleevent where userid=#{userid} and eventid = #{eventid} and isOverdue = 0
+    </select>
+    <select id="queryLoopSingleEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select <include refid="Base_Column_List"/> from loopevent where userid=#{userid} and eventid = #{eventid} and isOverdue = 0
     </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.DraftVo" >

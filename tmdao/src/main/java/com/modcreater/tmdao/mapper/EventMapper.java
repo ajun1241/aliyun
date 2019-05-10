@@ -41,6 +41,12 @@ public interface EventMapper {
     int deleteEventsByUserId(SingleEvent singleEvent);
 
     /**
+     * 删除重复事件
+     * @param singleEvent
+     * @return
+     */
+    int deleteLoopEventsByUserId(SingleEvent singleEvent);
+    /**
      * 更新事件
      *
      * @param singleEvent
@@ -160,5 +166,8 @@ public interface EventMapper {
      */
     List<Integer> queryDays(SingleEvent singleEvent);
 
+    SingleEvent querySingleEvent(SingleEvent singleEvent);
+
+    SingleEvent queryLoopSingleEvent(SingleEvent singleEvent);
 
 }
