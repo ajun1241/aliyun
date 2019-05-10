@@ -40,14 +40,6 @@ public interface EventService {
     Dto updateEvents(UpdateEventVo updateEventVo);
 
     /**
-     * 查询事件
-     *
-     * @param searchEventVo
-     * @return
-     */
-    Dto searchEvents(SearchEventVo searchEventVo);
-
-    /**
      * 同步本地数据到线上
      *
      * @param synchronousUpdateVo

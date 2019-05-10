@@ -39,102 +39,69 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
-        if (!ObjectUtils.isEmpty(uploadingEventVo)) {
-            if (StringUtils.isEmpty(uploadingEventVo.getSingleEvent())) {
-                return DtoUtil.getFalseDto("上传事件列表为空", 21012);
-            }
-            System.out.println("上传" + uploadingEventVo.toString());
-            if (StringUtils.isEmpty(uploadingEventVo.getUserId())) {
-                return DtoUtil.getFalseDto("请先登录", 21011);
-            }
-            System.out.println("这是孔庆一要的字符串****" + uploadingEventVo.getSingleEvent() + "****");
-            SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
-            System.out.println("是不是空=" + singleEvent);
-            singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
-            //这里开始判断是否是一个重复事件
-            String[] repeatTime = singleEvent.getRepeaTtime().split(",");
-            boolean b = false;
-            for (String s : repeatTime) {
-                b = "true".equals(s);
-            }
-            //如果状态值为真,则该事件为重复事件
-            if (b) {
-                if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingLoopEvents(singleEvent) > 0) {
-                    return DtoUtil.getSuccessDto("事件上传成功", 100000);
+        if (StringUtils.hasText(uploadingEventVo.getUserId())) {
+            if (StringUtils.hasText(uploadingEventVo.getSingleEvent())) {
+                System.out.println("上传" + uploadingEventVo.toString());
+                SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
+                singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
+                //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+                if (SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime())) {
+                    if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingLoopEvents(singleEvent) > 0) {
+                        return DtoUtil.getSuccessDto("事件上传成功", 100000);
+                    }
+                } else {
+                    if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
+                        return DtoUtil.getSuccessDto("事件上传成功", 100000);
+                    }
                 }
-            } else {
-                if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
-                    return DtoUtil.getSuccessDto("事件上传成功", 100000);
-                }
+                return DtoUtil.getFalseDto("事件上传失败", 21001);
             }
-            return DtoUtil.getFalseDto("事件上传失败", 21001);
+            return DtoUtil.getFalseDto("没有可上传的事件", 21002);
         }
-        return DtoUtil.getFalseDto("没有可上传的事件", 21002);
+        return DtoUtil.getFalseDto("请先登录", 21011);
     }
 
     @Override
     public Dto deleteEvents(DeleteEventVo deleteEventVo) {
-        if (!ObjectUtils.isEmpty(deleteEventVo)) {
-            System.out.println("删除" + deleteEventVo.toString());
-            if (StringUtils.isEmpty(deleteEventVo.getUserId())) {
-                return DtoUtil.getFalseDto("请先登录", 21011);
+        if (StringUtils.hasText(deleteEventVo.getUserId())) {
+            if (StringUtils.hasText(deleteEventVo.getEventId())) {
+                System.out.println("删除" + deleteEventVo.toString());
+                SingleEvent singleEvent = new SingleEvent();
+                singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
+                singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
+                if (eventMapper.withdrawEventsByUserId(singleEvent) > 0 || eventMapper.withdrawLoopEventsByUserId(singleEvent) > 0) {
+                    return DtoUtil.getSuccessDto("删除成功", 100000);
+                }
+                return DtoUtil.getFalseDto("删除事件失败", 21005);
             }
-            SingleEvent singleEvent = new SingleEvent();
-            singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
-            singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
-            if (eventMapper.withdrawEventsByUserId(singleEvent) > 0 || eventMapper.withdrawLoopEventsByUserId(singleEvent) > 0) {
-                return DtoUtil.getSuccessDto("删除成功", 100000);
-            }
-            return DtoUtil.getFalseDto("删除事件失败", 21005);
+            return DtoUtil.getFalseDto("删除条件接收失败", 21006);
         }
-        return DtoUtil.getFalseDto("删除条件接收失败", 21006);
+        return DtoUtil.getFalseDto("请先登录", 21011);
     }
 
 
     @Override
     public Dto updateEvents(UpdateEventVo updateEventVo) {
-        if (!ObjectUtils.isEmpty(updateEventVo)) {
-            System.out.println("修改" + updateEventVo.toString());
-            if (StringUtils.isEmpty(updateEventVo.getUserId())) {
-                return DtoUtil.getFalseDto("请先登录", 21011);
-            }
-            SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
-            singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
-            String[] repeatTime = singleEvent.getRepeaTtime().split(",");
-            boolean b = false;
-            for (String s : repeatTime) {
-                b = "true".equals(s);
-            }
-            if (b) {
-                if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.alterLoopEventsByUserId(singleEvent) > 0) {
-                    return DtoUtil.getSuccessDto("修改成功", 100000);
+        if (StringUtils.isEmpty(updateEventVo.getUserId())) {
+            if (!ObjectUtils.isEmpty(updateEventVo)) {
+                System.out.println("修改" + updateEventVo.toString());
+                SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
+                singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
+                //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+                if (SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime())) {
+                    if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.alterLoopEventsByUserId(singleEvent) > 0) {
+                        return DtoUtil.getSuccessDto("修改成功", 100000);
+                    }
+                } else {
+                    if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.alterEventsByUserId(singleEvent) > 0) {
+                        return DtoUtil.getSuccessDto("修改成功", 100000);
+                    }
                 }
-            } else {
-                if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.alterEventsByUserId(singleEvent) > 0) {
-                    return DtoUtil.getSuccessDto("修改成功", 100000);
-                }
+                return DtoUtil.getFalseDto("修改事件失败", 21007);
             }
-            return DtoUtil.getFalseDto("修改事件失败", 21007);
+            return DtoUtil.getFalseDto("修改条件接收失败", 21008);
         }
-        return DtoUtil.getFalseDto("修改条件接收失败", 21008);
-    }
-
-    @Override
-    public Dto searchEvents(SearchEventVo searchEventVo) {
-        if (!ObjectUtils.isEmpty(searchEventVo)) {
-            System.out.println("查询单一" + searchEventVo.toString());
-            if (StringUtils.isEmpty(searchEventVo.getUserId())) {
-                return DtoUtil.getFalseDto("请先登录", 21011);
-            }
-            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
-            List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
-            if (!ObjectUtils.isEmpty(singleEventList)) {
-                List<ShowSingleEvent> showSingleEventList = SingleEventUtil.getShowSingleEventList(singleEventList);
-                return DtoUtil.getSuccesWithDataDto("查询成功", showSingleEventList, 100000);
-            }
-            return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
-        }
-        return DtoUtil.getFalseDto("查询条件接收失败", 21004);
+        return DtoUtil.getFalseDto("请先登录", 21011);
     }
 
     @Override
@@ -320,176 +287,176 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
-        if (!ObjectUtils.isEmpty(searchEventVo)) {
-            if (StringUtils.isEmpty(searchEventVo.getUserId())) {
-                return DtoUtil.getFalseDto("请先登录", 21011);
-            }
-            System.out.println("按天查" + searchEventVo.toString());
-            boolean b = false;
-            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
-            //只根据level升序
-            List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByDayOrderByLevel(singleEvent);
-            List<ShowSingleEvent> showSingleEventListOrderByLevel = new ArrayList<>();
-            //根据level和事件升序
-            List<SingleEvent> singleEventListOrderByLevelAndDate = eventMapper.queryByDayOrderByLevelAndDate(singleEvent);
-            List<ShowSingleEvent> showSingleEventListOrderByLevelAndDate = new ArrayList<>();
-            //添加一个未排序的结果集到dayEvents中
-            DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
-            ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
-            ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
-            if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0 && singleEventList.size() != 0) {
-                showSingleEventListOrderByLevel = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevel);
-                showSingleEventListOrderByLevelAndDate = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevelAndDate);
-                showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
-                b = true;
-            }
-            dayEvents.setUserId(singleEvent.getUserid().intValue());
-            dayEvents.setTotalNum(singleEventList.size());
-            dayEvents.setDayEventId(Integer.valueOf(searchEventVo.getDayEventId()));
-            dayEvents.setMySingleEventList(showSingleEventList);
+        if (StringUtils.hasText(searchEventVo.getUserId())) {
+            if (StringUtils.hasText(searchEventVo.getDayEventId())) {
+                System.out.println("按天查" + searchEventVo.toString());
+                boolean singleResult = false;
+                boolean loopResult = false;
+                //拆分dayEventId并将查询条件逐一添加到对象中
+                SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
+                //只根据level升序
+                List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByDayOrderByLevel(singleEvent);
+                List<ShowSingleEvent> showSingleEventListOrderByLevel = new ArrayList<>();
+                //根据level和开始时间升序
+                List<SingleEvent> singleEventListOrderByLevelAndDate = eventMapper.queryByDayOrderByLevelAndDate(singleEvent);
+                List<ShowSingleEvent> showSingleEventListOrderByLevelAndDate = new ArrayList<>();
+                //添加一个未排序的结果集到dayEvents中
+                DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
+                ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+                ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
+                if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0 && singleEventList.size() != 0) {
+                    showSingleEventListOrderByLevel = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevel);
+                    showSingleEventListOrderByLevelAndDate = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevelAndDate);
+                    showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
+                    singleResult = true;
+                }
+                dayEvents.setUserId(singleEvent.getUserid().intValue());
+                dayEvents.setTotalNum(singleEventList.size());
+                dayEvents.setDayEventId(Integer.valueOf(searchEventVo.getDayEventId()));
+                dayEvents.setMySingleEventList(showSingleEventList);
 
-            /**
-             * 查询重复事件
-             */
-            int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
-            //根据用户ID查询重复事件
-            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
-            //判断上一条查询结果是否有数据
-            if (loopEventListInDataBase.size() != 0){
-                //遍历集合并将符合repeatTime = 星期 的对象分别添加到集合中
-                for (SingleEvent singleEvent1 : loopEventListInDataBase){
-                    ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
-                    if (showSingleEvent.getRepeaTtime()[week]){
-                        showSingleEventListOrderByLevel.add(showSingleEvent);
-                        showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
+                /**
+                 * 查询重复事件
+                 */
+                int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
+                //根据用户ID查询重复事件
+                List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+                //判断上一条查询结果是否有数据
+                if (loopEventListInDataBase.size() != 0) {
+                    //遍历集合并将符合repeatTime = 星期 的对象分别添加到集合中
+                    for (SingleEvent singleEvent1 : loopEventListInDataBase) {
+                        ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+                        if (showSingleEvent.getRepeaTtime()[week]) {
+                            showSingleEventListOrderByLevel.add(showSingleEvent);
+                            showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
+                            loopResult = true;
+                        }
                     }
                 }
+                /**
+                 * 将得到的数据封装到map作为返回
+                 */
+                Map<String, Object> result = new HashMap<>(3);
+                result.put("ShowSingleEventListOrderByLevel", showSingleEventListOrderByLevel);
+                result.put("ShowSingleEventListOrderByLevelAndDate", showSingleEventListOrderByLevelAndDate);
+                result.put("dayEvents", dayEvents);
+                if (singleResult && loopResult) {
+                    return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+                }
+                return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
             }
-            /**
-             * 将得到的数据封装到map作为返回
-             */
-            Map<String, Object> result = new HashMap<>(3);
-            result.put("ShowSingleEventListOrderByLevel", showSingleEventListOrderByLevel);
-            result.put("ShowSingleEventListOrderByLevelAndDate", showSingleEventListOrderByLevelAndDate);
-            result.put("dayEvents", dayEvents);
-            if (b) {
-                return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
-            }
-            return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
+            return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }
-        return DtoUtil.getFalseDto("查询条件接收失败", 21004);
+        return DtoUtil.getFalseDto("请先登录", 21011);
     }
 
     @Override
     public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo) {
-        if (!ObjectUtils.isEmpty(searchEventVo)) {
-            System.out.println("按月查" + searchEventVo.toString());
-            if (StringUtils.isEmpty(searchEventVo.getUserId())) {
-                return DtoUtil.getFalseDto("请先登录", 21011);
-            }
-            SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
-            //查询在该月内存在事件的日的集合
-            List<Integer> days = eventMapper.queryDays(singleEvent);
-            List<DayEvents<ShowSingleEvent>> dayEventsList = new ArrayList<>();
-            if (days.size() != 0) {
-                for (Integer day : days) {
-                    singleEvent.setDay(day.longValue());
-                    ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
-                    if (singleEventList.size() != 0) {
-                        ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
-                        DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
-                        dayEvents.setUserId(singleEvent.getUserid().intValue());
-                        dayEvents.setTotalNum(singleEventList.size());
-                        dayEvents.setDayEventId(Integer.valueOf(singleEvent.getYear().toString() + singleEvent.getMonth().toString() + singleEvent.getDay().toString()));
-                        dayEvents.setMySingleEventList(showSingleEventList);
-                        dayEventsList.add(dayEvents);
+        if (StringUtils.hasText(searchEventVo.getUserId())) {
+            if (StringUtils.hasText(searchEventVo.getDayEventId())) {
+                System.out.println("按月查" + searchEventVo.toString());
+                SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
+                //查询在该月内存在事件的日的集合
+                List<Integer> days = eventMapper.queryDays(singleEvent);
+                List<DayEvents<ShowSingleEvent>> dayEventsList = new ArrayList<>();
+                if (days.size() != 0) {
+                    for (Integer day : days) {
+                        singleEvent.setDay(day.longValue());
+                        ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+                        if (singleEventList.size() != 0) {
+                            ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
+                            DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
+                            dayEvents.setUserId(singleEvent.getUserid().intValue());
+                            dayEvents.setTotalNum(singleEventList.size());
+                            dayEvents.setDayEventId(Integer.valueOf(singleEvent.getYear().toString() + singleEvent.getMonth().toString() + singleEvent.getDay().toString()));
+                            dayEvents.setMySingleEventList(showSingleEventList);
+                            dayEventsList.add(dayEvents);
+                        }
                     }
-
+                    return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
                 }
-                return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
+                return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
             }
-
-            return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
+            return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }
-        return DtoUtil.getFalseDto("查询条件接收失败", 21004);
+        return DtoUtil.getFalseDto("请先登录", 21011);
     }
 
     @Override
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
-        if (!ObjectUtils.isEmpty(searchEventVo)) {
-            System.out.println("按周查" + searchEventVo.toString());
-            if (StringUtils.isEmpty(searchEventVo.getUserId())) {
-                return DtoUtil.getFalseDto("请先登录", 21011);
-            }
-            //按周查询单一事件
-            SingleEvent singleEvent;
-            List<DayEvents> dayEventsList = new ArrayList<>();
-            //noinspection AlibabaUndefineMagicConstant
-            for (int i = 0; i <= 6; i++) {
-                DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
-                String dayEventId = String.valueOf(Integer.valueOf(searchEventVo.getDayEventId()) + i);
-                singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
-                List<SingleEvent> singleEventList = eventMapper.queryByWeekOrderByStartTime(singleEvent);
-                ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
-                dayEvents.setMySingleEventList(showSingleEventList);
-                dayEvents.setTotalNum(dayEvents.getMySingleEventList().size());
-                dayEvents.setUserId(Integer.valueOf(searchEventVo.getUserId()));
-                dayEvents.setDayEventId(Integer.valueOf(dayEventId));
-                dayEventsList.add(dayEvents);
-            }
-            //按周查询重复事件
-            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
-            Map result = new HashMap<>(2);
-            List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
-            //创建七个几个代表一周七天
-            List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();
-            List<ShowSingleEvent> monShowLoopEventList = new ArrayList<>();
-            List<ShowSingleEvent> tueShowLoopEventList = new ArrayList<>();
-            List<ShowSingleEvent> wedShowLoopEventList = new ArrayList<>();
-            List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
-            List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
-            List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
-            for (SingleEvent singleEvent1 : loopEventListInDataBase) {
-                ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
-                Boolean[] booleans = showSingleEvent.getRepeaTtime();
-                //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
+        if (StringUtils.isEmpty(searchEventVo.getUserId())) {
+            if (!ObjectUtils.isEmpty(searchEventVo)) {
+                System.out.println("按周查" + searchEventVo.toString());
+                //按周查询单一事件
+                SingleEvent singleEvent;
+                List<DayEvents> dayEventsList = new ArrayList<>();
                 //noinspection AlibabaUndefineMagicConstant
                 for (int i = 0; i <= 6; i++) {
-                    if (i == 0 && booleans[i]) {
-                        sunShowLoopEventList.add(showSingleEvent);
-                    }
-                    if (i == 1 && booleans[i]) {
-                        monShowLoopEventList.add(showSingleEvent);
-                    }
-                    if (i == 2 && booleans[i]) {
-                        tueShowLoopEventList.add(showSingleEvent);
-                    }
-                    if (i == 3 && booleans[i]) {
-                        wedShowLoopEventList.add(showSingleEvent);
-                    }
-                    if (i == 4 && booleans[i]) {
-                        thuShowLoopEventList.add(showSingleEvent);
-                    }
-                    if (i == 5 && booleans[i]) {
-                        friShowLoopEventList.add(showSingleEvent);
-                    }
-                    if (i == 6 && booleans[i]) {
-                        satShowLoopEventList.add(showSingleEvent);
+                    DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
+                    String dayEventId = String.valueOf(Integer.valueOf(searchEventVo.getDayEventId()) + i);
+                    singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
+                    List<SingleEvent> singleEventList = eventMapper.queryByWeekOrderByStartTime(singleEvent);
+                    ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
+                    dayEvents.setMySingleEventList(showSingleEventList);
+                    dayEvents.setTotalNum(dayEvents.getMySingleEventList().size());
+                    dayEvents.setUserId(Integer.valueOf(searchEventVo.getUserId()));
+                    dayEvents.setDayEventId(Integer.valueOf(dayEventId));
+                    dayEventsList.add(dayEvents);
+                }
+                //按周查询重复事件
+                List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+                List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
+                //创建七个几个代表一周七天
+                List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();
+                List<ShowSingleEvent> monShowLoopEventList = new ArrayList<>();
+                List<ShowSingleEvent> tueShowLoopEventList = new ArrayList<>();
+                List<ShowSingleEvent> wedShowLoopEventList = new ArrayList<>();
+                List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
+                List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
+                List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
+                for (SingleEvent singleEvent1 : loopEventListInDataBase) {
+                    ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+                    Boolean[] booleans = showSingleEvent.getRepeaTtime();
+                    //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
+                    //noinspection AlibabaUndefineMagicConstant
+                    for (int i = 0; i <= 6; i++) {
+                        if (i == 0 && booleans[i]) {
+                            sunShowLoopEventList.add(showSingleEvent);
+                        }
+                        if (i == 1 && booleans[i]) {
+                            monShowLoopEventList.add(showSingleEvent);
+                        }
+                        if (i == 2 && booleans[i]) {
+                            tueShowLoopEventList.add(showSingleEvent);
+                        }
+                        if (i == 3 && booleans[i]) {
+                            wedShowLoopEventList.add(showSingleEvent);
+                        }
+                        if (i == 4 && booleans[i]) {
+                            thuShowLoopEventList.add(showSingleEvent);
+                        }
+                        if (i == 5 && booleans[i]) {
+                            friShowLoopEventList.add(showSingleEvent);
+                        }
+                        if (i == 6 && booleans[i]) {
+                            satShowLoopEventList.add(showSingleEvent);
+                        }
                     }
                 }
+                loopEventList.add(sunShowLoopEventList);
+                loopEventList.add(monShowLoopEventList);
+                loopEventList.add(tueShowLoopEventList);
+                loopEventList.add(wedShowLoopEventList);
+                loopEventList.add(thuShowLoopEventList);
+                loopEventList.add(friShowLoopEventList);
+                loopEventList.add(satShowLoopEventList);
+                Map<String,Object> result = new HashMap<>(2);
+                result.put("dayEventsList", dayEventsList);
+                result.put("loopEventList", loopEventList);
+                return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
             }
-            loopEventList.add(sunShowLoopEventList);
-            loopEventList.add(monShowLoopEventList);
-            loopEventList.add(tueShowLoopEventList);
-            loopEventList.add(wedShowLoopEventList);
-            loopEventList.add(thuShowLoopEventList);
-            loopEventList.add(friShowLoopEventList);
-            loopEventList.add(satShowLoopEventList);
-            result.put("dayEventsList", dayEventsList);
-            result.put("loopEventList", loopEventList);
-            return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+            return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }
-        return DtoUtil.getFalseDto("查询条件接收失败", 21004);
+        return DtoUtil.getFalseDto("请先登录", 21011);
     }
-
 }

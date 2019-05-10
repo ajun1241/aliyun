@@ -18,7 +18,6 @@ import java.util.List;
  * @Date: 2019-05-06
  * Time: 10:37
  */
-@SuppressWarnings({"ALL", "AlibabaUndefineMagicConstant"})
 public class SingleEventUtil {
 
     /**
@@ -66,13 +65,7 @@ public class SingleEventUtil {
      * @return
      */
     public static ShowSingleEvent getShowSingleEvent(SingleEvent singleEvent1) {
-        Boolean[] booleans = new Boolean[7];
         if (StringUtils.hasText(singleEvent1.getRepeaTtime())) {
-            String[] s = singleEvent1.getRepeaTtime().split(",");
-            //noinspection AlibabaUndefineMagicConstant
-            for (int i = 0; i <= 6; i++) {
-                booleans[i] = "true".equals(s[i]);
-            }
             ShowSingleEvent showSingleEvent = new ShowSingleEvent();
             showSingleEvent.setUserid(singleEvent1.getUserid());
             showSingleEvent.setEventid(singleEvent1.getEventid());
@@ -90,9 +83,36 @@ public class SingleEventUtil {
             showSingleEvent.setType(singleEvent1.getType());
             showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
             showSingleEvent.setAddress(singleEvent1.getAddress());
-            showSingleEvent.setRepeaTtime(booleans);
+            showSingleEvent.setRepeaTtime(getRepeatTime(singleEvent1));
             return showSingleEvent;
         }
         return new ShowSingleEvent();
+    }
+
+    /**
+     * 将SingleEvent中的repeaTtime字符串转换成ShowSingleEvent中的repeatTime数组
+     * @param singleEvent
+     * @return
+     */
+    public static Boolean[] getRepeatTime(SingleEvent singleEvent){
+        Boolean[] booleans = new Boolean[7];
+        String[] s = singleEvent.getRepeaTtime().split(",");
+        for (int i = 0; i <= 6; i++) {
+            booleans[i] = "true".equals(s[i]);
+        }
+        return booleans;
+    }
+
+    /**
+     * 对repeatTime字符串解析并判断是否是一个重复事件,如果是则返回true
+     * @param repeatTime
+     * @return
+     */
+    public static boolean isLoopEvent(String repeatTime){
+        boolean b = false;
+        for (String s : repeatTime.split(",")) {
+            b = "true".equals(s);
+        }
+        return b;
     }
 }
