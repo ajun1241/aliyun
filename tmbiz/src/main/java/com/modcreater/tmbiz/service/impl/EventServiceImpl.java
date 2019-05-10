@@ -245,16 +245,16 @@ public class EventServiceImpl implements EventService {
         }
         boolean flag=false;
         if (!StringUtils.isEmpty(synchronousUpdateVo.getDayEventList())){
-            //反射集合
+            //转换集合
             List<ArrayList> dayEvents=JSONObject.parseObject(synchronousUpdateVo.getDayEventList(),ArrayList.class);
             //上传普通事件
             for (Object dayEventsList:dayEvents) {
-                //反射成DayEvents
+                //转换成DayEvents
                 DayEvents dayEvents1=JSONObject.parseObject(dayEventsList.toString(),DayEvents.class);
-                //把getMySingleEventList()反射成集合
+                //把getMySingleEventList()转换成集合
                 ArrayList<SingleEvent> singleEventList= JSONObject.parseObject(dayEvents1.getMySingleEventList().toString(),ArrayList.class);
                 for (Object singleEvent:singleEventList) {
-                    //把遍历出的元素反射成对象
+                    //把遍历出的元素转换成对象
                     SingleEvent singleEvent1=JSONObject.parseObject(singleEvent.toString(),SingleEvent.class);
                     //插入用户id
                     singleEvent1.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
@@ -268,14 +268,14 @@ public class EventServiceImpl implements EventService {
             flag=true;
         }
         if (!StringUtils.isEmpty(synchronousUpdateVo.getLoopEventList())) {
-            //外层集合反射
+            //外层集合转换
             List<ArrayList> loopEvents = JSONObject.parseObject(synchronousUpdateVo.getLoopEventList(), ArrayList.class);
             //上传重复事件
             for (List<SingleEvent> singleEvents : loopEvents) {
-                //第二层反射
+                //第二层转换
                 List<SingleEvent> singleEventList=JSONObject.parseObject(singleEvents.toString(),ArrayList.class);
                 for (Object loopEvent : singleEventList) {
-                    //第三层反射
+                    //第三层转换
                     SingleEvent singleEvent=JSONObject.parseObject(loopEvent.toString(),SingleEvent.class);
                     singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
                     int i = eventMapper.uploadingLoopEvents(singleEvent);
