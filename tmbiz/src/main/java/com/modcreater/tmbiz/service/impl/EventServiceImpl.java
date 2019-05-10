@@ -1,7 +1,6 @@
 package com.modcreater.tmbiz.service.impl;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.pojo.LoopEvent;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.*;
@@ -18,8 +17,6 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -354,44 +351,27 @@ public class EventServiceImpl implements EventService {
             dayEvents.setDayEventId(Integer.valueOf(searchEventVo.getDayEventId()));
             dayEvents.setMySingleEventList(showSingleEventList);
 
-            //查询重复事件
+            /**
+             * 查询重复事件
+             */
             int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
-            List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            //根据用户ID查询重复事件
+            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            //判断上一条查询结果是否有数据
             if (loopEventListInDataBase.size() != 0){
-                for (LoopEvent loopEvent : loopEventListInDataBase){
-                    Boolean[] booleans = new Boolean[7];
-                    String[] s = loopEvent.getRepeatTime().split(",");
-                    //noinspection AlibabaUndefineMagicConstant
-                    for (int i = 0; i <= 6; i++) {
-                        booleans[i] = "true".equals(s[i]);
-                    }
-                    ShowSingleEvent showSingleEvent = new ShowSingleEvent();
-                    showSingleEvent.setUserid(loopEvent.getUserId());
-                    showSingleEvent.setEventid(loopEvent.getEventId());
-                    showSingleEvent.setEventname(loopEvent.getEventName());
-                    showSingleEvent.setStarttime(loopEvent.getStartTime());
-                    showSingleEvent.setEndtime(loopEvent.getEndTime());
-                    showSingleEvent.setFlag(loopEvent.getFlag());
-                    showSingleEvent.setLevel(loopEvent.getLevel());
-                    showSingleEvent.setPerson(loopEvent.getPerson());
-                    showSingleEvent.setRemindTime(loopEvent.getRemindTime());
-                    showSingleEvent.setRemarks(loopEvent.getRemarks());
-                    showSingleEvent.setDay(loopEvent.getDay());
-                    showSingleEvent.setMonth(loopEvent.getMonth());
-                    showSingleEvent.setYear(loopEvent.getYear());
-                    showSingleEvent.setType(loopEvent.getType());
-                    showSingleEvent.setIsOverdue(loopEvent.getIsOverdue());
-                    showSingleEvent.setAddress(loopEvent.getAddress());
-                    showSingleEvent.setRepeaTtime(booleans);
-                    if (booleans[week]){
+                //遍历集合并将符合repeatTime = 星期 的对象分别添加到集合中
+                for (SingleEvent singleEvent1 : loopEventListInDataBase){
+                    ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+                    if (showSingleEvent.getRepeaTtime()[week]){
                         showSingleEventListOrderByLevel.add(showSingleEvent);
                         showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
                     }
                 }
             }
-
-
-            Map<String, Object> result = new HashMap<>();
+            /**
+             * 将得到的数据封装到map作为返回
+             */
+            Map<String, Object> result = new HashMap<>(3);
             result.put("ShowSingleEventListOrderByLevel", showSingleEventListOrderByLevel);
             result.put("ShowSingleEventListOrderByLevelAndDate", showSingleEventListOrderByLevelAndDate);
             result.put("dayEvents", dayEvents);
@@ -411,40 +391,6 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("请先登录", 21011);
             }
             SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
-            /*List<SingleEvent> singleEventList = eventMapper.queryByDayEventIdsInMonth(singleEvent);
-            List<DayEvents<ShowSingleEvent>> dayEventsList = new ArrayList<>();
-            List<Integer> days = eventMapper.queryUserId(singleEvent);
-            if (singleEventList.size() != 0) {
-                b = true;
-            }
-
-            for (SingleEvent singleEvent1 : singleEventList) {
-                DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
-                ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
-                dayEvents.setUserId(singleEvent.getUserid().intValue());
-                StringBuilder dayEventId = new StringBuilder();
-                dayEventId.append(singleEvent1.getYear());
-                if (singleEvent1.getMonth() < 10) {
-                    dayEventId.append(0);
-                }
-                dayEventId.append(singleEvent1.getMonth());
-                String day1 = "00";
-                for (Integer day : days) {
-                    if (singleEvent1.getDay().toString().equals(day.toString())) {
-                        if (day < 10) {
-                            dayEventId.append(0);
-                        }
-                        day1 = day.toString();
-                        showSingleEventList.add(SingleEventUtil.getShowSingleEvent(singleEvent1));
-                    }
-                }
-                dayEventId.append(day1);
-                dayEvents.setDayEventId(Integer.valueOf(dayEventId.toString()));
-                dayEvents.setTotalNum(showSingleEventList.size());
-                dayEvents.setMySingleEventList(showSingleEventList);
-                dayEventsList.add(dayEvents);
-
-            }*/
             //查询在该月内存在事件的日的集合
             List<Integer> days = eventMapper.queryDays(singleEvent);
             List<DayEvents<ShowSingleEvent>> dayEventsList = new ArrayList<>();
@@ -471,23 +417,6 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
 
-    /*@Override
-    public Dto addNewLoopEvents(UploadingEventVo uploadingEventVo) {
-        if (!ObjectUtils.isEmpty(uploadingEventVo)) {
-            System.out.println("添加重复事件" + uploadingEventVo.toString());
-            if (StringUtils.isEmpty(uploadingEventVo.getUserId())) {
-                return DtoUtil.getFalseDto("请先登录", 21011);
-            }
-            SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
-            singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
-            if (eventMapper.uploadingLoopEvents(singleEvent) > 0) {
-                return DtoUtil.getSuccessDto("上传重复事件成功", 100000);
-            }
-            return DtoUtil.getFalseDto("上传重复事件失败", 21009);
-        }
-        return DtoUtil.getFalseDto("没有可上传的重复事件", 21010);
-    }*/
-
     @SuppressWarnings({"AlibabaUndefineMagicConstant", "AlibabaMethodTooLong"})
     @Override
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
@@ -513,8 +442,8 @@ public class EventServiceImpl implements EventService {
                 dayEventsList.add(dayEvents);
             }
             //按周查询重复事件
-            List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
-            Map result = new HashMap<>();
+            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            Map result = new HashMap<>(2);
             List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
             //创建七个几个代表一周七天
             List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();
@@ -524,32 +453,9 @@ public class EventServiceImpl implements EventService {
             List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
             List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
             List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
-            for (LoopEvent loopEvent : loopEventListInDataBase) {
-                ShowSingleEvent showSingleEvent = new ShowSingleEvent();
-                Boolean[] booleans = new Boolean[7];
-                String[] s = loopEvent.getRepeatTime().split(",");
-                //noinspection AlibabaUndefineMagicConstant
-                for (int i = 0; i <= 6; i++) {
-                    booleans[i] = "true".equals(s[i]);
-                }
-                showSingleEvent.setEventid(loopEvent.getEventId());
-                showSingleEvent.setUserid(loopEvent.getUserId());
-                showSingleEvent.setEventname(loopEvent.getEventName());
-                showSingleEvent.setStarttime(loopEvent.getStartTime());
-                showSingleEvent.setEndtime(loopEvent.getEndTime());
-                showSingleEvent.setAddress(loopEvent.getAddress());
-                showSingleEvent.setLevel(loopEvent.getLevel());
-                showSingleEvent.setFlag(loopEvent.getFlag());
-                showSingleEvent.setPerson(loopEvent.getPerson());
-                showSingleEvent.setRemarks(loopEvent.getRemarks());
-                showSingleEvent.setRepeaTtime(booleans);
-                showSingleEvent.setIsOverdue(loopEvent.getIsOverdue());
-                showSingleEvent.setRemindTime(loopEvent.getRemindTime());
-                showSingleEvent.setDay(loopEvent.getDay());
-                showSingleEvent.setMonth(loopEvent.getMonth());
-                showSingleEvent.setYear(loopEvent.getYear());
-                showSingleEvent.setType(loopEvent.getType());
-                System.out.println(showSingleEvent);
+            for (SingleEvent singleEvent1 : loopEventListInDataBase) {
+                ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+                Boolean[] booleans = showSingleEvent.getRepeaTtime();
                 //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
                 //noinspection AlibabaUndefineMagicConstant
                 for (int i = 0; i <= 6; i++) {

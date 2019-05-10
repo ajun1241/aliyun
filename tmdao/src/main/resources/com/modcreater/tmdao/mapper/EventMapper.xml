@@ -203,7 +203,7 @@
         select data from draft where phoneNum=#{phoneNum}
     </select>
 
-    <select id="queryLoopEvents" resultType="com.modcreater.tmbeans.pojo.LoopEvent">
+    <select id="queryLoopEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
         <include refid="Base_Column_List"/>
         from loopevent

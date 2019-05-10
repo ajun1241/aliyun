@@ -1,11 +1,8 @@
 package com.modcreater.tmbeans.vo;
 
-import com.modcreater.tmbeans.pojo.LoopEvent;
-import com.modcreater.tmbeans.pojo.SingleEvent;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.

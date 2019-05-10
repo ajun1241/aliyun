@@ -1,10 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
-import com.modcreater.tmbeans.pojo.LoopEvent;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.vo.DraftVo;
-import com.modcreater.tmbeans.vo.SingleEventForDatabase;
-import com.modcreater.tmbeans.vo.UploadingEventVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.ArrayList;
@@ -140,7 +137,7 @@ public interface EventMapper {
      * @param userId
      * @return
      */
-    List<LoopEvent> queryLoopEvents(String userId);
+    List<SingleEvent> queryLoopEvents(String userId);
 
     /**
      * 根据"周"查找事件并根据事件开始时间(startTime)排序

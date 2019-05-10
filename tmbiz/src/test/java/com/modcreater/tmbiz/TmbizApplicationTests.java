@@ -1,22 +1,16 @@
 package com.modcreater.tmbiz;
 
-import com.modcreater.tmbeans.pojo.LoopEvent;
-import com.modcreater.tmbeans.pojo.SingleEvent;
 //import com.modcreater.tmbeans.pojo.TestSingEvent;
-import com.modcreater.tmbeans.vo.SearchEventVo;
 import com.modcreater.tmbeans.vo.UploadingEventVo;
 import com.modcreater.tmdao.mapper.EventMapper;
-import com.modcreater.tmutils.SingleEventUtil;
-import org.junit.Test;
+        import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
+        import java.text.SimpleDateFormat;
+        import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -91,8 +85,7 @@ public class TmbizApplicationTests {
 
     @Test
     public void test5(){
-        List<LoopEvent> singleEvents = eventMapper.queryLoopEvents("10086");
-        System.out.println(singleEvents.size());
+
     }
 
 }
