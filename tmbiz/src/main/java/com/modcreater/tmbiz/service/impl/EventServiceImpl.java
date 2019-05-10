@@ -206,61 +206,58 @@ public class EventServiceImpl implements EventService {
         if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
-        if (eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId()) > 0) {
+        //判断是否第一次上传
+        if (eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId()) > 0 || (!ObjectUtils.isEmpty(eventMapper.queryLoopEvents(synchronousUpdateVo.getUserId())))) {
             return DtoUtil.getFalseDto("该用户已经上传过了", 26003);
         }
-        /*if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
-            return DtoUtil.getFalseDto("事件集未获取到", 25002);
-        }*/
-        ArrayList<DayEvents> dayEvents=JSONObject.parseObject(synchronousUpdateVo.getDayEventsList(),ArrayList.class);
-        List<Integer> dayEventIds = new ArrayList<>();
-        //查询时间段内的事件
-        for (DayEvents dayEvent : dayEvents) {
-            dayEventIds.add(dayEvent.getDayEventId());
-        }
-        System.out.println(dayEventIds.toString());
-        SingleEvent singleEvent = new SingleEvent();
-        for (Integer dayEventId:dayEventIds) {
-            try {
-                StringBuffer stringBuffer = new StringBuffer(dayEventId.toString());
-                String year = stringBuffer.substring(0, 4);
-                String month = stringBuffer.substring(4, 6);
-                String day = stringBuffer.substring(6, 8);
-                singleEvent.setYear(Long.parseLong(year));
-                singleEvent.setMonth(Long.parseLong(month));
-                singleEvent.setDay(Long.parseLong(day));
-                singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
-                //删除事件
-                System.out.println(singleEvent.toString());
-                int updResult = eventMapper.updOldEvent(singleEvent);
-                if (updResult<=0){
-                    return DtoUtil.getFalseDto("云端删除"+dayEventId+"失败",25004);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        //上传普通事件
-        for (DayEvents<SingleEvent> dayEventsList:dayEvents) {
-            for (SingleEvent singleEvent1:dayEventsList.getMySingleEventList()) {
-                //插入用户id
-                singleEvent1.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
-                int uplResult = eventMapper.uploadingEvents(singleEvent1);
-                if (uplResult <= 0) {
-                    return DtoUtil.getFalseDto("上传事件"+singleEvent1.getEventid()+"失败", 25005);
+        boolean flag=false;
+        if (!StringUtils.isEmpty(synchronousUpdateVo.getDayEventList())){
+            //转换集合
+            List<ArrayList> dayEvents=JSONObject.parseObject(synchronousUpdateVo.getDayEventList(),ArrayList.class);
+            //上传普通事件
+            for (Object dayEventsList:dayEvents) {
+                //转换成DayEvents
+                DayEvents dayEvents1=JSONObject.parseObject(dayEventsList.toString(),DayEvents.class);
+                //把getMySingleEventList()转换成集合
+                ArrayList<SingleEvent> singleEventList= JSONObject.parseObject(dayEvents1.getMySingleEventList().toString(),ArrayList.class);
+                for (Object singleEvent:singleEventList) {
+                    //把遍历出的元素转换成对象
+                    SingleEvent singleEvent1=JSONObject.parseObject(singleEvent.toString(),SingleEvent.class);
+                    //插入用户id
+                    singleEvent1.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
+                    //上传
+                    int uplResult = eventMapper.uploadingEvents(singleEvent1);
+                    if (uplResult <= 0) {
+                        return DtoUtil.getFalseDto("上传事件"+singleEvent1.getEventid()+"失败", 25005);
+                    }
                 }
             }
+            flag=true;
         }
-        //上传重复事件
-        /*for (List<SingleEvent> loopEvents:synchronousUpdateVo.getLoopEventList()) {
-            for (SingleEvent loopEvent:loopEvents) {
-                int i=eventMapper.uploadingLoopEvents(loopEvent);
-                if (i<=0){
-                    return DtoUtil.getFalseDto("上传重复事件"+loopEvent.getEventid()+"失败",25006);
+        if (!StringUtils.isEmpty(synchronousUpdateVo.getLoopEventList())) {
+            //外层集合转换
+            List<ArrayList> loopEvents = JSONObject.parseObject(synchronousUpdateVo.getLoopEventList(), ArrayList.class);
+            //上传重复事件
+            for (List<SingleEvent> singleEvents : loopEvents) {
+                //第二层转换
+                List<SingleEvent> singleEventList=JSONObject.parseObject(singleEvents.toString(),ArrayList.class);
+                for (Object loopEvent : singleEventList) {
+                    //第三层转换
+                    SingleEvent singleEvent=JSONObject.parseObject(loopEvent.toString(),SingleEvent.class);
+                    singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
+                    int i = eventMapper.uploadingLoopEvents(singleEvent);
+                    if (i <= 0) {
+                        return DtoUtil.getFalseDto("上传重复事件" + singleEvent.getEventid() + "失败", 25006);
+                    }
                 }
             }
-        }*/
-        return DtoUtil.getSuccessDto("数据同步成功", 100000);
+            flag=true;
+        }
+        if (flag){
+            return DtoUtil.getSuccessDto("数据同步成功", 100000);
+        }else {
+            return DtoUtil.getSuccessDto("数据同步失败", 25008);
+        }
     }
 
     @Override
