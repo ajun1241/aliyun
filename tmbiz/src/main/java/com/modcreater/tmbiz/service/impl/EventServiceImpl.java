@@ -489,7 +489,7 @@ public class EventServiceImpl implements EventService {
                 dayEventsList.add(dayEvents);
             }
             //按周查询重复事件
-            List<LoopEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
             Map result = new HashMap<>();
             List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
             //创建七个几个代表一周七天
@@ -500,31 +500,9 @@ public class EventServiceImpl implements EventService {
             List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
             List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
             List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
-            for (LoopEvent loopEvent : loopEventListInDataBase) {
-                ShowSingleEvent showSingleEvent = new ShowSingleEvent();
-                Boolean[] booleans = new Boolean[7];
-                String[] s = loopEvent.getRepeatTime().split(",");
-                for (int i = 0; i <= 6; i++) {
-                    booleans[i] = "true".equals(s[i]);
-                }
-                showSingleEvent.setEventid(loopEvent.getEventId());
-                showSingleEvent.setUserid(loopEvent.getUserId());
-                showSingleEvent.setEventname(loopEvent.getEventName());
-                showSingleEvent.setStarttime(loopEvent.getStartTime());
-                showSingleEvent.setEndtime(loopEvent.getEndTime());
-                showSingleEvent.setAddress(loopEvent.getAddress());
-                showSingleEvent.setLevel(loopEvent.getLevel());
-                showSingleEvent.setFlag(loopEvent.getFlag());
-                showSingleEvent.setPerson(loopEvent.getPerson());
-                showSingleEvent.setRemarks(loopEvent.getRemarks());
-                showSingleEvent.setRepeaTtime(booleans);
-                showSingleEvent.setIsOverdue(loopEvent.getIsOverdue());
-                showSingleEvent.setRemindTime(loopEvent.getRemindTime());
-                showSingleEvent.setDay(loopEvent.getDay());
-                showSingleEvent.setMonth(loopEvent.getMonth());
-                showSingleEvent.setYear(loopEvent.getYear());
-                showSingleEvent.setType(loopEvent.getType());
-                System.out.println(showSingleEvent);
+            for (SingleEvent singleEvent1 : loopEventListInDataBase) {
+                ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+                Boolean[] booleans = showSingleEvent.getRepeaTtime();
                 //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
                 for (int i = 0; i <= 6; i++) {
                     if (i == 0 && booleans[i]) {
