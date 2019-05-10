@@ -100,6 +100,7 @@ public class EventController {
     public Dto firstUplEvent(@RequestBody SynchronousUpdateVo synchronousUpdateVo){
         return eventService.firstUplEvent(synchronousUpdateVo);
     }
+
     /**
      * 草稿上传
      * @param draftVo

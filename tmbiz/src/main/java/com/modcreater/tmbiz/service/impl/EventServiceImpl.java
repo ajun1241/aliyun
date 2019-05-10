@@ -253,6 +253,7 @@ public class EventServiceImpl implements EventService {
         for (DayEvents<SingleEvent> dayEvents : synchronousUpdateVo.getDayEventsList()) {
             for (SingleEvent singleEvent : dayEvents.getMySingleEventList()) {
                 //上传
+                singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
                 if (eventMapper.uploadingEvents(singleEvent) <= 0) {
                     return DtoUtil.getFalseDto("同步上传失败", 26002);
                 }
@@ -283,6 +284,7 @@ public class EventServiceImpl implements EventService {
                     if (i != 0) {
                         for (String eventId : list) {
                             if (!eventId.equals(singleEvent.getEventid().toString())) {
+                                singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
                                 if (eventMapper.uplLoopEvent(singleEvent) <= 0) {
                                     return DtoUtil.getFalseDto("重复事件上传失败", 26004);
                                 }
