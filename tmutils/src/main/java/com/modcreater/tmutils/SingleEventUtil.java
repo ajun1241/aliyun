@@ -47,6 +47,11 @@ public class SingleEventUtil {
         return JSONObject.parseObject(singleEventText,clazz);
     }
 
+    /**
+     * 将传进来的SingleEvent集合转换成用来返回的ShowSingleEvent的集合
+     * @param singleEventList
+     * @return
+     */
     public static List<ShowSingleEvent> getShowSingleEventList(List<SingleEvent> singleEventList){
         List<ShowSingleEvent> showSingleEventList = new ArrayList<>();
         for (SingleEvent singleEvent1 : singleEventList) {
@@ -55,35 +60,38 @@ public class SingleEventUtil {
         return showSingleEventList;
     }
 
-    @SuppressWarnings("AlibabaUndefineMagicConstant")
-    public static ShowSingleEvent getShowSingleEvent(SingleEvent singleEvent1){
+    /**
+     * 将传进来的SingleEvent转换成ShowSingleEvent
+     * @param singleEvent1
+     * @return
+     */
+    public static ShowSingleEvent getShowSingleEvent(SingleEvent singleEvent1) {
         Boolean[] booleans = new Boolean[7];
-        if (StringUtils.hasText(singleEvent1.getRepeaTtime())){
-
-        String[] s = singleEvent1.getRepeaTtime().split(",");
-        //noinspection AlibabaUndefineMagicConstant
-        for (int i = 0; i <= 6; i++) {
-            booleans[i] = "true".equals(s[i]);
-        }
-        ShowSingleEvent showSingleEvent = new ShowSingleEvent();
-        showSingleEvent.setUserid(singleEvent1.getUserid());
-        showSingleEvent.setEventid(singleEvent1.getEventid());
-        showSingleEvent.setEventname(singleEvent1.getEventname());
-        showSingleEvent.setStarttime(singleEvent1.getStarttime());
-        showSingleEvent.setEndtime(singleEvent1.getEndtime());
-        showSingleEvent.setFlag(singleEvent1.getFlag());
-        showSingleEvent.setLevel(singleEvent1.getLevel());
-        showSingleEvent.setPerson(singleEvent1.getPerson());
-        showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
-        showSingleEvent.setRemarks(singleEvent1.getRemarks());
-        showSingleEvent.setDay(singleEvent1.getDay());
-        showSingleEvent.setMonth(singleEvent1.getMonth());
-        showSingleEvent.setYear(singleEvent1.getYear());
-        showSingleEvent.setType(singleEvent1.getType());
-        showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
-        showSingleEvent.setAddress(singleEvent1.getAddress());
-        showSingleEvent.setRepeaTtime(booleans);
-        return showSingleEvent;
+        if (StringUtils.hasText(singleEvent1.getRepeaTtime())) {
+            String[] s = singleEvent1.getRepeaTtime().split(",");
+            //noinspection AlibabaUndefineMagicConstant
+            for (int i = 0; i <= 6; i++) {
+                booleans[i] = "true".equals(s[i]);
+            }
+            ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+            showSingleEvent.setUserid(singleEvent1.getUserid());
+            showSingleEvent.setEventid(singleEvent1.getEventid());
+            showSingleEvent.setEventname(singleEvent1.getEventname());
+            showSingleEvent.setStarttime(singleEvent1.getStarttime());
+            showSingleEvent.setEndtime(singleEvent1.getEndtime());
+            showSingleEvent.setFlag(singleEvent1.getFlag());
+            showSingleEvent.setLevel(singleEvent1.getLevel());
+            showSingleEvent.setPerson(singleEvent1.getPerson());
+            showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
+            showSingleEvent.setRemarks(singleEvent1.getRemarks());
+            showSingleEvent.setDay(singleEvent1.getDay());
+            showSingleEvent.setMonth(singleEvent1.getMonth());
+            showSingleEvent.setYear(singleEvent1.getYear());
+            showSingleEvent.setType(singleEvent1.getType());
+            showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
+            showSingleEvent.setAddress(singleEvent1.getAddress());
+            showSingleEvent.setRepeaTtime(booleans);
+            return showSingleEvent;
         }
         return new ShowSingleEvent();
     }

@@ -27,7 +27,6 @@ import java.util.*;
  * @Date: 2019-04-29
  * Time: 11:32
  */
-@SuppressWarnings("ALL")
 @Service
 @Transactional
 public class EventServiceImpl implements EventService {
@@ -212,7 +211,6 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccesWithDataDto("数据同步成功", null, 100000);
     }
 
-    @SuppressWarnings("AlibabaUndefineMagicConstant")
     @Override
     public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo) {
         if (ObjectUtils.isEmpty(contrastTimestampVo)) {
@@ -320,7 +318,6 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccessDto("上传草稿成功", 100000);
     }
 
-    @SuppressWarnings("AlibabaUndefineMagicConstant")
     @Override
     public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
@@ -417,7 +414,6 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
 
-    @SuppressWarnings({"AlibabaUndefineMagicConstant", "AlibabaMethodTooLong"})
     @Override
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {

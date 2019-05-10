@@ -91,13 +91,6 @@ public interface EventService {
     Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo);
 
     /**
-     * 添加一个重复事件
-     * @param uploadingEventVo
-     * @return
-     */
-    /*Dto addNewLoopEvents(UploadingEventVo uploadingEventVo);*/
-
-    /**
      * 根据日期查询事件并排序(单位:周)
      * @param searchEventVo
      * @return
