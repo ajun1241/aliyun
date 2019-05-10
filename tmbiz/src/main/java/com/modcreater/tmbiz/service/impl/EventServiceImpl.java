@@ -82,15 +82,17 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto updateEvents(UpdateEventVo updateEventVo) {
-        if (StringUtils.isEmpty(updateEventVo.getUserId())) {
+        if (StringUtils.hasText(updateEventVo.getUserId())) {
             if (!ObjectUtils.isEmpty(updateEventVo)) {
                 System.out.println("修改" + updateEventVo.toString());
                 SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
                 singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
                 //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
                 if (SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime())) {
-                    if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.alterLoopEventsByUserId(singleEvent) > 0) {
-                        return DtoUtil.getSuccessDto("修改成功", 100000);
+                    if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.deleteEventsByUserId(singleEvent) > 0) {
+                        if (eventMapper.uplLoopEvent(singleEvent) > 0) {
+                            return DtoUtil.getSuccessDto("修改成功", 100000);
+                        }
                     }
                 } else {
                     if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.alterEventsByUserId(singleEvent) > 0) {

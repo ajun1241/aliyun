@@ -34,6 +34,13 @@ public interface EventMapper {
     int withdrawEventsByUserId(SingleEvent singleEvent);
 
     /**
+     * 删除事件
+     * @param singleEvent
+     * @return
+     */
+    int deleteEventsByUserId(SingleEvent singleEvent);
+
+    /**
      * 更新事件
      *
      * @param singleEvent

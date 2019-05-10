@@ -96,6 +96,9 @@
                 type = #{type}
             where eventId = #{eventid} and userId = #{userId}
     </update>
+    <delete id="deleteEventsByUserId">
+        delete from singleevent where eventId = #{eventid} and userId = #{userid}
+    </delete>
 
     <select id="queryEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
