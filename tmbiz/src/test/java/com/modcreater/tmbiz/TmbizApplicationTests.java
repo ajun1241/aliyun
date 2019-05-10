@@ -87,6 +87,10 @@ public class TmbizApplicationTests {
     }
 
     @Test
-    public void test5(){}
+    public void test5(){
+        String repeatTime="[false,true,true,true,true,false,false]";
+        String x=repeatTime.substring(1,(repeatTime.length()-1));
+        System.out.println(x);
+    }
 
 }

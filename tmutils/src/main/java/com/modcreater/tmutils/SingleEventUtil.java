@@ -96,7 +96,9 @@ public class SingleEventUtil {
      */
     public static Boolean[] getRepeatTime(SingleEvent singleEvent){
         Boolean[] booleans = new Boolean[7];
-        String[] s = singleEvent.getRepeaTtime().split(",");
+        String x=singleEvent.getRepeaTtime().substring(1,(singleEvent.getRepeaTtime().length()-1));
+        String[] s = x.split(",");
+        System.out.println("重复数组"+x);
         for (int i = 0; i <= 6; i++) {
             booleans[i] = "true".equals(s[i]);
         }
@@ -110,9 +112,15 @@ public class SingleEventUtil {
      */
     public static boolean isLoopEvent(String repeatTime){
         boolean b = false;
-        for (String s : repeatTime.split(",")) {
+        String x=repeatTime.substring(1,(repeatTime.length()-1));
+        System.out.println("重复数组"+x);
+        for (String s : x.split(",")) {
             b = "true".equals(s);
+            if (b){
+                break;
+            }
         }
+        System.out.println("b==>"+b);
         return b;
     }
 }

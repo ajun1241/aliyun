@@ -381,7 +381,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
-        if (StringUtils.isEmpty(searchEventVo.getUserId())) {
+        if (StringUtils.hasText(searchEventVo.getUserId())) {
             if (!ObjectUtils.isEmpty(searchEventVo)) {
                 System.out.println("按周查" + searchEventVo.toString());
                 //按周查询单一事件
