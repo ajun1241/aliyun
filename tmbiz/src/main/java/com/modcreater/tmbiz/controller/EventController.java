@@ -60,17 +60,6 @@ public class EventController {
     }
 
     /**
-     * 查询事件
-     *
-     * @param searchEventVo
-     * @return
-     */
-    @RequestMapping(value = "sea", method = RequestMethod.POST)
-    public Dto searchEvents(@RequestBody SearchEventVo searchEventVo) {
-        return eventService.searchEvents(searchEventVo);
-    }
-
-    /**
      * 同步本地数据
      *
      * @param synchronousUpdateVo
