@@ -24,11 +24,11 @@ public class SynchronousUpdateVo implements Serializable {
     /**
      * 事件集(单位:天)
      */
-    private List<DayEvents> dayEventsList;
+    private String dayEventsList;
     /**
      * 重复事件
      */
-    private List<List<SingleEvent>> loopEventList;
+    private String loopEventList;
     /**
      *
      */

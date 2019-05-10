@@ -30,6 +30,7 @@ import java.util.*;
  * @Date: 2019-04-29
  * Time: 11:32
  */
+@SuppressWarnings("ALL")
 @Service
 @Transactional
 public class EventServiceImpl implements EventService {
@@ -149,59 +150,53 @@ public class EventServiceImpl implements EventService {
         if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
-        if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
+        /*if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
             return DtoUtil.getFalseDto("事件集未获取到", 25002);
         }
         List<Integer> dayEventIds = new ArrayList<>();
+        //查询时间段内的事件
         for (DayEvents dayEvents : synchronousUpdateVo.getDayEventsList()) {
             dayEventIds.add(dayEvents.getDayEventId());
         }
-        //查询时间段内的事件
-        StringBuffer stringBuffer = null;
-        String year = null;
-        String month = null;
-        String day = null;
-//        List<SingleEvent> singleEvents=new ArrayList<>();
         System.out.println(dayEventIds.toString());
         SingleEvent singleEvent = new SingleEvent();
-        /*            singleEvents=eventMapper.queryEvents(singleEvent);
-            if (ObjectUtils.isEmpty(singleEvents)){
-                return DtoUtil.getFalseDto("该时间段内没有事件",25003);
-            }*/
-        for (int i = 0; i < dayEventIds.size(); i++) {
+        for (Integer dayEventId:dayEventIds) {
             try {
-                stringBuffer = new StringBuffer(dayEventIds.get(i).toString());
-//            System.out.println(stringBuffer);
-                year = stringBuffer.substring(0, 4);
-                month = stringBuffer.substring(4, 6);
-                day = stringBuffer.substring(6, 8);
+                StringBuffer stringBuffer = new StringBuffer(dayEventId.toString());
+                String year = stringBuffer.substring(0, 4);
+                String month = stringBuffer.substring(4, 6);
+                String day = stringBuffer.substring(6, 8);
                 singleEvent.setYear(Long.parseLong(year));
                 singleEvent.setMonth(Long.parseLong(month));
                 singleEvent.setDay(Long.parseLong(day));
                 singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
+                //删除事件
+                System.out.println(singleEvent.toString());
+                int updResult = eventMapper.updOldEvent(singleEvent);
+                if (updResult<=0){
+                    return DtoUtil.getFalseDto("云端删除"+dayEventId+"失败",25004);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        //删除事件
-        /*for (int i = 0; i <singleEvents.size() ; i++) {
-            int delResult=eventMapper.withdrawEventsByUserId(singleEvents.get(i));
-            if (delResult<=0){
-                return DtoUtil.getFalseDto("删除失败",25004);
-            }
-        }*/
-        System.out.println(singleEvent.toString());
-        int updResult = eventMapper.updOldEvent(singleEvent);
-        /*if (updResult<=0){
-            return DtoUtil.getFalseDto("云端删除失败",25004);
-        }*/
-        //上传事件
-        for (int i = 0; i < synchronousUpdateVo.getDayEventsList().size(); i++) {
-            DayEvents<SingleEvent> dayEvents = synchronousUpdateVo.getDayEventsList().get(i);
-            for (int j = 0; j < dayEvents.getMySingleEventList().size(); j++) {
-                int uplResult = eventMapper.uploadingEvents(dayEvents.getMySingleEventList().get(j));
+        //上传普通事件
+        for (DayEvents<SingleEvent> dayEvents:synchronousUpdateVo.getDayEventsList()) {
+            for (SingleEvent singleEvent1:dayEvents.getMySingleEventList()) {
+                //插入用户id
+                singleEvent1.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
+                int uplResult = eventMapper.uploadingEvents(singleEvent1);
                 if (uplResult <= 0) {
-                    return DtoUtil.getFalseDto("上传事件失败", 25005);
+                    return DtoUtil.getFalseDto("上传事件"+singleEvent1.getEventid()+"失败", 25005);
+                }
+            }
+        }
+        //上传重复事件
+        for (List<SingleEvent> loopEvents:synchronousUpdateVo.getLoopEventList()) {
+            for (SingleEvent loopEvent:loopEvents) {
+                int i=eventMapper.uploadingLoopEvents(loopEvent);
+                if (i<=0){
+                    return DtoUtil.getFalseDto("上传重复事件"+loopEvent.getEventid()+"失败",25006);
                 }
             }
         }
@@ -216,10 +211,11 @@ public class EventServiceImpl implements EventService {
             map.put("time", time);
         } catch (ParseException e) {
             e.printStackTrace();
-        }
-        return DtoUtil.getSuccesWithDataDto("数据同步成功", map, 100000);
+        }*/
+        return DtoUtil.getSuccesWithDataDto("数据同步成功", null, 100000);
     }
 
+    @SuppressWarnings("AlibabaUndefineMagicConstant")
     @Override
     public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo) {
         if (ObjectUtils.isEmpty(contrastTimestampVo)) {
@@ -232,6 +228,7 @@ public class EventServiceImpl implements EventService {
         if (StringUtils.isEmpty(time)) {
             return DtoUtil.getFalseDto("查询时间戳失败", 24003);
         }
+        //noinspection AlibabaUndefineMagicConstant
         if (Long.parseLong(contrastTimestampVo.getTime()) - Long.parseLong(time) <= 3) {
             return DtoUtil.getFalseDto("不需要同步", 24002);
         }
@@ -250,54 +247,57 @@ public class EventServiceImpl implements EventService {
         if (eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId()) > 0) {
             return DtoUtil.getFalseDto("该用户已经上传过了", 26003);
         }
-        //遍历拆分
-        for (DayEvents<SingleEvent> dayEvents : synchronousUpdateVo.getDayEventsList()) {
-            for (SingleEvent singleEvent : dayEvents.getMySingleEventList()) {
-                //上传
-                if (eventMapper.uploadingEvents(singleEvent) <= 0) {
-                    return DtoUtil.getFalseDto("同步上传失败", 26002);
+        /*if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
+            return DtoUtil.getFalseDto("事件集未获取到", 25002);
+        }*/
+        ArrayList<DayEvents> dayEvents=JSONObject.parseObject(synchronousUpdateVo.getDayEventsList(),ArrayList.class);
+        List<Integer> dayEventIds = new ArrayList<>();
+        //查询时间段内的事件
+        for (DayEvents dayEvent : dayEvents) {
+            dayEventIds.add(dayEvent.getDayEventId());
+        }
+        System.out.println(dayEventIds.toString());
+        SingleEvent singleEvent = new SingleEvent();
+        for (Integer dayEventId:dayEventIds) {
+            try {
+                StringBuffer stringBuffer = new StringBuffer(dayEventId.toString());
+                String year = stringBuffer.substring(0, 4);
+                String month = stringBuffer.substring(4, 6);
+                String day = stringBuffer.substring(6, 8);
+                singleEvent.setYear(Long.parseLong(year));
+                singleEvent.setMonth(Long.parseLong(month));
+                singleEvent.setDay(Long.parseLong(day));
+                singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
+                //删除事件
+                System.out.println(singleEvent.toString());
+                int updResult = eventMapper.updOldEvent(singleEvent);
+                if (updResult<=0){
+                    return DtoUtil.getFalseDto("云端删除"+dayEventId+"失败",25004);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        //上传普通事件
+        for (DayEvents<SingleEvent> dayEventsList:dayEvents) {
+            for (SingleEvent singleEvent1:dayEventsList.getMySingleEventList()) {
+                //插入用户id
+                singleEvent1.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
+                int uplResult = eventMapper.uploadingEvents(singleEvent1);
+                if (uplResult <= 0) {
+                    return DtoUtil.getFalseDto("上传事件"+singleEvent1.getEventid()+"失败", 25005);
                 }
             }
         }
-//        LoopEvent loopEvent=new LoopEvent();
-        List<String> list = new ArrayList();
-        list.add("0");
-        if (synchronousUpdateVo.getLoopEventList().size() > 0) {
-            for (int i = 0; i < synchronousUpdateVo.getLoopEventList().size(); i++) {
-                for (SingleEvent singleEvent : synchronousUpdateVo.getLoopEventList().get(i)) {
-                    //重复事件添加
-                    /*loopEvent.setAddress(singleEvent.getAddress());
-                    loopEvent.setDay(singleEvent.getDay().toString());
-                    loopEvent.setEventId(singleEvent.getEventid());
-                    loopEvent.setEndTime(singleEvent.getEndtime());
-                    loopEvent.setStartTime(singleEvent.getStarttime());
-                    loopEvent.setEventName(singleEvent.getEventname());
-                    loopEvent.setFlag(singleEvent.getFlag());
-                    loopEvent.setIsOverdue(singleEvent.getIsOverdue());
-                    loopEvent.setLevel(singleEvent.getLevel());
-                    loopEvent.setPerson(singleEvent.getPerson());
-                    loopEvent.setRemarks(singleEvent.getRemarks());
-                    loopEvent.setRemindTime(singleEvent.getRemindTime());
-                    loopEvent.setType(singleEvent.getType());
-                    loopEvent.setUserId(singleEvent.getUserid());
-                    loopEvent.setWeek(singleEvent.getRepeaTtime());*/
-                    if (i != 0) {
-                        for (String eventId : list) {
-                            if (!eventId.equals(singleEvent.getEventid().toString())) {
-                                if (eventMapper.uplLoopEvent(singleEvent) <= 0) {
-                                    return DtoUtil.getFalseDto("重复事件上传失败", 26004);
-                                }
-                            }
-                        }
-                    } else {
-                        if (eventMapper.uplLoopEvent(singleEvent) <= 0) {
-                            return DtoUtil.getFalseDto("重复事件上传失败", 26004);
-                        }
-                    }
-                    list.add(singleEvent.getEventid().toString());
+        //上传重复事件
+        /*for (List<SingleEvent> loopEvents:synchronousUpdateVo.getLoopEventList()) {
+            for (SingleEvent loopEvent:loopEvents) {
+                int i=eventMapper.uploadingLoopEvents(loopEvent);
+                if (i<=0){
+                    return DtoUtil.getFalseDto("上传重复事件"+loopEvent.getEventid()+"失败",25006);
                 }
             }
-        }
+        }*/
         return DtoUtil.getSuccessDto("数据同步成功", 100000);
     }
 
@@ -323,6 +323,7 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccessDto("上传草稿成功", 100000);
     }
 
+    @SuppressWarnings("AlibabaUndefineMagicConstant")
     @Override
     public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
@@ -360,6 +361,7 @@ public class EventServiceImpl implements EventService {
                 for (LoopEvent loopEvent : loopEventListInDataBase){
                     Boolean[] booleans = new Boolean[7];
                     String[] s = loopEvent.getRepeatTime().split(",");
+                    //noinspection AlibabaUndefineMagicConstant
                     for (int i = 0; i <= 6; i++) {
                         booleans[i] = "true".equals(s[i]);
                     }
@@ -486,6 +488,7 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("没有可上传的重复事件", 21010);
     }*/
 
+    @SuppressWarnings({"AlibabaUndefineMagicConstant", "AlibabaMethodTooLong"})
     @Override
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
@@ -496,6 +499,7 @@ public class EventServiceImpl implements EventService {
             //按周查询单一事件
             SingleEvent singleEvent;
             List<DayEvents> dayEventsList = new ArrayList<>();
+            //noinspection AlibabaUndefineMagicConstant
             for (int i = 0; i <= 6; i++) {
                 DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
                 String dayEventId = String.valueOf(Integer.valueOf(searchEventVo.getDayEventId()) + i);
@@ -524,6 +528,7 @@ public class EventServiceImpl implements EventService {
                 ShowSingleEvent showSingleEvent = new ShowSingleEvent();
                 Boolean[] booleans = new Boolean[7];
                 String[] s = loopEvent.getRepeatTime().split(",");
+                //noinspection AlibabaUndefineMagicConstant
                 for (int i = 0; i <= 6; i++) {
                     booleans[i] = "true".equals(s[i]);
                 }
@@ -546,6 +551,7 @@ public class EventServiceImpl implements EventService {
                 showSingleEvent.setType(loopEvent.getType());
                 System.out.println(showSingleEvent);
                 //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
+                //noinspection AlibabaUndefineMagicConstant
                 for (int i = 0; i <= 6; i++) {
                     if (i == 0 && booleans[i]) {
                         sunShowLoopEventList.add(showSingleEvent);

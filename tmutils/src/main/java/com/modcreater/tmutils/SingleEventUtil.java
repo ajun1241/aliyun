@@ -18,6 +18,7 @@ import java.util.List;
  * @Date: 2019-05-06
  * Time: 10:37
  */
+@SuppressWarnings({"ALL", "AlibabaUndefineMagicConstant"})
 public class SingleEventUtil {
 
     /**
@@ -54,11 +55,13 @@ public class SingleEventUtil {
         return showSingleEventList;
     }
 
+    @SuppressWarnings("AlibabaUndefineMagicConstant")
     public static ShowSingleEvent getShowSingleEvent(SingleEvent singleEvent1){
         Boolean[] booleans = new Boolean[7];
         if (StringUtils.hasText(singleEvent1.getRepeaTtime())){
 
         String[] s = singleEvent1.getRepeaTtime().split(",");
+        //noinspection AlibabaUndefineMagicConstant
         for (int i = 0; i <= 6; i++) {
             booleans[i] = "true".equals(s[i]);
         }
