@@ -27,8 +27,6 @@ public class EventController {
     @Resource
     private EventService eventService;
 
-    @Resource
-    private EventMapper eventMapper;
     /**
      * 添加一条事件
      *
