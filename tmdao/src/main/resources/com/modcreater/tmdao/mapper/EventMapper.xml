@@ -32,7 +32,6 @@
     <insert id="uploadingLoopEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
             insert into loopevent values
             (null ,
-            null,
             #{eventid} ,
             #{userid},
             #{eventname},

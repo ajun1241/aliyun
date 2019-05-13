@@ -5,6 +5,8 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.EventMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,6 +39,8 @@ public class EventController {
      */
     @RequestMapping(value = "upl", method = RequestMethod.POST)
     public Dto uploadingEvents(@RequestBody UploadingEventVo uploadingEventVo) {
+        Logger logger = LoggerFactory.getLogger(getClass());
+        logger.info(uploadingEventVo.toString());
         return eventService.addNewEvents(uploadingEventVo);
     }
 

@@ -26,9 +26,9 @@ public class SingleEventUtil {
     private static final Long VALUE11 = 100000000000L;
 
     private static final int LENGTH8 = 8;
-    private static final int LENGTH10 = 10;
-    private static final int LENGTH43 = 43;
-    private static final int LENGTH50 = 50;
+    private static final int LENGTH10 = 11;
+    private static final int LENGTH43 = 44;
+    private static final int LENGTH50 = 51;
 
     /**
      * 创建一个SingleEvent对象并仅赋值day,month,year和userId
@@ -128,7 +128,6 @@ public class SingleEventUtil {
                 break;
             }
         }
-        System.out.println("b==>"+b);
         return b;
     }
 
@@ -137,22 +136,22 @@ public class SingleEventUtil {
             return DtoUtil.getFalseDto("eventId不规范",21010);
         }
         if (singleEvent.getUserid() >= VALUE11){
-            return DtoUtil.getFalseDto("eventId不规范",21010);
+            return DtoUtil.getFalseDto("userId不规范",21010);
         }
         if (singleEvent.getEventname().length() >= LENGTH10){
             return DtoUtil.getFalseDto("eventName不规范",21010);
         }
         if (singleEvent.getAddress().length() >= LENGTH50){
-            return DtoUtil.getFalseDto("eventId不规范",21010);
+            return DtoUtil.getFalseDto("address不规范",21010);
         }
         if (singleEvent.getPerson().length() >= LENGTH50){
-            return DtoUtil.getFalseDto("eventId不规范",21010);
+            return DtoUtil.getFalseDto("Person不规范",21010);
         }
         if (singleEvent.getRemarks().length() >= LENGTH50){
-            return DtoUtil.getFalseDto("eventId不规范",21010);
+            return DtoUtil.getFalseDto("Remarks不规范",21010);
         }
         if (singleEvent.getRepeaTtime().length() >= LENGTH43){
-            return DtoUtil.getFalseDto("eventId不规范",21010);
+            return DtoUtil.getFalseDto("RepeaTtime不规范",21010);
         }
         return null;
     }
