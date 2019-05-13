@@ -1,6 +1,7 @@
 package com.modcreater.tmutils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import org.springframework.util.StringUtils;
@@ -19,6 +20,15 @@ import java.util.List;
  * Time: 10:37
  */
 public class SingleEventUtil {
+    private static final Long VALUE2 = 100L;
+    private static final Long VALUE4 = 10000L;
+    private static final Long VALUE10 = 10000000000L;
+    private static final Long VALUE11 = 100000000000L;
+
+    private static final int LENGTH8 = 8;
+    private static final int LENGTH10 = 10;
+    private static final int LENGTH43 = 43;
+    private static final int LENGTH50 = 50;
 
     /**
      * 创建一个SingleEvent对象并仅赋值day,month,year和userId
@@ -120,5 +130,30 @@ public class SingleEventUtil {
         }
         System.out.println("b==>"+b);
         return b;
+    }
+
+    public static Dto isSingleEventStandard(SingleEvent singleEvent){
+        if (singleEvent.getEventid() >= VALUE10){
+            return DtoUtil.getFalseDto("eventId不规范",21010);
+        }
+        if (singleEvent.getUserid() >= VALUE11){
+            return DtoUtil.getFalseDto("eventId不规范",21010);
+        }
+        if (singleEvent.getEventname().length() >= LENGTH10){
+            return DtoUtil.getFalseDto("eventName不规范",21010);
+        }
+        if (singleEvent.getAddress().length() >= LENGTH50){
+            return DtoUtil.getFalseDto("eventId不规范",21010);
+        }
+        if (singleEvent.getPerson().length() >= LENGTH50){
+            return DtoUtil.getFalseDto("eventId不规范",21010);
+        }
+        if (singleEvent.getRemarks().length() >= LENGTH50){
+            return DtoUtil.getFalseDto("eventId不规范",21010);
+        }
+        if (singleEvent.getRepeaTtime().length() >= LENGTH43){
+            return DtoUtil.getFalseDto("eventId不规范",21010);
+        }
+        return null;
     }
 }

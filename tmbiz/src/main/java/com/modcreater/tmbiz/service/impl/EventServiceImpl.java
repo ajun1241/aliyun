@@ -44,6 +44,11 @@ public class EventServiceImpl implements EventService {
                 System.out.println("上传" + uploadingEventVo.toString());
                 SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
                 singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
+                //对解析得到的SingleEvent进行检测
+                Dto dto = SingleEventUtil.isSingleEventStandard(singleEvent);
+                if (!ObjectUtils.isEmpty(dto)){
+                    return dto;
+                }
                 //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
                 if (SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime())) {
                     if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingLoopEvents(singleEvent) > 0) {
@@ -87,6 +92,11 @@ public class EventServiceImpl implements EventService {
                 System.out.println("修改" + updateEventVo.toString());
                 SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
                 singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
+                //对解析得到的SingleEvent进行检测
+                Dto dto = SingleEventUtil.isSingleEventStandard(singleEvent);
+                if (!ObjectUtils.isEmpty(dto)){
+                    return dto;
+                }
                 //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
                 if (SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime())) {
                     //根据userId和eventId查询重复事件表
@@ -253,6 +263,11 @@ public class EventServiceImpl implements EventService {
                     SingleEvent singleEvent1=JSONObject.parseObject(singleEvent.toString(),SingleEvent.class);
                     //插入用户id
                     singleEvent1.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
+                    //对解析得到的SingleEvent进行检测
+                    Dto dto = SingleEventUtil.isSingleEventStandard(singleEvent1);
+                    if (!ObjectUtils.isEmpty(dto)){
+                        return dto;
+                    }
                     //上传
                     int uplResult = eventMapper.uploadingEvents(singleEvent1);
                     if (uplResult <= 0) {
