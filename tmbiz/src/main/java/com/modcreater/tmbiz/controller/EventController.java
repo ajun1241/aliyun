@@ -29,6 +29,7 @@ public class EventController {
     @Resource
     private EventService eventService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventController.class);
     /**
      * 添加一条事件
      *
@@ -37,8 +38,7 @@ public class EventController {
      */
     @RequestMapping(value = "upl", method = RequestMethod.POST)
     public Dto uploadingEvents(@RequestBody UploadingEventVo uploadingEventVo) {
-        Logger logger = LoggerFactory.getLogger(getClass());
-        logger.info(uploadingEventVo.toString());
+        LOGGER.info("添加事件===>"+uploadingEventVo.toString());
         return eventService.addNewEvents(uploadingEventVo);
     }
 
@@ -50,6 +50,7 @@ public class EventController {
      */
     @RequestMapping(value = "del", method = RequestMethod.POST)
     public Dto deleteEvent(@RequestBody DeleteEventVo deleteEventVo) {
+        LOGGER.info("删除事件===>"+deleteEventVo.toString());
         return eventService.deleteEvents(deleteEventVo);
     }
 
@@ -61,6 +62,7 @@ public class EventController {
      */
     @RequestMapping(value = "upd", method = RequestMethod.POST)
     public Dto updateEvents(@RequestBody UpdateEventVo updateEventVo) {
+        LOGGER.info("修改事件===>"+updateEventVo.toString());
         return eventService.updateEvents(updateEventVo);
     }
 
@@ -82,6 +84,7 @@ public class EventController {
      */
     @RequestMapping(value = "ctime",method = RequestMethod.POST)
     public Dto contrastTimestamp(@RequestBody ContrastTimestampVo contrastTimestampVo){
+        LOGGER.info("对比时间戳===>"+contrastTimestampVo.toString());
         return eventService.contrastTimestamp(contrastTimestampVo);
     }
 
@@ -92,6 +95,7 @@ public class EventController {
      */
     @RequestMapping(value = "firupl",method = RequestMethod.POST)
     public Dto firstUplEvent(@RequestBody SynchronousUpdateVo synchronousUpdateVo){
+        LOGGER.info("第一次登陆事件数据同步===>"+synchronousUpdateVo.toString());
         return eventService.firstUplEvent(synchronousUpdateVo);
     }
 
@@ -102,6 +106,7 @@ public class EventController {
      */
     @RequestMapping(value = "upldraft",method = RequestMethod.POST)
     public Dto uplDraft(@RequestBody DraftVo draftVo){
+        LOGGER.info("草稿上传===>"+draftVo.toString());
         return eventService.uplDraft(draftVo);
     }
 
@@ -113,6 +118,7 @@ public class EventController {
      */
     @RequestMapping(value = "seabyday",method = RequestMethod.POST)
     public Dto searchByDay(@RequestBody SearchEventVo searchEventVo){
+        LOGGER.info("根据日查找事件===>"+searchEventVo.toString());
         return eventService.searchByDayEventIds(searchEventVo);
     }
 
@@ -123,6 +129,7 @@ public class EventController {
      */
     @RequestMapping(value = "seabymon",method = RequestMethod.POST)
     public Dto searchByMonth(@RequestBody SearchEventVo searchEventVo){
+        LOGGER.info("根据月查找事件===>"+searchEventVo.toString());
         return eventService.searchByDayEventIdsInMonth(searchEventVo);
     }
 
@@ -133,6 +140,7 @@ public class EventController {
      */
     @RequestMapping(value = "seabyweek",method = RequestMethod.POST)
     public Dto searchByWeek(@RequestBody SearchEventVo searchEventVo){
+        LOGGER.info("根据周查找事件===>"+searchEventVo.toString());
         return eventService.searchByDayEventIdsInWeek(searchEventVo);
     }
 }

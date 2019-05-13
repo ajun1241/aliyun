@@ -41,7 +41,6 @@ public class EventServiceImpl implements EventService {
     public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
         if (StringUtils.hasText(uploadingEventVo.getUserId())) {
             if (StringUtils.hasText(uploadingEventVo.getSingleEvent())) {
-                System.out.println("上传" + uploadingEventVo.toString());
                 SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
                 //对解析得到的SingleEvent进行检测
                 Dto dto = SingleEventUtil.isSingleEventStandard(singleEvent);
@@ -70,7 +69,6 @@ public class EventServiceImpl implements EventService {
     public Dto deleteEvents(DeleteEventVo deleteEventVo) {
         if (StringUtils.hasText(deleteEventVo.getUserId())) {
             if (StringUtils.hasText(deleteEventVo.getEventId())) {
-                System.out.println("删除" + deleteEventVo.toString());
                 SingleEvent singleEvent = new SingleEvent();
                 singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
                 singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
@@ -89,7 +87,6 @@ public class EventServiceImpl implements EventService {
     public Dto updateEvents(UpdateEventVo updateEventVo) {
         if (StringUtils.hasText(updateEventVo.getUserId())) {
             if (!ObjectUtils.isEmpty(updateEventVo)) {
-                System.out.println("修改" + updateEventVo.toString());
                 SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
                 //对解析得到的SingleEvent进行检测
                 Dto dto = SingleEventUtil.isSingleEventStandard(singleEvent);
@@ -143,7 +140,6 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(synchronousUpdateVo)) {
             return DtoUtil.getFalseDto("本地上传数据未获取到", 25001);
         }
-        System.out.println("本地数据上传" + synchronousUpdateVo.toString());
         if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
@@ -236,7 +232,6 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(synchronousUpdateVo)) {
             return DtoUtil.getFalseDto("同步数据未获取到", 26001);
         }
-        System.out.println("第一次上传" + synchronousUpdateVo.toString());
         if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
@@ -329,7 +324,6 @@ public class EventServiceImpl implements EventService {
     public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
         if (StringUtils.hasText(searchEventVo.getUserId())) {
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
-                System.out.println("按天查" + searchEventVo.toString());
                 /*boolean singleResult = false;
                 boolean loopResult = false;*/
                 //拆分dayEventId并将查询条件逐一添加到对象中
@@ -394,7 +388,6 @@ public class EventServiceImpl implements EventService {
     public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo) {
         if (StringUtils.hasText(searchEventVo.getUserId())) {
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
-                System.out.println("按月查" + searchEventVo.toString());
                 SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
                 //查询在该月内存在事件的日的集合
                 List<Integer> days = eventMapper.queryDays(singleEvent);
@@ -426,7 +419,6 @@ public class EventServiceImpl implements EventService {
     public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
         if (StringUtils.hasText(searchEventVo.getUserId())) {
             if (!ObjectUtils.isEmpty(searchEventVo)) {
-                System.out.println("按周查" + searchEventVo.toString());
                 //按周查询单一事件
                 SingleEvent singleEvent;
                 List<DayEvents> dayEventsList = new ArrayList<>();
