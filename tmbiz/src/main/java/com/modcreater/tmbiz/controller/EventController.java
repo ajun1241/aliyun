@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbiz.service.EventService;
+import com.modcreater.tmdao.mapper.EventMapper;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,6 +27,8 @@ public class EventController {
     @Resource
     private EventService eventService;
 
+    @Resource
+    private EventMapper eventMapper;
     /**
      * 添加一条事件
      *

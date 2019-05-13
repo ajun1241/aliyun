@@ -111,10 +111,6 @@ public interface EventMapper {
     List<SingleEvent> queryByDayOrderByLevelAndDate(SingleEvent singleEvent);
 
     /**
-     * 重复事件上传
-     */
-    int uplLoopEvent(SingleEvent singleEvent);
-    /**
      * 根据"月"查找事件并根据事件
      * @param singleEvent
      * @return

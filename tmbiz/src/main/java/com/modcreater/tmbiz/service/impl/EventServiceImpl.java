@@ -89,25 +89,31 @@ public class EventServiceImpl implements EventService {
                 singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
                 //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
                 if (SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime())) {
+                    //根据userId和eventId查询重复事件表
                     SingleEvent loopEvent2 = eventMapper.queryLoopSingleEvent(singleEvent);
+                    //如果查询结果不为空,则把将要修改的事件插入到重复事件表中并将原有的那条数据覆盖
                     if (!ObjectUtils.isEmpty(loopEvent2)){
                         if (eventMapper.alterLoopEventsByUserId(singleEvent) > 0){
                             return DtoUtil.getSuccessDto("修改成功",100000);
                         }
                     }else {
+                        //反之,将单一事件表中的单一事件删除,再将事件添加到重复事件表中
                         if (eventMapper.deleteEventsByUserId(singleEvent) > 0){
-                            if (eventMapper.uplLoopEvent(singleEvent) > 0){
+                            if (eventMapper.uploadingLoopEvents(singleEvent) > 0){
                                 return DtoUtil.getSuccessDto("修改成功",100000);
                             }
                         }
                     }
                 } else {
+                    //根据userId和eventId查询单一事件表
                     SingleEvent singleEvent1 = eventMapper.querySingleEvent(singleEvent);
+                    //如果查询结果不为空,则把将要修改的事件插入到单一事件表中并将原有的那条数据覆盖
                     if (!ObjectUtils.isEmpty(singleEvent1)){
                         if (eventMapper.alterEventsByUserId(singleEvent) > 0){
                             return DtoUtil.getSuccessDto("修改成功",100000);
                         }
                     }else {
+                        //反之,将重复事件表中的重复事件删除,再将事件添加到单一事件表中
                         if (eventMapper.deleteLoopEventsByUserId(singleEvent) > 0){
                             if (eventMapper.uploadingEvents(singleEvent) > 0){
                                 return DtoUtil.getSuccessDto("修改成功",100000);
