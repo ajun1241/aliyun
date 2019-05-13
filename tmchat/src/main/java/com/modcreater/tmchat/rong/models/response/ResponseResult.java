@@ -1,0 +1,21 @@
+package com.modcreater.tmchat.rong.models.response;
+
+import io.rong.models.Result;
+import io.rong.util.GsonUtil;
+
+/**
+ *  http 成功返回结果
+ */
+public class ResponseResult extends Result {
+
+	public ResponseResult(Integer code, String msg) {
+		super(code, msg);
+		this.code = code;
+		this.errorMessage = msg;
+	}
+
+	@Override
+	public String toString() {
+		return GsonUtil.toJson(this, io.rong.models.response.ResponseResult.class);
+	}
+}
