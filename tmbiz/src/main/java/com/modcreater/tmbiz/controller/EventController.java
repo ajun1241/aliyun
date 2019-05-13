@@ -65,10 +65,10 @@ public class EventController {
      * @param synchronousUpdateVo
      * @return
      */
-    @RequestMapping(value = "syup", method = RequestMethod.POST)
+    /*@RequestMapping(value = "syup", method = RequestMethod.POST)
     public Dto synchronousUpdate(@RequestBody SynchronousUpdateVo synchronousUpdateVo) {
         return eventService.synchronousUpdate(synchronousUpdateVo);
-    }
+    }*/
 
     /**
      * 对比时间戳

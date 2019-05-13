@@ -225,7 +225,11 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
         //判断是否第一次上传
-        if (eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId()) > 0 || (!ObjectUtils.isEmpty(eventMapper.queryLoopEvents(synchronousUpdateVo.getUserId())))) {
+        int ie=eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId());
+        List list=eventMapper.queryLoopEvents(synchronousUpdateVo.getUserId());
+       /* System.out.println("222222222222222222222222====>"+ie);
+        System.out.println("2222222222222222222222222==》"+list.size());*/
+        if ( ie> 0 || (list.size()>0)) {
             return DtoUtil.getFalseDto("该用户已经上传过了", 26003);
         }
         boolean flag=false;
@@ -305,8 +309,8 @@ public class EventServiceImpl implements EventService {
         if (StringUtils.hasText(searchEventVo.getUserId())) {
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
                 System.out.println("按天查" + searchEventVo.toString());
-                boolean singleResult = false;
-                boolean loopResult = false;
+                /*boolean singleResult = false;
+                boolean loopResult = false;*/
                 //拆分dayEventId并将查询条件逐一添加到对象中
                 SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
                 //只根据level升序
@@ -323,7 +327,7 @@ public class EventServiceImpl implements EventService {
                     showSingleEventListOrderByLevel = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevel);
                     showSingleEventListOrderByLevelAndDate = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevelAndDate);
                     showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
-                    singleResult = true;
+//                    singleResult = true;
                 }
                 dayEvents.setUserId(singleEvent.getUserid().intValue());
                 dayEvents.setTotalNum(singleEventList.size());
@@ -344,7 +348,7 @@ public class EventServiceImpl implements EventService {
                         if (showSingleEvent.getRepeaTtime()[week]) {
                             showSingleEventListOrderByLevel.add(showSingleEvent);
                             showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
-                            loopResult = true;
+//                            loopResult = true;
                         }
                     }
                 }
@@ -355,7 +359,7 @@ public class EventServiceImpl implements EventService {
                 result.put("ShowSingleEventListOrderByLevel", showSingleEventListOrderByLevel);
                 result.put("ShowSingleEventListOrderByLevelAndDate", showSingleEventListOrderByLevelAndDate);
                 result.put("dayEvents", dayEvents);
-                if (singleResult && loopResult) {
+                if (!ObjectUtils.isEmpty(dayEvents) ) {
                     return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
                 }
                 return DtoUtil.getFalseDto("查询失败,没有数据", 200000);

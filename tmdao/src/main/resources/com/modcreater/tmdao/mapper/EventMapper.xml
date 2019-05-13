@@ -94,7 +94,7 @@
                 month = #{month},
                 year = #{year},
                 type = #{type}
-            where eventId = #{eventid} and userId = #{userId}
+            where eventId = #{eventid} and userId = #{userid}
     </update>
     <delete id="deleteEventsByUserId">
         delete from singleevent where eventId = #{eventid} and userId = #{userid}
