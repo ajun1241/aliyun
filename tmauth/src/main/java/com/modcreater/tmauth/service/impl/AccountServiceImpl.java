@@ -110,6 +110,7 @@ public class AccountServiceImpl implements AccountService {
         if (add<=0){
             return DtoUtil.getFalseDto("注册失败！",14003);
         }
+
         result= accountMapper.checkCode(loginVo.getUserCode());
         if (ObjectUtils.isEmpty(result)){
             return DtoUtil.getFalseDto("注册时查找用户失败",14004);

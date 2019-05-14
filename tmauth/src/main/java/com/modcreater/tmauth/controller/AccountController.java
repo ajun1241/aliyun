@@ -19,26 +19,22 @@ public class AccountController {
     @PostMapping("dologin")
     @ApiOperation("登录")
     public Dto dologin(@RequestBody LoginVo loginVo){
-//        System.out.println(loginVo.toString());
         return userService.doLogin(loginVo);
     }
     @PostMapping("registered")
     @ApiOperation("注册")
     public Dto registered(@RequestBody LoginVo loginVo){
-//        System.out.println(loginVo.toString());
         return userService.registered(loginVo);
     }
     @PostMapping("queryaccount")
     @ApiOperation("查询账户信息")
     public Dto queryAccount(@RequestBody QueryUserVo queryUserVo){
-//        System.out.println(id);
         return userService.queryAccount(queryUserVo);
     }
 
     @PostMapping("updateaccount")
     @ApiOperation("修改账户信息")
     public Dto updateAccount(@RequestBody AccountVo accountVo){
-//        System.out.println(accountVo.toString());
         return userService.updateAccount(accountVo);
     }
 }
