@@ -34,13 +34,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
 
 
+
+
+
     private static final String appKey = "0vnjpoad03rzz";
     private static final String appSecret = "BbTOtrRIF5MOA";
     private static final String api = "http://api-cn.ronghub.com";
-    private static final TxtMessage txtMessage = new TxtMessage("hello", "helloExtra");
+    private static final TxtMessage txtMessage = new TxtMessage("20190514测试消息发送", "helloExtra");
 
     @RequestMapping(value = "solo", method = RequestMethod.POST)
-    public void testSolo() throws Exception{
+    public void testSolo(String tarId) throws Exception{
         RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret);
         //自定义 api 地址方式
         //RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret,api);
@@ -55,23 +58,24 @@ public class ChatController {
         /**
          * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/message/system.html#send
          *
-         * 发送系统消息
+         * 发送单聊消息
          *
          */
-        String[] targetIds = {"2651280140445094444"};
-        SystemMessage systemMessage = new SystemMessage()
-                .setSenderId("usetId")
+        String[] targetIds = {tarId};
+        PrivateMessage privateMessage = new PrivateMessage()
+                .setSenderId("userxxd2")
                 .setTargetId(targetIds)
                 .setObjectName(txtMessage.getType())
                 .setContent(txtMessage)
-                .setPushContent("this is a push")
-                .setPushData("{'pushData':'hello'}")
+                .setPushContent("")
+                .setPushData("{\"pushData\":\"hello\"}")
+                .setCount("4")
+                .setVerifyBlacklist(0)
                 .setIsPersisted(0)
                 .setIsCounted(0)
-                .setContentAvailable(0);
-
-        ResponseResult result = system.send(systemMessage);
-        System.out.println("send system message:  " + result.toString());
+                .setIsIncludeSender(0);
+        ResponseResult privateResult = Private.send(privateMessage);
+        System.out.println(privateResult.toString());
     }
 
     @RequestMapping(value = "register",method = RequestMethod.POST)

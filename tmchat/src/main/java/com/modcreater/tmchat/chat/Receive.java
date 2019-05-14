@@ -1,5 +1,7 @@
 package com.modcreater.tmchat.chat;
 
+import org.springframework.scheduling.annotation.Scheduled;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -10,6 +12,8 @@ package com.modcreater.tmchat.chat;
  */
 public class Receive {
 
-
+    public static void main(String[] args) {
+        System.out.println("定时器工作了");
+    }
 
 }
