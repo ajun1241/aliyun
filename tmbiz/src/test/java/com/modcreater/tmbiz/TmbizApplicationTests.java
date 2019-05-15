@@ -53,18 +53,7 @@ public class TmbizApplicationTests {
 
     @Test
     public void test2() {
-        String s = "20190512";
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-        Date date = new Date();
-        try {
-            date = simpleDateFormat.parse(s);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        calendar.setTime(date);
-        int week = calendar.get(Calendar.DAY_OF_WEEK);
-        System.out.println(week);
+        System.out.println(DateUtil.stringToWeek("20190515"));;
     }
 
     @Test
