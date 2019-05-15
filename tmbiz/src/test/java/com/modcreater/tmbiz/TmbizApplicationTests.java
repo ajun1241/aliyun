@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.vo.DayEvents;
 import com.modcreater.tmbeans.vo.UploadingEventVo;
 import com.modcreater.tmdao.mapper.EventMapper;
-        import org.junit.Test;
+import com.modcreater.tmutils.DateUtil;
+import com.modcreater.tmutils.SingleEventUtil;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -50,25 +52,7 @@ public class TmbizApplicationTests {
 
     @Test
     public void test2() {
-        UploadingEventVo uploadingEventVo = new UploadingEventVo();
-      /*  uploadingEventVo.setEventid(100L);
-        uploadingEventVo.setUserid(10086L);
-        uploadingEventVo.setEventname("测试名称");
-        uploadingEventVo.setStarttime("1557109312");
-        uploadingEventVo.setEndtime("1557109312");
-        uploadingEventVo.setAddress("测试地址");
-        uploadingEventVo.setLevel(1L);
-        uploadingEventVo.setFlag(1L);
-        uploadingEventVo.setPerson("测试人物");
-        uploadingEventVo.setRemarks("测试备注");
-        uploadingEventVo.setRepeaTtime("2");
-        uploadingEventVo.setIsOverdue(0L);
-        uploadingEventVo.setRemindTime("1557109312");
-        uploadingEventVo.setDay(5L);
-        uploadingEventVo.setMonth(5L);
-        uploadingEventVo.setYear(2019L);
-        uploadingEventVo.setType(1L);*/
-//        System.out.println(SingleEventUtil.getSingleEvent(uploadingEventVo));
+        System.out.println(DateUtil.stringToWeek("201952"));;
     }
 
     @Test

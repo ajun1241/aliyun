@@ -24,6 +24,11 @@ public class DateUtil {
         return date;
     }
 
+    /**
+     * 时间戳转周
+     * @param s
+     * @return
+     */
     public static int stringToWeek(String s){
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");

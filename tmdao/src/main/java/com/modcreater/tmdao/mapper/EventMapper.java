@@ -26,6 +26,13 @@ public interface EventMapper {
     int uploadingEvents(SingleEvent singleEvent);
 
     /**
+     * 根据用户ID,年月日以及时间开始结束时间判断数据库是否存在时间冲突的事件
+     * @param singleEvent
+     * @return
+     */
+    int countIdByDate(SingleEvent singleEvent);
+
+    /**
      * 撤销事件
      *
      * @param singleEvent
