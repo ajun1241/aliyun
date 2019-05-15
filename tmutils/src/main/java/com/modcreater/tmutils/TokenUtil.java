@@ -1,5 +1,7 @@
 package com.modcreater.tmutils;
 
+import com.alibaba.fastjson.JSONObject;
+import com.modcreater.tmbeans.show.MyToken;
 import io.rong.RongCloud;
 import io.rong.methods.user.User;
 import io.rong.models.Result;
@@ -40,6 +42,7 @@ public class TokenUtil {
         if (ObjectUtils.isEmpty(result)){
             return null;
         }
+        MyToken myToken= JSONObject.parseObject(result.toString(),MyToken.class);
         System.out.println("getToken:  " + result.toString());
 
         /**
@@ -50,6 +53,6 @@ public class TokenUtil {
          */
         Result refreshResult = User.update(user);
         System.out.println("refresh:  " + refreshResult.toString());
-        return result.toString();
+        return myToken.getToken();
     }
 }

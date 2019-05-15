@@ -19,5 +19,6 @@ public class AccountVo implements Serializable {
     private long userType;
     private String time;
     private String apptype;
+    private String token;
 //    private String headImgUrl;
 }

@@ -19,7 +19,7 @@ public interface AccountService {
     Dto doLogin(LoginVo loginVo);
 
     /**
-     * 注册
+     * 注册/登录
      * @param loginVo
      * @return
      */

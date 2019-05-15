@@ -68,6 +68,7 @@ public class AccountServiceImpl implements AccountService {
         if (ObjectUtils.isEmpty(loginVo)){
             return DtoUtil.getFalseDto("注册信息接收失败",14001);
         }
+        Map map=new HashMap();
         String token=null;
         Account account=new Account();
         Account result=accountMapper.checkCode(loginVo.getUserCode());
@@ -79,6 +80,9 @@ public class AccountServiceImpl implements AccountService {
                     return DtoUtil.getFalseDto("注册时查询用户失败",14004);
                 }
                 return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",result,14002);
+            }
+            if (StringUtils.isEmpty(result.getHeadImgUrl())){
+                result.setHeadImgUrl("2333");
             }
             //登录
             //生成token
@@ -97,7 +101,9 @@ public class AccountServiceImpl implements AccountService {
             if (accountMapper.updateAccount(account)<=0){
                 return DtoUtil.getFalseDto("token保存失败",14006);
             }
-            return DtoUtil.getSuccesWithDataDto("登录成功",token,100000);
+
+            map.put("token",token);
+            return DtoUtil.getSuccesWithDataDto("登录成功",map,100000);
         }
         //未注册时
         account.setUserCode(loginVo.getUserCode());
@@ -136,6 +142,9 @@ public class AccountServiceImpl implements AccountService {
         if (StringUtils.isEmpty(addPwdVo.getUserPassword())){
             return DtoUtil.getFalseDto("密码不能为空",15002);
         }
+        if (StringUtils.isEmpty(addPwdVo.getHeadImgUrl())){
+            addPwdVo.setHeadImgUrl("2333");
+        }
         //生成token
         String token=null;
         TokenUtil tokenUtil=new TokenUtil();
@@ -154,7 +163,9 @@ public class AccountServiceImpl implements AccountService {
         if (accountMapper.updateAccount(account)<=0){
             return DtoUtil.getFalseDto("添加密码失败",15003);
         }
-        return DtoUtil.getSuccesWithDataDto("添加密码成功",token,100000);
+        Map map=new HashMap();
+        map.put("token",token);
+        return DtoUtil.getSuccesWithDataDto("添加密码成功",map,100000);
     }
 
 
