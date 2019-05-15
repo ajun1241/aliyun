@@ -3,6 +3,7 @@ package com.modcreater.tmauth.controller;
 import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.AccountVo;
+import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
 import io.swagger.annotations.ApiOperation;
@@ -16,10 +17,16 @@ public class AccountController {
     @Resource
     private AccountService userService;
 
-    @PostMapping("dologin")
+   /* @PostMapping("dologin")
     @ApiOperation("登录")
     public Dto dologin(@RequestBody LoginVo loginVo){
         return userService.doLogin(loginVo);
+    }*/
+
+    @PostMapping("addpwd")
+    @ApiOperation("添加密码")
+    public Dto addPassword(@RequestBody AddPwdVo addPwdVo){
+        return userService.addPassword(addPwdVo);
     }
     @PostMapping("registered")
     @ApiOperation("注册")

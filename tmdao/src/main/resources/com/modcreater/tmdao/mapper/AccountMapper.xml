@@ -52,6 +52,9 @@
             <if test="modifyDate != null">
                 modifyDate = #{modifyDate},
             </if>
+            <if test="userPassword != null">
+                userPassword = #{userPassword},
+            </if>
         </set>
         where id=#{id}
     </update>

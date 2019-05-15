@@ -91,7 +91,7 @@ public class ChatController {
          * 注册用户，生成用户在融云的唯一身份标识 Token
          */
         UserModel user = new UserModel()
-                .setId("userxxd2")
+                .setId("zhoujun")
                 .setName("username")
                 .setPortrait("http://www.rongcloud.cn/images/logo.png");
         TokenResult result = User.register(user);
