@@ -120,15 +120,13 @@ public class SingleEventUtil {
      * @return
      */
     public static boolean isLoopEvent(String repeatTime){
-        boolean b = false;
         String x=repeatTime.substring(1,(repeatTime.length()-1));
         for (String s : x.split(",")) {
-            b = "true".equals(s);
-            if (b){
-                break;
+            if ("true".equals(s)){
+                return true;
             }
         }
-        return b;
+        return false;
     }
 
     public static Dto isSingleEventStandard(SingleEvent singleEvent){
