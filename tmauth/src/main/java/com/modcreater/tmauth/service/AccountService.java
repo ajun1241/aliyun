@@ -7,6 +7,7 @@ import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
 
+import java.util.Date;
 import java.util.List;
 
 public interface AccountService {
@@ -45,10 +46,11 @@ public interface AccountService {
      */
     Dto addPassword(AddPwdVo addPwdVo);
 
-    /**
-     * 查询token接口
-     * @param userId
+
+   /* *//**
+     *执行操作时修改时间戳
+     * @param date
      * @return
-     */
-    Dto createToken(String userId);
+     *//*
+    Dto updateTimeStamp(String date);*/
 }

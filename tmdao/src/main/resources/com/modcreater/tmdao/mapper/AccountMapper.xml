@@ -55,6 +55,9 @@
             <if test="userPassword != null">
                 userPassword = #{userPassword},
             </if>
+            <if test="token != null">
+                token = #{token},
+            </if>
         </set>
         where id=#{id}
     </update>

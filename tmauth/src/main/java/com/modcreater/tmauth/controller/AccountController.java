@@ -28,11 +28,13 @@ public class AccountController {
     public Dto addPassword(@RequestBody AddPwdVo addPwdVo){
         return userService.addPassword(addPwdVo);
     }
+
     @PostMapping("registered")
-    @ApiOperation("注册")
+    @ApiOperation("注册/登录")
     public Dto registered(@RequestBody LoginVo loginVo){
         return userService.registered(loginVo);
     }
+
     @PostMapping("queryaccount")
     @ApiOperation("查询账户信息")
     public Dto queryAccount(@RequestBody QueryUserVo queryUserVo){

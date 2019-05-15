@@ -69,6 +69,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("注册信息接收失败",14001);
         }
         String token=null;
+        Account account=new Account();
         Account result=accountMapper.checkCode(loginVo.getUserCode());
         //如果已经注册
         if (!ObjectUtils.isEmpty(result)){
@@ -88,12 +89,17 @@ public class AccountServiceImpl implements AccountService {
                 e.printStackTrace();
             }
             if (StringUtils.isEmpty(token)){
-                return DtoUtil.getFalseDto("生成token失败",15004);
+                return DtoUtil.getFalseDto("生成token失败",14005);
+            }
+            //把token保存在数据库
+            account.setId(result.getId());
+            account.setToken(token);
+            if (accountMapper.updateAccount(account)<=0){
+                return DtoUtil.getFalseDto("token保存失败",14006);
             }
             return DtoUtil.getSuccesWithDataDto("登录成功",token,100000);
         }
         //未注册时
-        Account account=new Account();
         account.setUserCode(loginVo.getUserCode());
         account.setUserType(loginVo.getUserType());
         account.setUserName("未果新用户");
@@ -130,13 +136,6 @@ public class AccountServiceImpl implements AccountService {
         if (StringUtils.isEmpty(addPwdVo.getUserPassword())){
             return DtoUtil.getFalseDto("密码不能为空",15002);
         }
-        Account account=new Account();
-        account.setId(Long.parseLong(addPwdVo.getUserId()));
-        account.setUserPassword(addPwdVo.getUserPassword());
-        int i=accountMapper.updateAccount(account);
-        if (i<=0){
-            return DtoUtil.getFalseDto("添加密码失败",15003);
-        }
         //生成token
         String token=null;
         TokenUtil tokenUtil=new TokenUtil();
@@ -148,18 +147,16 @@ public class AccountServiceImpl implements AccountService {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("生成token失败",15004);
         }
+        Account account=new Account();
+        account.setId(Long.parseLong(addPwdVo.getUserId()));
+        account.setUserPassword(addPwdVo.getUserPassword());
+        account.setToken(token);
+        if (accountMapper.updateAccount(account)<=0){
+            return DtoUtil.getFalseDto("添加密码失败",15003);
+        }
         return DtoUtil.getSuccesWithDataDto("添加密码成功",token,100000);
     }
 
-    /**
-     * 查询token接口
-     * @param userId
-     * @return
-     */
-    @Override
-    public Dto createToken(String userId) {
-        return null;
-    }
 
     @Override
     public Dto queryAccount(QueryUserVo queryUserVo) {

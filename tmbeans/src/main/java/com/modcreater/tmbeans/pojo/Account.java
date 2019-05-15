@@ -23,5 +23,6 @@ public class Account implements Serializable {
   private Long userType;
   private String headImgUrl;
   private String time;
+  private String token;
 
 }
