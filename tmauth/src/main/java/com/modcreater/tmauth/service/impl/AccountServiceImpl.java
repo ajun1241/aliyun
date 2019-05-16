@@ -10,6 +10,7 @@ import com.modcreater.tmbeans.vo.QueryUserVo;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.MD5Util;
 import com.modcreater.tmutils.TokenUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -158,7 +159,7 @@ public class AccountServiceImpl implements AccountService {
         }
         Account account=new Account();
         account.setId(Long.parseLong(addPwdVo.getUserId()));
-        account.setUserPassword(addPwdVo.getUserPassword());
+        account.setUserPassword(MD5Util.createMD5(addPwdVo.getUserPassword()));
         account.setToken(token);
         if (accountMapper.updateAccount(account)<=0){
             return DtoUtil.getFalseDto("添加密码失败",15003);
