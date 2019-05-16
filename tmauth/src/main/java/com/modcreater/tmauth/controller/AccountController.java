@@ -6,8 +6,7 @@ import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
-import com.modcreater.tmbeans.vo.uservo.BuildFriendshipVo;
-import com.modcreater.tmbeans.vo.uservo.QueFridenVo;
+import com.modcreater.tmbeans.vo.uservo.*;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,6 +60,24 @@ public class AccountController {
     @ApiOperation("添加好友")
     public Dto buildFriendship(@RequestBody BuildFriendshipVo buildFriendshipVo, HttpServletRequest request){
         return userService.buildFriendship(buildFriendshipVo,request.getHeader("token"));
+    }
+
+    @PostMapping("queryFriendList")
+    @ApiOperation("查询好友列表")
+    public Dto queryFriendList(@RequestBody QueryFriendListVo queryFriendListVo, HttpServletRequest request){
+        return userService.queryFriendList(queryFriendListVo,request.getHeader("token"));
+    }
+
+    @PostMapping("updateFriendJurisdiction")
+    @ApiOperation("修改好友权限")
+    public Dto updateFriendJurisdiction(@RequestBody UpdateFriendJurisdictionVo updateFriendJurisdictionVo, HttpServletRequest request){
+        return userService.updateFriendJurisdiction(updateFriendJurisdictionVo,request.getHeader("token"));
+    }
+
+    @PostMapping("deleteFriendship")
+    @ApiOperation("解除好友关系")
+    public Dto deleteFriendship(@RequestBody DeleteFriendshipVo deleteFriendshipVo, HttpServletRequest request){
+        return userService.deleteFriendship(deleteFriendshipVo,request.getHeader("token"));
     }
 
     /**

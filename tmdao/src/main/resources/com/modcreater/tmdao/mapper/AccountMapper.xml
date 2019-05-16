@@ -100,7 +100,7 @@
         where id=#{id}
     </update>
 
-    <delete id="deleteFriendship" parameterType="String">
-        delete from friendship where id=#{id}
+    <delete id="deleteFriendship" parameterType="com.modcreater.tmbeans.vo.uservo.DeleteFriendshipVo">
+        delete from friendship where userId=#{userId} and friendId=#{friendId}
     </delete>
 </mapper>

@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.uservo.BuildFriendshipVo;
+import com.modcreater.tmbeans.vo.uservo.DeleteFriendshipVo;
 import com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -95,8 +96,8 @@ public interface AccountMapper {
 
     /**
      * 解除好友关系
-     * @param id
+     * @param deleteFriendshipVo
      * @return
      */
-    int deleteFriendship(String id);
+    int deleteFriendship(DeleteFriendshipVo deleteFriendshipVo);
 }

@@ -193,11 +193,11 @@ public class AccountServiceImpl implements AccountService {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(queFridenVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
         if (ObjectUtils.isEmpty(queFridenVo)){
             return DtoUtil.getFalseDto("搜索好友数据获取失败",16001);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(queFridenVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         Account account=accountMapper.queryFriendByUserCode(queFridenVo.getUserCode());
         if (ObjectUtils.isEmpty(account)){
@@ -216,11 +216,11 @@ public class AccountServiceImpl implements AccountService {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(buildFriendshipVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
         if (ObjectUtils.isEmpty(buildFriendshipVo)){
             return DtoUtil.getFalseDto("添加好友数据未获取到",16002);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(buildFriendshipVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         //建立双向好友关系
         int i=accountMapper.buildFriendship(buildFriendshipVo);
@@ -241,7 +241,20 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Dto queryFriendList(QueryFriendListVo queryFriendListVo, String token) {
-        return null;
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(queryFriendListVo)){
+            return DtoUtil.getFalseDto("查询好友数据未获取到",16004);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(queryFriendListVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        List<Account> accountList=accountMapper.queryFriendList(queryFriendListVo.getUserId());
+        if (ObjectUtils.isEmpty(accountList)){
+            return DtoUtil.getFalseDto("查询好友列表失败",200000);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询好友列表成功",accountList,100000);
     }
     /**
      * 修改好友权限
@@ -251,7 +264,19 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Dto updateFriendJurisdiction(UpdateFriendJurisdictionVo jurisdictionVo, String token) {
-        return null;
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(jurisdictionVo)){
+            return DtoUtil.getFalseDto("修改好友数据未获取到",16005);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(jurisdictionVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        if (accountMapper.updateFriendJurisdiction(jurisdictionVo)<=0){
+            return DtoUtil.getFalseDto("修改好友权限失败",16006);
+        }
+        return DtoUtil.getFalseDto("修改好友权限成功",100000);
     }
     /**
      * 解除好友关系
@@ -261,7 +286,25 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Dto deleteFriendship(DeleteFriendshipVo deleteFriendshipVo, String token) {
-        return null;
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(deleteFriendshipVo)){
+            return DtoUtil.getFalseDto("删除好友数据未获取到",16007);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(deleteFriendshipVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        //双向删除
+        int i=accountMapper.deleteFriendship(deleteFriendshipVo);
+        String temp=deleteFriendshipVo.getUserId();
+        deleteFriendshipVo.setUserId(deleteFriendshipVo.getFriendId());
+        deleteFriendshipVo.setFriendId(temp);
+        int j=accountMapper.deleteFriendship(deleteFriendshipVo);
+        if (i<=0||j<=0){
+            return DtoUtil.getFalseDto("删除好友失败",16008);
+        }
+        return DtoUtil.getSuccessDto("删除好友成功",100000);
     }
 
     @Override
