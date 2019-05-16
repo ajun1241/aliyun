@@ -12,6 +12,7 @@ import java.io.Serializable;
  */
 @Data
 public class QueFridenVo implements Serializable {
+    private String userId;
     private String userCode;
     private String appType;
 }

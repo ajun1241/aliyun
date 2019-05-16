@@ -191,7 +191,7 @@ public class AccountServiceImpl implements AccountService {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(token))){
+        if (!token.equals(stringRedisTemplate.opsForValue().get(queFridenVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         if (ObjectUtils.isEmpty(queFridenVo)){
@@ -214,7 +214,7 @@ public class AccountServiceImpl implements AccountService {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(token))){
+        if (!token.equals(stringRedisTemplate.opsForValue().get(buildFriendshipVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         if (ObjectUtils.isEmpty(buildFriendshipVo)){
@@ -224,10 +224,10 @@ public class AccountServiceImpl implements AccountService {
         int i=accountMapper.buildFriendship(buildFriendshipVo);
         String temp=buildFriendshipVo.getUserId();
         buildFriendshipVo.setUserId(buildFriendshipVo.getFriendId());
-        buildFriendshipVo.setFriendId(null);
+        buildFriendshipVo.setFriendId(temp);
         int j=accountMapper.buildFriendship(buildFriendshipVo);
         if (i<=0||j<=0){
-            throw new RuntimeException("添加好友失败");
+            return DtoUtil.getFalseDto("添加好友失败",16003);
         }
         return DtoUtil.getSuccessDto("添加好友成功",100000);
     }
@@ -282,16 +282,8 @@ public class AccountServiceImpl implements AccountService {
         if (ObjectUtils.isEmpty(account)){
             return DtoUtil.getFalseDto("查询用户信息失败",200000);
         }
-        AccountVo accountVo=new AccountVo();
-        accountVo.setId(account.getId());
-        accountVo.setUserCode(account.getUserCode());
-        accountVo.setUserName(account.getUserName());
-        accountVo.setGender(account.getGender());
-        accountVo.setBirthday(account.getBirthday());
-//        accountVo.setHeadImgUrl("");
-        accountVo.setUserType(account.getUserType());
-        accountVo.setTime(account.getTime());
-        return DtoUtil.getSuccesWithDataDto("查询用户信息成功",accountVo,100000);
+        account.setUserPassword(null);
+        return DtoUtil.getSuccesWithDataDto("查询用户信息成功",account,100000);
     }
 
     @Override

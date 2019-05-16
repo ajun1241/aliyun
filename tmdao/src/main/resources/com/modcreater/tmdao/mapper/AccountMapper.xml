@@ -23,7 +23,7 @@
             ,#{userName}
             ,#{gender}
             ,#{birthday}
-            ,#{IDcard}
+            ,#{IDCard}
             ,#{offlineTime}
             ,#{userType}
             ,#{headImgUrl}
