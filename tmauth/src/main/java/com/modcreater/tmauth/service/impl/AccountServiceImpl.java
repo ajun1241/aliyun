@@ -12,6 +12,8 @@ import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
 import com.modcreater.tmutils.TokenUtil;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -25,12 +27,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @Author: AJun
+ */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class AccountServiceImpl implements AccountService {
     @Resource
     private AccountMapper accountMapper;
     private static Pattern pattern = Pattern.compile("[0-9]*");
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
     @Override
     public Dto doLogin(LoginVo loginVo) {
         if (ObjectUtils.isEmpty(loginVo)){
@@ -99,8 +106,10 @@ public class AccountServiceImpl implements AccountService {
             //把token保存在数据库
             account.setId(result.getId());
             account.setToken(token);
+            //把token保存在redis
+            stringRedisTemplate.opsForValue().set(result.getId().toString(),token);
             if (accountMapper.updateAccount(account)<=0){
-                return DtoUtil.getFalseDto("token保存失败",14006);
+                return DtoUtil.getFalseDto("生成token失败",14006);
             }
 
             map.put("token",token);
@@ -161,6 +170,8 @@ public class AccountServiceImpl implements AccountService {
         account.setId(Long.parseLong(addPwdVo.getUserId()));
         account.setUserPassword(MD5Util.createMD5(addPwdVo.getUserPassword()));
         account.setToken(token);
+        //把token保存在redis
+        stringRedisTemplate.opsForValue().set(addPwdVo.getUserId(),token);
         if (accountMapper.updateAccount(account)<=0){
             return DtoUtil.getFalseDto("添加密码失败",15003);
         }
@@ -171,9 +182,19 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public Dto queryAccount(QueryUserVo queryUserVo) {
+    public Dto queryAccount(QueryUserVo queryUserVo,String token) {
         if (ObjectUtils.isEmpty(queryUserVo)){
             return DtoUtil.getFalseDto("用户数据接收失败",12001);
+        }
+        if (StringUtils.isEmpty(queryUserVo.getId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        String redisToken=stringRedisTemplate.opsForValue().get(queryUserVo.getId());
+        if (!token.equals(redisToken)){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         Account account= accountMapper.queryAccount(queryUserVo.getId());
         if (ObjectUtils.isEmpty(account)){
@@ -192,9 +213,19 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Dto updateAccount(AccountVo accountVo) {
+    public Dto updateAccount(AccountVo accountVo,String token) {
         if (ObjectUtils.isEmpty(accountVo)){
             return DtoUtil.getFalseDto("用户信息接收失败",13001);
+        }
+        if (StringUtils.isEmpty(accountVo.getId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        String redisToken=stringRedisTemplate.opsForValue().get(accountVo.getId());
+        if (!token.equals(redisToken)){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         //判断日期格式
 

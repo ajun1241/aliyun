@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/auth/")
@@ -37,13 +38,13 @@ public class AccountController {
 
     @PostMapping("queryaccount")
     @ApiOperation("查询账户信息")
-    public Dto queryAccount(@RequestBody QueryUserVo queryUserVo){
-        return userService.queryAccount(queryUserVo);
+    public Dto queryAccount(@RequestBody QueryUserVo queryUserVo, HttpServletRequest request){
+        return userService.queryAccount(queryUserVo,request.getHeader("token"));
     }
 
     @PostMapping("updateaccount")
     @ApiOperation("修改账户信息")
-    public Dto updateAccount(@RequestBody AccountVo accountVo){
-        return userService.updateAccount(accountVo);
+    public Dto updateAccount(@RequestBody AccountVo accountVo, HttpServletRequest request){
+        return userService.updateAccount(accountVo,request.getHeader("token"));
     }
 }

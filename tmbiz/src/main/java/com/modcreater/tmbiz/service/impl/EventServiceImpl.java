@@ -32,7 +32,7 @@ import java.util.*;
  * Time: 11:32
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class EventServiceImpl implements EventService {
 
     @Resource
@@ -54,7 +54,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
             if (!redisApi.get(uploadingEventVo.getUserId()).equals(token)){
-                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+                return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (StringUtils.hasText(uploadingEventVo.getSingleEvent())) {
                 System.out.println("上传" + uploadingEventVo.toString());
@@ -120,7 +120,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
             if (!redisApi.get(deleteEventVo.getUserId()).equals(token)){
-                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+                return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (StringUtils.hasText(deleteEventVo.getEventId())) {
                 System.out.println("删除" + deleteEventVo.toString());
@@ -145,7 +145,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
             if (!redisApi.get(updateEventVo.getUserId()).equals(token)){
-                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+                return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (!ObjectUtils.isEmpty(updateEventVo)) {
                 System.out.println("修改" + updateEventVo.toString());
@@ -210,7 +210,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
         }
         if (!redisApi.get(synchronousUpdateVo.getUserId()).equals(token)){
-            return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         /*if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
             return DtoUtil.getFalseDto("事件集未获取到", 25002);
@@ -289,7 +289,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
         }
         if (!redisApi.get(contrastTimestampVo.getUserId()).equals(token)){
-            return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         String time = accountMapper.queryTime(contrastTimestampVo.getUserId());
         if (StringUtils.isEmpty(time)) {
@@ -315,7 +315,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
         }
         if (!redisApi.get(synchronousUpdateVo.getUserId()).equals(token)){
-            return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         //判断是否第一次上传
         int ie=eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId());
@@ -409,7 +409,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
             if (!redisApi.get(searchEventVo.getUserId()).equals(token)){
-                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+                return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
                 System.out.println("按天查" + searchEventVo.toString());
@@ -480,7 +480,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
             if (!redisApi.get(searchEventVo.getUserId()).equals(token)){
-                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+                return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
                 System.out.println("按月查" + searchEventVo.toString());
@@ -518,7 +518,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
             if (!redisApi.get(searchEventVo.getUserId()).equals(token)){
-                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+                return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (!ObjectUtils.isEmpty(searchEventVo)) {
                 System.out.println("按周查" + searchEventVo.toString());

@@ -28,16 +28,18 @@ public interface AccountService {
     /**
      * 修改账号信息
      * @param accountVo
+     * @param token
      * @return
      */
-    Dto updateAccount(AccountVo accountVo);
+    Dto updateAccount(AccountVo accountVo,String token);
 
     /**
      * 查看用户详情
      * @param queryUserVo
+     * @param token
      * @return
      */
-    Dto queryAccount(QueryUserVo queryUserVo);
+    Dto queryAccount(QueryUserVo queryUserVo,String token);
 
     /**
      *添加二级密码
