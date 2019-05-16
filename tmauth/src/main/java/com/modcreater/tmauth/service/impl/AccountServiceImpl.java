@@ -7,6 +7,7 @@ import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
+import com.modcreater.tmbeans.vo.uservo.*;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
@@ -76,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
         if (ObjectUtils.isEmpty(loginVo)){
             return DtoUtil.getFalseDto("注册信息接收失败",14001);
         }
-        Map map=new HashMap();
+        System.out.println("登录"+loginVo.toString());
         String token=null;
         Account account=new Account();
         Account result=accountMapper.checkCode(loginVo.getUserCode());
@@ -87,7 +88,7 @@ public class AccountServiceImpl implements AccountService {
                 if (ObjectUtils.isEmpty(result)){
                     return DtoUtil.getFalseDto("注册时查询用户失败",14004);
                 }
-                return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",result,14002);
+                return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",result,100000);
             }
             if (StringUtils.isEmpty(result.getHeadImgUrl())){
                 result.setHeadImgUrl("2333");
@@ -111,21 +112,21 @@ public class AccountServiceImpl implements AccountService {
             if (accountMapper.updateAccount(account)<=0){
                 return DtoUtil.getFalseDto("生成token失败",14006);
             }
-
-            map.put("token",token);
-            return DtoUtil.getSuccesWithDataDto("登录成功",map,100000);
+            result.setToken(token);
+            result.setUserPassword(null);
+            return DtoUtil.getSuccesWithDataDto("登录成功",result,100000);
         }
         //未注册时
         account.setUserCode(loginVo.getUserCode());
         account.setUserType(loginVo.getUserType());
-        account.setUserName("未果新用户");
+        account.setUserName("时系新用户");
         account.setGender(0L);
         try {
             account.setBirthday(DateUtil.dateToStamp(new Date()));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        account.setIDcard("");
+        account.setIDCard("");
         account.setOfflineTime(null);
         account.setHeadImgUrl("");
         account.setTime(null);
@@ -137,7 +138,7 @@ public class AccountServiceImpl implements AccountService {
         if (ObjectUtils.isEmpty(result)){
             return DtoUtil.getFalseDto("注册时查找用户失败",14004);
         }
-        return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",result,14002);
+        return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",result,100000);
     }
     /**
      *添加二级密码
@@ -175,9 +176,90 @@ public class AccountServiceImpl implements AccountService {
         if (accountMapper.updateAccount(account)<=0){
             return DtoUtil.getFalseDto("添加密码失败",15003);
         }
-        Map map=new HashMap();
-        map.put("token",token);
-        return DtoUtil.getSuccesWithDataDto("添加密码成功",map,100000);
+        account=accountMapper.queryAccount(addPwdVo.getUserId());
+        return DtoUtil.getSuccesWithDataDto("添加密码成功",account,100000);
+    }
+
+    /**
+     * 根据账号搜索好友
+     * @param queFridenVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto queryFriendByUserCode(QueFridenVo queFridenVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(token))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        if (ObjectUtils.isEmpty(queFridenVo)){
+            return DtoUtil.getFalseDto("搜索好友数据获取失败",16001);
+        }
+        Account account=accountMapper.queryFriendByUserCode(queFridenVo.getUserCode());
+        if (ObjectUtils.isEmpty(account)){
+            return DtoUtil.getFalseDto("搜索好友失败",200000);
+        }
+        return DtoUtil.getSuccesWithDataDto("搜索好友成功",account,100000);
+    }
+    /**
+     * 建立好友关系
+     * @param buildFriendshipVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto buildFriendship(BuildFriendshipVo buildFriendshipVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(token))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        if (ObjectUtils.isEmpty(buildFriendshipVo)){
+            return DtoUtil.getFalseDto("添加好友数据未获取到",16002);
+        }
+        //建立双向好友关系
+        int i=accountMapper.buildFriendship(buildFriendshipVo);
+        String temp=buildFriendshipVo.getUserId();
+        buildFriendshipVo.setUserId(buildFriendshipVo.getFriendId());
+        buildFriendshipVo.setFriendId(null);
+        int j=accountMapper.buildFriendship(buildFriendshipVo);
+        if (i<=0||j<=0){
+            throw new RuntimeException("添加好友失败");
+        }
+        return DtoUtil.getSuccessDto("添加好友成功",100000);
+    }
+    /**
+     * 查询好友列表
+     * @param queryFriendListVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto queryFriendList(QueryFriendListVo queryFriendListVo, String token) {
+        return null;
+    }
+    /**
+     * 修改好友权限
+     * @param jurisdictionVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto updateFriendJurisdiction(UpdateFriendJurisdictionVo jurisdictionVo, String token) {
+        return null;
+    }
+    /**
+     * 解除好友关系
+     * @param deleteFriendshipVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto deleteFriendship(DeleteFriendshipVo deleteFriendshipVo, String token) {
+        return null;
     }
 
 

@@ -32,11 +32,9 @@
     <select id="checkCode" parameterType="String" resultType="com.modcreater.tmbeans.pojo.Account">
         select * from account where userCode=#{userCode}
     </select>
-
     <select id="queryAccount" resultType="com.modcreater.tmbeans.pojo.Account">
         select * from account where id=#{id}
     </select>
-
     <update id="updateAccount" parameterType="com.modcreater.tmbeans.pojo.Account">
         update account
         <set>
@@ -61,7 +59,6 @@
         </set>
         where id=#{id}
     </update>
-
     <update id="updateTimestampUnderAccount">
         update account
         <set>
@@ -74,4 +71,36 @@
     <select id="queryTime" resultType="String">
         select `time` from account where id=#{id}
     </select>
+
+    <select id="queryFriendByUserCode" parameterType="String" resultType="com.modcreater.tmbeans.pojo.Account">
+        select * from account where userCode=#{userCode}
+    </select>
+
+    <insert id="buildFriendship" parameterType="com.modcreater.tmbeans.vo.uservo.BuildFriendshipVo">
+        insert into friendship (userId,friendId) values (#{userId},#{friendId})
+    </insert>
+
+    <select id="queryFriendList" parameterType="String" resultType="com.modcreater.tmbeans.pojo.Account">
+        SELECT * FROM account WHERE id IN (SELECT friendId FROM friendship WHERE userId=#{userId})
+    </select>
+
+    <update id="updateFriendJurisdiction" parameterType="com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo">
+        update friendship
+        <set>
+            <if test="invite > = 0 ">
+                invite=#{invite}
+            </if>
+             <if test="sustain > = 0 ">
+                 sustain=#{sustain}
+            </if>
+             <if test="hide > = 0 ">
+                 hide=#{hide}
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="deleteFriendship" parameterType="String">
+        delete from friendship where id=#{id}
+    </delete>
 </mapper>

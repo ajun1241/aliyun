@@ -16,7 +16,7 @@ public class Account implements Serializable {
   private String userName;
   private Long gender;
   private String birthday;
-  private String IDcard;
+  private String IDCard;
   private Date createDate;
   private Date modifyDate;
   private String offlineTime;

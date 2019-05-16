@@ -4,6 +4,8 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.LoginVo;
+import com.modcreater.tmbeans.vo.uservo.BuildFriendshipVo;
+import com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -61,4 +63,40 @@ public interface AccountMapper {
      * @return
      */
     String queryTime(String id);
+
+
+    /**
+     * 根据账号搜索好友
+     * @param userCode
+     * @return
+     */
+    Account queryFriendByUserCode(String userCode);
+
+    /**
+     * 建立好友关系
+     * @param buildFriendshipVo
+     * @return
+     */
+    int buildFriendship(BuildFriendshipVo buildFriendshipVo);
+
+    /**
+     * 查询好友列表
+     * @param userId
+     * @return
+     */
+    List<Account> queryFriendList(String userId);
+
+    /**
+     * 修改好友权限
+     * @param jurisdictionVo
+     * @return
+     */
+    int updateFriendJurisdiction(UpdateFriendJurisdictionVo jurisdictionVo);
+
+    /**
+     * 解除好友关系
+     * @param id
+     * @return
+     */
+    int deleteFriendship(String id);
 }

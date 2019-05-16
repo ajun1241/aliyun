@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
+import com.modcreater.tmbeans.vo.uservo.*;
 
 import java.util.Date;
 import java.util.List;
@@ -55,4 +56,47 @@ public interface AccountService {
      * @return
      *//*
     Dto updateTimeStamp(String date);*/
+
+
+
+
+    /**
+     * 根据账号搜索好友
+     * @param queFridenVo
+     * @param token
+     * @return
+     */
+    Dto queryFriendByUserCode(QueFridenVo queFridenVo, String token);
+
+    /**
+     * 建立好友关系
+     * @param buildFriendshipVo
+     * @param token
+     * @return
+     */
+    Dto buildFriendship(BuildFriendshipVo buildFriendshipVo,String token);
+
+    /**
+     * 查询好友列表
+     * @param queryFriendListVo
+     * @param token
+     * @return
+     */
+    Dto queryFriendList(QueryFriendListVo queryFriendListVo, String token);
+
+    /**
+     * 修改好友权限
+     * @param jurisdictionVo
+     * @param token
+     * @return
+     */
+    Dto updateFriendJurisdiction(UpdateFriendJurisdictionVo jurisdictionVo, String token);
+
+    /**
+     * 解除好友关系
+     * @param deleteFriendshipVo
+     * @param token
+     * @return
+     */
+    Dto deleteFriendship(DeleteFriendshipVo deleteFriendshipVo, String token);
 }

@@ -6,6 +6,8 @@ import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
+import com.modcreater.tmbeans.vo.uservo.BuildFriendshipVo;
+import com.modcreater.tmbeans.vo.uservo.QueFridenVo;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +41,7 @@ public class AccountController {
     @PostMapping("queryaccount")
     @ApiOperation("查询账户信息")
     public Dto queryAccount(@RequestBody QueryUserVo queryUserVo, HttpServletRequest request){
+        System.out.println("token===>>>"+request.getHeader("token"));
         return userService.queryAccount(queryUserVo,request.getHeader("token"));
     }
 
@@ -46,5 +49,17 @@ public class AccountController {
     @ApiOperation("修改账户信息")
     public Dto updateAccount(@RequestBody AccountVo accountVo, HttpServletRequest request){
         return userService.updateAccount(accountVo,request.getHeader("token"));
+    }
+
+    @PostMapping("queryfriend")
+    @ApiOperation("搜索好友")
+    public Dto queryFriendByUserCode(@RequestBody QueFridenVo queFridenVo, HttpServletRequest request){
+        return userService.queryFriendByUserCode(queFridenVo,request.getHeader("token"));
+    }
+
+    @PostMapping("buildfriendship")
+    @ApiOperation("添加好友")
+    public Dto buildFriendship(@RequestBody BuildFriendshipVo buildFriendshipVo, HttpServletRequest request){
+        return userService.buildFriendship(buildFriendshipVo,request.getHeader("token"));
     }
 }
