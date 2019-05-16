@@ -9,7 +9,9 @@ import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.RedisApi;
 import com.modcreater.tmutils.SingleEventUtil;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -39,9 +41,21 @@ public class EventServiceImpl implements EventService {
     @Resource
     private AccountMapper accountMapper;
 
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private RedisApi redisApi;
+
     @Override
-    public Dto addNewEvents(UploadingEventVo uploadingEventVo) {
+    public Dto addNewEvents(UploadingEventVo uploadingEventVo,String token) {
         if (StringUtils.hasText(uploadingEventVo.getUserId())) {
+            if (!StringUtils.hasText(token)){
+                return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+            }
+            if (!redisApi.get(uploadingEventVo.getUserId()).equals(token)){
+                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+            }
             if (StringUtils.hasText(uploadingEventVo.getSingleEvent())) {
                 System.out.println("上传" + uploadingEventVo.toString());
                 SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
@@ -100,8 +114,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto deleteEvents(DeleteEventVo deleteEventVo) {
+    public Dto deleteEvents(DeleteEventVo deleteEventVo,String token) {
         if (StringUtils.hasText(deleteEventVo.getUserId())) {
+            if (!StringUtils.hasText(token)){
+                return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+            }
+            if (!redisApi.get(deleteEventVo.getUserId()).equals(token)){
+                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+            }
             if (StringUtils.hasText(deleteEventVo.getEventId())) {
                 System.out.println("删除" + deleteEventVo.toString());
                 SingleEvent singleEvent = new SingleEvent();
@@ -119,8 +139,14 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public Dto updateEvents(UpdateEventVo updateEventVo) {
+    public Dto updateEvents(UpdateEventVo updateEventVo,String token) {
         if (StringUtils.hasText(updateEventVo.getUserId())) {
+            if (!StringUtils.hasText(token)){
+                return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+            }
+            if (!redisApi.get(updateEventVo.getUserId()).equals(token)){
+                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+            }
             if (!ObjectUtils.isEmpty(updateEventVo)) {
                 System.out.println("修改" + updateEventVo.toString());
                 SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
@@ -172,13 +198,19 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto synchronousUpdate(SynchronousUpdateVo synchronousUpdateVo) {
+    public Dto synchronousUpdate(SynchronousUpdateVo synchronousUpdateVo,String token) {
         if (ObjectUtils.isEmpty(synchronousUpdateVo)) {
             return DtoUtil.getFalseDto("本地上传数据未获取到", 25001);
         }
         System.out.println("本地数据上传" + synchronousUpdateVo.toString());
         if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+        }
+        if (!redisApi.get(synchronousUpdateVo.getUserId()).equals(token)){
+            return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
         }
         /*if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
             return DtoUtil.getFalseDto("事件集未获取到", 25002);
@@ -246,12 +278,18 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo) {
+    public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo,String token) {
         if (ObjectUtils.isEmpty(contrastTimestampVo)) {
             return DtoUtil.getFalseDto("时间戳获取失败", 24001);
         }
         if (StringUtils.isEmpty(contrastTimestampVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+        }
+        if (!redisApi.get(contrastTimestampVo.getUserId()).equals(token)){
+            return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
         }
         String time = accountMapper.queryTime(contrastTimestampVo.getUserId());
         if (StringUtils.isEmpty(time)) {
@@ -265,13 +303,19 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto firstUplEvent(SynchronousUpdateVo synchronousUpdateVo) {
+    public Dto firstUplEvent(SynchronousUpdateVo synchronousUpdateVo,String token) {
         if (ObjectUtils.isEmpty(synchronousUpdateVo)) {
             return DtoUtil.getFalseDto("同步数据未获取到", 26001);
         }
         System.out.println("第一次上传" + synchronousUpdateVo.toString());
         if (StringUtils.isEmpty(synchronousUpdateVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+        }
+        if (!redisApi.get(synchronousUpdateVo.getUserId()).equals(token)){
+            return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
         }
         //判断是否第一次上传
         int ie=eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId());
@@ -337,7 +381,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto uplDraft(DraftVo draftVo) {
+    public Dto uplDraft(DraftVo draftVo,String token) {
         if (ObjectUtils.isEmpty(draftVo)) {
             return DtoUtil.getFalseDto("上传草稿未获取到", 27001);
         }
@@ -359,8 +403,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto searchByDayEventIds(SearchEventVo searchEventVo) {
+    public Dto searchByDayEventIds(SearchEventVo searchEventVo,String token) {
         if (StringUtils.hasText(searchEventVo.getUserId())) {
+            if (!StringUtils.hasText(token)){
+                return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+            }
+            if (!redisApi.get(searchEventVo.getUserId()).equals(token)){
+                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+            }
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
                 System.out.println("按天查" + searchEventVo.toString());
                 /*boolean singleResult = false;
@@ -424,8 +474,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo) {
+    public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo,String token) {
         if (StringUtils.hasText(searchEventVo.getUserId())) {
+            if (!StringUtils.hasText(token)){
+                return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+            }
+            if (!redisApi.get(searchEventVo.getUserId()).equals(token)){
+                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+            }
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
                 System.out.println("按月查" + searchEventVo.toString());
                 SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
@@ -456,8 +512,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo) {
+    public Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo,String token) {
         if (StringUtils.hasText(searchEventVo.getUserId())) {
+            if (!StringUtils.hasText(token)){
+                return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+            }
+            if (!redisApi.get(searchEventVo.getUserId()).equals(token)){
+                return DtoUtil.getFalseDto("您的账号在另一台设备上登录",21014);
+            }
             if (!ObjectUtils.isEmpty(searchEventVo)) {
                 System.out.println("按周查" + searchEventVo.toString());
                 //按周查询单一事件

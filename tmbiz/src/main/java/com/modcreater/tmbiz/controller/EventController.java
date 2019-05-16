@@ -5,12 +5,14 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.EventMapper;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,8 +36,8 @@ public class EventController {
      * @return
      */
     @RequestMapping(value = "upl", method = RequestMethod.POST)
-    public Dto uploadingEvents(@RequestBody UploadingEventVo uploadingEventVo) {
-        return eventService.addNewEvents(uploadingEventVo);
+    public Dto uploadingEvents(@RequestBody UploadingEventVo uploadingEventVo, HttpServletRequest request) {
+        return eventService.addNewEvents(uploadingEventVo,request.getHeader("token"));
     }
 
     /**
@@ -45,8 +47,8 @@ public class EventController {
      * @return
      */
     @RequestMapping(value = "del", method = RequestMethod.POST)
-    public Dto deleteEvent(@RequestBody DeleteEventVo deleteEventVo) {
-        return eventService.deleteEvents(deleteEventVo);
+    public Dto deleteEvent(@RequestBody DeleteEventVo deleteEventVo, HttpServletRequest request) {
+        return eventService.deleteEvents(deleteEventVo,request.getHeader("token"));
     }
 
     /**
@@ -56,8 +58,8 @@ public class EventController {
      * @return
      */
     @RequestMapping(value = "upd", method = RequestMethod.POST)
-    public Dto updateEvents(@RequestBody UpdateEventVo updateEventVo) {
-        return eventService.updateEvents(updateEventVo);
+    public Dto updateEvents(@RequestBody UpdateEventVo updateEventVo, HttpServletRequest request) {
+        return eventService.updateEvents(updateEventVo,request.getHeader("token"));
     }
 
     /**
@@ -77,8 +79,8 @@ public class EventController {
      * @return
      */
     @RequestMapping(value = "ctime",method = RequestMethod.POST)
-    public Dto contrastTimestamp(@RequestBody ContrastTimestampVo contrastTimestampVo){
-        return eventService.contrastTimestamp(contrastTimestampVo);
+    public Dto contrastTimestamp(@RequestBody ContrastTimestampVo contrastTimestampVo, HttpServletRequest request){
+        return eventService.contrastTimestamp(contrastTimestampVo,request.getHeader("token"));
     }
 
     /**
@@ -87,8 +89,8 @@ public class EventController {
      * @return
      */
     @RequestMapping(value = "firupl",method = RequestMethod.POST)
-    public Dto firstUplEvent(@RequestBody SynchronousUpdateVo synchronousUpdateVo){
-        return eventService.firstUplEvent(synchronousUpdateVo);
+    public Dto firstUplEvent(@RequestBody SynchronousUpdateVo synchronousUpdateVo, HttpServletRequest request){
+        return eventService.firstUplEvent(synchronousUpdateVo,request.getHeader("token"));
     }
 
     /**
@@ -97,8 +99,8 @@ public class EventController {
      * @return
      */
     @RequestMapping(value = "upldraft",method = RequestMethod.POST)
-    public Dto uplDraft(@RequestBody DraftVo draftVo){
-        return eventService.uplDraft(draftVo);
+    public Dto uplDraft(@RequestBody DraftVo draftVo, HttpServletRequest request){
+        return eventService.uplDraft(draftVo,request.getHeader("token"));
     }
 
 
@@ -108,8 +110,8 @@ public class EventController {
      * @return
      */
     @RequestMapping(value = "seabyday",method = RequestMethod.POST)
-    public Dto searchByDay(@RequestBody SearchEventVo searchEventVo){
-        return eventService.searchByDayEventIds(searchEventVo);
+    public Dto searchByDay(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
+        return eventService.searchByDayEventIds(searchEventVo,request.getHeader("token"));
     }
 
     /**
@@ -118,8 +120,8 @@ public class EventController {
      * @return
      */
     @RequestMapping(value = "seabymon",method = RequestMethod.POST)
-    public Dto searchByMonth(@RequestBody SearchEventVo searchEventVo){
-        return eventService.searchByDayEventIdsInMonth(searchEventVo);
+    public Dto searchByMonth(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
+        return eventService.searchByDayEventIdsInMonth(searchEventVo,request.getHeader("token"));
     }
 
     /**
@@ -128,7 +130,7 @@ public class EventController {
      * @return
      */
     @RequestMapping(value = "seabyweek",method = RequestMethod.POST)
-    public Dto searchByWeek(@RequestBody SearchEventVo searchEventVo){
-        return eventService.searchByDayEventIdsInWeek(searchEventVo);
+    public Dto searchByWeek(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
+        return eventService.searchByDayEventIdsInWeek(searchEventVo,request.getHeader("token"));
     }
 }

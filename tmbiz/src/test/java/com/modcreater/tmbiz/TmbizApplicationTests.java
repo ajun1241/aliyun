@@ -13,12 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -54,17 +53,7 @@ public class TmbizApplicationTests {
     @Test
     public void test2() {
         String s = "20190512";
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-        Date date = new Date();
-        try {
-            date = simpleDateFormat.parse(s);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        calendar.setTime(date);
-        int week = calendar.get(Calendar.DAY_OF_WEEK);
-        System.out.println(week);
+        System.out.println(DateUtil.stringToWeek(s));
     }
 
     @Test
@@ -87,6 +76,11 @@ public class TmbizApplicationTests {
         String repeatTime="[false,true,true,true,true,false,false]";
         String x=repeatTime.substring(1,(repeatTime.length()-1));
         System.out.println(x);
+    }
+
+    @Test
+    public void test() {
+
     }
 
 }
