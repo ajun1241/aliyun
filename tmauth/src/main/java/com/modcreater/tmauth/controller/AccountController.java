@@ -62,4 +62,15 @@ public class AccountController {
     public Dto buildFriendship(@RequestBody BuildFriendshipVo buildFriendshipVo, HttpServletRequest request){
         return userService.buildFriendship(buildFriendshipVo,request.getHeader("token"));
     }
+
+    /**
+     * 查询用户成就(图片的URL地址)
+     * @param userId
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "searchachievement",method = RequestMethod.POST)
+    public Dto queryUserAchievement(@RequestBody String userId,HttpServletRequest httpServletRequest){
+        return userService.queryUserAchievement(userId,httpServletRequest.getHeader("token"));
+    }
 }

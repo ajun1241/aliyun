@@ -9,11 +9,11 @@ import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
 import com.modcreater.tmbeans.vo.uservo.*;
 import com.modcreater.tmdao.mapper.AccountMapper;
+import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
 import com.modcreater.tmutils.TokenUtil;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +23,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +38,9 @@ public class AccountServiceImpl implements AccountService {
     private static Pattern pattern = Pattern.compile("[0-9]*");
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private AchievementMapper achievementMapper;
     @Override
     public Dto doLogin(LoginVo loginVo) {
         if (ObjectUtils.isEmpty(loginVo)){
@@ -260,6 +262,22 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Dto deleteFriendship(DeleteFriendshipVo deleteFriendshipVo, String token) {
         return null;
+    }
+
+    @Override
+    public Dto queryUserAchievement(String userId, String token) {
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        String redisToken=stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        List<String> imgUrlList = achievementMapper.searchAllAchievement(userId);
+        if (imgUrlList.size() == 0){
+            return DtoUtil.getFalseDto("该用户没有成就",100000);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询用户成就成功",imgUrlList,100000);
     }
 
 
