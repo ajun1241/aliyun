@@ -1,6 +1,9 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.Achievement;
+import com.modcreater.tmbeans.pojo.UserStatistics;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,5 +24,20 @@ public interface AchievementMapper {
      * @return
      */
     List<String> searchAllAchievement(String userId);
+
+    /**
+     * 根据用户ID查询该用户的统计数据
+     * @param userId
+     * @return
+     */
+    UserStatistics queryUserStatistics(String userId);
+
+    /**
+     * 查询成就完成条件
+     * @return
+     */
+    List<Achievement> queryAchievement();
+
+    int addNewAchievement(@Param("id") Long id, @Param("userId") String userId);
 
 }

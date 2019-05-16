@@ -2,6 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.AchievementMapper">
 
+    <sql id="Base_Column_List_UserStatistics">
+        id,userId,loggedDays,completed,unfinished,drafts
+    </sql>
+
+    <sql id="Base_Column_List_Achievement">
+        id,name,imgUrl,loggedDaysCondition,finishedEventsCondition
+    </sql>
+    <insert id="addNewAchievement">
+        insert into userachievement values (null,#{userId},#{id})
+    </insert>
+
     <select id="searchAllAchievement" resultType="String">
         SELECT imgurl
         from achievement
@@ -9,6 +20,12 @@
         (SELECT achievementId
         from userachievement
         where userId = #{userId})
+    </select>
+    <select id="queryUserStatistics" resultType="com.modcreater.tmbeans.pojo.UserStatistics">
+        select <include refid="Base_Column_List_UserStatistics"/> from userstatistics where userId = #{userId}
+    </select>
+    <select id="queryAchievement" resultType="com.modcreater.tmbeans.pojo.Achievement">
+        select <include refid="Base_Column_List_Achievement"/> from achievement
     </select>
 
 </mapper>
