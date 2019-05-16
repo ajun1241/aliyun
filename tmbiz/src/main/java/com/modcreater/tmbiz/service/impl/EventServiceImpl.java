@@ -9,11 +9,8 @@ import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
-import com.modcreater.tmutils.RedisApi;
 import com.modcreater.tmutils.SingleEventUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -44,16 +41,13 @@ public class EventServiceImpl implements EventService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-    @Resource
-    private RedisApi redisApi;
-
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo,String token) {
         if (StringUtils.hasText(uploadingEventVo.getUserId())) {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
-            if (!redisApi.get(uploadingEventVo.getUserId()).equals(token)){
+            if (!token.equals(stringRedisTemplate.opsForValue().get(uploadingEventVo.getUserId()))){
                 return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (StringUtils.hasText(uploadingEventVo.getSingleEvent())) {
@@ -119,7 +113,7 @@ public class EventServiceImpl implements EventService {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
-            if (!redisApi.get(deleteEventVo.getUserId()).equals(token)){
+            if (!token.equals(stringRedisTemplate.opsForValue().get(deleteEventVo.getUserId()))){
                 return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (StringUtils.hasText(deleteEventVo.getEventId())) {
@@ -144,7 +138,7 @@ public class EventServiceImpl implements EventService {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
-            if (!redisApi.get(updateEventVo.getUserId()).equals(token)){
+            if (!token.equals(stringRedisTemplate.opsForValue().get(updateEventVo.getUserId()))){
                 return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (!ObjectUtils.isEmpty(updateEventVo)) {
@@ -209,7 +203,7 @@ public class EventServiceImpl implements EventService {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
         }
-        if (!redisApi.get(synchronousUpdateVo.getUserId()).equals(token)){
+        if (!token.equals(stringRedisTemplate.opsForValue().get(synchronousUpdateVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         /*if (synchronousUpdateVo.getDayEventsList().size() <= 0) {
@@ -288,7 +282,7 @@ public class EventServiceImpl implements EventService {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
         }
-        if (!redisApi.get(contrastTimestampVo.getUserId()).equals(token)){
+        if (!token.equals(stringRedisTemplate.opsForValue().get(contrastTimestampVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         String time = accountMapper.queryTime(contrastTimestampVo.getUserId());
@@ -314,7 +308,7 @@ public class EventServiceImpl implements EventService {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
         }
-        if (!redisApi.get(synchronousUpdateVo.getUserId()).equals(token)){
+        if (!token.equals(stringRedisTemplate.opsForValue().get(synchronousUpdateVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         //判断是否第一次上传
@@ -408,7 +402,7 @@ public class EventServiceImpl implements EventService {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
-            if (!redisApi.get(searchEventVo.getUserId()).equals(token)){
+            if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))){
                 return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
@@ -479,7 +473,7 @@ public class EventServiceImpl implements EventService {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
-            if (!redisApi.get(searchEventVo.getUserId()).equals(token)){
+            if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))){
                 return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
@@ -517,7 +511,7 @@ public class EventServiceImpl implements EventService {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
-            if (!redisApi.get(searchEventVo.getUserId()).equals(token)){
+            if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))){
                 return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
             if (!ObjectUtils.isEmpty(searchEventVo)) {

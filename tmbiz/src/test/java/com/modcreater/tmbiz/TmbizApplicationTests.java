@@ -10,6 +10,7 @@ import com.modcreater.tmutils.SingleEventUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
@@ -25,6 +26,9 @@ public class TmbizApplicationTests {
 
     @Resource
     private EventMapper eventMapper;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Test
     public void contextLoads() throws Exception {
@@ -80,7 +84,7 @@ public class TmbizApplicationTests {
 
     @Test
     public void test() {
-
+        System.out.println(stringRedisTemplate.opsForValue().get("test"));
     }
 
 }
