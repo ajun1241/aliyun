@@ -18,6 +18,7 @@ import static com.modcreater.tmutils.RongCloudUtil.appSecret;
 /**
  * 生成token的工具类
  */
+
 public class RongCloudMethodUtil {
 
     public String createToken(String userId,String userName,String headImgUrl) throws Exception {
@@ -71,7 +72,6 @@ public class RongCloudMethodUtil {
 
         String systemMessage = "https://api.cn.rong.io/message/system/publish.json";
         Map<String, String> params = new HashMap<String, String>();
-        // String content="{\"content\":\"2\"}";
         params.put("content", content);
         params.put("fromUserId", fromUserId);
         params.put("toUserId", toUserId);

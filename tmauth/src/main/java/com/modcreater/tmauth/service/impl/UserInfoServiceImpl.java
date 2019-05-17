@@ -51,6 +51,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto showUserDetails(String userId, String token) {
+        System.out.println("()()("+userId);
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
