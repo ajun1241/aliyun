@@ -10,16 +10,18 @@
         insert into account
             (userCode,
             userPassword,
+            isFirst,
             userName,
             gender,
             birthday,
             IDcard,
             offlineTime,
             userType,
-            headImgUrl,
-            time)
+            headImgUrl
+            )
         values (#{userCode}
             ,#{userPassword}
+            ,#{isFirst}
             ,#{userName}
             ,#{gender}
             ,#{birthday}
@@ -27,7 +29,7 @@
             ,#{offlineTime}
             ,#{userType}
             ,#{headImgUrl}
-            ,#{time})
+            )
     </insert>
     <select id="checkCode" parameterType="String" resultType="com.modcreater.tmbeans.pojo.Account">
         select * from account where userCode=#{userCode}
@@ -52,6 +54,9 @@
             </if>
             <if test="userPassword != null">
                 userPassword = #{userPassword},
+            </if>
+            <if test="isFirst != 0">
+                isFirst = #{isFirst},
             </if>
             <if test="token != null">
                 token = #{token},

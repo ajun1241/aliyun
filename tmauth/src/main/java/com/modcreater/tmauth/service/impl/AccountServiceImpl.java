@@ -16,7 +16,7 @@ import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
-import com.modcreater.tmutils.TokenUtil;
+import com.modcreater.tmutils.RongCloudUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +67,6 @@ public class AccountServiceImpl implements AccountService {
         accountVo.setUserName(account.getUserName());
         accountVo.setGender(account.getGender());
         accountVo.setBirthday(account.getBirthday());
-        accountVo.setTime(account.getTime());
 //        accountVo.setHeadImgUrl("");
         accountVo.setUserType(account.getUserType());
         return DtoUtil.getSuccesWithDataDto("登录成功!",accountVo,100000);
@@ -100,9 +99,9 @@ public class AccountServiceImpl implements AccountService {
             }
             //登录
             //生成token
-            TokenUtil tokenUtil=new TokenUtil();
+            RongCloudUtil rongCloudUtil =new RongCloudUtil();
             try {
-                token=tokenUtil.createToken(result.getId().toString(),result.getUserName(),result.getHeadImgUrl());
+                token= rongCloudUtil.createToken(result.getId().toString(),result.getUserName(),result.getHeadImgUrl());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -124,7 +123,7 @@ public class AccountServiceImpl implements AccountService {
         //未注册时
         account.setUserCode(loginVo.getUserCode());
         account.setUserType(loginVo.getUserType());
-        account.setUserName("时系新用户");
+        account.setUserName("智秀新用户");
         account.setGender(0L);
         try {
             account.setBirthday(DateUtil.dateToStamp(new Date()));
@@ -134,7 +133,6 @@ public class AccountServiceImpl implements AccountService {
         account.setIDCard("");
         account.setOfflineTime(null);
         account.setHeadImgUrl("");
-        account.setTime(null);
         int add= accountMapper.register(account);
         if (add<=0){
             return DtoUtil.getFalseDto("注册失败！",14003);
@@ -163,9 +161,9 @@ public class AccountServiceImpl implements AccountService {
         }
         //生成token
         String token=null;
-        TokenUtil tokenUtil=new TokenUtil();
+        RongCloudUtil rongCloudUtil =new RongCloudUtil();
         try {
-            token=tokenUtil.createToken(addPwdVo.getUserId(),addPwdVo.getUserName(),addPwdVo.getHeadImgUrl());
+            token= rongCloudUtil.createToken(addPwdVo.getUserId(),addPwdVo.getUserName(),addPwdVo.getHeadImgUrl());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -176,6 +174,7 @@ public class AccountServiceImpl implements AccountService {
         account.setId(Long.parseLong(addPwdVo.getUserId()));
         account.setUserPassword(MD5Util.createMD5(addPwdVo.getUserPassword()));
         account.setToken(token);
+        account.setIsFirst(1);
         //把token保存在redis
         stringRedisTemplate.opsForValue().set(addPwdVo.getUserId(),token);
         if (accountMapper.updateAccount(account)<=0){

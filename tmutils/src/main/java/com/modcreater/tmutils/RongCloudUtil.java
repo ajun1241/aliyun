@@ -12,7 +12,7 @@ import org.springframework.util.ObjectUtils;
 /**
  * 生成token的工具类
  */
-public class TokenUtil {
+public class RongCloudUtil {
     /**
      * 此处替换成您的appKey
      * */

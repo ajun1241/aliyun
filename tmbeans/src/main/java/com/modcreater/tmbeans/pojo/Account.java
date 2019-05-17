@@ -12,7 +12,7 @@ public class Account implements Serializable {
   private Long id;
   private String userCode;
   private String userPassword;
-  private String verificationCode;
+  private int isFirst;
   private String userName;
   private Long gender;
   private String birthday;
@@ -22,7 +22,6 @@ public class Account implements Serializable {
   private String offlineTime;
   private Long userType;
   private String headImgUrl;
-  private String time;
   private String token;
 
 }
