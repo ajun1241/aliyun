@@ -275,7 +275,7 @@
         from singleevent
         where userId = #{userid}
         and isOverdue = #{isOverdue}
-        and eventName like "%#{eventname}%"
+        and eventName like "%"#{eventname}"%"
         order by year desc,month desc,day desc
     </select>
 

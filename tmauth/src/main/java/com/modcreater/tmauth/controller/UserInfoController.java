@@ -31,7 +31,7 @@ public class UserInfoController {
 
     /**
      * 显示用户详情
-     * @param userId
+     * @param userIdVo
      * @param request
      * @return
      */
@@ -42,7 +42,7 @@ public class UserInfoController {
 
     /**
      * 显示用户已完成事件
-     * @param userId
+     * @param userIdVo
      * @param request
      * @return
      */
@@ -53,8 +53,7 @@ public class UserInfoController {
 
     /**
      * 根据事件名称查询事件
-     * @param userId
-     * @param eventName
+     * @param receivedIdName
      * @param request
      * @return
      */
@@ -76,7 +75,7 @@ public class UserInfoController {
 
     /**
      * 显示用户未完成的事件
-     * @param userId
+     * @param userIdVo
      * @param request
      * @return
      */
@@ -87,7 +86,7 @@ public class UserInfoController {
 
     /**
      * 根据事件名称查询用户未完成的事件
-     * @param eventName
+     * @param receivedIdName
      * @param request
      * @return
      */
@@ -109,7 +108,7 @@ public class UserInfoController {
 
     /**
      * 数据统计
-     * @param userId
+     * @param userIdVo
      * @param request
      * @return
      */
@@ -121,7 +120,7 @@ public class UserInfoController {
 
     /**
      * 查询用户成就(图片的URL地址)
-     * @param userId
+     * @param userIdVo
      * @param httpServletRequest
      * @return
      */
