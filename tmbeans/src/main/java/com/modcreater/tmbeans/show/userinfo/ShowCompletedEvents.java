@@ -12,7 +12,24 @@ import lombok.Data;
  */
 @Data
 public class ShowCompletedEvents {
+    /**
+     * 事件ID
+     */
+    private String eventId;
 
+    /**
+     * 用户ID
+     */
+    private String userId;
 
+    /**
+     * 事件名称
+     */
+    private String eventName;
+
+    /**
+     * 事件开始日期
+     */
+    private String date;
 
 }

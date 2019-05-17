@@ -5,11 +5,13 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Achievement;
 import com.modcreater.tmbeans.pojo.UserAchievement;
 import com.modcreater.tmbeans.pojo.UserStatistics;
+import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
+import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Resource
     private AccountMapper accountMapper;
+
+    @Resource
+    private EventMapper eventMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -81,7 +86,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        return null;
+        //查询用户已完成的事件(根据事件排序,只显示7条)
+        List<ShowCompletedEvents> showCompletedEventsList = eventMapper.queryUserCompletedEventsByStartDate();
+        if (showCompletedEventsList.size() != 0){
+            return DtoUtil.getSuccesWithDataDto("查询已完成事件成功",showCompletedEventsList,100000);
+        }
+        return DtoUtil.getSuccessDto("未查到已完成事件",100000);
     }
 
     @Override

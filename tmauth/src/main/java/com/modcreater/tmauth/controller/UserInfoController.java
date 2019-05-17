@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
  * Time: 13:42
  */
 @RestController
-@RequestMapping(value = "/userInfo/")
+@RequestMapping(value = "/userinfo/")
 public class UserInfoController {
 
     @Resource

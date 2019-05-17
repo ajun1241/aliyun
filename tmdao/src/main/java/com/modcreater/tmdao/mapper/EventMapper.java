@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.vo.eventvo.DraftVo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -169,8 +170,14 @@ public interface EventMapper {
      */
     List<Integer> queryDays(SingleEvent singleEvent);
 
+    /**
+     * 根据userId和eventId查询单一事件表
+     * @param singleEvent
+     * @return
+     */
     SingleEvent querySingleEvent(SingleEvent singleEvent);
 
     SingleEvent queryLoopSingleEvent(SingleEvent singleEvent);
 
+    List<ShowCompletedEvents> queryUserCompletedEventsByStartDate();
 }
