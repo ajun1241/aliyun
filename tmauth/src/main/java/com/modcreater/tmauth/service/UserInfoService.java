@@ -60,11 +60,12 @@ public interface UserInfoService {
 
     /**
      * 根据事件标题查询用户未完成的事件
+     * @param userId
      * @param eventName
      * @param token
      * @return
      */
-    Dto searchUnfinishedEventsByEventName(String eventName, String token);
+    Dto searchUnfinishedEventsByEventName(String userId,String eventName, String token);
 
     /**
      * 筛选用户未完成的事件

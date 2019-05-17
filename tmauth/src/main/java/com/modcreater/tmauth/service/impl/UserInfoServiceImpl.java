@@ -187,7 +187,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public Dto searchUnfinishedEventsByEventName(String eventName, String token) {
+    public Dto searchUnfinishedEventsByEventName(String userId,String eventName, String token) {
         return null;
     }
 

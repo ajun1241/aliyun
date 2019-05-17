@@ -3,6 +3,9 @@ package com.modcreater.tmauth.controller;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdName;
+import com.modcreater.tmbeans.vo.uservo.UserIdVo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,9 +36,8 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping(value = "showuserdetails",method = RequestMethod.POST)
-    public Dto showUserDetails(String userId,String appType,HttpServletRequest request){
-        System.out.println("************"+userId);
-        return userInfoService.showUserDetails(userId,request.getHeader("token"));
+    public Dto showUserDetails(@RequestBody UserIdVo userIdVo, HttpServletRequest request){
+        return userInfoService.showUserDetails(userIdVo.getUserId(),request.getHeader("token"));
     }
 
     /**
@@ -45,8 +47,8 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping(value = "showcompletedevents",method = RequestMethod.POST)
-    public Dto showCompletedEvents(String userId,String appType,HttpServletRequest request){
-        return userInfoService.showCompletedEvents(userId,request.getHeader("token"));
+    public Dto showCompletedEvents(@RequestBody UserIdVo userIdVo,HttpServletRequest request){
+        return userInfoService.showCompletedEvents(userIdVo.getUserId(),request.getHeader("token"));
     }
 
     /**
@@ -57,8 +59,8 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping(value = "searchcompletedeventsbyeventname",method = RequestMethod.POST)
-    public Dto searchCompletedEventsByEventName(String userId,String eventName,String appType,HttpServletRequest request){
-        return userInfoService.searchCompletedEventsByEventName(userId,eventName,request.getHeader("token"));
+    public Dto searchCompletedEventsByEventName(@RequestBody ReceivedIdName receivedIdName, HttpServletRequest request){
+        return userInfoService.searchCompletedEventsByEventName(receivedIdName.getUserId(),receivedIdName.getEventName(),request.getHeader("token"));
     }
 
     /**
@@ -79,8 +81,8 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping(value = "showunfinishedevents",method = RequestMethod.POST)
-    public Dto showUnfinishedEvents(String userId,String appType,HttpServletRequest request){
-        return userInfoService.showUnfinishedEvents(userId,request.getHeader("token"));
+    public Dto showUnfinishedEvents(@RequestBody UserIdVo userIdVo,HttpServletRequest request){
+        return userInfoService.showUnfinishedEvents(userIdVo.getUserId(),request.getHeader("token"));
     }
 
     /**
@@ -90,8 +92,8 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping(value = "searchunfinishedeventsbyeventname",method = RequestMethod.POST)
-    public Dto searchUnfinishedEventsByEventName(String eventName,String appType,HttpServletRequest request){
-        return userInfoService.searchUnfinishedEventsByEventName(eventName,request.getHeader("token"));
+    public Dto searchUnfinishedEventsByEventName(@RequestBody ReceivedIdName receivedIdName,HttpServletRequest request){
+        return userInfoService.searchUnfinishedEventsByEventName(receivedIdName.getUserId(),receivedIdName.getEventName(),request.getHeader("token"));
     }
 
     /**
@@ -112,8 +114,8 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping(value = "statisticanalysisofdata",method = RequestMethod.POST)
-    public Dto statisticAnalysisOfData(String userId,String appType,HttpServletRequest request){
-        return userInfoService.statisticAnalysisOfData(userId,request.getHeader("token"));
+    public Dto statisticAnalysisOfData(@RequestBody UserIdVo userIdVo,HttpServletRequest request){
+        return userInfoService.statisticAnalysisOfData(userIdVo.getUserId(),request.getHeader("token"));
     }
 
 
@@ -124,8 +126,8 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping(value = "searchachievement",method = RequestMethod.POST)
-    public Dto queryUserAchievement(String userId, String appType,HttpServletRequest httpServletRequest){
-        return userInfoService.queryUserAchievement(userId,httpServletRequest.getHeader("token"));
+    public Dto queryUserAchievement(@RequestBody UserIdVo userIdVo,HttpServletRequest httpServletRequest){
+        return userInfoService.queryUserAchievement(userIdVo.getUserId(),httpServletRequest.getHeader("token"));
     }
 
 }
