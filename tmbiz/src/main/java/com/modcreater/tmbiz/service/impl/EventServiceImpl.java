@@ -495,6 +495,7 @@ public class EventServiceImpl implements EventService {
                 Long now = System.currentTimeMillis();
                 UserStatistics userStatistics = new UserStatistics();
                 userStatistics.setLastOperatedTime(now);
+                System.out.println("()()()()()()("+now.toString());
                 //将本次操作的事件更新到用户统计表
                 achievementMapper.updateUserStatistics(userStatistics,searchEventVo.getUserId());
                 //如果当前操作时间与用户上一次操作的时间的差值大于一天则更改用户统计表中的登录天数
