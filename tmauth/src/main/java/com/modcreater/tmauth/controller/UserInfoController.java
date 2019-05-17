@@ -34,6 +34,7 @@ public class UserInfoController {
      */
     @RequestMapping(value = "showuserdetails",method = RequestMethod.POST)
     public Dto showUserDetails(String userId,String appType,HttpServletRequest request){
+        System.out.println("************"+userId);
         return userInfoService.showUserDetails(userId,request.getHeader("token"));
     }
 

@@ -64,8 +64,8 @@ public class AccountController {
 
     @PostMapping("queryFriendList")
     @ApiOperation("查询好友列表")
-    public Dto queryFriendList(@RequestBody QueryFriendListVo queryFriendListVo, HttpServletRequest request){
-        return userService.queryFriendList(queryFriendListVo,request.getHeader("token"));
+    public Dto queryFriendList(@RequestBody UserIdVo userIdVo, HttpServletRequest request){
+        return userService.queryFriendList(userIdVo,request.getHeader("token"));
     }
 
     @PostMapping("updateFriendJurisdiction")

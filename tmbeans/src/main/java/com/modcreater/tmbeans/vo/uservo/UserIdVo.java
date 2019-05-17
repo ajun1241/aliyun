@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @Date: 2019/5/16 13:55
  */
 @Data
-public class QueryFriendListVo implements Serializable {
+public class UserIdVo implements Serializable {
     private String userId;
     private String appType;
 }

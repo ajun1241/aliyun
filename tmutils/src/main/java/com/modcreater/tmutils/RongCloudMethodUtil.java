@@ -9,11 +9,7 @@ import io.rong.models.response.TokenResult;
 import io.rong.models.user.UserModel;
 import org.springframework.util.ObjectUtils;
 
-import java.io.DataOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.sql.Timestamp;
+
 import java.util.HashMap;
 import java.util.Map;
 import static com.modcreater.tmutils.RongCloudUtil.appKey;

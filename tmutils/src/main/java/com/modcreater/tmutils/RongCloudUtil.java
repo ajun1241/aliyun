@@ -12,8 +12,8 @@ import java.util.Map;
 
 public class RongCloudUtil {
 
-    public final static String appKey = "";// 申请的融云key
-    public final static String appSecret = "";// 申请的的云secret
+    public final static String appKey = "0vnjpoad03rzz";// 申请的融云key
+    public final static String appSecret = "BbTOtrRIF5MOA";// 申请的的云secret
     private final static int[] abcde = { 0x67452301, 0xefcdab89, 0x98badcfe,
             0x10325476, 0xc3d2e1f0 };// sha1加密产参数
     // 摘要数据存储数组

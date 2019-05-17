@@ -390,7 +390,6 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(draftVo)) {
             return DtoUtil.getFalseDto("上传草稿未获取到", 27001);
         }
-
         //查看草稿是否已存在
         String data = eventMapper.queryDraftByPhone(draftVo.getPhoneNum());
         if (StringUtils.isEmpty(data)) {

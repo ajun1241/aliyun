@@ -28,7 +28,7 @@
                 drafts = drafts + #{userStatistics.drafts},
             </if>
             <if test="userStatistics.lastOperatedTime != null and userStatistics.lastOperatedTime != 0">
-                lastLoginTime = #{userStatistics.lastOperatedTime}
+                lastOperatedTime = #{userStatistics.lastOperatedTime}
             </if>
         </set>
         where userId = #{userId}

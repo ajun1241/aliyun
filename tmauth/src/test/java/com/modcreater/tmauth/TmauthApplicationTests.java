@@ -17,7 +17,9 @@ public class TmauthApplicationTests {
 
     @Test
     public void contextLoads() {
-        System.out.println(MD5Util.createMD5("qweasd"));
+        String a="[true,true,true,true,true,null,true]";
+
+        System.out.println(a.indexOf("null"));
     }
 
 }

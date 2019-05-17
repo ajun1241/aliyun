@@ -3,15 +3,12 @@ package com.modcreater.tmauth.service.impl;
 import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Account;
-import com.modcreater.tmbeans.pojo.Achievement;
-import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
 import com.modcreater.tmbeans.vo.uservo.*;
 import com.modcreater.tmdao.mapper.AccountMapper;
-import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
@@ -222,7 +219,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Dto sendFriendRequest() {
+    public Dto sendFriendRequest(SendFriendRequestVo sendFriendRequestVo, String token) {
         return null;
     }
 
@@ -257,22 +254,22 @@ public class AccountServiceImpl implements AccountService {
     }
     /**
      * 查询好友列表
-     * @param queryFriendListVo
+     * @param userIdVo
      * @param token
      * @return
      */
     @Override
-    public Dto queryFriendList(QueryFriendListVo queryFriendListVo, String token) {
+    public Dto queryFriendList(UserIdVo userIdVo, String token) {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        if (ObjectUtils.isEmpty(queryFriendListVo)){
+        if (ObjectUtils.isEmpty(userIdVo)){
             return DtoUtil.getFalseDto("查询好友数据未获取到",16004);
         }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(queryFriendListVo.getUserId()))){
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userIdVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        List<Account> accountList=accountMapper.queryFriendList(queryFriendListVo.getUserId());
+        List<Account> accountList=accountMapper.queryFriendList(userIdVo.getUserId());
         if (ObjectUtils.isEmpty(accountList)){
             return DtoUtil.getFalseDto("查询好友列表失败",200000);
         }

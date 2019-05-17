@@ -1,15 +1,11 @@
 package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
 import com.modcreater.tmbeans.vo.uservo.*;
-
-import java.util.Date;
-import java.util.List;
 
 public interface AccountService {
     /**
@@ -67,8 +63,13 @@ public interface AccountService {
      */
     Dto queryFriendByUserCode(QueFridenVo queFridenVo, String token);
 
-
-    Dto sendFriendRequest();
+    /**
+     * 发送添加好友请求
+     * @param sendFriendRequestVo
+     * @param token
+     * @return
+     */
+    Dto sendFriendRequest(SendFriendRequestVo sendFriendRequestVo,String token);
 
 
     /**
@@ -81,11 +82,11 @@ public interface AccountService {
 
     /**
      * 查询好友列表
-     * @param queryFriendListVo
+     * @param userIdVo
      * @param token
      * @return
      */
-    Dto queryFriendList(QueryFriendListVo queryFriendListVo, String token);
+    Dto queryFriendList(UserIdVo userIdVo, String token);
 
     /**
      * 修改好友权限
