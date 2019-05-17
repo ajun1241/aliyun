@@ -260,6 +260,24 @@
     <select id="queryLoopSingleEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select <include refid="Base_Column_List"/> from loopevent where userid=#{userid} and eventid = #{eventid} and isOverdue = 0
     </select>
+    <select id="queryUserEventsByStartDate" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select eventId,userId,eventName,day,month,year
+        from singleevent
+        where userId = #{userId}
+        and isOverdue = #{isOverdue}
+        order by year desc,month desc,day desc limit 0,7
+    </select>
+    <select id="queryUserLoopEventsByStartDate" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select eventId,userId,eventName,repeatTime from singleevent where userId = #{userId} and isOverdue = #{isOverdue}
+    </select>
+    <select id="searchEventsByEventName" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select eventId,userId,eventName,day,month,year
+        from singleevent
+        where userId = #{userid}
+        and isOverdue = #{isOverdue}
+        and eventName like "%#{eventname}%"
+        order by year desc,month desc,day desc
+    </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo" >
         update draft set `data`=concat(`data`,#{data})

@@ -50,17 +50,18 @@ public class UserInfoController {
 
     /**
      * 根据事件名称查询事件
+     * @param userId
      * @param eventName
      * @param request
      * @return
      */
     @RequestMapping(value = "searchcompletedeventsbyeventname",method = RequestMethod.POST)
-    public Dto searchCompletedEventsByEventName(String eventName,String appType,HttpServletRequest request){
-        return userInfoService.searchCompletedEventsByEventName(eventName,request.getHeader("token"));
+    public Dto searchCompletedEventsByEventName(String userId,String eventName,String appType,HttpServletRequest request){
+        return userInfoService.searchCompletedEventsByEventName(userId,eventName,request.getHeader("token"));
     }
 
     /**
-     * 筛选事件
+     * 筛选已完成的事件
      * @param receivedEventConditions
      * @param request
      * @return

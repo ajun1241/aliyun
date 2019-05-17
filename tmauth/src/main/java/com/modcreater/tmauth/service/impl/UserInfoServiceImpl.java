@@ -3,6 +3,7 @@ package com.modcreater.tmauth.service.impl;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Achievement;
+import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.UserAchievement;
 import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
@@ -12,7 +13,9 @@ import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
+import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.SingleEventUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +23,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -58,7 +59,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         if (StringUtils.hasText(userId)){
-            ShowUserDetails showUserDetails = accountMapper.queryUserDetails(userId);
             UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
             ShowUserStatistics showUserStatistics= new ShowUserStatistics();
             showUserStatistics.setCompleted(userStatistics.getCompleted());
@@ -66,8 +66,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             showUserStatistics.setDrafts(userStatistics.getDrafts());
             List<String> imgUrlList = queryUserAchievementInBase(userId);
             Map<String,Object> result = new HashMap<>(3);
-            //用户信息
-            result.put("showUserDetails",showUserDetails);
             //用户事件状态
             result.put("userStatistics",showUserStatistics);
             //用户所有成就
@@ -87,8 +85,27 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         //查询用户已完成的事件(根据事件排序,只显示7条)
-        List<ShowCompletedEvents> showCompletedEventsList = eventMapper.queryUserCompletedEventsByStartDate();
-        if (showCompletedEventsList.size() != 0){
+        /*List<SingleEvent> showCompletedLoopEventsList = eventMapper.queryUserCompletedEventsByStartDate(userId,"2");
+        DateUtil.stringToWeek(String.valueOf(new Date("yyyyMMdd")));
+        if (showCompletedLoopEventsList.size() != 0){
+            for (SingleEvent singleEvent : showCompletedLoopEventsList){
+                Boolean[] booleans = SingleEventUtil.getRepeatTime(singleEvent);
+                if (booleans[DateUtil.getTodayWeek()]){
+
+                }
+            }
+        }*/
+        List<SingleEvent> singleEventList = eventMapper.queryUserEventsByStartDate(userId,"2");
+        if (singleEventList.size() != 0){
+            List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
+            for (SingleEvent singleEvent : singleEventList){
+                ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
+                showCompletedEvents.setEventId(singleEvent.getEventid().toString());
+                showCompletedEvents.setUserId(singleEvent.getUserid().toString());
+                showCompletedEvents.setEventName(singleEvent.getEventname());
+                showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
+                showCompletedEventsList.add(showCompletedEvents);
+            }
             return DtoUtil.getSuccesWithDataDto("查询已完成事件成功",showCompletedEventsList,100000);
         }
         return DtoUtil.getSuccessDto("未查到已完成事件",100000);
@@ -131,8 +148,32 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public Dto searchCompletedEventsByEventName(String eventName, String token) {
-        return null;
+    public Dto searchCompletedEventsByEventName(String userId,String eventName, String token) {
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        String redisToken=stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        SingleEvent inDataBase = new SingleEvent();
+        inDataBase.setUserid(Long.valueOf(userId));
+        inDataBase.setEventname(eventName);
+        inDataBase.setIsOverdue(2L);
+        List<SingleEvent> singleEventList = eventMapper.searchEventsByEventName(inDataBase);
+        if (singleEventList.size() != 0){
+            List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
+            for (SingleEvent singleEvent : singleEventList){
+                ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
+                showCompletedEvents.setEventId(singleEvent.getEventid().toString());
+                showCompletedEvents.setEventName(singleEvent.getEventname());
+                showCompletedEvents.setUserId(singleEvent.getUserid().toString());
+                showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
+                showCompletedEventsList.add(showCompletedEvents);
+            }
+            return DtoUtil.getSuccesWithDataDto("查询成功",showCompletedEventsList,100000);
+        }
+        return DtoUtil.getSuccessDto("未查询到结果",100000);
     }
 
     @Override
@@ -159,5 +200,4 @@ public class UserInfoServiceImpl implements UserInfoService {
     public Dto statisticAnalysisOfData(String userId, String token) {
         return null;
     }
-
 }

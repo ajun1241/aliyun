@@ -34,6 +34,55 @@ public interface UserInfoService {
 
 
     /**
+     * 根据事件名称查询事件
+     * @param userId
+     * @param eventName
+     * @param token
+     * @return
+     */
+    Dto searchCompletedEventsByEventName(String userId,String eventName, String token);
+
+    /**
+     * 筛选已完成的事件
+     * @param receivedEventConditions
+     * @param token
+     * @return
+     */
+    Dto filtrateCompletedEvents(ReceivedEventConditions receivedEventConditions, String token);
+
+    /**
+     * 查询用户未完成的事件
+     * @param userId
+     * @param token
+     * @return
+     */
+    Dto showUnfinishedEvents(String userId, String token);
+
+    /**
+     * 根据事件标题查询用户未完成的事件
+     * @param eventName
+     * @param token
+     * @return
+     */
+    Dto searchUnfinishedEventsByEventName(String eventName, String token);
+
+    /**
+     * 筛选用户未完成的事件
+     * @param receivedEventConditions
+     * @param token
+     * @return
+     */
+    Dto filtrateUnfinishedEvents(ReceivedEventConditions receivedEventConditions, String token);
+
+    /**
+     * 数据统计
+     * @param userId
+     * @param token
+     * @return
+     */
+    Dto statisticAnalysisOfData(String userId, String token);
+
+    /**
      * 查询用户的成就
      * @param userId
      * @param token
@@ -47,16 +96,4 @@ public interface UserInfoService {
      * @return
      */
     List<String> queryUserAchievementInBase(String userId);
-
-    Dto searchCompletedEventsByEventName(String eventName, String token);
-
-    Dto filtrateCompletedEvents(ReceivedEventConditions receivedEventConditions, String token);
-
-    Dto showUnfinishedEvents(String userId, String token);
-
-    Dto searchUnfinishedEventsByEventName(String eventName, String token);
-
-    Dto filtrateUnfinishedEvents(ReceivedEventConditions receivedEventConditions, String token);
-
-    Dto statisticAnalysisOfData(String userId, String token);
 }

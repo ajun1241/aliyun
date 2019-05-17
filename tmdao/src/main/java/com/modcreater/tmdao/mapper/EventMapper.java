@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.vo.eventvo.DraftVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -171,13 +172,39 @@ public interface EventMapper {
     List<Integer> queryDays(SingleEvent singleEvent);
 
     /**
-     * 根据userId和eventId查询单一事件表
+     * 根据userId和eventId查询单一事件表(未完成事件)
      * @param singleEvent
      * @return
      */
     SingleEvent querySingleEvent(SingleEvent singleEvent);
 
+    /**
+     * 根据userId和eventId查询重复事件表(未完成事件)
+     * @param singleEvent
+     * @return
+     */
     SingleEvent queryLoopSingleEvent(SingleEvent singleEvent);
 
-    List<ShowCompletedEvents> queryUserCompletedEventsByStartDate();
+    /**
+     * 根据userId和完成状态查询单一事件表
+     * @param userId
+     * @param isOverdue
+     * @return
+     */
+    List<SingleEvent> queryUserEventsByStartDate(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
+
+    /**
+     * 根据userId和完成状态查询重复事件表
+     * @param userId
+     * @param isOverdue
+     * @return
+     */
+    List<SingleEvent> queryUserLoopEventsByStartDate(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
+
+    /**
+     * 根据用户ID,事件状态和事件名称模糊查询
+     * @param singleEvent
+     * @return
+     */
+    List<SingleEvent> searchEventsByEventName(SingleEvent singleEvent);
 }

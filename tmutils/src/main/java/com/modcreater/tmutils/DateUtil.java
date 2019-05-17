@@ -45,4 +45,19 @@ public class DateUtil {
         }
         return week;
     }
+
+    /**
+     * 获取今天的周
+     * @return
+     */
+    public static int getTodayWeek(){
+        Calendar calendar = Calendar.getInstance();
+        Date date = new Date();
+        calendar.setTime(date);
+        int week = calendar.get(Calendar.DAY_OF_WEEK)-1;
+        if (week == 0){
+            week = 7;
+        }
+        return week;
+    }
 }
