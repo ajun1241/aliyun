@@ -13,4 +13,10 @@ public class AddPwdVo implements Serializable {
     private String userPassword;
     private String userName;
     private String headImgUrl;
+
+    private String IDCard;
+    private String realName;
+    private String userAddress;
+
+    private String appType;
 }

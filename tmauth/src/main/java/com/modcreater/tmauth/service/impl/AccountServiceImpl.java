@@ -2,7 +2,6 @@ package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.exception.MyException;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.Achievement;
 import com.modcreater.tmbeans.pojo.UserStatistics;
@@ -16,7 +15,7 @@ import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
-import com.modcreater.tmutils.RongCloudUtil;
+import com.modcreater.tmutils.RongCloudMethodUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +67,8 @@ public class AccountServiceImpl implements AccountService {
         accountVo.setUserType(account.getUserType());
         return DtoUtil.getSuccesWithDataDto("登录成功!",accountVo,100000);
     }
+
+
     /**
      * 注册/登录
      * @param loginVo
@@ -96,9 +97,9 @@ public class AccountServiceImpl implements AccountService {
             }
             //登录
             //生成token
-            RongCloudUtil rongCloudUtil =new RongCloudUtil();
+            RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
             try {
-                token= rongCloudUtil.createToken(result.getId().toString(),result.getUserName(),result.getHeadImgUrl());
+                token= rongCloudMethodUtil.createToken(result.getId().toString(),result.getUserName(),result.getHeadImgUrl());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -120,7 +121,7 @@ public class AccountServiceImpl implements AccountService {
         //未注册时
         account.setUserCode(loginVo.getUserCode());
         account.setUserType(loginVo.getUserType());
-        account.setUserName("智秀新用户");
+        account.setUserName(loginVo.getUserCode());
         account.setGender(0L);
         try {
             account.setBirthday(DateUtil.dateToStamp(new Date()));
@@ -135,6 +136,8 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("注册失败！",14003);
         }
         result= accountMapper.checkCode(loginVo.getUserCode());
+        //注册时添加用户权限信息
+        accountMapper.insertUserRight(result.getId().toString());
         if (ObjectUtils.isEmpty(result)){
             return DtoUtil.getFalseDto("注册时查找用户失败",14004);
         }
@@ -158,9 +161,9 @@ public class AccountServiceImpl implements AccountService {
         }
         //生成token
         String token=null;
-        RongCloudUtil rongCloudUtil =new RongCloudUtil();
+        RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
         try {
-            token= rongCloudUtil.createToken(addPwdVo.getUserId(),addPwdVo.getUserName(),addPwdVo.getHeadImgUrl());
+            token= rongCloudMethodUtil.createToken(addPwdVo.getUserId(),addPwdVo.getUserName(),addPwdVo.getHeadImgUrl());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,8 +177,21 @@ public class AccountServiceImpl implements AccountService {
         account.setIsFirst(1);
         //把token保存在redis
         stringRedisTemplate.opsForValue().set(addPwdVo.getUserId(),token);
-        if (accountMapper.updateAccount(account)<=0){
-            return DtoUtil.getFalseDto("添加密码失败",15003);
+        //没有实名认证
+        if (StringUtils.isEmpty(addPwdVo.getIDCard())&&StringUtils.isEmpty(addPwdVo.getRealName())&&StringUtils.isEmpty(addPwdVo.getUserAddress())){
+            if (accountMapper.updateAccount(account)<=0){
+                return DtoUtil.getFalseDto("添加密码失败",15003);
+            }
+        }else {
+            //有实名认证
+            account.setIDCard(addPwdVo.getIDCard());
+            account.setRealName(addPwdVo.getRealName());
+            account.setUserAddress(addPwdVo.getUserAddress());
+            if (accountMapper.updateAccount(account)<=0){
+                return DtoUtil.getFalseDto("添加密码失败",15003);
+            }
+            //更改实名认证状态(认证中)
+            accountMapper.updRealName(addPwdVo.getUserId(),"1");
         }
         account=accountMapper.queryAccount(addPwdVo.getUserId());
         return DtoUtil.getSuccesWithDataDto("添加密码成功",account,100000);
@@ -204,6 +220,13 @@ public class AccountServiceImpl implements AccountService {
         }
         return DtoUtil.getSuccesWithDataDto("搜索好友成功",account,100000);
     }
+
+    @Override
+    public Dto sendFriendRequest() {
+        return null;
+    }
+
+
     /**
      * 建立好友关系
      * @param buildFriendshipVo

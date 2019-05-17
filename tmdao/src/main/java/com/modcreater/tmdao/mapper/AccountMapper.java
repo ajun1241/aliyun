@@ -103,6 +103,21 @@ public interface AccountMapper {
     int deleteFriendship(DeleteFriendshipVo deleteFriendshipVo);
 
     /**
+     * 增加实名认证
+     * @param userId
+     * @param realNameAuthentication
+     * @return
+     */
+    int updRealName(@Param("userId") String userId,@Param("realNameAuthentication") String realNameAuthentication);
+
+    /**
+     * 注册时增加用户权限表信息
+     * @param userId
+     * @return
+     */
+    int insertUserRight(String userId);
+
+    /**
      * 根据用户ID查询用户名称头像及头像
      * @param userId
      * @return

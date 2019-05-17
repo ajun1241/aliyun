@@ -58,6 +58,7 @@ public interface AccountService {
     Dto updateTimeStamp(String date);*/
 
 
+
     /**
      * 根据账号搜索好友
      * @param queFridenVo
@@ -65,6 +66,10 @@ public interface AccountService {
      * @return
      */
     Dto queryFriendByUserCode(QueFridenVo queFridenVo, String token);
+
+
+    Dto sendFriendRequest();
+
 
     /**
      * 建立好友关系
