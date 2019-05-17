@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.pojo.UserStatistics;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,11 +34,32 @@ public interface AchievementMapper {
     UserStatistics queryUserStatistics(String userId);
 
     /**
+     * 根据用户ID查询该用户的"上一次操作时间"
+     * @param userId
+     * @return
+     */
+    Long queryUserStatisticsDate(String userId);
+
+    /**
      * 查询成就完成条件
      * @return
      */
     List<Achievement> queryAchievement();
 
+    /**
+     * 为用户添加一个新的成就
+     * @param id
+     * @param userId
+     * @return
+     */
     int addNewAchievement(@Param("id") Long id, @Param("userId") String userId);
+
+    /**
+     * 修改用户统计表
+     * @param userStatistics
+     * @param userId
+     * @return
+     */
+    int updateUserStatistics(@Param("userStatistics") UserStatistics userStatistics ,@Param("userId") String userId);
 
 }

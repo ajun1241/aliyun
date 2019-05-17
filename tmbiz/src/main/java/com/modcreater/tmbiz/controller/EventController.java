@@ -1,11 +1,8 @@
 package com.modcreater.tmbiz.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.pojo.SingleEvent;
-import com.modcreater.tmbeans.vo.*;
+import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbiz.service.EventService;
-import com.modcreater.tmdao.mapper.EventMapper;
-import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,7 +38,7 @@ public class EventController {
     }
 
     /**
-     * 删除一条事件
+     * 修改事件状态
      *
      * @param deleteEventVo
      * @return

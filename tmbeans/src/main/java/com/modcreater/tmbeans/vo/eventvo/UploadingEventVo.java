@@ -1,7 +1,9 @@
-package com.modcreater.tmbeans.vo;
+package com.modcreater.tmbeans.vo.eventvo;
 
+import com.modcreater.tmbeans.pojo.SingleEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.ibatis.annotations.Param;
 
 import java.io.Serializable;
 
@@ -11,21 +13,14 @@ import java.io.Serializable;
  *
  * @Author: Goku_yi
  * @Date: 2019-04-30
- * Time: 16:31
+ * Time: 16:05
  */
 @Data
-public class DeleteEventVo implements Serializable {
+public class UploadingEventVo implements Serializable {
     /**
      * 用户ID
      */
     private String userId;
-    /**
-     * 事件ID(1904301700)
-     */
-    private String eventId;
-    /**
-     *
-     */
+    private String singleEvent;
     private String apptype;
-
 }

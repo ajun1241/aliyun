@@ -108,4 +108,9 @@
     <delete id="deleteFriendship" parameterType="com.modcreater.tmbeans.vo.uservo.DeleteFriendshipVo">
         delete from friendship where userId=#{userId} and friendId=#{friendId}
     </delete>
+
+    <select id="queryUserDetails" resultType="com.modcreater.tmbeans.show.userinfo.ShowUserDetails">
+        select userName,userSign,headImgUrl "userHeadPortrait" from account where id = #{userId}
+    </select>
+
 </mapper>

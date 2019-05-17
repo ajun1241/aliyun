@@ -49,14 +49,6 @@ public interface AccountService {
      */
     Dto addPassword(AddPwdVo addPwdVo);
 
-    /**
-     * 查询用户的成就
-     * @param userId
-     * @param token
-     * @return
-     */
-    Dto queryUserAchievement(String userId,String token);
-
 
    /* *//**
      *执行操作时修改时间戳
@@ -64,8 +56,6 @@ public interface AccountService {
      * @return
      *//*
     Dto updateTimeStamp(String date);*/
-
-
 
 
     /**

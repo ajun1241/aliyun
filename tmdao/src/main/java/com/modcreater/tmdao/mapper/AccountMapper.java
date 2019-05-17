@@ -2,6 +2,7 @@ package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Account;
+import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.uservo.BuildFriendshipVo;
@@ -100,4 +101,11 @@ public interface AccountMapper {
      * @return
      */
     int deleteFriendship(DeleteFriendshipVo deleteFriendshipVo);
+
+    /**
+     * 根据用户ID查询用户名称头像及头像
+     * @param userId
+     * @return
+     */
+    ShowUserDetails queryUserDetails(String userId);
 }

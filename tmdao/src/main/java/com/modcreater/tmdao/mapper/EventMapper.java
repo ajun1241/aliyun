@@ -1,7 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
-import com.modcreater.tmbeans.vo.DraftVo;
+import com.modcreater.tmbeans.vo.eventvo.DraftVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.ArrayList;

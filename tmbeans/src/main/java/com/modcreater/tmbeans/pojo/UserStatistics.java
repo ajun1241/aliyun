@@ -2,6 +2,8 @@ package com.modcreater.tmbeans.pojo;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -36,5 +38,9 @@ public class UserStatistics {
      *草稿箱内的事件
      */
     private Long drafts;
+    /**
+     * 最后操作(按天查询)的时间
+     */
+    private Long lastOperatedTime;
 
 }

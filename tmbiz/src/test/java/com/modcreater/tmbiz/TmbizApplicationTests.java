@@ -1,12 +1,9 @@
 package com.modcreater.tmbiz;
 
 //import com.modcreater.tmbeans.pojo.TestSingEvent;
-import com.alibaba.fastjson.JSONObject;
-import com.modcreater.tmbeans.vo.DayEvents;
-import com.modcreater.tmbeans.vo.UploadingEventVo;
+import com.modcreater.tmbeans.vo.eventvo.UploadingEventVo;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
-import com.modcreater.tmutils.SingleEventUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,9 +11,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 

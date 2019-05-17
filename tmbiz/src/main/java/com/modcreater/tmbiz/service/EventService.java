@@ -1,9 +1,7 @@
 package com.modcreater.tmbiz.service;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.vo.*;
-
-import java.util.List;
+import com.modcreater.tmbeans.vo.eventvo.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,7 +29,7 @@ public interface EventService {
      * @param token
      * @return
      */
-    Dto deleteEvents(DeleteEventVo deleteEventVo,String token);
+    Dto deleteEvents(DeleteEventVo deleteEventVo, String token);
 
     /**
      * 修改事件
@@ -49,7 +47,7 @@ public interface EventService {
      * @param token
      * @return
      */
-    Dto synchronousUpdate(SynchronousUpdateVo synchronousUpdateVo,String token);
+    Dto synchronousUpdate(SynchronousUpdateVo synchronousUpdateVo, String token);
 
     /**
      * 对比时间戳
@@ -58,7 +56,7 @@ public interface EventService {
      *@param token
      * @return
      */
-    Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo,String token);
+    Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo, String token);
 
     /**
      * 第一次同步
@@ -74,14 +72,14 @@ public interface EventService {
      * @param token
      * @return
      */
-    Dto uplDraft(DraftVo draftVo,String token);
+    Dto uplDraft(DraftVo draftVo, String token);
     /**
      * 根据日期查询事件并排序(单位:日)
      * @param searchEventVo
      * @param token
      * @return
      */
-    Dto searchByDayEventIds(SearchEventVo searchEventVo,String token);
+    Dto searchByDayEventIds(SearchEventVo searchEventVo, String token);
 
     /**
      * 根据日期查询事件并排序(单位:月)

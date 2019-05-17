@@ -41,9 +41,6 @@ public class AccountServiceImpl implements AccountService {
     private static Pattern pattern = Pattern.compile("[0-9]*");
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
-    @Resource
-    private AchievementMapper achievementMapper;
     @Override
     public Dto doLogin(LoginVo loginVo) {
         if (ObjectUtils.isEmpty(loginVo)){
@@ -307,37 +304,6 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("删除好友失败",16008);
         }
         return DtoUtil.getSuccessDto("删除好友成功",100000);
-    }
-
-    @Override
-    public Dto queryUserAchievement(String userId, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        /**
-         * 在此查询用户统计表,并判断该用户是否完成某个成就
-         */
-        UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
-        List<Achievement> achievementList = achievementMapper.queryAchievement();
-        if (!ObjectUtils.isEmpty(userStatistics) && !ObjectUtils.isEmpty(achievementList)) {
-            for (Achievement achievement : achievementList) {
-                if (userStatistics.getLoggedDays() == (achievement.getLoggedDaysCondition()).longValue()) {
-                    achievementMapper.addNewAchievement(achievement.getId(),userId);
-                }
-                if (userStatistics.getCompleted() == achievement.getFinishedEventsCondition().longValue()){
-                    achievementMapper.addNewAchievement(achievement.getId(),userId);
-                }
-            }
-        }
-        List<String> imgUrlList = achievementMapper.searchAllAchievement(userId);
-        if (imgUrlList.size() == 0) {
-            return DtoUtil.getFalseDto("该用户没有成就", 100000);
-        }
-        return DtoUtil.getSuccesWithDataDto("查询用户成就成功",imgUrlList,100000);
     }
 
 

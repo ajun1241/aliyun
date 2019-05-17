@@ -1,4 +1,4 @@
-package com.modcreater.tmbeans.vo;
+package com.modcreater.tmbeans.vo.eventvo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -2,10 +2,12 @@ package com.modcreater.tmbiz.service.impl;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
-import com.modcreater.tmbeans.vo.*;
+import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.AccountMapper;
+import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
@@ -37,6 +39,9 @@ public class EventServiceImpl implements EventService {
 
     @Resource
     private AccountMapper accountMapper;
+
+    @Resource
+    private AchievementMapper achievementMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -108,7 +113,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto deleteEvents(DeleteEventVo deleteEventVo,String token) {
+    public Dto deleteEvents(DeleteEventVo deleteEventVo, String token) {
         if (StringUtils.hasText(deleteEventVo.getUserId())) {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
@@ -121,12 +126,18 @@ public class EventServiceImpl implements EventService {
                 SingleEvent singleEvent = new SingleEvent();
                 singleEvent.setUserid(Long.valueOf(deleteEventVo.getUserId()));
                 singleEvent.setEventid(Long.valueOf(deleteEventVo.getEventId()));
-                if (eventMapper.withdrawEventsByUserId(singleEvent) > 0 || eventMapper.withdrawLoopEventsByUserId(singleEvent) > 0) {
-                    return DtoUtil.getSuccessDto("删除成功", 100000);
+                singleEvent.setIsOverdue(Long.valueOf(deleteEventVo.getEventStatus()));
+                if (singleEvent.getIsOverdue() == 1){
+                    UserStatistics userStatistics = new UserStatistics();
+                    userStatistics.setCompleted(1L);
+                    achievementMapper.updateUserStatistics(userStatistics,singleEvent.getUserid().toString());
                 }
-                return DtoUtil.getFalseDto("删除事件失败", 21005);
+                if (eventMapper.withdrawEventsByUserId(singleEvent) > 0 || eventMapper.withdrawLoopEventsByUserId(singleEvent) > 0) {
+                    return DtoUtil.getSuccessDto("修改事件状态成功", 100000);
+                }
+                return DtoUtil.getFalseDto("修改事件状态失败", 21005);
             }
-            return DtoUtil.getFalseDto("删除条件接收失败", 21006);
+            return DtoUtil.getFalseDto("修改事件状态接收失败", 21006);
         }
         return DtoUtil.getFalseDto("请先登录", 21011);
     }
@@ -272,7 +283,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo,String token) {
+    public Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo, String token) {
         if (ObjectUtils.isEmpty(contrastTimestampVo)) {
             return DtoUtil.getFalseDto("时间戳获取失败", 24001);
         }
@@ -375,7 +386,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto uplDraft(DraftVo draftVo,String token) {
+    public Dto uplDraft(DraftVo draftVo, String token) {
         if (ObjectUtils.isEmpty(draftVo)) {
             return DtoUtil.getFalseDto("上传草稿未获取到", 27001);
         }
@@ -397,7 +408,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto searchByDayEventIds(SearchEventVo searchEventVo,String token) {
+    public Dto searchByDayEventIds(SearchEventVo searchEventVo, String token) {
         if (StringUtils.hasText(searchEventVo.getUserId())) {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
@@ -478,6 +489,22 @@ public class EventServiceImpl implements EventService {
             }
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
                 System.out.println("按月查" + searchEventVo.toString());
+                //用户操作界面,记录时间
+                //查询上一次用户操作过的时间
+                Long lastUserStatisticsDate = achievementMapper.queryUserStatisticsDate(searchEventVo.getUserId());
+                //生成系统时间
+                Long now = System.currentTimeMillis();
+                UserStatistics userStatistics = new UserStatistics();
+                userStatistics.setLastOperatedTime(now);
+                //将本次操作的事件更新到用户统计表
+                achievementMapper.updateUserStatistics(userStatistics,searchEventVo.getUserId());
+                //如果当前操作时间与用户上一次操作的时间的差值大于一天则更改用户统计表中的登录天数
+                if ((now - lastUserStatisticsDate) >= 86400000){
+                    UserStatistics userStatisticsForLogin = new UserStatistics();
+                    userStatisticsForLogin.setLoggedDays(1L);
+                    achievementMapper.updateUserStatistics(userStatisticsForLogin,searchEventVo.getUserId());
+                }
+
                 SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
                 //查询在该月内存在事件的日的集合
                 List<Integer> days = eventMapper.queryDays(singleEvent);

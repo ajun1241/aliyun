@@ -61,11 +61,11 @@
     </insert>
 
     <update id="withdrawEventsByUserId">
-        update singleevent set isOverdue = 2 where eventId = #{eventid} and userId = #{userid} and isOverdue &lt;&gt; 2
+        update singleevent set isOverdue = #{isOverdue} where eventId = #{eventid} and userId = #{userid} and isOverdue &lt;&gt; 2
     </update>
 
     <update id="withdrawLoopEventsByUserId">
-        update loopevent set isOverdue = 2 where eventId = #{eventid} and userId = #{userid} and isOverdue &lt;&gt; 2
+        update loopevent set isOverdue = #{isOverdue} where eventId = #{eventid} and userId = #{userid} and isOverdue &lt;&gt; 2
     </update>
 
     <update id="alterEventsByUserId">
@@ -208,7 +208,7 @@
         select count(1) from singleevent where userId=#{userId}
     </select>
 
-    <insert id="uplDraft" parameterType="com.modcreater.tmbeans.vo.DraftVo">
+    <insert id="uplDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo">
         insert into draft values
         (null ,
         #{phoneNum},
@@ -261,7 +261,7 @@
         select <include refid="Base_Column_List"/> from loopevent where userid=#{userid} and eventid = #{eventid} and isOverdue = 0
     </select>
 
-    <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.DraftVo" >
+    <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo" >
         update draft set `data`=concat(`data`,#{data})
         where phoneNum=#{phoneNum}
     </update>
