@@ -13,6 +13,10 @@ import lombok.Data;
 @Data
 public class ReceivedEventConditions {
     /**
+     * 用户ID
+     */
+    private String userId;
+    /**
      * 开始日期(20190517)
      */
     private String startDate;

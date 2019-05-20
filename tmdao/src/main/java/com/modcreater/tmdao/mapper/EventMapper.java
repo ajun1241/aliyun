@@ -3,6 +3,7 @@ package com.modcreater.tmdao.mapper;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.vo.eventvo.DraftVo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -207,4 +208,12 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> searchEventsByEventName(SingleEvent singleEvent);
+
+    /**
+     * 根据筛选条件查询事件
+     * @param singleEvent
+     * @param isOverdue
+     * @return
+     */
+    List<SingleEvent> queryCompletedEventsByConditions(@Param("singleEvent") SingleEvent singleEvent,@Param("isOverdue") String isOverdue);
 }

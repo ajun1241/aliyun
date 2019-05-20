@@ -73,7 +73,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             result.put("imgUrlList",imgUrlList);
             return DtoUtil.getSuccesWithDataDto("查询用户详情成功",result,100000);
         }
-        return DtoUtil.getFalseDto("查询用户详情失败",40001);
+        return DtoUtil.getSuccessDto("没有查询到用户信息",100000);
     }
 
     @Override
@@ -179,7 +179,52 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto filtrateCompletedEvents(ReceivedEventConditions receivedEventConditions, String token) {
-        return null;
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(receivedEventConditions)){
+            return DtoUtil.getFalseDto("筛选条件接收失败",40002);
+        }
+        if (!StringUtils.hasText(receivedEventConditions.getStartTime())){
+            return DtoUtil.getFalseDto("开始时间不能为空",40001);
+        }
+        if (!StringUtils.hasText(receivedEventConditions.getEndTime())){
+            return DtoUtil.getFalseDto("结束时间不能为空",40004);
+        }
+        String redisToken=stringRedisTemplate.opsForValue().get(receivedEventConditions.getUserId());
+        if (!token.equals(redisToken)){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        SingleEvent singleEventCondition = new SingleEvent();
+        singleEventCondition.setType(Long.valueOf(receivedEventConditions.getEventType()));
+        singleEventCondition.setLevel(Long.valueOf(receivedEventConditions.getEventLevel()));
+        singleEventCondition.setStarttime(receivedEventConditions.getStartTime());
+        singleEventCondition.setEndtime(receivedEventConditions.getEndTime());
+        singleEventCondition.setPerson(receivedEventConditions.getPerson());
+        if (receivedEventConditions.getStartDate().length() != 8){
+            return DtoUtil.getFalseDto("日期格式异常",40003);
+        }
+        StringBuilder startDate = new StringBuilder(receivedEventConditions.getStartDate());
+        singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
+        singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
+        singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
+        List<SingleEvent> singleEventList = eventMapper.queryCompletedEventsByConditions(singleEventCondition,"1");
+        /**
+         * 可能要做重复事件
+         */
+        if (singleEventList.size() != 0){
+            List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
+            for (SingleEvent singleEvent : singleEventList){
+                ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
+                showCompletedEvents.setEventId(singleEvent.getEventid().toString());
+                showCompletedEvents.setUserId(singleEvent.getUserid().toString());
+                showCompletedEvents.setEventName(singleEvent.getEventname());
+                showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
+                showCompletedEventsList.add(showCompletedEvents);
+            }
+            return DtoUtil.getSuccesWithDataDto("筛选已完成事件成功",showCompletedEventsList,100000);
+        }
+        return DtoUtil.getSuccessDto("没有查询到事件",100000);
     }
 
     @Override

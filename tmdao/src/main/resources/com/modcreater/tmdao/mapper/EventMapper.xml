@@ -278,6 +278,38 @@
         and eventName like "%"#{eventname}"%"
         order by year desc,month desc,day desc
     </select>
+    <select id="queryCompletedEventsByConditions" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select eventId,userId,eventName,day,month,year
+        from singleevent
+        <where>
+            <if test="singleEvent.type != null and  singleEvent.type != ''">
+                type = #{singleEvent.type}
+            </if>
+            <if test="singleEvent.level != null and  singleEvent.level != ''">
+                and level = #{singleEvent.level}
+            </if>
+            <if test="singleEvent.person != null and  singleEvent.person != ''">
+                and person = #{singleEvent.person}
+            </if>
+            <if test="singleEvent.year != null and  singleEvent.year != ''">
+                and year = #{singleEvent.year}
+            </if>
+            <if test="singleEvent.month != null and  singleEvent.month != ''">
+                and month = #{singleEvent.month}
+            </if>
+            <if test="singleEvent.day != null and  singleEvent.day != ''">
+                and day = #{singleEvent.day}
+            </if>
+            <if test="isOverdue != null and isOverdue != ''">
+                and isOverdue = #{isOverdue}
+            </if>
+        </where>
+        and ((startTime &lt;= #{singleEvent.starttime} and startTime &gt;= #{singleEvent.endtime}) or
+        (endTime &gt;= #{singleEvent.starttime} and endTime &lt;= #{singleEvent.endtime}) or
+        (startTime &lt;= #{singleEvent.starttime} and endTime &gt;= #{singleEvent.endtime}) or
+        (startTime &gt;= #{singleEvent.starttime} and endTime &lt;= #{singleEvent.endtime}))
+        order by year desc,month desc,day desc
+    </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo" >
         update draft set `data`=concat(`data`,#{data})
