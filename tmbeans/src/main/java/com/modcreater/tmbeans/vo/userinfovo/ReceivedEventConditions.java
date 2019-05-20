@@ -40,6 +40,10 @@ public class ReceivedEventConditions {
      * 相关人员
      */
     private String person;
+    /**
+     * 事件状态
+     */
+    private String isOverdue;
 
     private String appType;
 }

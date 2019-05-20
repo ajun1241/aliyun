@@ -3,9 +3,9 @@ package com.modcreater.tmauth.controller;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdName;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedFiltrateUserEvents;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
 import com.modcreater.tmbeans.vo.uservo.UserIdVo;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,24 +42,24 @@ public class UserInfoController {
 
     /**
      * 显示用户已完成事件
-     * @param userIdVo
+     * @param receivedIdIsOverdue
      * @param request
      * @return
      */
-    @RequestMapping(value = "showcompletedevents",method = RequestMethod.POST)
-    public Dto showCompletedEvents(@RequestBody UserIdVo userIdVo,HttpServletRequest request){
-        return userInfoService.showCompletedEvents(userIdVo.getUserId(),request.getHeader("token"));
+    @RequestMapping(value = "showuserevents",method = RequestMethod.POST)
+    public Dto showUserEvents(@RequestBody ReceivedIdIsOverdue receivedIdIsOverdue, HttpServletRequest request){
+        return userInfoService.showUserEvents(receivedIdIsOverdue.getUserId(),receivedIdIsOverdue.getIsOverdue(),request.getHeader("token"));
     }
 
     /**
      * 根据事件名称查询事件
-     * @param receivedIdName
+     * @param receivedFiltrateUserEvents
      * @param request
      * @return
      */
-    @RequestMapping(value = "searchcompletedeventsbyeventname",method = RequestMethod.POST)
-    public Dto searchCompletedEventsByEventName(@RequestBody ReceivedIdName receivedIdName, HttpServletRequest request){
-        return userInfoService.searchCompletedEventsByEventName(receivedIdName.getUserId(),receivedIdName.getEventName(),request.getHeader("token"));
+    @RequestMapping(value = "searchusereventsbyeventname",method = RequestMethod.POST)
+    public Dto searchUserEventsByEventName(@RequestBody ReceivedFiltrateUserEvents receivedFiltrateUserEvents, HttpServletRequest request){
+        return userInfoService.searchUserEventsByEventName(receivedFiltrateUserEvents.getUserId(),receivedFiltrateUserEvents.getEventName(),receivedFiltrateUserEvents.getIsOverdue(),request.getHeader("token"));
     }
 
     /**
@@ -68,42 +68,9 @@ public class UserInfoController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "filtratecompletedevents",method = RequestMethod.POST)
-    public Dto filtrateCompletedEvents(@RequestBody ReceivedEventConditions receivedEventConditions,HttpServletRequest request){
-        return userInfoService.filtrateCompletedEvents(receivedEventConditions,request.getHeader("token"));
-    }
-
-    /**
-     * 显示用户未完成的事件
-     * @param userIdVo
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "showunfinishedevents",method = RequestMethod.POST)
-    public Dto showUnfinishedEvents(@RequestBody UserIdVo userIdVo,HttpServletRequest request){
-        return userInfoService.showUnfinishedEvents(userIdVo.getUserId(),request.getHeader("token"));
-    }
-
-    /**
-     * 根据事件名称查询用户未完成的事件
-     * @param receivedIdName
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "searchunfinishedeventsbyeventname",method = RequestMethod.POST)
-    public Dto searchUnfinishedEventsByEventName(@RequestBody ReceivedIdName receivedIdName,HttpServletRequest request){
-        return userInfoService.searchUnfinishedEventsByEventName(receivedIdName.getUserId(),receivedIdName.getEventName(),request.getHeader("token"));
-    }
-
-    /**
-     * 筛选用户未完成的事件
-     * @param receivedEventConditions
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "filtrateunfinishedevents",method = RequestMethod.POST)
-    public Dto filtrateUnfinishedEvents(@RequestBody ReceivedEventConditions receivedEventConditions ,String appType,HttpServletRequest request){
-        return userInfoService.filtrateUnfinishedEvents(receivedEventConditions,request.getHeader("token"));
+    @RequestMapping(value = "filtrateuserevents",method = RequestMethod.POST)
+    public Dto filtrateUserEvents(@RequestBody ReceivedEventConditions receivedEventConditions,HttpServletRequest request){
+        return userInfoService.filtrateUserEvents(receivedEventConditions,request.getHeader("token"));
     }
 
     /**
@@ -128,5 +95,38 @@ public class UserInfoController {
     public Dto queryUserAchievement(@RequestBody UserIdVo userIdVo,HttpServletRequest httpServletRequest){
         return userInfoService.queryUserAchievement(userIdVo.getUserId(),httpServletRequest.getHeader("token"));
     }
+
+    /**
+     * 显示用户未完成的事件
+     * @param userIdVo
+     * @param request
+     * @return
+     *//*
+    @RequestMapping(value = "showunfinishedevents",method = RequestMethod.POST)
+    public Dto showUnfinishedEvents(@RequestBody UserIdVo userIdVo,HttpServletRequest request){
+        return userInfoService.showUnfinishedEvents(userIdVo.getUserId(),request.getHeader("token"));
+    }
+
+    *//**
+     * 根据事件名称查询用户未完成的事件
+     * @param receivedIdName
+     * @param request
+     * @return
+     *//*
+    @RequestMapping(value = "searchunfinishedeventsbyeventname",method = RequestMethod.POST)
+    public Dto searchUnfinishedEventsByEventName(@RequestBody ReceivedIdName receivedIdName,HttpServletRequest request){
+        return userInfoService.searchUnfinishedEventsByEventName(receivedIdName.getUserId(),receivedIdName.getEventName(),request.getHeader("token"));
+    }
+
+    *//**
+     * 筛选用户未完成的事件
+     * @param receivedEventConditions
+     * @param request
+     * @return
+     *//*
+    @RequestMapping(value = "filtrateunfinishedevents",method = RequestMethod.POST)
+    public Dto filtrateUnfinishedEvents(@RequestBody ReceivedEventConditions receivedEventConditions ,String appType,HttpServletRequest request){
+        return userInfoService.filtrateUnfinishedEvents(receivedEventConditions,request.getHeader("token"));
+    }*/
 
 }

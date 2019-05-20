@@ -392,6 +392,21 @@ public class EventServiceImpl implements EventService {
         }
         //查看草稿是否已存在
         String data = eventMapper.queryDraftByPhone(draftVo.getPhoneNum());
+        UserStatistics userStatistics = new UserStatistics();
+        StringBuffer dataNum = new StringBuffer(draftVo.getData());
+        Long times =0L;
+        String condition = "eventid";
+        for(int i=0;i<dataNum.length();i++) {
+            if(dataNum.indexOf(condition, i)!=-1){
+                i=dataNum.indexOf(condition, i);
+                times++;
+            }
+        }
+        userStatistics.setUserId(Long.valueOf(draftVo.getUserId()));
+        userStatistics.setDrafts(times);
+        if (achievementMapper.updateUserStatistics(userStatistics,userStatistics.getUserId().toString()) == 0){
+            return DtoUtil.getFalseDto("草稿箱数据计数失败",27004);
+        }
         if (StringUtils.isEmpty(data)) {
             //第一次上传草稿
             if (eventMapper.uplDraft(draftVo) <= 0) {

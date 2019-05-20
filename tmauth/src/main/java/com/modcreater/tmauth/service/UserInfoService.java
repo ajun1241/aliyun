@@ -27,10 +27,11 @@ public interface UserInfoService {
     /**
      * 查询用户已完成的事件
      * @param userId
+     * @param isOverdue
      * @param token
      * @return
      */
-    Dto showCompletedEvents(String userId, String token);
+    Dto showUserEvents(String userId,String isOverdue, String token);
 
 
     /**
@@ -40,7 +41,7 @@ public interface UserInfoService {
      * @param token
      * @return
      */
-    Dto searchCompletedEventsByEventName(String userId,String eventName, String token);
+    Dto searchUserEventsByEventName(String userId,String eventName,String isOverdue, String token);
 
     /**
      * 筛选已完成的事件
@@ -48,32 +49,7 @@ public interface UserInfoService {
      * @param token
      * @return
      */
-    Dto filtrateCompletedEvents(ReceivedEventConditions receivedEventConditions, String token);
-
-    /**
-     * 查询用户未完成的事件
-     * @param userId
-     * @param token
-     * @return
-     */
-    Dto showUnfinishedEvents(String userId, String token);
-
-    /**
-     * 根据事件标题查询用户未完成的事件
-     * @param userId
-     * @param eventName
-     * @param token
-     * @return
-     */
-    Dto searchUnfinishedEventsByEventName(String userId,String eventName, String token);
-
-    /**
-     * 筛选用户未完成的事件
-     * @param receivedEventConditions
-     * @param token
-     * @return
-     */
-    Dto filtrateUnfinishedEvents(ReceivedEventConditions receivedEventConditions, String token);
+    Dto filtrateUserEvents(ReceivedEventConditions receivedEventConditions, String token);
 
     /**
      * 数据统计
@@ -97,4 +73,29 @@ public interface UserInfoService {
      * @return
      */
     List<String> queryUserAchievementInBase(String userId);
+
+    /**
+     * 查询用户未完成的事件
+     * @param userId
+     * @param token
+     * @return
+     *//*
+    Dto showUnfinishedEvents(String userId, String token);
+
+    *//**
+     * 根据事件标题查询用户未完成的事件
+     * @param userId
+     * @param eventName
+     * @param token
+     * @return
+     *//*
+    Dto searchUnfinishedEventsByEventName(String userId,String eventName, String token);
+
+    *//**
+     * 筛选用户未完成的事件
+     * @param receivedEventConditions
+     * @param token
+     * @return
+     *//*
+    Dto filtrateUnfinishedEvents(ReceivedEventConditions receivedEventConditions, String token);*/
 }

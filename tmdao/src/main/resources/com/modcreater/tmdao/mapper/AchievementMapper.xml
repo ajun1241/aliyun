@@ -12,6 +12,9 @@
     <insert id="addNewAchievement">
         insert into userachievement values (null,#{userId},#{id})
     </insert>
+    <insert id="addNewUserStatistics">
+        insert into userstatistics (userId) values (#{userId})
+    </insert>
     <update id="updateUserStatistics">
         update userstatistics
         <set>

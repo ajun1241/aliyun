@@ -1,11 +1,13 @@
 package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.UserInfoService;
+import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Achievement;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.UserAchievement;
 import com.modcreater.tmbeans.pojo.UserStatistics;
+import com.modcreater.tmbeans.show.ShowUserAnalysis;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
@@ -23,6 +25,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -77,7 +80,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public Dto showCompletedEvents(String userId, String token) {
+    public Dto showUserEvents(String userId,String isOverdue, String token) {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -85,8 +88,11 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
+        if (!StringUtils.hasText(isOverdue)){
+            return DtoUtil.getFalseDto("事件状态未获取到",40005);
+        }
         //查询用户已完成的事件(根据事件排序,只显示7条)
-        /*List<SingleEvent> showCompletedLoopEventsList = eventMapper.queryUserCompletedEventsByStartDate(userId,"2");
+        /*List<SingleEvent> showCompletedLoopEventsList = eventMapper.queryUserCompletedEventsByStartDate(userId,"1");
         DateUtil.stringToWeek(String.valueOf(new Date("yyyyMMdd")));
         if (showCompletedLoopEventsList.size() != 0){
             for (SingleEvent singleEvent : showCompletedLoopEventsList){
@@ -96,7 +102,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
             }
         }*/
-        List<SingleEvent> singleEventList = eventMapper.queryUserEventsByStartDate(userId,"2");
+        List<SingleEvent> singleEventList = eventMapper.queryUserEventsByUserIdIsOverdue(userId,isOverdue);
         if (singleEventList.size() != 0){
             List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
             for (SingleEvent singleEvent : singleEventList){
@@ -107,9 +113,9 @@ public class UserInfoServiceImpl implements UserInfoService {
                 showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
                 showCompletedEventsList.add(showCompletedEvents);
             }
-            return DtoUtil.getSuccesWithDataDto("查询已完成事件成功",showCompletedEventsList,100000);
+            return DtoUtil.getSuccesWithDataDto("查询用户事件成功",showCompletedEventsList,100000);
         }
-        return DtoUtil.getSuccessDto("未查到已完成事件",100000);
+        return DtoUtil.getSuccessDto("未查到用户事件",100000);
     }
 
     @Override
@@ -149,7 +155,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public Dto searchCompletedEventsByEventName(String userId,String eventName, String token) {
+    public Dto searchUserEventsByEventName(String userId,String eventName,String isOverdue, String token) {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -160,7 +166,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         SingleEvent inDataBase = new SingleEvent();
         inDataBase.setUserid(Long.valueOf(userId));
         inDataBase.setEventname(eventName);
-        inDataBase.setIsOverdue(2L);
+        inDataBase.setIsOverdue(Long.valueOf(isOverdue));
         List<SingleEvent> singleEventList = eventMapper.searchEventsByEventName(inDataBase);
         if (singleEventList.size() != 0){
             List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
@@ -178,7 +184,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public Dto filtrateCompletedEvents(ReceivedEventConditions receivedEventConditions, String token) {
+    public Dto filtrateUserEvents(ReceivedEventConditions receivedEventConditions, String token) {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -201,6 +207,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         singleEventCondition.setStarttime(receivedEventConditions.getStartTime());
         singleEventCondition.setEndtime(receivedEventConditions.getEndTime());
         singleEventCondition.setPerson(receivedEventConditions.getPerson());
+        singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         if (receivedEventConditions.getStartDate().length() != 8){
             return DtoUtil.getFalseDto("日期格式异常",40003);
         }
@@ -208,7 +215,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
         singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
         singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
-        List<SingleEvent> singleEventList = eventMapper.queryCompletedEventsByConditions(singleEventCondition,"1");
+        List<SingleEvent> singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
         /**
          * 可能要做重复事件
          */
@@ -228,6 +235,89 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
+    public Dto statisticAnalysisOfData(String userId, String token) {
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
+        }
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+        }
+        ShowUserAnalysis showUserAnalysis = new ShowUserAnalysis();
+        showUserAnalysis.setUserId(userId);
+        //记录单一事件和重复事件的总和
+        Long totalEvents = 0L;
+        //记录单一事件和重复事件的总用时分钟数
+        Long totalMinutes = 0L;
+        Map<Long,String> percentResult = new HashMap<>();
+        Map<Long,Long> totalMinutesResult = new HashMap<>();
+        List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
+        List<GetUserEventsGroupByType> loopTypeList = eventMapper.getUserLoopEventsGroupByType(userId);
+        //控制计算精度
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        //此处判断,如果重复事件和单一事件都有查询结果
+        if (loopTypeList.size() != 0 && typeList.size() != 0) {
+            for (GetUserEventsGroupByType loopType : loopTypeList) {
+                for (GetUserEventsGroupByType type : typeList) {
+                    if (loopType.getType().equals(type.getType())){
+                        //记录时间总和
+                        totalEvents += type.getNum() + loopType.getNum();
+                        //记录用时分钟总和
+                        totalMinutes += type.getTotalMinutes() + loopType.getTotalMinutes();
+                        type.setNum(type.getNum() + loopType.getNum());
+                        type.setTotalMinutes(type.getTotalMinutes() + loopType.getTotalMinutes());
+                    }
+                }
+            }
+            for (GetUserEventsGroupByType type : typeList){
+                percentResult.put(type.getType(),decimalFormat.format((double)type.getNum()/totalEvents));
+                totalMinutesResult.put(type.getType(),type.getTotalMinutes());
+            }
+            Long maxSingleEventType = eventMapper.getMaxSingleEventType(userId);
+            Long maxLoopEventType = eventMapper.getMaxLoopEventType(userId);
+            if (maxSingleEventType > maxLoopEventType){
+                showUserAnalysis.setMaxType(maxSingleEventType);
+            }else {
+                showUserAnalysis.setMaxType(maxLoopEventType);
+            }
+            Long minSingleEventType = eventMapper.getMinSingleEventType(userId);
+            Long minLoopEventType = eventMapper.getMinLoopEventType(userId);
+            if (minSingleEventType < minLoopEventType){
+                showUserAnalysis.setMaxType(minSingleEventType);
+            }else {
+                showUserAnalysis.setMaxType(minLoopEventType);
+            }
+        }else if (loopTypeList.size() != 0 && typeList.size() == 0){
+            for (GetUserEventsGroupByType type : loopTypeList){
+                totalEvents += type.getNum();
+                totalMinutes += type.getTotalMinutes();
+            }
+            for (GetUserEventsGroupByType type : loopTypeList){
+                percentResult.put(type.getType(),decimalFormat.format((double)type.getNum()/totalEvents));
+                totalMinutesResult.put(type.getType(),type.getTotalMinutes());
+            }
+            showUserAnalysis.setMaxType(eventMapper.getMaxLoopEventType(userId));
+            showUserAnalysis.setMinType(eventMapper.getMinLoopEventType(userId));
+        }else if (loopTypeList.size() == 0 && typeList.size() != 0){
+            for (GetUserEventsGroupByType type : typeList){
+                totalEvents += type.getNum();
+                totalMinutes += type.getTotalMinutes();
+            }
+            for (GetUserEventsGroupByType type : typeList){
+                percentResult.put(type.getType(),decimalFormat.format((double)type.getNum()/totalEvents));
+                totalMinutesResult.put(type.getType(),type.getTotalMinutes());
+            }
+            showUserAnalysis.setMaxType(eventMapper.getMaxSingleEventType(userId));
+            showUserAnalysis.setMinType(eventMapper.getMinSingleEventType(userId));
+        }
+        showUserAnalysis.setPercentResult(percentResult);
+        showUserAnalysis.setTotalEvents(totalEvents);
+        showUserAnalysis.setTotalMinutesResult(totalMinutesResult);
+        showUserAnalysis.setSumMinutes(totalMinutes);
+        return DtoUtil.getSuccesWithDataDto("用户数据统计成功",showUserAnalysis,100000);
+    }
+
+    /*@Override
     public Dto showUnfinishedEvents(String userId, String token) {
         return null;
     }
@@ -240,10 +330,5 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public Dto filtrateUnfinishedEvents(ReceivedEventConditions receivedEventConditions, String token) {
         return null;
-    }
-
-    @Override
-    public Dto statisticAnalysisOfData(String userId, String token) {
-        return null;
-    }
+    }*/
 }

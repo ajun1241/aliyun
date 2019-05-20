@@ -11,11 +11,13 @@ import lombok.Data;
  * Time: 17:55
  */
 @Data
-public class ReceivedIdName {
+public class ReceivedFiltrateUserEvents {
 
     private String userId;
 
     private String eventName;
+
+    private String isOverdue;
 
     private String appType;
 

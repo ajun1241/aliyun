@@ -9,6 +9,7 @@ import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
 import com.modcreater.tmbeans.vo.uservo.*;
 import com.modcreater.tmdao.mapper.AccountMapper;
+import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
@@ -38,6 +39,9 @@ public class AccountServiceImpl implements AccountService {
     private AccountMapper accountMapper;
 
     private static Pattern pattern = Pattern.compile("[0-9]*");
+
+    @Resource
+    private AchievementMapper achievementMapper;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -198,6 +202,9 @@ public class AccountServiceImpl implements AccountService {
             accountMapper.updRealName(addPwdVo.getUserId(),"1");
         }
         account=accountMapper.queryAccount(addPwdVo.getUserId());
+        if (achievementMapper.addNewUserStatistics(addPwdVo.getUserId()) == 0){
+            return DtoUtil.getFalseDto("为用户添加计数表失败",15005);
+        }
         return DtoUtil.getSuccesWithDataDto("添加密码成功",account,100000);
     }
 

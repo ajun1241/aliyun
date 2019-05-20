@@ -211,6 +211,7 @@
     <insert id="uplDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo">
         insert into draft values
         (null ,
+        #{userId},
         #{phoneNum},
         #{data}
         )
@@ -260,14 +261,14 @@
     <select id="queryLoopSingleEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select <include refid="Base_Column_List"/> from loopevent where userid=#{userid} and eventid = #{eventid} and isOverdue = 0
     </select>
-    <select id="queryUserEventsByStartDate" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+    <select id="queryUserEventsByUserIdIsOverdue" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select eventId,userId,eventName,day,month,year
         from singleevent
         where userId = #{userId}
         and isOverdue = #{isOverdue}
         order by year desc,month desc,day desc limit 0,7
     </select>
-    <select id="queryUserLoopEventsByStartDate" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+    <select id="queryUserLoopEventsByUserIdIsOverdue" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select eventId,userId,eventName,repeatTime from singleevent where userId = #{userId} and isOverdue = #{isOverdue}
     </select>
     <select id="searchEventsByEventName" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
@@ -278,37 +279,61 @@
         and eventName like "%"#{eventname}"%"
         order by year desc,month desc,day desc
     </select>
-    <select id="queryCompletedEventsByConditions" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+    <select id="queryEventsByConditions" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select eventId,userId,eventName,day,month,year
         from singleevent
         <where>
-            <if test="singleEvent.type != null and  singleEvent.type != ''">
-                type = #{singleEvent.type}
+            <if test="type != null and type != ''">
+                type = #{type}
             </if>
-            <if test="singleEvent.level != null and  singleEvent.level != ''">
-                and level = #{singleEvent.level}
+            <if test="level != null and level != ''">
+                and level = #{level}
             </if>
-            <if test="singleEvent.person != null and  singleEvent.person != ''">
-                and person = #{singleEvent.person}
+            <if test="person != null and person != ''">
+                and person = #{person}
             </if>
-            <if test="singleEvent.year != null and  singleEvent.year != ''">
-                and year = #{singleEvent.year}
+            <if test="year != null and year != ''">
+                and year = #{year}
             </if>
-            <if test="singleEvent.month != null and  singleEvent.month != ''">
-                and month = #{singleEvent.month}
+            <if test="month != null and month != ''">
+                and month = #{month}
             </if>
-            <if test="singleEvent.day != null and  singleEvent.day != ''">
-                and day = #{singleEvent.day}
+            <if test="day != null and day != ''">
+                and day = #{day}
             </if>
-            <if test="isOverdue != null and isOverdue != ''">
+            <if test="isOverdue != null">
                 and isOverdue = #{isOverdue}
             </if>
         </where>
-        and ((startTime &lt;= #{singleEvent.starttime} and startTime &gt;= #{singleEvent.endtime}) or
-        (endTime &gt;= #{singleEvent.starttime} and endTime &lt;= #{singleEvent.endtime}) or
-        (startTime &lt;= #{singleEvent.starttime} and endTime &gt;= #{singleEvent.endtime}) or
-        (startTime &gt;= #{singleEvent.starttime} and endTime &lt;= #{singleEvent.endtime}))
+        and ((startTime &gt;= #{starttime} and startTime &lt;= #{endtime}) or
+        (endTime &gt;= #{starttime} and endTime &lt;= #{endtime}) or
+        (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}) or
+        (startTime &gt;= #{starttime} and endTime &lt;= #{endtime}))
         order by year desc,month desc,day desc
+    </select>
+    <select id="getUserEventsGroupByType" resultType="com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType">
+        select type ,sum(endTime-startTime) totalMinutes ,count(type) num from singleevent
+        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1) group by type
+    </select>
+    <select id="getUserLoopEventsGroupByType" resultType="com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType">
+        select type ,sum(endTime-startTime) totalMinutes ,count(type) num from loopevent
+        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1) group by type
+    </select>
+    <select id="getMaxSingleEventType" resultType="java.lang.Long">
+        select max(endTime-startTime) from singleevent
+        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1)
+    </select>
+    <select id="getMaxLoopEventType" resultType="java.lang.Long">
+        select max(endTime-startTime) from loopevent
+        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1)
+    </select>
+    <select id="getMinSingleEventType" resultType="java.lang.Long">
+        select min(endTime-startTime) from singleevent
+        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1)
+    </select>
+    <select id="getMinLoopEventType" resultType="java.lang.Long">
+        select min(endTime-startTime) from loopevent
+        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1)
     </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo" >

@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.vo.eventvo.DraftVo;
@@ -192,7 +193,7 @@ public interface EventMapper {
      * @param isOverdue
      * @return
      */
-    List<SingleEvent> queryUserEventsByStartDate(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
+    List<SingleEvent> queryUserEventsByUserIdIsOverdue(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
 
     /**
      * 根据userId和完成状态查询重复事件表
@@ -200,7 +201,7 @@ public interface EventMapper {
      * @param isOverdue
      * @return
      */
-    List<SingleEvent> queryUserLoopEventsByStartDate(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
+    List<SingleEvent> queryUserLoopEventsByUserIdIsOverdue(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
 
     /**
      * 根据用户ID,事件状态和事件名称模糊查询
@@ -212,8 +213,49 @@ public interface EventMapper {
     /**
      * 根据筛选条件查询事件
      * @param singleEvent
-     * @param isOverdue
      * @return
      */
-    List<SingleEvent> queryCompletedEventsByConditions(@Param("singleEvent") SingleEvent singleEvent,@Param("isOverdue") String isOverdue);
+    List<SingleEvent> queryEventsByConditions(SingleEvent singleEvent);
+
+    /**
+     * 统计单一事件类型数量及用时分钟总和
+     * @param userId
+     * @return
+     */
+    List<GetUserEventsGroupByType> getUserEventsGroupByType(String userId);
+
+    /**
+     * 统计重复事件类型数量及用时分钟总和
+     * @param userId
+     * @return
+     */
+    List<GetUserEventsGroupByType> getUserLoopEventsGroupByType(String userId);
+
+    /**
+     * 获取单一事件表中用户创建类型最多的类型
+     * @param userId
+     * @return
+     */
+    Long getMaxSingleEventType(String userId);
+
+    /**
+     * 获取重复事件表中用户创建类型最多的类型
+     * @param userId
+     * @return
+     */
+    Long getMaxLoopEventType(String userId);
+
+    /**
+     * 获取单一事件表中用户创建类型最少的类型
+     * @param userId
+     * @return
+     */
+    Long getMinSingleEventType(String userId);
+
+    /**
+     * 获取重复事件表中用户创建类型最少的类型
+     * @param userId
+     * @return
+     */
+    Long getMinLoopEventType(String userId);
 }
