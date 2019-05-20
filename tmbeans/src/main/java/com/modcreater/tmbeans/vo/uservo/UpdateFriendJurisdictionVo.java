@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Data
 public class UpdateFriendJurisdictionVo implements Serializable {
-    private String id;
+    private String friendId;
     private String userId;
     private String invite;
     private String sustain;

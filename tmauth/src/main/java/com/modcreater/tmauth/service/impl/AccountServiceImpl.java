@@ -13,6 +13,9 @@ import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
 import com.modcreater.tmutils.RongCloudMethodUtil;
+import io.rong.messages.InfoNtfMessage;
+import io.rong.messages.TxtMessage;
+import io.rong.models.response.ResponseResult;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +24,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,9 +36,13 @@ import java.util.regex.Pattern;
 public class AccountServiceImpl implements AccountService {
     @Resource
     private AccountMapper accountMapper;
+
     private static Pattern pattern = Pattern.compile("[0-9]*");
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
+
     @Override
     public Dto doLogin(LoginVo loginVo) {
         if (ObjectUtils.isEmpty(loginVo)){
@@ -94,7 +100,7 @@ public class AccountServiceImpl implements AccountService {
             }
             //登录
             //生成token
-            RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
+
             try {
                 token= rongCloudMethodUtil.createToken(result.getId().toString(),result.getUserName(),result.getHeadImgUrl());
             } catch (Exception e) {
@@ -140,6 +146,7 @@ public class AccountServiceImpl implements AccountService {
         }
         return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",result,100000);
     }
+
     /**
      *添加二级密码
      * @param addPwdVo
@@ -158,7 +165,7 @@ public class AccountServiceImpl implements AccountService {
         }
         //生成token
         String token=null;
-        RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
+
         try {
             token= rongCloudMethodUtil.createToken(addPwdVo.getUserId(),addPwdVo.getUserName(),addPwdVo.getHeadImgUrl());
         } catch (Exception e) {
@@ -208,50 +215,124 @@ public class AccountServiceImpl implements AccountService {
         if (ObjectUtils.isEmpty(queFridenVo)){
             return DtoUtil.getFalseDto("搜索好友数据获取失败",16001);
         }
+        System.out.println("搜索好友："+queFridenVo.toString());
         if (!token.equals(stringRedisTemplate.opsForValue().get(queFridenVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         Account account=accountMapper.queryFriendByUserCode(queFridenVo.getUserCode());
+        Map<String,String> map=new HashMap();
+        map.put("userId",account.getId().toString());
+        map.put("userCode",account.getUserCode());
+        map.put("userName",account.getUserName());
+        map.put("gender",account.getGender().toString());
+        map.put("birthday",account.getBirthday());
+        map.put("headImgUrl",account.getHeadImgUrl());
         if (ObjectUtils.isEmpty(account)){
             return DtoUtil.getFalseDto("搜索好友失败",200000);
         }
-        return DtoUtil.getSuccesWithDataDto("搜索好友成功",account,100000);
+        return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
     }
-
-    @Override
-    public Dto sendFriendRequest(SendFriendRequestVo sendFriendRequestVo, String token) {
-        return null;
-    }
-
 
     /**
-     * 建立好友关系
-     * @param buildFriendshipVo
+     * 发送添加好友请求
+     * @param sendFriendRequestVo
      * @param token
      * @return
      */
     @Override
-    public Dto buildFriendship(BuildFriendshipVo buildFriendshipVo, String token) {
+    public Dto sendFriendRequest(SendFriendRequestVo sendFriendRequestVo, String token) {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        if (ObjectUtils.isEmpty(buildFriendshipVo)){
-            return DtoUtil.getFalseDto("添加好友数据未获取到",16002);
+        System.out.println("添加请求"+sendFriendRequestVo.toString());
+        if (StringUtils.isEmpty(sendFriendRequestVo.getUserId())|| StringUtils.isEmpty(sendFriendRequestVo.getFriendId())){
+            return DtoUtil.getFalseDto("userId和friendId不能为空",17001);
         }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(buildFriendshipVo.getUserId()))){
+        if (!token.equals(stringRedisTemplate.opsForValue().get(sendFriendRequestVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        //建立双向好友关系
-        int i=accountMapper.buildFriendship(buildFriendshipVo);
-        String temp=buildFriendshipVo.getUserId();
-        buildFriendshipVo.setUserId(buildFriendshipVo.getFriendId());
-        buildFriendshipVo.setFriendId(temp);
-        int j=accountMapper.buildFriendship(buildFriendshipVo);
+        //判断这俩人是不是已经是好友
+        if (accountMapper.queryFriendRel(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId())>0){
+            return DtoUtil.getFalseDto("你们已经是好友了不能添加",17006);
+        }
+//        sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
+        //发送添加信息
+        ResponseResult result;
+        try {
+            result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(), sendFriendRequestVo.getFriendId(), sendFriendRequestVo.getContent(), "","","");
+            if (result.getCode()!=200){
+                return DtoUtil.getFalseDto("发送请求失败",17002);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("出现错误了",233);
+        }
+        return DtoUtil.getSuccessDto("发送成功",100000);
+    }
+
+    /**
+     * 发送接受好友请求
+     * @param sendFriendResponseVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto sendFriendResponse(SendFriendResponseVo sendFriendResponseVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        System.out.println("接受请求"+sendFriendResponseVo.toString());
+        if (StringUtils.isEmpty(sendFriendResponseVo.getUserId())|| StringUtils.isEmpty(sendFriendResponseVo.getFriendId())){
+            return DtoUtil.getFalseDto("userId和friendId不能为空",17001);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(sendFriendResponseVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        //更新双方的status
+        //给请求者 发一条消息说，我同意你的请求了
+        Account user = accountMapper.queryAccount(sendFriendResponseVo.getUserId());
+        Account friend = accountMapper.queryAccount(sendFriendResponseVo.getFriendId());
+        String extra = "{sourceUserNickname:"+ user.getUserName() + ",version:123456}";
+        try {
+            rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),"我是"+user.getUserName()+"，我已经同意你的好友请求了","","",extra);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ResponseResult result1;
+        ResponseResult result2;
+        ResponseResult result3;
+        try {
+            //小灰条通知
+            result1=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),new InfoNtfMessage("你已添加了"+ friend.getUserName() +"，现在可以开始聊天了。",""));
+            if (result1.getCode()!=200){
+                return DtoUtil.getFalseDto("发送小灰条通知失败",17003);
+            }
+            //发送文本消息
+            result2=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),new TxtMessage("我通过了你的朋友验证请求，现在我们可以开始聊天了",""));
+            if (result2.getCode()!=200){
+                return DtoUtil.getFalseDto("发送文本result2消息失败",17004);
+            }
+            result3=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getFriendId(),sendFriendResponseVo.getUserId(),new TxtMessage(friend.getUserName(),""));
+            if (result3.getCode()!=200){
+                return DtoUtil.getFalseDto("发送文本result3消息失败",17005);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("出现错误了",233);
+        }
+        //建立好友关系
+        int i=accountMapper.buildFriendship(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId());
+        int j=accountMapper.buildFriendship(sendFriendResponseVo.getFriendId(),sendFriendResponseVo.getUserId());
         if (i<=0||j<=0){
             return DtoUtil.getFalseDto("添加好友失败",16003);
         }
+        //移除黑名单
+
         return DtoUtil.getSuccessDto("添加好友成功",100000);
     }
+
+
+
     /**
      * 查询好友列表
      * @param userIdVo
@@ -269,12 +350,25 @@ public class AccountServiceImpl implements AccountService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(userIdVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        List<Account> accountList=accountMapper.queryFriendList(userIdVo.getUserId());
+        int pageSize=Integer.parseInt(userIdVo.getPageSize());
+        int pageIndex=Integer.parseInt(userIdVo.getPageNumber())*pageSize;
+        List<Account> accountList=accountMapper.queryFriendList(userIdVo.getUserId(),String.valueOf(pageIndex),userIdVo.getPageSize());
+        Map map=new HashMap();
+        List<Map> maps=new ArrayList<>();
+        for (Account account:accountList) {
+            map.put("friendId",account.getId());
+            map.put("userCode",account.getUserCode());
+            map.put("userName",account.getUserName());
+            map.put("headImgUrl",account.getHeadImgUrl());
+            map.put("gender",account.getGender());
+            maps.add(map);
+        }
         if (ObjectUtils.isEmpty(accountList)){
             return DtoUtil.getFalseDto("查询好友列表失败",200000);
         }
-        return DtoUtil.getSuccesWithDataDto("查询好友列表成功",accountList,100000);
+        return DtoUtil.getSuccesWithDataDto("查询好友列表成功",maps,100000);
     }
+
     /**
      * 修改好友权限
      * @param jurisdictionVo
@@ -297,6 +391,7 @@ public class AccountServiceImpl implements AccountService {
         }
         return DtoUtil.getFalseDto("修改好友权限成功",100000);
     }
+
     /**
      * 解除好友关系
      * @param deleteFriendshipVo
@@ -313,6 +408,17 @@ public class AccountServiceImpl implements AccountService {
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(deleteFriendshipVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        //判断这俩人是不是好友
+        if (accountMapper.queryFriendRel(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId())<=0){
+            return DtoUtil.getFalseDto("你们不是好友不能执行相关操作",16009);
+        }
+        //加入到融云的黑名单
+        try {
+            rongCloudMethodUtil.addBlackList(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("拉黑操作出错",233);
         }
         //双向删除
         int i=accountMapper.deleteFriendship(deleteFriendshipVo);

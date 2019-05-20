@@ -75,18 +75,31 @@ public interface AccountMapper {
     Account queryFriendByUserCode(String userCode);
 
     /**
-     * 建立好友关系
-     * @param buildFriendshipVo
+     * 查询好友关系
+     * @param userId
+     * @param friendId
      * @return
      */
-    int buildFriendship(BuildFriendshipVo buildFriendshipVo);
+    int queryFriendRel(String userId,String friendId);
+
+
+    /**
+     * 建立好友关系
+     * @param userId
+     * @param friendId
+     * @return
+     */
+    int buildFriendship(String userId,String friendId);
 
     /**
      * 查询好友列表
      * @param userId
+     * @param pageIndex
+     * @param pageSize
      * @return
      */
-    List<Account> queryFriendList(String userId);
+    List<Account> queryFriendList(@Param("userId") String userId,@Param("pageIndex") String pageIndex,@Param("pageSize") String pageSize);
+
 
     /**
      * 修改好友权限

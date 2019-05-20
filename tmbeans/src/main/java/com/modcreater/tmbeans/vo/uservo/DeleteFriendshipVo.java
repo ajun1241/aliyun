@@ -12,7 +12,6 @@ import java.io.Serializable;
  */
 @Data
 public class DeleteFriendshipVo implements Serializable {
-    private String id;
     private String userId;
     private String friendId;
     private String appType;

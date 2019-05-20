@@ -71,14 +71,14 @@ public interface AccountService {
      */
     Dto sendFriendRequest(SendFriendRequestVo sendFriendRequestVo,String token);
 
-
     /**
-     * 建立好友关系
-     * @param buildFriendshipVo
+     * 发送接受好友请求
+     * @param sendFriendResponseVo
      * @param token
      * @return
      */
-    Dto buildFriendship(BuildFriendshipVo buildFriendshipVo,String token);
+    Dto sendFriendResponse(SendFriendResponseVo sendFriendResponseVo,String token);
+
 
     /**
      * 查询好友列表

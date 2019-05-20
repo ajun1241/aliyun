@@ -13,5 +13,9 @@ import java.io.Serializable;
 @Data
 public class UserIdVo implements Serializable {
     private String userId;
+    //第几页
+    private String pageNumber;
+    //每页的条数
+    private String pageSize;
     private String appType;
 }

@@ -56,10 +56,16 @@ public class AccountController {
         return userService.queryFriendByUserCode(queFridenVo,request.getHeader("token"));
     }
 
-    @PostMapping("buildfriendship")
-    @ApiOperation("添加好友")
-    public Dto buildFriendship(@RequestBody BuildFriendshipVo buildFriendshipVo, HttpServletRequest request){
-        return userService.buildFriendship(buildFriendshipVo,request.getHeader("token"));
+    @PostMapping("sendfriendrequest")
+    @ApiOperation("发送添加好友请求")
+    public Dto sendFriendRequest(@RequestBody SendFriendRequestVo requestVo, HttpServletRequest request){
+        return userService.sendFriendRequest(requestVo,request.getHeader("token"));
+    }
+
+    @PostMapping("sendfriendresponse")
+    @ApiOperation("发送同意添加好友请求")
+    public Dto sendFriendResponse(@RequestBody SendFriendResponseVo responseVo, HttpServletRequest request){
+        return userService.sendFriendResponse(responseVo,request.getHeader("token"));
     }
 
     @PostMapping("queryFriendList")

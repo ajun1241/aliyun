@@ -20,9 +20,8 @@ import java.io.Serializable;
 
 
 @Data
-public class SendFriendRequestVo implements Serializable {
+public class SendFriendResponseVo implements Serializable {
 
-    private String content;
     private String userId;
     private String friendId;
 

@@ -3,36 +3,59 @@ package com.modcreater.tmutils;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.show.MyToken;
 import io.rong.RongCloud;
+import io.rong.messages.BaseMessage;
+import io.rong.messages.TxtMessage;
+import io.rong.messages.VoiceMessage;
+import io.rong.methods.message.chatroom.Chatroom;
+import io.rong.methods.message.discussion.Discussion;
+import io.rong.methods.message.group.Group;
+import io.rong.methods.message.history.History;
+import io.rong.methods.message.system.MsgSystem;
 import io.rong.methods.user.User;
+import io.rong.methods.user.blacklist.Blacklist;
 import io.rong.models.Result;
+import io.rong.models.message.PrivateMessage;
+import io.rong.models.message.SystemMessage;
+import io.rong.models.response.ResponseResult;
 import io.rong.models.response.TokenResult;
 import io.rong.models.user.UserModel;
 import org.springframework.util.ObjectUtils;
 
 
-import java.util.HashMap;
-import java.util.Map;
-import static com.modcreater.tmutils.RongCloudUtil.appKey;
-import static com.modcreater.tmutils.RongCloudUtil.appSecret;
-
 /**
+ * @Author: AJun
  * 生成token的工具类
  */
 
 public class RongCloudMethodUtil {
 
+    public final static String appKey = "0vnjpoad03rzz";// 申请的融云key
+    public final static String appSecret = "BbTOtrRIF5MOA";// 申请的的云secret
+
+    VoiceMessage voiceMessage = new VoiceMessage("hello", "helloExtra", 20L);
+
+    RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret);
+
+    //自定义 api 地址方式
+    //RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret,api);
+
+    io.rong.methods.message._private.Private Private = rongCloud.message.msgPrivate;
+    MsgSystem system = rongCloud.message.system;
+    Group group = rongCloud.message.group;
+    Chatroom chatroom = rongCloud.message.chatroom;
+    Discussion discussion = rongCloud.message.discussion;
+    History history = rongCloud.message.history;
+
+    /**
+     * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/user/user.html#register
+     *
+     * 注册用户，生成用户在融云的唯一身份标识 Token
+     */
     public String createToken(String userId,String userName,String headImgUrl) throws Exception {
 
-        RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret);
-        //自定义 api 地址方式
-        // RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret,api);
+
         User User = rongCloud.user;
 
-        /**
-         * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/user/user.html#register
-         *
-         * 注册用户，生成用户在融云的唯一身份标识 Token
-         */
         UserModel user = new UserModel()
                 .setId(userId)
                 .setName(userName)
@@ -55,41 +78,82 @@ public class RongCloudMethodUtil {
         return myToken.getToken();
     }
 
+    /**
+     * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/message/system.html#send
+     *
+     * 发送系统消息
+     *
+     */
+    public ResponseResult sendSystemMessage(String userId,String friendId,String content,String pushContent,String pushData,String extra) throws Exception {
+
+        TxtMessage txtMessage = new TxtMessage(content, extra);
+        String[] targetIds = {friendId};
+        SystemMessage systemMessage = new SystemMessage()
+                .setSenderId(userId)
+                .setTargetId(targetIds)
+                .setObjectName(txtMessage.getType())
+                .setContent(txtMessage)
+                .setPushContent(pushContent)
+                .setPushData(pushData)
+                .setIsPersisted(0)
+                .setIsCounted(0)
+                .setContentAvailable(0);
+
+        ResponseResult result = system.send(systemMessage);
+        System.out.println("send system message:  " + result.toString());
+        return result;
+    }
 
     /**
-     * 推送系统信息
-     *
-     * @param content 消息内容
-     * @param fromUserId 1
-     * @param toUserId  userId
-     * @param objectName  RC:TxtMsg
-     * @param pushContent 消息标题
-     * @param pushData 空-安卓  非空：苹果
+     * 通过融云发送单聊消息
      */
-    public static void pushSystemMessage(String content, String fromUserId,
-                                         String toUserId, String objectName, String pushContent,
-                                         String pushData) {
-
-        String systemMessage = "https://api.cn.rong.io/message/system/publish.json";
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("content", content);
-        params.put("fromUserId", fromUserId);
-        params.put("toUserId", toUserId);
-        params.put("objectName", objectName);
-        params.put("pushContent", pushContent);
-        params.put("pushData", pushData);
-        byte[] resultArray;
-        try {
-            resultArray = RongCloudUtil.post(systemMessage, params, "UTF-8",
-                    20000);
-            String result = new String(resultArray);
-            System.out.println(result);
-        } catch (Exception e) {
-            System.out.println("发送信息出错了");
-        }
+    public ResponseResult sendPrivateMsg(String senderId, String targetId, BaseMessage baseMessage) throws Exception {
+        PrivateMessage privateMessage = new PrivateMessage()
+                .setSenderId(senderId)
+                .setTargetId(new String[]{targetId})
+                .setObjectName(baseMessage.getType())
+                .setContent(baseMessage)
+                .setPushContent("")
+                .setPushData("")
+                .setCount("")
+                .setVerifyBlacklist(0)
+                .setIsPersisted(0)
+                .setIsCounted(0)
+                .setIsIncludeSender(0);
+        //发送单聊方法
+        ResponseResult privateResult = Private.send(privateMessage);
+        System.out.println("send private message:  " + privateResult.toString());
+        return privateResult;
     }
 
-    public static void pushFriendRequest(){
-        String systemMessage="https://api-cn.ronghub.com/push.json";
+
+
+    /**
+     * 移除黑名单
+     */
+    public void removeBlackList(String userId,String friendId) throws Exception {
+        UserModel user = getUserModel(userId,friendId);
+        rongCloud.user.blackList.remove(user);
+
+    }
+    /**
+     * 添加黑名单
+     */
+    public void addBlackList(String userId,String friendId) throws Exception {
+        UserModel user = getUserModel(userId,friendId);
+        rongCloud.user.blackList.add(user);
+
+    }
+
+    private  UserModel getUserModel(String userId,String friendId){
+        UserModel blackUser = new UserModel().setId(userId);
+        UserModel[] blacklist = {blackUser};
+        UserModel user = new UserModel()
+                .setId(friendId)
+                .setBlacklist(blacklist);
+        return user;
     }
 }
+
+
+

@@ -88,28 +88,31 @@
         select * from account where userCode=#{userCode}
     </select>
 
-    <insert id="buildFriendship" parameterType="com.modcreater.tmbeans.vo.uservo.BuildFriendshipVo">
+    <insert id="buildFriendship" parameterType="String">
         insert into friendship (userId,friendId) values (#{userId},#{friendId})
     </insert>
 
     <select id="queryFriendList" parameterType="String" resultType="com.modcreater.tmbeans.pojo.Account">
         SELECT * FROM account WHERE id IN (SELECT friendId FROM friendship WHERE userId=#{userId})
+
+            limit #{pageIndex},#{pageSize}
+
     </select>
 
     <update id="updateFriendJurisdiction" parameterType="com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo">
         update friendship
         <set>
-            <if test="invite > = 0 ">
-                invite=#{invite}
+            <if test="invite  >= 0 ">
+                invite=#{invite},
             </if>
-             <if test="sustain > = 0 ">
-                 sustain=#{sustain}
+             <if test="sustain >= 0 ">
+                 sustain=#{sustain},
             </if>
-             <if test="hide > = 0 ">
-                 hide=#{hide}
+              <if test="hide  >= 0 ">
+                 hide=#{hide},
             </if>
         </set>
-        where id=#{id}
+        where userId=#{userId} and friendId=#{friendId}
     </update>
 
     <delete id="deleteFriendship" parameterType="com.modcreater.tmbeans.vo.uservo.DeleteFriendshipVo">
@@ -129,4 +132,7 @@
         select userName,userSign,headImgUrl "userHeadPortrait" from account where id = #{userId}
     </select>
 
+    <select id="queryFriendRel" parameterType="String" resultType="int">
+        select count(1) from friendship where userId=#{userId} and  friendId=#{friendId}
+    </select>
 </mapper>
