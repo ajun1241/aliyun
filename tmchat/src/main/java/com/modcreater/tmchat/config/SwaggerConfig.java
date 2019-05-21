@@ -18,7 +18,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.ArrayList;
 import java.util.List;
 
-@Configuration // applicationContext.xml    springboot
+@Configuration
 @EnableSwagger2
 @ComponentScan("com.modcreater.tmchat.*")
 @Component
@@ -28,13 +28,13 @@ public class SwaggerConfig {
         //添加head参数配置start
         ParameterBuilder tokenPar = new ParameterBuilder();
         List<Parameter> pars = new ArrayList<>();
-        tokenPar.name("token").description("请求头").modelRef(new ModelRef("string")).parameterType("header").required(false).build();
+        tokenPar.name("token").description("令牌").modelRef(new ModelRef("string")).parameterType("header").required(false).build();
         pars.add(tokenPar.build());
         //添加head参数配置end
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.modcreater.tmauth.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.modcreater.tmbiz.controller"))
                 .paths(PathSelectors.any())
                 .build()
                 .globalOperationParameters(pars);//注意这里
@@ -42,7 +42,7 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("时间管理聊天模块")
+                .title("时间管理通讯模块")
                 .description("以下")
                 .termsOfServiceUrl("")
                 .version("1.0")

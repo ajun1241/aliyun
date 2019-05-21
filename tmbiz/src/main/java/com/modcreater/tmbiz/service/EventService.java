@@ -2,6 +2,7 @@ package com.modcreater.tmbiz.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.eventvo.*;
+import com.modcreater.tmbeans.vo.uservo.SendInviteMsgVo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -96,4 +97,20 @@ public interface EventService {
      * @return
      */
     Dto searchByDayEventIdsInWeek(SearchEventVo searchEventVo,String token);
+
+    /**
+     * 发送好友邀请消息
+     * @param sendInviteMsgVo
+     * @param token
+     * @return
+     */
+    Dto sendInviteMsg(SendInviteMsgVo sendInviteMsgVo, String token);
+
+    /**
+     * 发送好友接受邀请消息
+     * @param sendInviteMsgVo
+     * @param token
+     * @return
+     */
+    Dto sendInviteAcceptMsg(SendInviteMsgVo sendInviteMsgVo,String token);
 }

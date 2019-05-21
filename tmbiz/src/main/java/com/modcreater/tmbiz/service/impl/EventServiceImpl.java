@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.eventvo.*;
+import com.modcreater.tmbeans.vo.uservo.SendInviteMsgVo;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
@@ -634,4 +635,42 @@ public class EventServiceImpl implements EventService {
         }
         return DtoUtil.getFalseDto("请先登录", 21011);
     }
+
+
+    /**
+     * 发送好友邀请消息
+     * @param sendInviteMsgVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto sendInviteMsg(SendInviteMsgVo sendInviteMsgVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        System.out.println("接受请求"+sendInviteMsgVo.toString());
+        if (StringUtils.isEmpty(sendInviteMsgVo.getUserId())|| (sendInviteMsgVo.getFriendIds().length>0)){
+            return DtoUtil.getFalseDto("userId和friendId不能为空",17001);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(sendInviteMsgVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        //发送邀请消息给好友
+
+        return null;
+    }
+
+    /**
+     * 发送好友接受邀请消息
+     * @param sendInviteMsgVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto sendInviteAcceptMsg(SendInviteMsgVo sendInviteMsgVo, String token) {
+        //计入统计
+        //
+        return null;
+    }
+
 }
