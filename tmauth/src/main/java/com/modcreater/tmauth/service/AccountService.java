@@ -47,8 +47,6 @@ public interface AccountService {
      *//*
     Dto updateTimeStamp(String date);*/
 
-
-
     /**
      * 根据账号搜索好友
      * @param queFridenVo
@@ -97,4 +95,5 @@ public interface AccountService {
      * @return
      */
     Dto deleteFriendship(DeleteFriendshipVo deleteFriendshipVo, String token);
+
 }

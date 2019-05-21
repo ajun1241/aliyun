@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.show.MyToken;
 import io.rong.RongCloud;
 import io.rong.messages.BaseMessage;
+import io.rong.messages.ContactNtfMessage;
 import io.rong.messages.TxtMessage;
 import io.rong.messages.VoiceMessage;
 import io.rong.methods.message.chatroom.Chatroom;
@@ -84,15 +85,16 @@ public class RongCloudMethodUtil {
      * 发送系统消息
      *
      */
-    public ResponseResult sendSystemMessage(String userId,String friendId,String content,String pushContent,String pushData,String extra) throws Exception {
+    public ResponseResult sendSystemMessage(String userId,String friendId,BaseMessage contactNtfMessage,String pushContent,String pushData) throws Exception {
 
-        TxtMessage txtMessage = new TxtMessage(content, extra);
+//        TxtMessage txtMessage = new TxtMessage(content, extra);
         String[] targetIds = {friendId};
+
         SystemMessage systemMessage = new SystemMessage()
                 .setSenderId(userId)
                 .setTargetId(targetIds)
-                .setObjectName(txtMessage.getType())
-                .setContent(txtMessage)
+                .setObjectName(contactNtfMessage.getType())
+                .setContent(contactNtfMessage)
                 .setPushContent(pushContent)
                 .setPushData(pushData)
                 .setIsPersisted(0)

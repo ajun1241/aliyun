@@ -15,6 +15,7 @@ import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
 import com.modcreater.tmutils.RongCloudMethodUtil;
+import io.rong.messages.ContactNtfMessage;
 import io.rong.messages.InfoNtfMessage;
 import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
@@ -289,7 +290,8 @@ public class AccountServiceImpl implements AccountService {
         //发送添加信息
         ResponseResult result;
         try {
-            result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(), sendFriendRequestVo.getFriendId(), sendFriendRequestVo.getContent(), "","","");
+            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("Request","",sendFriendRequestVo.getUserId(), sendFriendRequestVo.getFriendId(), sendFriendRequestVo.getContent());
+            result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(), sendFriendRequestVo.getFriendId(), contactNtfMessage, "","");
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送请求失败",17002);
             }
@@ -324,7 +326,8 @@ public class AccountServiceImpl implements AccountService {
         Account friend = accountMapper.queryAccount(sendFriendResponseVo.getFriendId());
         String extra = "{sourceUserNickname:"+ user.getUserName() + ",version:123456}";
         try {
-            rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),"我是"+user.getUserName()+"，我已经同意你的好友请求了","","",extra);
+            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("Request",extra,sendFriendResponseVo.getUserId(), sendFriendResponseVo.getFriendId(), "我是"+user.getUserName()+"，我已经同意你的好友请求了");
+            rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),contactNtfMessage,"","");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -462,7 +465,6 @@ public class AccountServiceImpl implements AccountService {
         }
         return DtoUtil.getSuccessDto("删除好友成功",100000);
     }
-
 
     @Override
     public Dto queryAccount(QueryUserVo queryUserVo,String token) {
