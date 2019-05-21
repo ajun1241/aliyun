@@ -66,6 +66,9 @@
             <if test="token != null">
                 token = #{token},
             </if>
+            <if test="userSign != null">
+                userSign = #{userSign}
+            </if>
         </set>
         where id=#{id}
     </update>

@@ -10,6 +10,7 @@ import com.modcreater.tmbeans.vo.QueryUserVo;
 import com.modcreater.tmbeans.vo.uservo.*;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
+import com.modcreater.tmdao.mapper.UserSettingsMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
@@ -42,6 +43,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Resource
     private AchievementMapper achievementMapper;
+    @Resource
+    private UserSettingsMapper userSettingsMapper;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -204,6 +207,9 @@ public class AccountServiceImpl implements AccountService {
         account=accountMapper.queryAccount(addPwdVo.getUserId());
         if (achievementMapper.addNewUserStatistics(addPwdVo.getUserId()) == 0){
             return DtoUtil.getFalseDto("为用户添加计数表失败",15005);
+        }
+        if (userSettingsMapper.addNewUserSettings(addPwdVo.getUserId()) == 0){
+            return DtoUtil.getFalseDto("为用户添加设置失败",15006);
         }
         return DtoUtil.getSuccesWithDataDto("添加密码成功",account,100000);
     }
@@ -491,6 +497,7 @@ public class AccountServiceImpl implements AccountService {
         account.setUserType(accountVo.getUserType());
         account.setBirthday(accountVo.getBirthday());
         account.setModifyDate(new Date());
+        account.setUserSign(accountVo.getUserSign());
         int result=accountMapper.updateAccount(account);
         if (result<=0){
             return DtoUtil.getFalseDto("用户信息修改失败",13002);

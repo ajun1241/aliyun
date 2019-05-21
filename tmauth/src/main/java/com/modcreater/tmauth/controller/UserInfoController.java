@@ -41,7 +41,7 @@ public class UserInfoController {
     }
 
     /**
-     * 显示用户已完成事件
+     * 显示用户事件(已完成,未完成)
      * @param receivedIdIsOverdue
      * @param request
      * @return
