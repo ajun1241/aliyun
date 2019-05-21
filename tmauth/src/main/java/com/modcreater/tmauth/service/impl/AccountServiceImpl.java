@@ -49,36 +49,6 @@ public class AccountServiceImpl implements AccountService {
     private StringRedisTemplate stringRedisTemplate;
 
     RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
-
-    @Override
-    public Dto doLogin(LoginVo loginVo) {
-        if (ObjectUtils.isEmpty(loginVo)){
-            return DtoUtil.getFalseDto("登录信息接收失败",11001);
-        }
-        AccountVo accountVo=new AccountVo();
-        //判断是否新用户
-        Account result= accountMapper.checkCode(loginVo.getUserCode());
-        if (ObjectUtils.isEmpty(result)){
-            //是新用户注册
-            return DtoUtil.getFalseDto("用户未注册，请先注册",11002);
-        }
-        //老用户直接登录
-        Account account= accountMapper.doLogin(loginVo);
-        if (ObjectUtils.isEmpty(account)){
-            return DtoUtil.getFalseDto("登录失败,用户名或密码错误",200000);
-        }
-//        Account account=accountMapper.queryAccount(id);
-        accountVo.setId(account.getId());
-        accountVo.setUserCode(account.getUserCode());
-        accountVo.setUserName(account.getUserName());
-        accountVo.setGender(account.getGender());
-        accountVo.setBirthday(account.getBirthday());
-//        accountVo.setHeadImgUrl("");
-        accountVo.setUserType(account.getUserType());
-        return DtoUtil.getSuccesWithDataDto("登录成功!",accountVo,100000);
-    }
-
-
     /**
      * 注册/登录
      * @param loginVo
@@ -91,23 +61,32 @@ public class AccountServiceImpl implements AccountService {
         }
         System.out.println("登录"+loginVo.toString());
         String token=null;
+        Map map=new HashMap();
         Account account=new Account();
         Account result=accountMapper.checkCode(loginVo.getUserCode());
         //如果已经注册
         if (!ObjectUtils.isEmpty(result)){
             if (StringUtils.isEmpty(result.getUserPassword())){
-                result= accountMapper.checkCode(loginVo.getUserCode());
-                if (ObjectUtils.isEmpty(result)){
-                    return DtoUtil.getFalseDto("注册时查询用户失败",14004);
-                }
-                return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",result,100000);
+                map.put("id",result.getId());
+                map.put("userCode",result.getUserCode());
+                map.put("isFirst",result.getIsFirst());
+                map.put("userName",result.getUserName());
+                map.put("gender",result.getGender());
+                map.put("birthday",result.getBirthday());
+                map.put("headImgUrl",result.getHeadImgUrl());
+
+                map.put("IDCard",result.getIDCard());
+                map.put("userType",result.getUserType());
+                map.put("realName",result.getRealName());
+                map.put("userAddress",result.getUserAddress());
+                map.put("userSign",result.getUserSign());
+                return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
             }
             if (StringUtils.isEmpty(result.getHeadImgUrl())){
                 result.setHeadImgUrl("2333");
             }
             //登录
             //生成token
-
             try {
                 token= rongCloudMethodUtil.createToken(result.getId().toString(),result.getUserName(),result.getHeadImgUrl());
             } catch (Exception e) {
@@ -124,6 +103,19 @@ public class AccountServiceImpl implements AccountService {
             if (accountMapper.updateAccount(account)<=0){
                 return DtoUtil.getFalseDto("生成token失败",14006);
             }
+            map.put("id",result.getId());
+            map.put("userCode",result.getUserCode());
+            map.put("isFirst",result.getIsFirst());
+            map.put("userName",result.getUserName());
+            map.put("gender",result.getGender());
+            map.put("birthday",result.getBirthday());
+            map.put("headImgUrl",result.getHeadImgUrl());
+            map.put("IDCard",result.getIDCard());
+            map.put("userType",result.getUserType());
+            map.put("realName",result.getRealName());
+            map.put("userAddress",result.getUserAddress());
+            map.put("userSign",result.getUserSign());
+            map.put("token",token);
             result.setToken(token);
             result.setUserPassword(null);
             return DtoUtil.getSuccesWithDataDto("登录成功",result,100000);
@@ -151,7 +143,19 @@ public class AccountServiceImpl implements AccountService {
         if (ObjectUtils.isEmpty(result)){
             return DtoUtil.getFalseDto("注册时查找用户失败",14004);
         }
-        return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",result,100000);
+        map.put("id",result.getId());
+        map.put("userCode",result.getUserCode());
+        map.put("isFirst",result.getIsFirst());
+        map.put("userName",result.getUserName());
+        map.put("gender",result.getGender());
+        map.put("birthday",result.getBirthday());
+        map.put("headImgUrl",result.getHeadImgUrl());
+        map.put("IDCard",result.getIDCard());
+        map.put("userType",result.getUserType());
+        map.put("realName",result.getRealName());
+        map.put("userAddress",result.getUserAddress());
+        map.put("userSign",result.getUserSign());
+        return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
     }
 
     /**
@@ -205,13 +209,22 @@ public class AccountServiceImpl implements AccountService {
             accountMapper.updRealName(addPwdVo.getUserId(),"1");
         }
         account=accountMapper.queryAccount(addPwdVo.getUserId());
+        Map map=new HashMap();
+        map.put("id",account.getId());
+        map.put("userCode",account.getUserCode());
+        map.put("isFirst",account.getIsFirst());
+        map.put("userName",account.getUserName());
+        map.put("gender",account.getGender());
+        map.put("birthday",account.getBirthday());
+        map.put("headImgUrl",account.getHeadImgUrl());
+        map.put("token",account.getToken());
         if (achievementMapper.addNewUserStatistics(addPwdVo.getUserId()) == 0){
             return DtoUtil.getFalseDto("为用户添加计数表失败",15005);
         }
         if (userSettingsMapper.addNewUserSettings(addPwdVo.getUserId()) == 0){
             return DtoUtil.getFalseDto("为用户添加设置失败",15006);
         }
-        return DtoUtil.getSuccesWithDataDto("添加密码成功",account,100000);
+        return DtoUtil.getSuccesWithDataDto("添加密码成功",map,100000);
     }
 
     /**
@@ -232,7 +245,10 @@ public class AccountServiceImpl implements AccountService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(queFridenVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
+        //好友表信息
         Account account=accountMapper.queryFriendByUserCode(queFridenVo.getUserCode());
+        //其他表信息
+
         Map<String,String> map=new HashMap();
         map.put("userId",account.getId().toString());
         map.put("userCode",account.getUserCode());
@@ -240,6 +256,7 @@ public class AccountServiceImpl implements AccountService {
         map.put("gender",account.getGender().toString());
         map.put("birthday",account.getBirthday());
         map.put("headImgUrl",account.getHeadImgUrl());
+        map.put("userSign",account.getUserSign());
         if (ObjectUtils.isEmpty(account)){
             return DtoUtil.getFalseDto("搜索好友失败",200000);
         }
@@ -354,6 +371,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Dto queryFriendList(UserIdVo userIdVo, String token) {
+        System.out.println("{}{}{{{}++"+userIdVo.toString());
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -364,11 +382,11 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         int pageSize=Integer.parseInt(userIdVo.getPageSize());
-        int pageIndex=Integer.parseInt(userIdVo.getPageNumber())*pageSize;
-        List<Account> accountList=accountMapper.queryFriendList(userIdVo.getUserId(),String.valueOf(pageIndex),userIdVo.getPageSize());
-        Map map=new HashMap();
+        int pageIndex=(Integer.parseInt(userIdVo.getPageNumber())-1)*pageSize;
+        List<Account> accountList=accountMapper.queryFriendList(userIdVo.getUserId(),pageIndex,pageSize);
         List<Map> maps=new ArrayList<>();
         for (Account account:accountList) {
+            Map map=new HashMap();
             map.put("friendId",account.getId());
             map.put("userCode",account.getUserCode());
             map.put("userName",account.getUserName());

@@ -98,7 +98,7 @@ public interface AccountMapper {
      * @param pageSize
      * @return
      */
-    List<Account> queryFriendList(@Param("userId") String userId,@Param("pageIndex") String pageIndex,@Param("pageSize") String pageSize);
+    List<Account> queryFriendList(@Param("userId") String userId,@Param("pageIndex") int pageIndex,@Param("pageSize") int pageSize);
 
 
     /**
