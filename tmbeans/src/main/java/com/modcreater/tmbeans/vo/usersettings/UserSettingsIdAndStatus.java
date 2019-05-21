@@ -20,5 +20,11 @@ public class UserSettingsIdAndStatus {
      * 设置状态(0/1)
      */
     private int status;
+    /**
+     * 要修改的设置的名称
+     */
+    private String type;
+
+    private String appType;
 
 }

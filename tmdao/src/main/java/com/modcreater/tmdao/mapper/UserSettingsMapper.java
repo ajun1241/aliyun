@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,4 +20,13 @@ public interface UserSettingsMapper {
      * @return
      */
     int addNewUserSettings(String userId);
+
+    /**
+     * 根据字段userId修改设置
+     * @param type
+     * @param userId
+     * @param status
+     * @return
+     */
+    int updateUserSettings(@Param("type") String type,@Param("userId") String userId,@Param("status") int status);
 }

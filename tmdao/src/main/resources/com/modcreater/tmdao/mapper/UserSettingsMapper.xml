@@ -5,4 +5,7 @@
     <insert id="addNewUserSettings">
         insert into usersettings (userId) values (#{userId})
     </insert>
+    <update id="updateUserSettings" statementType="STATEMENT">
+        update usersettings set ${type} = ${status} where userId = ${userId}
+    </update>
 </mapper>
