@@ -127,8 +127,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        List<String> imgUrlList = queryUserAchievementInBase(userId);
-        if (imgUrlList.size() != 0){
+        List<String> result = queryUserAchievementInBase(userId);
+        if (result.size() != 0){
+            Map<String,List<String>> imgUrlList = new HashMap<>();
+            imgUrlList.put("imgUrlList",result);
             return DtoUtil.getSuccesWithDataDto("查询用户成就成功",imgUrlList,100000);
         }
         return DtoUtil.getSuccessDto("该用户还没有任何成就",100000);
