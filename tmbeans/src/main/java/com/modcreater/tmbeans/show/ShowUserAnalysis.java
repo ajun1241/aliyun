@@ -27,7 +27,7 @@ public class ShowUserAnalysis {
      * key:事件类型编号
      * value:该类型事件所用分钟数
      */
-    private Map<Long,Long> totalMinutesResult;
+    private Map<String,Long> totalMinutesResult;
     /**
      * 有效事件总数量
      */

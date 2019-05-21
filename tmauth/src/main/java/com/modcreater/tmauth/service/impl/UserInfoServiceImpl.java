@@ -252,7 +252,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         //记录单一事件和重复事件的总用时分钟数
         Long totalMinutes = 0L;
         Map<String,String> percentResult = new HashMap<>();
-        Map<Long,Long> totalMinutesResult = new HashMap<>();
+        Map<String,Long> totalMinutesResult = new HashMap<>();
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
         List<GetUserEventsGroupByType> loopTypeList = eventMapper.getUserLoopEventsGroupByType(userId);
         //控制计算精度
@@ -277,50 +277,57 @@ public class UserInfoServiceImpl implements UserInfoService {
                         percentResult.put("a","0");
                     }
                     percentResult.put("a",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("a",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 1){
+                    if (type.getNum() == 1){
                         percentResult.put("b","0");
                     }
                     percentResult.put("b",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("b",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 2){
+                    if (type.getNum() == 2){
                         percentResult.put("c","0");
                     }
                     percentResult.put("c",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("c",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 3){
+                    if (type.getNum() == 3){
                         percentResult.put("d","0");
                     }
                     percentResult.put("d",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("d",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 4){
+                    if (type.getNum() == 4){
                         percentResult.put("e","0");
                     }
                     percentResult.put("e",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("e",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 5){
+                    if (type.getNum() == 5){
                         percentResult.put("f","0");
                     }
                     percentResult.put("f",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("f",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 6){
+                    if (type.getNum() == 6){
                         percentResult.put("g","0");
                     }
                     percentResult.put("g",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("g",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 7){
+                    if (type.getNum() == 7){
                         percentResult.put("h","0");
                     }
                     percentResult.put("h",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("h",type.getTotalMinutes());
                 }
-                totalMinutesResult.put(type.getType(),type.getTotalMinutes());
             }
             Long maxSingleEventType = eventMapper.getMaxSingleEventType(userId);
             Long maxLoopEventType = eventMapper.getMaxLoopEventType(userId);
@@ -341,56 +348,63 @@ public class UserInfoServiceImpl implements UserInfoService {
                 totalEvents += type.getNum();
                 totalMinutes += type.getTotalMinutes();
             }
-            for (GetUserEventsGroupByType type : loopTypeList){
+            for (GetUserEventsGroupByType type : typeList){
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
                         percentResult.put("a","0");
                     }
                     percentResult.put("a",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("a",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 1){
+                    if (type.getNum() == 1){
                         percentResult.put("b","0");
                     }
                     percentResult.put("b",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("b",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 2){
+                    if (type.getNum() == 2){
                         percentResult.put("c","0");
                     }
                     percentResult.put("c",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("c",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 3){
+                    if (type.getNum() == 3){
                         percentResult.put("d","0");
                     }
                     percentResult.put("d",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("d",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 4){
+                    if (type.getNum() == 4){
                         percentResult.put("e","0");
                     }
                     percentResult.put("e",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("e",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 5){
+                    if (type.getNum() == 5){
                         percentResult.put("f","0");
                     }
                     percentResult.put("f",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("f",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 6){
+                    if (type.getNum() == 6){
                         percentResult.put("g","0");
                     }
                     percentResult.put("g",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("g",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 7){
+                    if (type.getNum() == 7){
                         percentResult.put("h","0");
                     }
                     percentResult.put("h",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("h",type.getTotalMinutes());
                 }
-                totalMinutesResult.put(type.getType(),type.getTotalMinutes());
             }
             showUserAnalysis.setMaxType(eventMapper.getMaxLoopEventType(userId));
             showUserAnalysis.setMinType(eventMapper.getMinLoopEventType(userId));
@@ -405,50 +419,57 @@ public class UserInfoServiceImpl implements UserInfoService {
                         percentResult.put("a","0");
                     }
                     percentResult.put("a",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("a",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 1){
+                    if (type.getNum() == 1){
                         percentResult.put("b","0");
                     }
                     percentResult.put("b",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("b",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 2){
+                    if (type.getNum() == 2){
                         percentResult.put("c","0");
                     }
                     percentResult.put("c",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("c",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 3){
+                    if (type.getNum() == 3){
                         percentResult.put("d","0");
                     }
                     percentResult.put("d",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("d",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 4){
+                    if (type.getNum() == 4){
                         percentResult.put("e","0");
                     }
                     percentResult.put("e",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("e",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 5){
+                    if (type.getNum() == 5){
                         percentResult.put("f","0");
                     }
                     percentResult.put("f",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("f",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 6){
+                    if (type.getNum() == 6){
                         percentResult.put("g","0");
                     }
                     percentResult.put("g",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("g",type.getTotalMinutes());
                 }
-                if (type.getType() == 0){
-                    if (type.getNum() == 0){
+                if (type.getType() == 7){
+                    if (type.getNum() == 7){
                         percentResult.put("h","0");
                     }
                     percentResult.put("h",decimalFormat.format((double)type.getNum()/totalEvents));
+                    totalMinutesResult.put("h",type.getTotalMinutes());
                 }
-                totalMinutesResult.put(type.getType(),type.getTotalMinutes());
             }
             showUserAnalysis.setMaxType(eventMapper.getMaxSingleEventType(userId));
             showUserAnalysis.setMinType(eventMapper.getMinSingleEventType(userId));
