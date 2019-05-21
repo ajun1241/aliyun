@@ -274,51 +274,51 @@ public class UserInfoServiceImpl implements UserInfoService {
             for (GetUserEventsGroupByType type : typeList){
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("学习","0");
+                        percentResult.put("a","0");
                     }
-                    percentResult.put("学习",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("a",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("工作","0");
+                        percentResult.put("b","0");
                     }
-                    percentResult.put("工作",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("b",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("商务","0");
+                        percentResult.put("c","0");
                     }
-                    percentResult.put("商务",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("c",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("休闲","0");
+                        percentResult.put("d","0");
                     }
-                    percentResult.put("休闲",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("d",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("家庭","0");
+                        percentResult.put("e","0");
                     }
-                    percentResult.put("家庭",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("e",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("节日","0");
+                        percentResult.put("f","0");
                     }
-                    percentResult.put("节日",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("f",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("假期","0");
+                        percentResult.put("g","0");
                     }
-                    percentResult.put("假期",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("g",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("其他","0");
+                        percentResult.put("h","0");
                     }
-                    percentResult.put("其他",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("h",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 totalMinutesResult.put(type.getType(),type.getTotalMinutes());
             }
@@ -344,51 +344,51 @@ public class UserInfoServiceImpl implements UserInfoService {
             for (GetUserEventsGroupByType type : loopTypeList){
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("学习","0");
+                        percentResult.put("a","0");
                     }
-                    percentResult.put("学习",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("a",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("工作","0");
+                        percentResult.put("b","0");
                     }
-                    percentResult.put("工作",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("b",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("商务","0");
+                        percentResult.put("c","0");
                     }
-                    percentResult.put("商务",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("c",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("休闲","0");
+                        percentResult.put("d","0");
                     }
-                    percentResult.put("休闲",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("d",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("家庭","0");
+                        percentResult.put("e","0");
                     }
-                    percentResult.put("家庭",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("e",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("节日","0");
+                        percentResult.put("f","0");
                     }
-                    percentResult.put("节日",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("f",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("假期","0");
+                        percentResult.put("g","0");
                     }
-                    percentResult.put("假期",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("g",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("其他","0");
+                        percentResult.put("h","0");
                     }
-                    percentResult.put("其他",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("h",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 totalMinutesResult.put(type.getType(),type.getTotalMinutes());
             }
@@ -402,51 +402,51 @@ public class UserInfoServiceImpl implements UserInfoService {
             for (GetUserEventsGroupByType type : typeList){
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("学习","0");
+                        percentResult.put("a","0");
                     }
-                    percentResult.put("学习",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("a",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("工作","0");
+                        percentResult.put("b","0");
                     }
-                    percentResult.put("工作",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("b",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("商务","0");
+                        percentResult.put("c","0");
                     }
-                    percentResult.put("商务",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("c",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("休闲","0");
+                        percentResult.put("d","0");
                     }
-                    percentResult.put("休闲",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("d",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("家庭","0");
+                        percentResult.put("e","0");
                     }
-                    percentResult.put("家庭",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("e",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("节日","0");
+                        percentResult.put("f","0");
                     }
-                    percentResult.put("节日",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("f",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("假期","0");
+                        percentResult.put("g","0");
                     }
-                    percentResult.put("假期",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("g",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 if (type.getType() == 0){
                     if (type.getNum() == 0){
-                        percentResult.put("其他","0");
+                        percentResult.put("h","0");
                     }
-                    percentResult.put("其他",decimalFormat.format((double)type.getNum()/totalEvents));
+                    percentResult.put("h",decimalFormat.format((double)type.getNum()/totalEvents));
                 }
                 totalMinutesResult.put(type.getType(),type.getTotalMinutes());
             }
