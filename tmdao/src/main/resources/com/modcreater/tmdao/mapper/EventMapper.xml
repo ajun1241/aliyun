@@ -31,10 +31,13 @@
 
     <select id="countIdByDate" resultType="java.lang.Integer">
         select count(id) from singleevent where
-        (userId = #{userid} and day = #{day} and month = #{month} and year = #{year}) and
-        ((startTime &gt; #{starttime} and endTime &lt; #{endtime}) or
-        (startTime &gt;= #{starttime} and startTime &lt;= #{endtime}) or
-        (endTime &gt;= #{starttime} and endTime &lt;= #{endtime}) or
+        userId = #{userid} and day = #{day} and month = #{month} and year = #{year} and
+        ((startTime &gt;= #{starttime} and endTime &lt;= #{endtime})
+        or
+        (startTime &gt;= #{starttime} and startTime &lt;= #{endtime})
+        or
+        (endTime &gt;= #{starttime} and endTime &lt;= #{endtime})
+        or
         (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}))
     </select>
 

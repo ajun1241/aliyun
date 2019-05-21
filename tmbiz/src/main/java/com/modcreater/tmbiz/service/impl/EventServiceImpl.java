@@ -66,43 +66,45 @@ public class EventServiceImpl implements EventService {
                     return dto;
                 }
                 singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
-
-                //如果查询Id的数量为0才能继续添加的操作(单一事件)
-                if (eventMapper.countIdByDate(singleEvent) != 0){
-                    return DtoUtil.getFalseDto("时间段冲突,无法添加事件",21012);
-                }
-                //判断重复事件表中是否有冲突的时间段的事件
-                List<SingleEvent> loopEventList = eventMapper.queryLoopEvents(singleEvent.getUserid().toString());
-                String day = singleEvent.getDay().toString();
-                String month = singleEvent.getMonth().toString();
-                if (day.length() < 2){
-                    day = "0"+day;
-                }
-                if (month.length() < 2){
-                    month = "0"+month;
-                }
-                int week = (DateUtil.stringToWeek(singleEvent.getYear().toString()+month+day))-1;
-                for (SingleEvent loopEvent : loopEventList){
-                    Boolean[] loopEventRepeatTimeInDataBase = SingleEventUtil.getRepeatTime(loopEvent);
-                    if (loopEventRepeatTimeInDataBase[week]){
-                        int startTimeInDataBase = Integer.valueOf(loopEvent.getStarttime());
-                        int endTimeInDataBase = Integer.valueOf(loopEvent.getStarttime());
-                        int startTime = Integer.valueOf(singleEvent.getStarttime());
-                        int endTime = Integer.valueOf(singleEvent.getEndtime());
-                        if (((startTime>startTimeInDataBase && endTime<endTimeInDataBase)
-                                || (startTime>=startTimeInDataBase && startTime <= endTimeInDataBase)
-                                || (endTime>=startTimeInDataBase && endTime<=endTimeInDataBase)
-                                || (startTime<=startTimeInDataBase && endTime>=endTimeInDataBase))){
-                            return DtoUtil.getFalseDto("时间段冲突,无法添加事件",21012);
-                        }
-                    }
-                }
                 //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
                 if (SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime())) {
+                    //判断重复事件表中是否有冲突的时间段的事件
+                    List<SingleEvent> loopEventList = eventMapper.queryLoopEvents(singleEvent.getUserid().toString());
+                    String day = singleEvent.getDay().toString();
+                    String month = singleEvent.getMonth().toString();
+                    if (day.length() < 2){
+                        day = "0"+day;
+                    }
+                    if (month.length() < 2){
+                        month = "0"+month;
+                    }
+                    int week = (DateUtil.stringToWeek(singleEvent.getYear().toString()+month+day))-1;
+                    for (SingleEvent loopEvent : loopEventList){
+                        Boolean[] loopEventRepeatTimeInDataBase = SingleEventUtil.getRepeatTime(loopEvent);
+                        if (loopEventRepeatTimeInDataBase[week]){
+                            int startTimeInDataBase = Integer.valueOf(loopEvent.getStarttime());
+                            int endTimeInDataBase = Integer.valueOf(loopEvent.getStarttime());
+                            int startTime = Integer.valueOf(singleEvent.getStarttime());
+                            int endTime = Integer.valueOf(singleEvent.getEndtime());
+                            if (((startTime>startTimeInDataBase && endTime<endTimeInDataBase)
+                                    || (startTime>=startTimeInDataBase && startTime <= endTimeInDataBase)
+                                    || (endTime>=startTimeInDataBase && endTime<=endTimeInDataBase)
+                                    || (startTime<=startTimeInDataBase && endTime>=endTimeInDataBase))){
+                                return DtoUtil.getFalseDto("时间段冲突,无法添加重复事件",21012);
+                            }
+                        }
+                    }
+                    if (eventMapper.countIdByDate(singleEvent) != 0){
+                        return DtoUtil.getFalseDto("时间段冲突,无法添加事件",21012);
+                    }
                     if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingLoopEvents(singleEvent) > 0) {
                         return DtoUtil.getSuccessDto("事件上传成功", 100000);
                     }
                 } else {
+                    //如果查询Id的数量为0才能继续添加的操作(单一事件)
+                    if (eventMapper.countIdByDate(singleEvent) != 0){
+                        return DtoUtil.getFalseDto("时间段冲突,无法添加单一事件",21012);
+                    }
                     if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
                         return DtoUtil.getSuccessDto("事件上传成功", 100000);
                     }

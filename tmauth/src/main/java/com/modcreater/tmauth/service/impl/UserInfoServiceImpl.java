@@ -251,7 +251,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         Long totalEvents = 0L;
         //记录单一事件和重复事件的总用时分钟数
         Long totalMinutes = 0L;
-        Map<Long,String> percentResult = new HashMap<>();
+        Map<String,String> percentResult = new HashMap<>();
         Map<Long,Long> totalMinutesResult = new HashMap<>();
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
         List<GetUserEventsGroupByType> loopTypeList = eventMapper.getUserLoopEventsGroupByType(userId);
@@ -272,7 +272,54 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
             }
             for (GetUserEventsGroupByType type : typeList){
-                percentResult.put(type.getType(),decimalFormat.format((double)type.getNum()/totalEvents));
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("学习","0");
+                    }
+                    percentResult.put("学习",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("工作","0");
+                    }
+                    percentResult.put("工作",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("商务","0");
+                    }
+                    percentResult.put("商务",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("休闲","0");
+                    }
+                    percentResult.put("休闲",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("家庭","0");
+                    }
+                    percentResult.put("家庭",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("节日","0");
+                    }
+                    percentResult.put("节日",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("假期","0");
+                    }
+                    percentResult.put("假期",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("其他","0");
+                    }
+                    percentResult.put("其他",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
                 totalMinutesResult.put(type.getType(),type.getTotalMinutes());
             }
             Long maxSingleEventType = eventMapper.getMaxSingleEventType(userId);
@@ -295,7 +342,54 @@ public class UserInfoServiceImpl implements UserInfoService {
                 totalMinutes += type.getTotalMinutes();
             }
             for (GetUserEventsGroupByType type : loopTypeList){
-                percentResult.put(type.getType(),decimalFormat.format((double)type.getNum()/totalEvents));
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("学习","0");
+                    }
+                    percentResult.put("学习",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("工作","0");
+                    }
+                    percentResult.put("工作",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("商务","0");
+                    }
+                    percentResult.put("商务",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("休闲","0");
+                    }
+                    percentResult.put("休闲",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("家庭","0");
+                    }
+                    percentResult.put("家庭",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("节日","0");
+                    }
+                    percentResult.put("节日",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("假期","0");
+                    }
+                    percentResult.put("假期",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("其他","0");
+                    }
+                    percentResult.put("其他",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
                 totalMinutesResult.put(type.getType(),type.getTotalMinutes());
             }
             showUserAnalysis.setMaxType(eventMapper.getMaxLoopEventType(userId));
@@ -306,7 +400,54 @@ public class UserInfoServiceImpl implements UserInfoService {
                 totalMinutes += type.getTotalMinutes();
             }
             for (GetUserEventsGroupByType type : typeList){
-                percentResult.put(type.getType(),decimalFormat.format((double)type.getNum()/totalEvents));
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("学习","0");
+                    }
+                    percentResult.put("学习",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("工作","0");
+                    }
+                    percentResult.put("工作",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("商务","0");
+                    }
+                    percentResult.put("商务",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("休闲","0");
+                    }
+                    percentResult.put("休闲",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("家庭","0");
+                    }
+                    percentResult.put("家庭",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("节日","0");
+                    }
+                    percentResult.put("节日",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("假期","0");
+                    }
+                    percentResult.put("假期",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
+                if (type.getType() == 0){
+                    if (type.getNum() == 0){
+                        percentResult.put("其他","0");
+                    }
+                    percentResult.put("其他",decimalFormat.format((double)type.getNum()/totalEvents));
+                }
                 totalMinutesResult.put(type.getType(),type.getTotalMinutes());
             }
             showUserAnalysis.setMaxType(eventMapper.getMaxSingleEventType(userId));

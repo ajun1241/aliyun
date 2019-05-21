@@ -22,7 +22,7 @@ public class ShowUserAnalysis {
      * key:事件类型编号
      * value:该类型事件数量占总有效事件数量总和的百分比浮点数
      */
-    private Map<Long,String> percentResult;
+    private Map<String,String> percentResult;
     /**
      * key:事件类型编号
      * value:该类型事件所用分钟数

@@ -4,6 +4,7 @@ import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedFiltrateUserEvents;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
 import com.modcreater.tmbeans.vo.uservo.UserIdVo;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,13 +32,13 @@ public class UserInfoController {
 
     /**
      * 显示用户详情
-     * @param userIdVo
+     * @param receivedId
      * @param request
      * @return
      */
     @RequestMapping(value = "showuserdetails",method = RequestMethod.POST)
-    public Dto showUserDetails(@RequestBody UserIdVo userIdVo, HttpServletRequest request){
-        return userInfoService.showUserDetails(userIdVo.getUserId(),request.getHeader("token"));
+    public Dto showUserDetails(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return userInfoService.showUserDetails(receivedId.getUserId(),request.getHeader("token"));
     }
 
     /**
@@ -75,25 +76,25 @@ public class UserInfoController {
 
     /**
      * 数据统计
-     * @param userIdVo
+     * @param receivedId
      * @param request
      * @return
      */
     @RequestMapping(value = "statisticanalysisofdata",method = RequestMethod.POST)
-    public Dto statisticAnalysisOfData(@RequestBody UserIdVo userIdVo,HttpServletRequest request){
-        return userInfoService.statisticAnalysisOfData(userIdVo.getUserId(),request.getHeader("token"));
+    public Dto statisticAnalysisOfData(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return userInfoService.statisticAnalysisOfData(receivedId.getUserId(),request.getHeader("token"));
     }
 
 
     /**
      * 查询用户成就(图片的URL地址)
-     * @param userIdVo
+     * @param receivedId
      * @param httpServletRequest
      * @return
      */
     @RequestMapping(value = "searchachievement",method = RequestMethod.POST)
-    public Dto queryUserAchievement(@RequestBody UserIdVo userIdVo,HttpServletRequest httpServletRequest){
-        return userInfoService.queryUserAchievement(userIdVo.getUserId(),httpServletRequest.getHeader("token"));
+    public Dto queryUserAchievement(@RequestBody ReceivedId receivedId,HttpServletRequest httpServletRequest){
+        return userInfoService.queryUserAchievement(receivedId.getUserId(),httpServletRequest.getHeader("token"));
     }
 
     /**
