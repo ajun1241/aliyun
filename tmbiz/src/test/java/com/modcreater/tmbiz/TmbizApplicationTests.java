@@ -4,6 +4,16 @@ package com.modcreater.tmbiz;
 import com.modcreater.tmbeans.vo.eventvo.UploadingEventVo;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
+import io.rong.RongCloud;
+import io.rong.messages.VoiceMessage;
+import io.rong.methods.message._private.Private;
+import io.rong.methods.message.chatroom.Chatroom;
+import io.rong.methods.message.discussion.Discussion;
+import io.rong.methods.message.group.Group;
+import io.rong.methods.message.history.History;
+import io.rong.methods.message.system.MsgSystem;
+import io.rong.models.message.PrivateMessage;
+import io.rong.models.response.ResponseResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -77,8 +87,38 @@ public class TmbizApplicationTests {
     }
 
     @Test
-    public void test() {
-        System.out.println(stringRedisTemplate.opsForValue().get("test"));
+    public void test() throws Exception {
+        RongCloud rongCloud = RongCloud.getInstance("0vnjpoad03rzz", "BbTOtrRIF5MOA");
+        //自定义 api 地址方式
+        //RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret,api);
+
+        VoiceMessage voiceMessage = new VoiceMessage("花花说的很好打啊实打实大大大", "helloExtra", 20L);
+        Private Private = rongCloud.message.msgPrivate;
+        MsgSystem system = rongCloud.message.system;
+        Group group = rongCloud.message.group;
+        Chatroom chatroom = rongCloud.message.chatroom;
+        Discussion discussion = rongCloud.message.discussion;
+        History history = rongCloud.message.history;
+        /**
+         * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/message/private.html#send
+         *
+         * 发送单聊消息
+         * */
+        String[] targetIds = {"100033"};
+        PrivateMessage privateMessage = new PrivateMessage()
+                .setSenderId("100023")
+                .setTargetId(targetIds)
+                .setObjectName(voiceMessage.getType())
+                .setContent(voiceMessage)
+                .setPushContent("")
+                .setPushData("{\"pushData\":\"hello\"}")
+                .setCount("4")
+                .setVerifyBlacklist(0)
+                .setIsPersisted(0)
+                .setIsCounted(0)
+                .setIsIncludeSender(0);
+        ResponseResult privateResult = Private.send(privateMessage);
+        System.out.println("send private message:  " + privateResult.toString());
     }
 
 }

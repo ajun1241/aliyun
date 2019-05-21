@@ -52,6 +52,8 @@ public class EventServiceImpl implements EventService {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
+            System.out.println("我的token"+stringRedisTemplate.opsForValue().get(uploadingEventVo.getUserId()));
+            System.out.println(uploadingEventVo.toString());
             if (!token.equals(stringRedisTemplate.opsForValue().get(uploadingEventVo.getUserId()))){
                 return DtoUtil.getFalseDto("token过期请先登录",21014);
             }

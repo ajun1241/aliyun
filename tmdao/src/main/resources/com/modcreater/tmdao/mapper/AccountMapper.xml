@@ -95,11 +95,11 @@
         insert into friendship (userId,friendId) values (#{userId},#{friendId})
     </insert>
 
-    <select id="queryFriendList" parameterType="String" resultType="com.modcreater.tmbeans.pojo.Account">
+    <select id="queryFriendList"  resultType="com.modcreater.tmbeans.pojo.Account">
         SELECT * FROM account WHERE id IN (SELECT friendId FROM friendship WHERE userId=#{userId})
-
+        <if test=" pageIndex>=0 and pageSize>0">
             limit #{pageIndex},#{pageSize}
-
+        </if>
     </select>
 
     <update id="updateFriendJurisdiction" parameterType="com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo">

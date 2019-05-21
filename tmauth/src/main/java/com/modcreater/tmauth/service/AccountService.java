@@ -8,12 +8,6 @@ import com.modcreater.tmbeans.vo.QueryUserVo;
 import com.modcreater.tmbeans.vo.uservo.*;
 
 public interface AccountService {
-    /**
-     * 登录
-     * @param loginVo
-     * @return
-     */
-    Dto doLogin(LoginVo loginVo);
 
     /**
      * 注册/登录
