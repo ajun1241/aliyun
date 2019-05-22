@@ -31,13 +31,26 @@
     </insert>
 
     <select id="countIdByDate" resultType="java.lang.Integer">
-        select count(id) from singleevent where
-        userId = #{userid} and day = #{day} and month = #{month} and year = #{year} and
-        ((startTime &gt;= #{starttime} and endTime &lt;= #{endtime})
+        select count(id) from singleevent
+        <where>
+            <if test="userid != null">
+                userId = #{userid}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+        </where>
+        and ((startTime &gt; #{starttime} and endTime &lt; #{endtime})
         or
-        (startTime &gt;= #{starttime} and startTime &lt;= #{endtime})
+        (startTime &gt; #{starttime} and startTime &lt; #{endtime})
         or
-        (endTime &gt;= #{starttime} and endTime &lt;= #{endtime})
+        (endTime &gt; #{starttime} and endTime &lt; #{endtime})
         or
         (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}))
     </select>
@@ -65,11 +78,7 @@
     </insert>
 
     <update id="withdrawEventsByUserId">
-        update singleevent set isOverdue = #{isOverdue} where eventId = #{eventid} and userId = #{userid} and isOverdue &lt;&gt; 2
-    </update>
-
-    <update id="withdrawLoopEventsByUserId">
-        update loopevent set isOverdue = #{isOverdue} where eventId = #{eventid} and userId = #{userid} and isOverdue &lt;&gt; 2
+        update singleevent set isOverdue = #{eventStatus} where eventId = #{eventId} and userId = #{userId}
     </update>
 
     <update id="alterEventsByUserId">
@@ -88,35 +97,10 @@
                 day = #{day},
                 month = #{month},
                 year = #{year},
-                type = #{type}
+                type = #{type},
+                isLoop = #{isLoop}
             where eventId = #{eventid} and userId = #{userid}
     </update>
-
-    <update id="alterLoopEventsByUserId">
-            update loopevent set
-                eventName = #{eventname},
-                startTime = #{starttime},
-                endTime = #{endtime},
-                address = #{address},
-                level = #{level},
-                flag = #{flag},
-                person = #{person},
-                remarks = #{remarks},
-                repeatTime = #{repeaTtime},
-                isOverdue = #{isOverdue},
-                remindTime = #{remindTime},
-                day = #{day},
-                month = #{month},
-                year = #{year},
-                type = #{type}
-            where eventId = #{eventid} and userId = #{userid}
-    </update>
-    <delete id="deleteEventsByUserId">
-        delete from singleevent where eventId = #{eventid} and userId = #{userid}
-    </delete>
-    <delete id="deleteLoopEventsByUserId">
-        delete from loopevent where eventId = #{eventid} and userId = #{userid}
-    </delete>
 
     <select id="queryEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
@@ -183,30 +167,6 @@
         </where>
         order by level asc , startTime asc
     </select>
-    <select id="queryByDayEventIdsInMonth" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select
-        <include refid="Base_Column_List"/>
-        from singleevent
-        <where>
-            <if test="userid != null">
-                userid = #{userid}
-            </if>
-            <if test="month != null">
-                and month = #{month}
-            </if>
-            <if test="year != null">
-                and year = #{year}
-            </if>
-            and isOverdue &lt;&gt; 2
-        </where>
-        order by day asc
-    </select>
-
-    <update id="updOldEvent">
-            update singleevent set
-                isOverdue = 2
-            where userId = #{userid} and year =#{year} and month=#{month} and day=#{day}
-    </update>
 
     <select id="queryEventByUserId" resultType="int">
         select count(1) from singleevent where userId=#{userId}
@@ -228,8 +188,8 @@
     <select id="queryLoopEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
         <include refid="Base_Column_List"/>
-        from loopevent
-        where userid = #{userId} and isOverdue &lt;&gt; 2 order by startTime asc
+        from singleevent
+        where userid = #{userId} and isLoop = 1 and isOverdue &lt;&gt; 2 order by startTime asc
     </select>
     <select id="queryByWeekOrderByStartTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
@@ -259,11 +219,14 @@
         and year = #{year}
         group by day
     </select>
-    <select id="querySingleEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select <include refid="Base_Column_List"/> from singleevent where userid=#{userid} and eventid = #{eventid} and isOverdue = 0
-    </select>
-    <select id="queryLoopSingleEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select <include refid="Base_Column_List"/> from loopevent where userid=#{userid} and eventid = #{eventid} and isOverdue = 0
+    <select id="querySingleEventTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select startTime,endTime from singleevent
+        <where>
+            <if test="isLoop != null">
+                isLoop = #{isLoop}
+            </if>
+        </where>
+         and userid=#{userid} and eventid = #{eventid}
     </select>
     <select id="queryUserEventsByUserIdIsOverdue" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select eventId,userId,eventName,day,month,year
@@ -271,9 +234,6 @@
         where userId = #{userId}
         and isOverdue = #{isOverdue}
         order by year desc,month desc,day desc limit 0,7
-    </select>
-    <select id="queryUserLoopEventsByUserIdIsOverdue" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select eventId,userId,eventName,repeatTime from singleevent where userId = #{userId} and isOverdue = #{isOverdue}
     </select>
     <select id="searchEventsByEventName" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select eventId,userId,eventName,day,month,year

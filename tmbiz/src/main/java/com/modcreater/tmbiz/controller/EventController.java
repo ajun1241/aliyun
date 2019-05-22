@@ -60,27 +60,6 @@ public class EventController {
     }
 
     /**
-     * 同步本地数据
-     *
-     * @param synchronousUpdateVo
-     * @return
-     */
-    /*@RequestMapping(value = "syup", method = RequestMethod.POST)
-    public Dto synchronousUpdate(@RequestBody SynchronousUpdateVo synchronousUpdateVo) {
-        return eventService.synchronousUpdate(synchronousUpdateVo);
-    }*/
-
-    /**
-     * 对比时间戳
-     * @param contrastTimestampVo
-     * @return
-     */
-    @RequestMapping(value = "ctime",method = RequestMethod.POST)
-    public Dto contrastTimestamp(@RequestBody ContrastTimestampVo contrastTimestampVo, HttpServletRequest request){
-        return eventService.contrastTimestamp(contrastTimestampVo,request.getHeader("token"));
-    }
-
-    /**
      * 第一次登录事件数据同步
      * @param synchronousUpdateVo
      * @return

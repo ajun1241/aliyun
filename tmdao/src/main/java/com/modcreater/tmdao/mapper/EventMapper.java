@@ -3,6 +3,7 @@ package com.modcreater.tmdao.mapper;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
+import com.modcreater.tmbeans.vo.eventvo.DeleteEventVo;
 import com.modcreater.tmbeans.vo.eventvo.DraftVo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import org.apache.ibatis.annotations.Mapper;
@@ -39,24 +40,10 @@ public interface EventMapper {
     /**
      * 撤销事件
      *
-     * @param singleEvent
+     * @param deleteEventVo
      * @return
      */
-    int withdrawEventsByUserId(SingleEvent singleEvent);
-
-    /**
-     * 删除事件
-     * @param singleEvent
-     * @return
-     */
-    int deleteEventsByUserId(SingleEvent singleEvent);
-
-    /**
-     * 删除重复事件
-     * @param singleEvent
-     * @return
-     */
-    int deleteLoopEventsByUserId(SingleEvent singleEvent);
+    int withdrawEventsByUserId(DeleteEventVo deleteEventVo);
     /**
      * 更新事件
      *
@@ -72,13 +59,6 @@ public interface EventMapper {
      * @return
      */
     ArrayList<SingleEvent> queryEvents(SingleEvent singleEvent);
-
-    /**
-     * 同步修改
-     * @param singleEvent
-     * @return
-     */
-    int updOldEvent(SingleEvent singleEvent);
 
     /**
      * 根据用户id查询事件
@@ -122,34 +102,11 @@ public interface EventMapper {
     List<SingleEvent> queryByDayOrderByLevelAndDate(SingleEvent singleEvent);
 
     /**
-     * 根据"月"查找事件并根据事件
-     * @param singleEvent
-     * @return
-     */
-    List<SingleEvent> queryByDayEventIdsInMonth(SingleEvent singleEvent);
-
-    /**
      * 添加一个重复事件
      * @param singleEvent
      * @return
      */
     int uploadingLoopEvents(SingleEvent singleEvent);
-
-    /**
-     * 撤销一个重复事件
-     *
-     * @param singleEvent
-     * @return
-     */
-    int withdrawLoopEventsByUserId(SingleEvent singleEvent);
-
-    /**
-     * 更新一个重复事件
-     *
-     * @param singleEvent
-     * @return
-     */
-    int alterLoopEventsByUserId(SingleEvent singleEvent);
 
     /**
      * 查询重复事件
@@ -174,18 +131,11 @@ public interface EventMapper {
     List<Integer> queryDays(SingleEvent singleEvent);
 
     /**
-     * 根据userId和eventId查询单一事件表(未完成事件)
+     * 根据userId和eventId查询事件的开始时间和结束时间
      * @param singleEvent
      * @return
      */
-    SingleEvent querySingleEvent(SingleEvent singleEvent);
-
-    /**
-     * 根据userId和eventId查询重复事件表(未完成事件)
-     * @param singleEvent
-     * @return
-     */
-    SingleEvent queryLoopSingleEvent(SingleEvent singleEvent);
+    SingleEvent querySingleEventTime(SingleEvent singleEvent);
 
     /**
      * 根据userId和完成状态查询单一事件表
@@ -194,14 +144,6 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> queryUserEventsByUserIdIsOverdue(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
-
-    /**
-     * 根据userId和完成状态查询重复事件表
-     * @param userId
-     * @param isOverdue
-     * @return
-     */
-    List<SingleEvent> queryUserLoopEventsByUserIdIsOverdue(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
 
     /**
      * 根据用户ID,事件状态和事件名称模糊查询

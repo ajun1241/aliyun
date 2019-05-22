@@ -254,7 +254,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         Map<String,String> percentResult = new HashMap<>();
         Map<String,Long> totalMinutesResult = new HashMap<>();
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
+        List<GetUserEventsGroupByType> newList = new ArrayList<>();
         List<GetUserEventsGroupByType> loopTypeList = eventMapper.getUserLoopEventsGroupByType(userId);
+        System.out.println(typeList.size() +"<=======>"+loopTypeList.size());
         //控制计算精度
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         //此处判断,如果重复事件和单一事件都有查询结果
@@ -262,12 +264,20 @@ public class UserInfoServiceImpl implements UserInfoService {
             for (GetUserEventsGroupByType loopType : loopTypeList) {
                 for (GetUserEventsGroupByType type : typeList) {
                     if (loopType.getType().equals(type.getType())){
-                        //记录时间总和
+                        System.out.println("进入单一+重复");
+                        //记录事件总和
                         totalEvents += type.getNum() + loopType.getNum();
                         //记录用时分钟总和
                         totalMinutes += type.getTotalMinutes() + loopType.getTotalMinutes();
                         type.setNum(type.getNum() + loopType.getNum());
                         type.setTotalMinutes(type.getTotalMinutes() + loopType.getTotalMinutes());
+                    }else {
+                        System.out.println("进入单一+重复else");
+                        //记录事件总和
+                        totalEvents += type.getNum() + loopType.getNum();
+                        //记录用时分钟总和
+                        totalMinutes += type.getTotalMinutes() + loopType.getTotalMinutes();
+                        newList.add(loopType);
                     }
                 }
             }
@@ -344,6 +354,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 showUserAnalysis.setMaxType(minLoopEventType);
             }
         }else if (loopTypeList.size() != 0 && typeList.size() == 0){
+            System.out.println("进入重复");
             for (GetUserEventsGroupByType type : loopTypeList){
                 totalEvents += type.getNum();
                 totalMinutes += type.getTotalMinutes();
@@ -409,6 +420,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             showUserAnalysis.setMaxType(eventMapper.getMaxLoopEventType(userId));
             showUserAnalysis.setMinType(eventMapper.getMinLoopEventType(userId));
         }else if (loopTypeList.size() == 0 && typeList.size() != 0){
+            System.out.println("进入单一");
             for (GetUserEventsGroupByType type : typeList){
                 totalEvents += type.getNum();
                 totalMinutes += type.getTotalMinutes();

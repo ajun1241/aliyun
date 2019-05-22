@@ -42,24 +42,6 @@ public interface EventService {
     Dto updateEvents(UpdateEventVo updateEventVo,String token);
 
     /**
-     * 同步本地数据到线上
-     *
-     * @param synchronousUpdateVo
-     * @param token
-     * @return
-     */
-    Dto synchronousUpdate(SynchronousUpdateVo synchronousUpdateVo, String token);
-
-    /**
-     * 对比时间戳
-     *
-     * @param contrastTimestampVo
-     *@param token
-     * @return
-     */
-    Dto contrastTimestamp(ContrastTimestampVo contrastTimestampVo, String token);
-
-    /**
      * 第一次同步
      * @param synchronousUpdateVo
      * @param token
