@@ -17,9 +17,11 @@ public class TmauthApplicationTests {
 
     @Test
     public void contextLoads() {
-        String a="[true,true,true,true,true,null,true]";
-
-        System.out.println(a.indexOf("null"));
+        int a=180;
+        int b=a/60;
+        int c=a%60;
+        System.out.println("b"+b);
+        System.out.println("c"+c);
     }
 
 }

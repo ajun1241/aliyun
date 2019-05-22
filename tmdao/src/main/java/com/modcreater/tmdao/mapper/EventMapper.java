@@ -179,4 +179,6 @@ public interface EventMapper {
      * @return
      */
     Long countEvents(String userId);
+
+    List<SingleEvent> queryEventListBy
 }

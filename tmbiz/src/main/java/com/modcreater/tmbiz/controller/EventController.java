@@ -3,10 +3,8 @@ package com.modcreater.tmbiz.controller;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbiz.service.EventService;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -108,5 +106,15 @@ public class EventController {
     @RequestMapping(value = "seabyweek",method = RequestMethod.POST)
     public Dto searchByWeek(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
         return eventService.searchByDayEventIdsInWeek(searchEventVo,request.getHeader("token"));
+    }
+    /**
+     * 添加一条邀请事件
+     * @param addInviteEventVo
+     * @return
+     */
+    @PostMapping(value = "addinviteevent")
+    @ApiOperation("添加一条邀请事件")
+    public Dto addInviteEvent(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){
+        return eventService.addInviteEvent(addInviteEventVo,request.getHeader("token"));
     }
 }

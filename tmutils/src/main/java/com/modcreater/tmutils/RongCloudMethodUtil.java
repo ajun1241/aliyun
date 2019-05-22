@@ -20,6 +20,7 @@ import io.rong.models.message.SystemMessage;
 import io.rong.models.response.ResponseResult;
 import io.rong.models.response.TokenResult;
 import io.rong.models.user.UserModel;
+import io.rong.util.GsonUtil;
 import org.springframework.util.ObjectUtils;
 
 
@@ -85,14 +86,10 @@ public class RongCloudMethodUtil {
      * 发送系统消息
      *
      */
-    public ResponseResult sendSystemMessage(String userId,String friendId,BaseMessage contactNtfMessage,String pushContent,String pushData) throws Exception {
-
-//        TxtMessage txtMessage = new TxtMessage(content, extra);
-        String[] targetIds = {friendId};
-
+    public ResponseResult sendSystemMessage(String userId,String[] friendId,BaseMessage contactNtfMessage,String pushContent,String pushData) throws Exception {
         SystemMessage systemMessage = new SystemMessage()
                 .setSenderId(userId)
-                .setTargetId(targetIds)
+                .setTargetId(friendId)
                 .setObjectName(contactNtfMessage.getType())
                 .setContent(contactNtfMessage)
                 .setPushContent(pushContent)
@@ -155,6 +152,7 @@ public class RongCloudMethodUtil {
                 .setBlacklist(blacklist);
         return user;
     }
+
 }
 
 

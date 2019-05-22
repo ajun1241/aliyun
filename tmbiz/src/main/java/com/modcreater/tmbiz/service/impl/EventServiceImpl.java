@@ -1,18 +1,18 @@
 package com.modcreater.tmbiz.service.impl;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.pojo.StatisticsTable;
 import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.eventvo.*;
-import com.modcreater.tmbeans.vo.uservo.SendInviteMsgVo;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
-import com.modcreater.tmutils.DateUtil;
-import com.modcreater.tmutils.DtoUtil;
-import com.modcreater.tmutils.SingleEventUtil;
+import com.modcreater.tmdao.mapper.StatisticsMapper;
+import com.modcreater.tmutils.*;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +40,9 @@ public class EventServiceImpl implements EventService {
 
     @Resource
     private AccountMapper accountMapper;
+
+    @Resource
+    private StatisticsMapper statisticsMapper;
 
     @Resource
     private AchievementMapper achievementMapper;
@@ -271,6 +274,8 @@ public class EventServiceImpl implements EventService {
             if (!StringUtils.hasText(token)){
                 return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
             }
+            System.out.println("收到的数据"+searchEventVo.toString());
+            System.out.println("这是我收到的token*****************************>"+token);
             if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))){
                 return DtoUtil.getFalseDto("token过期请先登录",21014);
             }
@@ -473,40 +478,107 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("请先登录", 21011);
     }
 
-
     /**
-     * 发送好友邀请消息
-     * @param sendInviteMsgVo
+     * 添加一条邀请事件
+     * @param addInviteEventVo
      * @param token
      * @return
      */
     @Override
-    public Dto sendInviteMsg(SendInviteMsgVo sendInviteMsgVo, String token) {
+    public Dto addInviteEvent(AddInviteEventVo addInviteEventVo, String token) {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        System.out.println("接受请求"+sendInviteMsgVo.toString());
-        if (StringUtils.isEmpty(sendInviteMsgVo.getUserId())|| (sendInviteMsgVo.getFriendIds().length>0)){
-            return DtoUtil.getFalseDto("userId和friendId不能为空",17001);
+        if (ObjectUtils.isEmpty(addInviteEventVo)){
+            return DtoUtil.getFalseDto("添加邀请事件数据未获取到",26001);
         }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(sendInviteMsgVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        if (StringUtils.isEmpty(addInviteEventVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
         }
-        //发送邀请消息给好友
+        if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        //保存这条事件(放redis)
+        SingleEvent singleEvent=JSONObject.parseObject(addInviteEventVo.getSingleEvent(),SingleEvent.class);
+        String[] persons=singleEvent.getPerson().split(",");
+        String redisKey=addInviteEventVo.getUserId()+singleEvent.getEventid();
+        stringRedisTemplate.opsForValue().set(redisKey,addInviteEventVo.getSingleEvent());
+        //生成统计表
+        List<StatisticsTable> tables=new ArrayList<>();
+        for (String userId:persons) {
+            StatisticsTable statisticsTable=new StatisticsTable();
+            statisticsTable.setCreatorId(Long.parseLong(addInviteEventVo.getUserId()));
+            statisticsTable.setEventId(singleEvent.getEventid());
+            statisticsTable.setUserId(Long.parseLong(userId));
+            tables.add(statisticsTable);
+        }
+        int i=statisticsMapper.createStatistics(tables);
+        if (i<=0){
+            return DtoUtil.getFalseDto("生成统计表失败",26003);
+        }
+        //向被邀请者发送信息
+        try {
+            Account account=accountMapper.queryAccount(addInviteEventVo.getUserId());
+
+            RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+            String content=account.getUserName()+"邀请你参加"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+"的"+singleEvent.getEventname()+"活动;"+"时间"+Integer.parseInt(singleEvent.getStarttime())/60+":"+Integer.parseInt(singleEvent.getStarttime())%60+"至"+Integer.parseInt(singleEvent.getEndtime())/60+":"+Integer.parseInt(singleEvent.getEndtime())%60;
+            System.out.println("消息内容"+content);
+            InviteMessage inviteMessage=new InviteMessage(content,"",redisKey);
+            rongCloudMethodUtil.sendSystemMessage(addInviteEventVo.getUserId(),persons,inviteMessage,"","");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("消息发送出错",26002);
+        }
+        return DtoUtil.getSuccessDto("消息发送成功",100000);
+    }
+
+    /**
+     * 回应事件邀请
+     * @param feedbackEventInviteVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto feedbackEventInvite(FeedbackEventInviteVo feedbackEventInviteVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(feedbackEventInviteVo)){
+            return DtoUtil.getFalseDto("添加邀请事件数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(feedbackEventInviteVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        //通过判断所有用户是否都答复决定是否发送消息给事件发起者
+        if (Integer.parseInt(feedbackEventInviteVo.getChoose())==0){
+            //判断接受者的事件列表是否有冲突
+            //拿到发起者的事件
+            SingleEvent singleEvent=JSONObject.parseObject(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getExtraData()),SingleEvent.class);
+            //查到冲突的事件集合
+            
+        }
+        //通过判断timeUp字段决定是否发送消息给事件发起者
+
+
+
+        //冲突给该用户反馈
+        //不冲突把该用户的选择记录在统计表
+
 
         return null;
     }
 
     /**
-     * 发送好友接受邀请消息
-     * @param sendInviteMsgVo
+     * 创建者选择
+     * @param eventCreatorChooseVo
      * @param token
      * @return
      */
     @Override
-    public Dto sendInviteAcceptMsg(SendInviteMsgVo sendInviteMsgVo, String token) {
-        //计入统计
-        //
+    public Dto eventCreatorChoose(EventCreatorChooseVo eventCreatorChooseVo, String token) {
         return null;
     }
 

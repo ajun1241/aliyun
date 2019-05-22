@@ -96,6 +96,7 @@ public class AccountServiceImpl implements AccountService {
             if (StringUtils.isEmpty(token)){
                 return DtoUtil.getFalseDto("生成token失败",14005);
             }
+            System.out.println("这是我要的token*****************************>"+token);
             //把token保存在数据库
             account.setId(result.getId());
             account.setToken(token);
@@ -290,8 +291,9 @@ public class AccountServiceImpl implements AccountService {
         //发送添加信息
         ResponseResult result;
         try {
+            String[] friendId={sendFriendRequestVo.getFriendId()};
             ContactNtfMessage contactNtfMessage=new ContactNtfMessage("Request","",sendFriendRequestVo.getUserId(), sendFriendRequestVo.getFriendId(), sendFriendRequestVo.getContent());
-            result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(), sendFriendRequestVo.getFriendId(), contactNtfMessage, "","");
+            result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送请求失败",17002);
             }
@@ -324,10 +326,11 @@ public class AccountServiceImpl implements AccountService {
         //给请求者 发一条消息说，我同意你的请求了
         Account user = accountMapper.queryAccount(sendFriendResponseVo.getUserId());
         Account friend = accountMapper.queryAccount(sendFriendResponseVo.getFriendId());
-        String extra = "{sourceUserNickname:"+ user.getUserName() + ",version:123456}";
+        String extra = "";
         try {
+            String[] friendId={sendFriendResponseVo.getFriendId()};
             ContactNtfMessage contactNtfMessage=new ContactNtfMessage("Request",extra,sendFriendResponseVo.getUserId(), sendFriendResponseVo.getFriendId(), "我是"+user.getUserName()+"，我已经同意你的好友请求了");
-            rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),contactNtfMessage,"","");
+            rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),friendId,contactNtfMessage,"","");
         } catch (Exception e) {
             e.printStackTrace();
         }
