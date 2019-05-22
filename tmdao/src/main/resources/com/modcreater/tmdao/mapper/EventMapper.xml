@@ -119,7 +119,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue &lt;&gt; 2
+            and isOverdue in (1,0)
         </where>
         order by day asc ,startTime asc
     </select>
@@ -141,7 +141,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue &lt;&gt; 2
+            and isOverdue in (1,0)
         </where>
         order by level asc
     </select>
@@ -163,7 +163,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue &lt;&gt; 2
+            and isOverdue in (1,0)
         </where>
         order by level asc , startTime asc
     </select>
@@ -189,7 +189,7 @@
         select
         <include refid="Base_Column_List"/>
         from singleevent
-        where userid = #{userId} and isLoop = 1 and isOverdue &lt;&gt; 2 order by startTime asc
+        where userid = #{userId} and isLoop = 1 and isOverdue in (1,0) order by startTime asc
     </select>
     <select id="queryByWeekOrderByStartTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select
@@ -208,7 +208,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue &lt;&gt; 2
+            and isOverdue in (1,0)
         </where>
         order by startTime asc
     </select>
@@ -264,36 +264,30 @@
             <if test="isOverdue != null">
                 and isOverdue = #{isOverdue}
             </if>
+            <if test="starttime != null and starttime != 0 and endtime != null and endtime != 0">
+                and ((startTime &gt;= #{starttime} and startTime &lt;= #{endtime}) or
+                (endTime &gt;= #{starttime} and endTime &lt;= #{endtime}) or
+                (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}) or
+                (startTime &gt;= #{starttime} and endTime &lt;= #{endtime}))
+            </if>
         </where>
-        and ((startTime &gt;= #{starttime} and startTime &lt;= #{endtime}) or
-        (endTime &gt;= #{starttime} and endTime &lt;= #{endtime}) or
-        (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}) or
-        (startTime &gt;= #{starttime} and endTime &lt;= #{endtime}))
+        and isLoop = 0
         order by year desc,month desc,day desc
     </select>
     <select id="getUserEventsGroupByType" resultType="com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType">
         select type ,sum(endTime-startTime) totalMinutes ,count(type) num from singleevent
-        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1) group by type
-    </select>
-    <select id="getUserLoopEventsGroupByType" resultType="com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType">
-        select type ,sum(endTime-startTime) totalMinutes ,count(type) num from loopevent
-        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1) group by type
+        where userId = #{userId} and isOverdue in (1,0) group by type
     </select>
     <select id="getMaxSingleEventType" resultType="java.lang.Long">
         select max(endTime-startTime) from singleevent
-        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1)
-    </select>
-    <select id="getMaxLoopEventType" resultType="java.lang.Long">
-        select max(endTime-startTime) from loopevent
-        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1)
+        where userId = #{userId} and isOverdue in (1,0)
     </select>
     <select id="getMinSingleEventType" resultType="java.lang.Long">
         select min(endTime-startTime) from singleevent
-        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1)
+        where userId = #{userId} and isOverdue in (1,0)
     </select>
-    <select id="getMinLoopEventType" resultType="java.lang.Long">
-        select min(endTime-startTime) from loopevent
-        where userId = #{userId} and (isOverdue = 0 or isOverdue = 1)
+    <select id="countEvents" resultType="java.lang.Long">
+        select count(id) from singleevent where userId = #{userId} and isOverdue in (1,0)
     </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo" >

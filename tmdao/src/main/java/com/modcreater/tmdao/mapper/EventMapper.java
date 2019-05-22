@@ -160,25 +160,11 @@ public interface EventMapper {
     List<GetUserEventsGroupByType> getUserEventsGroupByType(String userId);
 
     /**
-     * 统计重复事件类型数量及用时分钟总和
-     * @param userId
-     * @return
-     */
-    List<GetUserEventsGroupByType> getUserLoopEventsGroupByType(String userId);
-
-    /**
      * 获取单一事件表中用户创建类型最多的类型
      * @param userId
      * @return
      */
     Long getMaxSingleEventType(String userId);
-
-    /**
-     * 获取重复事件表中用户创建类型最多的类型
-     * @param userId
-     * @return
-     */
-    Long getMaxLoopEventType(String userId);
 
     /**
      * 获取单一事件表中用户创建类型最少的类型
@@ -188,9 +174,9 @@ public interface EventMapper {
     Long getMinSingleEventType(String userId);
 
     /**
-     * 获取重复事件表中用户创建类型最少的类型
+     * 根据userId查询事件表中共有多少条有效(未完成和已完成1/2)事件
      * @param userId
      * @return
      */
-    Long getMinLoopEventType(String userId);
+    Long countEvents(String userId);
 }

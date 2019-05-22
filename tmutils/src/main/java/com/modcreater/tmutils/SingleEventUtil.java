@@ -167,21 +167,25 @@ public class SingleEventUtil {
      * @return
      */
     public static boolean isAllPropertiesEmpty(Object object,List<String> excludesFields){
-        //定义状态值
-        boolean b = true;
-        for (Field s : object.getClass().getDeclaredFields()){
-            //设置私有属性可访问
-            s.setAccessible(true);
-            //排除不包括的属性名;属性值不为空;属性值转换成String不为""
+        /// 取到obj的class, 并取到所有属性
+        Field[] fs = object.getClass().getDeclaredFields();
+        // 定义一个flag, 标记是否所有属性值为空
+        boolean flag = true;
+        // 遍历所有属性
+        for (Field f : fs) {
+            // 设置私有属性也是可以访问的
+            f.setAccessible(true);
+            // 1.排除不包括的属性名, 2.属性值不为空, 3.属性值转换成String不为""
             try {
-                if (!excludesFields.contains(s.getName()) && s.get(object) != null && "".equals(s.get(object).toString())){
-                    //同时满足3个条件,对象则不全为空
-                    b = false;
+                if(!excludesFields.contains(f.getName()) && f.get(object) != null && !"".equals(f.get(object).toString())) {
+                    // 有属性满足3个条件的话, 那么说明对象属性不全为空
+                    flag = false;
+                    break;
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
-        return b;
+        return flag;
     }
 }

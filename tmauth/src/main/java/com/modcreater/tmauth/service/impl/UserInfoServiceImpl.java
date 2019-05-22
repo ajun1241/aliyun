@@ -52,6 +52,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    private static final String[] TYPE = {"学习","工作","商务","休闲","家庭","节日","假期","其他"};
+
     @Override
     public Dto showUserDetails(String userId, String token) {
         System.out.println("查询用户成就==>"+userId);
@@ -154,12 +156,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (ObjectUtils.isEmpty(receivedEventConditions)){
             return DtoUtil.getFalseDto("筛选条件接收失败",40002);
         }
-        if (!StringUtils.hasText(receivedEventConditions.getStartTime())){
-            return DtoUtil.getFalseDto("开始时间不能为空",40001);
-        }
-        if (!StringUtils.hasText(receivedEventConditions.getEndTime())){
-            return DtoUtil.getFalseDto("结束时间不能为空",40004);
-        }
         String redisToken=stringRedisTemplate.opsForValue().get(receivedEventConditions.getUserId());
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
@@ -167,9 +163,16 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<String> list = new ArrayList();
         list.add("userId");
         list.add("appType");
+        list.add("isOverdue");
         //判断条件除userId和appType是否全部为空
         if (SingleEventUtil.isAllPropertiesEmpty(receivedEventConditions,list)){
             return showUserEvents(receivedEventConditions.getUserId(),receivedEventConditions.getIsOverdue(),token);
+        }
+        if (!StringUtils.hasText(receivedEventConditions.getStartTime())){
+            return DtoUtil.getFalseDto("开始时间不能为空",40001);
+        }
+        if (!StringUtils.hasText(receivedEventConditions.getEndTime())){
+            return DtoUtil.getFalseDto("结束时间不能为空",40004);
         }
         SingleEvent singleEventCondition = new SingleEvent();
         singleEventCondition.setEventname(receivedEventConditions.getEventName());
@@ -186,6 +189,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
         singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
         singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
+        System.out.println(singleEventCondition.toString());
         List<SingleEvent> singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
         /**
          * 可能要做重复事件
@@ -216,35 +220,31 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         ShowUserAnalysis showUserAnalysis = new ShowUserAnalysis();
         showUserAnalysis.setUserId(userId);
-        //记录单一事件和重复事件的总和
-        Long totalEvents = 0L;
-        //记录单一事件和重复事件的总用时分钟数
+        DecimalFormat format = new DecimalFormat("#.##");
+        //记录的总和
+        Long totalEvents = eventMapper.countEvents(userId);
+        //记录事件的总用时分钟数
         Long totalMinutes = 0L;
         Map<String,String> percentResult = new HashMap<>();
         Map<String,Long> totalMinutesResult = new HashMap<>();
-
+        List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
+        for (GetUserEventsGroupByType type : typeList){
+            for (int i = 0 ;i <= 7; i++){
+                percentResult.put(TYPE[i],"");
+                totalMinutesResult.put(TYPE[i],0L);
+                if (type.getType().equals(i)){
+                    percentResult.put(TYPE[i],format.format(type.getNum()/totalEvents));
+                    totalMinutesResult.put(TYPE[i],type.getTotalMinutes());
+                }
+            }
+            totalMinutes += type.getTotalMinutes();
+        }
         showUserAnalysis.setMaxType(eventMapper.getMaxSingleEventType(userId));
         showUserAnalysis.setMinType(eventMapper.getMinSingleEventType(userId));
-
         showUserAnalysis.setPercentResult(percentResult);
         showUserAnalysis.setTotalEvents(totalEvents);
         showUserAnalysis.setTotalMinutesResult(totalMinutesResult);
         showUserAnalysis.setSumMinutes(totalMinutes);
         return DtoUtil.getSuccesWithDataDto("用户数据统计成功",showUserAnalysis,100000);
     }
-
-    /*@Override
-    public Dto showUnfinishedEvents(String userId, String token) {
-        return null;
-    }
-
-    @Override
-    public Dto searchUnfinishedEventsByEventName(String userId,String eventName, String token) {
-        return null;
-    }
-
-    @Override
-    public Dto filtrateUnfinishedEvents(ReceivedEventConditions receivedEventConditions, String token) {
-        return null;
-    }*/
 }

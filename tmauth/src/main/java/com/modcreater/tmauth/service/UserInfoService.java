@@ -63,29 +63,4 @@ public interface UserInfoService {
      * @return
      */
     List<String> queryUserAchievementInBase(String userId);
-
-    /**
-     * 查询用户未完成的事件
-     * @param userId
-     * @param token
-     * @return
-     *//*
-    Dto showUnfinishedEvents(String userId, String token);
-
-    *//**
-     * 根据事件标题查询用户未完成的事件
-     * @param userId
-     * @param eventName
-     * @param token
-     * @return
-     *//*
-    Dto searchUnfinishedEventsByEventName(String userId,String eventName, String token);
-
-    *//**
-     * 筛选用户未完成的事件
-     * @param receivedEventConditions
-     * @param token
-     * @return
-     *//*
-    Dto filtrateUnfinishedEvents(ReceivedEventConditions receivedEventConditions, String token);*/
 }

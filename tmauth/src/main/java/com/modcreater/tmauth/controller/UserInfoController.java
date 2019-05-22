@@ -3,10 +3,8 @@ package com.modcreater.tmauth.controller;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedFiltrateUserEvents;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
-import com.modcreater.tmbeans.vo.uservo.UserIdVo;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -73,50 +71,4 @@ public class UserInfoController {
     public Dto statisticAnalysisOfData(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.statisticAnalysisOfData(receivedId.getUserId(),request.getHeader("token"));
     }
-
-
-    /**
-     * 查询用户成就(图片的URL地址)
-     * @param receivedId
-     * @param httpServletRequest
-     * @return
-     */
-    @RequestMapping(value = "searchachievement",method = RequestMethod.POST)
-    public Dto queryUserAchievement(@RequestBody ReceivedId receivedId,HttpServletRequest httpServletRequest){
-        return userInfoService.queryUserAchievement(receivedId.getUserId(),httpServletRequest.getHeader("token"));
-    }
-
-    /**
-     * 显示用户未完成的事件
-     * @param userIdVo
-     * @param request
-     * @return
-     *//*
-    @RequestMapping(value = "showunfinishedevents",method = RequestMethod.POST)
-    public Dto showUnfinishedEvents(@RequestBody UserIdVo userIdVo,HttpServletRequest request){
-        return userInfoService.showUnfinishedEvents(userIdVo.getUserId(),request.getHeader("token"));
-    }
-
-    *//**
-     * 根据事件名称查询用户未完成的事件
-     * @param receivedIdName
-     * @param request
-     * @return
-     *//*
-    @RequestMapping(value = "searchunfinishedeventsbyeventname",method = RequestMethod.POST)
-    public Dto searchUnfinishedEventsByEventName(@RequestBody ReceivedIdName receivedIdName,HttpServletRequest request){
-        return userInfoService.searchUnfinishedEventsByEventName(receivedIdName.getUserId(),receivedIdName.getEventName(),request.getHeader("token"));
-    }
-
-    *//**
-     * 筛选用户未完成的事件
-     * @param receivedEventConditions
-     * @param request
-     * @return
-     *//*
-    @RequestMapping(value = "filtrateunfinishedevents",method = RequestMethod.POST)
-    public Dto filtrateUnfinishedEvents(@RequestBody ReceivedEventConditions receivedEventConditions ,String appType,HttpServletRequest request){
-        return userInfoService.filtrateUnfinishedEvents(receivedEventConditions,request.getHeader("token"));
-    }*/
-
 }
