@@ -498,7 +498,7 @@ public class EventServiceImpl implements EventService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21013);
         }
-        //保存这条事件(放redis)
+        //保存这条事件
         SingleEvent singleEvent=JSONObject.parseObject(addInviteEventVo.getSingleEvent(),SingleEvent.class);
         String[] persons=singleEvent.getPerson().split(",");
         String redisKey=addInviteEventVo.getUserId()+singleEvent.getEventid();
@@ -552,20 +552,39 @@ public class EventServiceImpl implements EventService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21013);
         }
+        //拿到发起者的事件
+        SingleEvent singleEvent=JSONObject.parseObject(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getExtraData()),SingleEvent.class);
+        String[] persons=singleEvent.getPerson().split(",");
+        StatisticsTable statisticsTable=new StatisticsTable();
         //通过判断所有用户是否都答复决定是否发送消息给事件发起者
+        //如果同意
         if (Integer.parseInt(feedbackEventInviteVo.getChoose())==0){
             //判断接受者的事件列表是否有冲突
-            //拿到发起者的事件
-            SingleEvent singleEvent=JSONObject.parseObject(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getExtraData()),SingleEvent.class);
             //查到冲突的事件集合
-            
+            List<SingleEvent> singleEvents=eventMapper.queryClashEventList(singleEvent);
+            //如果有冲突反馈给该用户
+            if (singleEvents.size()>0){
+                return DtoUtil.getSuccesWithDataDto("当前时间段已有事件",singleEvents,100000);
+            }
+            //更改反馈统计表
+            statisticsTable.setUserId(Long.parseLong(feedbackEventInviteVo.getUserId()));
+            statisticsTable.setEventId(singleEvent.getEventid());
+            statisticsTable.setCreatorId(singleEvent.getUserid());
+            statisticsTable.setChoose(Long.parseLong(feedbackEventInviteVo.getChoose()));
+            statisticsTable.setModify(1);
+            statisticsMapper.updateStatistics(statisticsTable);
+            //查询是否所有人都给了反馈
+            int i=statisticsMapper.queryStatisticsCount(statisticsTable);
+            //所有的反馈都收到了
+            if (i>=persons.length){
+                //发送统计结果给事件发起者
+                RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+                /*InviteMessage inviteMessage=new InviteMessage();
+                rongCloudMethodUtil.sendSystemMessage();*/
+            }
         }
         //通过判断timeUp字段决定是否发送消息给事件发起者
 
-
-
-        //冲突给该用户反馈
-        //不冲突把该用户的选择记录在统计表
 
 
         return null;

@@ -21,4 +21,8 @@ public class FeedbackEventInviteVo implements Serializable {
      * 发送邀请时的扩展数据
      */
     private String extraData;
+    /**
+     * 拒绝理由
+     */
+    private String rejectContent;
 }

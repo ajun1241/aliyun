@@ -19,4 +19,19 @@ public interface StatisticsMapper {
      * @return
      */
     int createStatistics(List<StatisticsTable> statisticsTable);
+
+    /**
+     * 更改统计表
+     * @param statisticsTable
+     * @return
+     */
+    int updateStatistics(StatisticsTable statisticsTable);
+
+    /**
+     * 查询统计总条数
+     * @param statisticsTable
+     * @return
+     */
+    int queryStatisticsCount(StatisticsTable statisticsTable);
+
 }
