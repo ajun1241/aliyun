@@ -33,16 +33,6 @@ public interface UserInfoService {
      */
     Dto showUserEvents(String userId,String isOverdue, String token);
 
-
-    /**
-     * 根据事件名称查询事件
-     * @param userId
-     * @param eventName
-     * @param token
-     * @return
-     */
-    Dto searchUserEventsByEventName(String userId,String eventName,String isOverdue, String token);
-
     /**
      * 筛选已完成的事件
      * @param receivedEventConditions

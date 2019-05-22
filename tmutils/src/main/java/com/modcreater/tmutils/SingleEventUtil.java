@@ -27,8 +27,8 @@ public class SingleEventUtil {
 
     private static final int LENGTH8 = 8;
     private static final int LENGTH10 = 11;
-    private static final int LENGTH43 = 44;
-    private static final int LENGTH50 = 51;
+    private static final int LENGTH44 = 44;
+    private static final int LENGTH51 = 51;
 
     /**
      * 创建一个SingleEvent对象并仅赋值day,month,year和userId
@@ -129,6 +129,11 @@ public class SingleEventUtil {
         return false;
     }
 
+    /**
+     * 判断事件对象中属性是否都符合标准
+     * @param singleEvent
+     * @return
+     */
     public static Dto isSingleEventStandard(SingleEvent singleEvent){
         if (singleEvent.getEventid() >= VALUE10){
             return DtoUtil.getFalseDto("eventId不规范",21010);
@@ -139,18 +144,44 @@ public class SingleEventUtil {
         if (singleEvent.getEventname().length() >= LENGTH10){
             return DtoUtil.getFalseDto("eventName不规范",21010);
         }
-        if (singleEvent.getAddress().length() >= LENGTH50){
+        if (singleEvent.getAddress().length() >= LENGTH51){
             return DtoUtil.getFalseDto("address不规范",21010);
         }
-        if (singleEvent.getPerson().length() >= LENGTH50){
+        if (singleEvent.getPerson().length() >= LENGTH51){
             return DtoUtil.getFalseDto("Person不规范",21010);
         }
-        if (singleEvent.getRemarks().length() >= LENGTH50){
+        if (singleEvent.getRemarks().length() >= LENGTH51){
             return DtoUtil.getFalseDto("Remarks不规范",21010);
         }
-        if (singleEvent.getRepeaTtime().length() >= LENGTH43){
+        if (singleEvent.getRepeaTtime().length() >= LENGTH44){
             return DtoUtil.getFalseDto("RepeaTtime不规范",21010);
         }
         return null;
+    }
+
+    /**
+     * 判断对象中除指定外的属性是否全部为空
+     * 返回真:
+     * @param object
+     * @param excludesFields
+     * @return
+     */
+    public static boolean isAllPropertiesEmpty(Object object,List<String> excludesFields){
+        //定义状态值
+        boolean b = true;
+        for (Field s : object.getClass().getDeclaredFields()){
+            //设置私有属性可访问
+            s.setAccessible(true);
+            //排除不包括的属性名;属性值不为空;属性值转换成String不为""
+            try {
+                if (!excludesFields.contains(s.getName()) && s.get(object) != null && "".equals(s.get(object).toString())){
+                    //同时满足3个条件,对象则不全为空
+                    b = false;
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return b;
     }
 }

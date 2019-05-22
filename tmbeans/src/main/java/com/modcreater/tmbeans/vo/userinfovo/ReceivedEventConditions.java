@@ -17,6 +17,10 @@ public class ReceivedEventConditions {
      */
     private String userId;
     /**
+     * 事件名称
+     */
+    private String eventName;
+    /**
      * 开始日期(20190517)
      */
     private String startDate;

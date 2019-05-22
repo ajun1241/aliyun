@@ -235,20 +235,16 @@
         and isOverdue = #{isOverdue}
         order by year desc,month desc,day desc limit 0,7
     </select>
-    <select id="searchEventsByEventName" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select eventId,userId,eventName,day,month,year
-        from singleevent
-        where userId = #{userid}
-        and isOverdue = #{isOverdue}
-        and eventName like "%"#{eventname}"%"
-        order by year desc,month desc,day desc
-    </select>
+
     <select id="queryEventsByConditions" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select eventId,userId,eventName,day,month,year
         from singleevent
         <where>
+            <if test="eventname != null and eventname != ''">
+                eventName like "%"#{eventname}"%"
+            </if>
             <if test="type != null and type != ''">
-                type = #{type}
+                and type = #{type}
             </if>
             <if test="level != null and level != ''">
                 and level = #{level}

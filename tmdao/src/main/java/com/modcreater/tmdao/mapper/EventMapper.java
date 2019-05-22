@@ -146,13 +146,6 @@ public interface EventMapper {
     List<SingleEvent> queryUserEventsByUserIdIsOverdue(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
 
     /**
-     * 根据用户ID,事件状态和事件名称模糊查询
-     * @param singleEvent
-     * @return
-     */
-    List<SingleEvent> searchEventsByEventName(SingleEvent singleEvent);
-
-    /**
      * 根据筛选条件查询事件
      * @param singleEvent
      * @return
