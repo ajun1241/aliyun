@@ -113,4 +113,28 @@ public interface EventService {
      * @return
      */
     Dto sendInviteAcceptMsg(SendInviteMsgVo sendInviteMsgVo,String token);
+
+   /* *//**
+     * 添加一条邀请事件
+     * @param addInviteEventVo
+     * @param token
+     * @return
+     *//*
+    Dto addInviteEvent(AddInviteEventVo addInviteEventVo,String token);
+
+    *//**
+     * 回应事件邀请
+     * @param feedbackEventInviteVo
+     * @param token
+     * @return
+     *//*
+    Dto feedbackEventInvite(FeedbackEventInviteVo feedbackEventInviteVo,String token);
+
+    *//**
+     * 创建者选择
+     * @param eventCreatorChooseVo
+     * @param token
+     * @return
+     *//*
+    Dto eventCreatorChoose(EventCreatorChooseVo eventCreatorChooseVo,String token);*/
 }

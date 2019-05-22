@@ -80,6 +80,10 @@ public class SingleEvent implements Serializable {
      * 事件分类（0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他）
      */
     private Long type;
+    /**
+     * 是否重复
+     */
+    private int isLoop;
 
     public SingleEvent() {
 

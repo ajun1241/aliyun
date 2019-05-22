@@ -26,7 +26,8 @@
             #{day},
             #{month},
             #{year},
-            #{type})
+            #{type},
+            #{isLoop})
     </insert>
 
     <select id="countIdByDate" resultType="java.lang.Integer">
