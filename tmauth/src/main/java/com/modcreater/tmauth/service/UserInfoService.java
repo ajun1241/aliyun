@@ -63,4 +63,12 @@ public interface UserInfoService {
      * @return
      */
     List<String> queryUserAchievementInBase(String userId);
+
+    /**
+     * 获取我的(前)一周的数据
+     * @param userId
+     * @param token
+     * @return
+     */
+    Dto myWeek(String userId, String token);
 }

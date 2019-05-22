@@ -71,4 +71,20 @@ public class UserInfoController {
     public Dto statisticAnalysisOfData(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.statisticAnalysisOfData(receivedId.getUserId(),request.getHeader("token"));
     }
+
+    /**
+     * 查询用户成就
+     * @param receivedId
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "searchachievement",method = RequestMethod.POST)
+    public Dto searchAchievement(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return userInfoService.queryUserAchievement(receivedId.getUserId(),request.getHeader("token"));
+    }
+
+    @RequestMapping(value = "myweek",method = RequestMethod.POST)
+    public Dto myWeek(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return userInfoService.myWeek(receivedId.getUserId(),request.getHeader("token"));
+    }
 }

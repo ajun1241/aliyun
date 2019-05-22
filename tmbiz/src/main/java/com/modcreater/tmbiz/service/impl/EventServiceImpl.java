@@ -21,6 +21,8 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -410,11 +412,19 @@ public class EventServiceImpl implements EventService {
                 SingleEvent singleEvent;
                 //按周查询单一事件
                 List<DayEvents> dayEventsList = new ArrayList<>();
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
                 for (int i = 0; i <= 6; i++) {
                     DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
-                    String dayEventId = String.valueOf(Integer.valueOf(searchEventVo.getDayEventId()) + i);
+                    Calendar calendar = Calendar.getInstance();
+                    try {
+                        calendar.setTime(simpleDateFormat.parse(searchEventVo.getDayEventId()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    calendar.add(Calendar.DATE,1);
+                    String dayEventId = simpleDateFormat.format(calendar.getTime());
                     singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
-                    List<SingleEvent> singleEventList = eventMapper.queryByWeekOrderByStartTime(singleEvent);
+                    List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
                     ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
                     dayEvents.setMySingleEventList(showSingleEventList);
                     dayEvents.setTotalNum(dayEvents.getMySingleEventList().size());

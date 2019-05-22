@@ -7,6 +7,7 @@ import com.modcreater.tmbeans.pojo.Achievement;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.UserAchievement;
 import com.modcreater.tmbeans.pojo.UserStatistics;
+import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.show.ShowUserAnalysis;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
@@ -26,6 +27,9 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -52,7 +56,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-    private static final String[] TYPE = {"学习","工作","商务","休闲","家庭","节日","假期","其他"};
+    private static final String[] TYPE = {"a","b","c","d","e","f","g","h"};
 
     @Override
     public Dto showUserDetails(String userId, String token) {
@@ -189,7 +193,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
         singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
         singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
-        System.out.println(singleEventCondition.toString());
         List<SingleEvent> singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
         /**
          * 可能要做重复事件
@@ -220,20 +223,24 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         ShowUserAnalysis showUserAnalysis = new ShowUserAnalysis();
         showUserAnalysis.setUserId(userId);
-        DecimalFormat format = new DecimalFormat("#.##");
+        DecimalFormat format = new DecimalFormat("0.00");
         //记录的总和
         Long totalEvents = eventMapper.countEvents(userId);
         //记录事件的总用时分钟数
         Long totalMinutes = 0L;
-        Map<String,String> percentResult = new HashMap<>();
+        Map<String,Double> percentResult = new HashMap<>();
         Map<String,Long> totalMinutesResult = new HashMap<>();
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(2);
+        for (int i = 0 ;i <= 7; i++){
+            percentResult.put(TYPE[i],null);
+            totalMinutesResult.put(TYPE[i],null);
+        }
         for (GetUserEventsGroupByType type : typeList){
             for (int i = 0 ;i <= 7; i++){
-                percentResult.put(TYPE[i],"");
-                totalMinutesResult.put(TYPE[i],0L);
-                if (type.getType().equals(i)){
-                    percentResult.put(TYPE[i],format.format(type.getNum()/totalEvents));
+                if (type.getType() == i){
+                    percentResult.put(TYPE[i],Double.valueOf(nf.format((double)type.getNum()/totalEvents)));
                     totalMinutesResult.put(TYPE[i],type.getTotalMinutes());
                 }
             }
@@ -246,5 +253,34 @@ public class UserInfoServiceImpl implements UserInfoService {
         showUserAnalysis.setTotalMinutesResult(totalMinutesResult);
         showUserAnalysis.setSumMinutes(totalMinutes);
         return DtoUtil.getSuccesWithDataDto("用户数据统计成功",showUserAnalysis,100000);
+    }
+
+    @Override
+    public Dto myWeek(String userId, String token) {
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
+        }
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+        }
+        SingleEvent condition = new SingleEvent();
+        condition.setUserid(Long.valueOf(userId));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        for (int i = 0; i <= 6; i++) {
+            Calendar calendar = Calendar.getInstance();
+            try {
+                calendar.setTime(simpleDateFormat.parse(userId));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            calendar.add(Calendar.DATE,1);
+            StringBuffer startDate = new StringBuffer(simpleDateFormat.format(calendar.getTime()));
+            condition.setYear(Long.valueOf(startDate.substring(0,4)));
+            condition.setMonth(Long.valueOf(startDate.substring(4,6)));
+            condition.setDay(Long.valueOf(startDate.substring(6,8)));
+            List<ShowSingleEvent> showSingleEventList = SingleEventUtil.getShowSingleEventList(eventMapper.queryEvents(condition));
+        }
+        return null;
     }
 }

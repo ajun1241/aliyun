@@ -119,8 +119,9 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue in (1,0)
+            and isOverdue in (1,0) and isLoop = 1
         </where>
+
         order by day asc ,startTime asc
     </select>
 
@@ -190,27 +191,6 @@
         <include refid="Base_Column_List"/>
         from singleevent
         where userid = #{userId} and isLoop = 1 and isOverdue in (1,0) order by startTime asc
-    </select>
-    <select id="queryByWeekOrderByStartTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select
-        <include refid="Base_Column_List"/>
-        from singleevent
-        <where>
-            <if test="userid != null">
-                userid = #{userid}
-            </if>
-            <if test="day != null">
-                and day = #{day}
-            </if>
-            <if test="month != null">
-                and month = #{month}
-            </if>
-            <if test="year != null">
-                and year = #{year}
-            </if>
-            and isOverdue in (1,0)
-        </where>
-        order by startTime asc
     </select>
     <select id="queryDays" resultType="java.lang.Integer">
         select day from singleevent where

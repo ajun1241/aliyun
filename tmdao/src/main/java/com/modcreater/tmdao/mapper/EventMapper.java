@@ -117,13 +117,6 @@ public interface EventMapper {
     List<SingleEvent> queryLoopEvents(String userId);
 
     /**
-     * 根据"周"查找事件并根据事件开始时间(startTime)排序
-     * @param singleEvent
-     * @return
-     */
-    ArrayList<SingleEvent> queryByWeekOrderByStartTime(SingleEvent singleEvent);
-
-    /**
      * 根据用户ID查询用户当月有哪些天存在事件
      * @param singleEvent
      * @return
@@ -180,5 +173,5 @@ public interface EventMapper {
      */
     Long countEvents(String userId);
 
-    List<SingleEvent> queryEventListBy
+//    List<SingleEvent> queryEventListBy
 }
