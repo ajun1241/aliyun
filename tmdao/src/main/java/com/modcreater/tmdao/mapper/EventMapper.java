@@ -173,5 +173,10 @@ public interface EventMapper {
      */
     Long countEvents(String userId);
 
-//    List<SingleEvent> queryEventListBy
+    /**
+     * 查询冲突事件
+     * @param singleEvent
+     * @return
+     */
+    List<SingleEvent> queryClashEventList(SingleEvent singleEvent);
 }

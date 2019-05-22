@@ -274,4 +274,20 @@
         update draft set `data`=concat(`data`,#{data})
         where phoneNum=#{phoneNum}
     </update>
+    <select id="queryClashEventList " parameterType="com.modcreater.tmbeans.pojo.SingleEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from singleevent
+        where
+        userId = #{userid} and
+        and month = #{month} and
+        and day = #{day} and
+        and year = #{year} and
+        and ((startTime &gt; #{starttime} and endTime &lt; #{endtime})
+        or
+        (startTime &gt; #{starttime} and startTime &lt; #{endtime})
+        or
+        (endTime &gt; #{starttime} and endTime &lt; #{endtime})
+        or
+        (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}))
+    </select>
+
 </mapper>

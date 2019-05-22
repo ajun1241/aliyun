@@ -9,4 +9,28 @@
             (#{item.creatorId},#{item.eventId},#{item.userId})
         </foreach>
     </insert>
+    <update id="updateStatistics" parameterType="com.modcreater.tmbeans.pojo.StatisticsTable">
+        update statisticstable
+        set
+            choose = #{choose},
+            modify = #{modify},
+            <if test="rejectContent != null and rejectContent != ''">
+                rejectContent = #{rejectContent},
+            </if>
+        where
+            creatorId=#{creatorId}
+        and
+            eventId=#{eventId}
+        and
+            userId=#{userId}
+    </update>
+    <select id="queryStatisticsCount" parameterType="com.modcreater.tmbeans.pojo.StatisticsTable" resultType="int">
+        select count(1) from statisticstable
+        where
+            creatorId=#{creatorId}
+        and
+            eventId=#{eventId}
+        and
+            modify=1
+    </select>
 </mapper>
