@@ -53,17 +53,6 @@ public class UserInfoController {
     }
 
     /**
-     * 根据事件名称查询事件
-     * @param receivedFiltrateUserEvents
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "searchusereventsbyeventname",method = RequestMethod.POST)
-    public Dto searchUserEventsByEventName(@RequestBody ReceivedFiltrateUserEvents receivedFiltrateUserEvents, HttpServletRequest request){
-        return userInfoService.searchUserEventsByEventName(receivedFiltrateUserEvents.getUserId(),receivedFiltrateUserEvents.getEventName(),receivedFiltrateUserEvents.getIsOverdue(),request.getHeader("token"));
-    }
-
-    /**
      * 筛选已完成的事件
      * @param receivedEventConditions
      * @param request
