@@ -2,6 +2,7 @@ package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.dto.MyDetail;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
@@ -27,6 +28,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -247,21 +249,54 @@ public class AccountServiceImpl implements AccountService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(queFridenVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
+        Map<String,String> map=new HashMap();
+        Date date=new Date();
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+        String[] myDate=sdf.format(date).split("-");
+        for (int i = 0; i < myDate.length; i++) {
+            System.out.println("今天的日期"+myDate[i]);
+        }
+
         //好友表信息
         Account account=accountMapper.queryFriendByUserCode(queFridenVo.getUserCode());
-        //其他表信息
+        if (ObjectUtils.isEmpty(account)){
+            return DtoUtil.getFalseDto("搜索好友失败",200000);
+        }
+        //日规划,月规划
+        MyDetail result=accountMapper.queryPlanByDayAndMonth(account.getId().toString(),myDate[2],myDate[0],myDate[1]);
+        //已完成
 
-        Map<String,String> map=new HashMap();
+        //判断这俩人是不是已经是好友
+        if (accountMapper.queryFriendRel(queFridenVo.getUserId(),account.getId().toString())>0){
+            //已经是好友时
+            //成就
+            map.put("userId",account.getId().toString());
+            map.put("userCode",account.getUserCode());
+            map.put("userName",account.getUserName());
+            map.put("gender",account.getGender().toString());
+            map.put("birthday",account.getBirthday());
+            map.put("headImgUrl",account.getHeadImgUrl());
+            map.put("userSign",account.getUserSign());
+
+            map.put("dayPlan",result.getDay());
+            map.put("monthPlan",result.getMonth());
+            map.put("finish",account.getUserSign());
+            map.put("achievement",account.getUserSign());
+
+            return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
+        }
+        //其他表信息
+        //日规划
+        //月规划
+        //已完成
+
         map.put("userId",account.getId().toString());
         map.put("userCode",account.getUserCode());
         map.put("userName",account.getUserName());
         map.put("gender",account.getGender().toString());
-        map.put("birthday",account.getBirthday());
         map.put("headImgUrl",account.getHeadImgUrl());
         map.put("userSign",account.getUserSign());
-        if (ObjectUtils.isEmpty(account)){
-            return DtoUtil.getFalseDto("搜索好友失败",200000);
-        }
+
         return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
     }
 
@@ -404,6 +439,16 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("查询好友列表失败",200000);
         }
         return DtoUtil.getSuccesWithDataDto("查询好友列表成功",maps,100000);
+    }
+
+    /**
+     * 查看好友详情
+     * @param UserId
+     * @return
+     */
+    @Override
+    public Dto queryFriendDetails(String UserId) {
+        return null;
     }
 
     /**

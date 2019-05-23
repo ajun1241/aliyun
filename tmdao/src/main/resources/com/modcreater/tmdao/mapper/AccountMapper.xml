@@ -138,4 +138,8 @@
     <select id="queryFriendRel" parameterType="String" resultType="int">
         select count(1) from friendship where userId=#{userId} and  friendId=#{friendId}
     </select>
+    <select id="queryPlanByDayAndMonth" resultType="com.modcreater.tmbeans.dto.MyDetail" >
+        SELECT (SELECT COUNT(1) FROM singleevent WHERE  userId=#{userId} AND `day`=#{day} AND `year`=#{year} AND `month`= #{month} AND isOverdue=0)AS day,
+        (SELECT COUNT(1) FROM singleevent WHERE  userId=#{userId}  AND `year`=#{year} AND `month`= #{month} AND isOverdue=0)AS month FROM singleevent LIMIT 1
+    </select>
 </mapper>

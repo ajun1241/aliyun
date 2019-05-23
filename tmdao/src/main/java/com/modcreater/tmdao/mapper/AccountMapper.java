@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.dto.MyDetail;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.vo.AccountVo;
@@ -12,6 +13,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface AccountMapper {
@@ -136,4 +138,14 @@ public interface AccountMapper {
      * @return
      */
     ShowUserDetails queryUserDetails(String userId);
+
+    /**
+     * 查询待规划事件
+     * @param userId
+     * @param day
+     * @param year
+     * @param month
+     * @return
+     */
+    MyDetail queryPlanByDayAndMonth(String  userId, String  day, String year , String  month);
 }

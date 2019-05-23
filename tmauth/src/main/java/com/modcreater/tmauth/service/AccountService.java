@@ -81,6 +81,13 @@ public interface AccountService {
     Dto queryFriendList(UserIdVo userIdVo, String token);
 
     /**
+     * 查看好友详情
+     * @param UserId
+     * @return
+     */
+    Dto queryFriendDetails(String UserId);
+
+    /**
      * 修改好友权限
      * @param jurisdictionVo
      * @param token
