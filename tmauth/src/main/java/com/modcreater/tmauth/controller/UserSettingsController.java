@@ -39,27 +39,15 @@ public class UserSettingsController {
     }
 
     /**
-     * 修改不想被邀请的好友
+     * 修改好友权限(邀请或支持的限制)
      * @param peopleNotAllowed
      * @param request
      * @return
      */
     @RequestMapping(value = "updatenotallowedinvited",method = RequestMethod.POST)
-    public Dto updateNotAllowedInvited(@RequestBody PeopleNotAllowed peopleNotAllowed, HttpServletRequest request){
-        return userSettingsService.updateNotAllowedInvited(peopleNotAllowed.getUserId(),peopleNotAllowed.getFriendsIds(),request.getHeader("token"));
+    public Dto updateNotAllowed(@RequestBody PeopleNotAllowed peopleNotAllowed, HttpServletRequest request){
+        return userSettingsService.updateNotAllowed(peopleNotAllowed,request.getHeader("token"));
     }
-
-    /**
-     * 修改不想被支持的好友
-     * @param peopleNotAllowed
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "updatenotallowedsupported",method = RequestMethod.POST)
-    public Dto updateNotAllowedSupported(@RequestBody PeopleNotAllowed peopleNotAllowed, HttpServletRequest request){
-        return userSettingsService.updateNotAllowedSupported(peopleNotAllowed.getUserId(),peopleNotAllowed.getFriendsIds(),request.getHeader("token"));
-    }
-
 
     /*@RequestMapping(value = "updateReceiveNewMessage", method = RequestMethod.POST)
     public Dto updateReceiveNewMessage(@RequestBody UserSettingsIdAndStatus idAndStatus, HttpServletRequest request) {

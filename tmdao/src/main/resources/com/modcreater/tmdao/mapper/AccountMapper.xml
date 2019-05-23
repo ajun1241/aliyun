@@ -118,6 +118,10 @@
         where userId=#{userId} and friendId=#{friendId}
     </update>
 
+    <update id="updateFriendJurisdictionForSingleCondition" statementType="STATEMENT">
+        update friendship set #{updateType} = #{status} where userId = #{userId} and friendId = #{friendsIds}
+    </update>
+
     <delete id="deleteFriendship" parameterType="com.modcreater.tmbeans.vo.uservo.DeleteFriendshipVo">
         delete from friendship where userId=#{userId} and friendId=#{friendId}
     </delete>
@@ -129,6 +133,7 @@
     <update id="updRealName" parameterType="String">
         update userright set realNameAuthentication = #{realNameAuthentication} where userId=#{userId}
     </update>
+
 
 
     <select id="queryUserDetails" resultType="com.modcreater.tmbeans.show.userinfo.ShowUserDetails">

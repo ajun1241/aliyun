@@ -1,6 +1,7 @@
 package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.usersettings.PeopleNotAllowed;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,21 +25,11 @@ public interface UserSettingsService {
 
     /**
      * 修改不想被邀请的好友
-     * @param userId
-     * @param friendsIds
+     * @param peopleNotAllowed
      * @param token
      * @return
      */
-    Dto updateNotAllowedInvited(String userId, String friendsIds, String token);
-
-    /**
-     * 修改不想被支持的好友
-     * @param userId
-     * @param friendsIds
-     * @param token
-     * @return
-     */
-    Dto updateNotAllowedSupported(String userId, String friendsIds, String token);
+    Dto updateNotAllowed(PeopleNotAllowed peopleNotAllowed, String token);
 
     /**
      * 修改是否接收新消息

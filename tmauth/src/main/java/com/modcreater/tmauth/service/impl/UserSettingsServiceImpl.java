@@ -3,14 +3,19 @@ package com.modcreater.tmauth.service.impl;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmauth.service.UserSettingsService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.usersettings.PeopleNotAllowed;
+import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.UserSettingsMapper;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.SingleEventUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,6 +31,9 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Resource
     private UserSettingsMapper userSettingsMapper;
+
+    @Resource
+    private AccountMapper accountMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -46,13 +54,28 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     }
 
     @Override
-    public Dto updateNotAllowedInvited(String userId, String friendsIds, String token) {
-        return null;
-    }
-
-    @Override
-    public Dto updateNotAllowedSupported(String userId, String friendsIds, String token) {
-        return null;
+    public Dto updateNotAllowed(PeopleNotAllowed peopleNotAllowed, String token) {
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        String redisToken=stringRedisTemplate.opsForValue().get(peopleNotAllowed.getUserId());
+        if (!token.equals(redisToken)){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        List<String> conditions = new ArrayList<>();
+        conditions.add("appType");
+        conditions.add("friendsIds");
+        if (!StringUtils.hasText(peopleNotAllowed.getFriendsIds()) || SingleEventUtil.isAllPropertiesEmpty(peopleNotAllowed,conditions)){
+            return DtoUtil.getFalseDto("条件接收失败",50002);
+        }
+        String[] friends = peopleNotAllowed.getFriendsIds().split(",");
+        for (String id : friends){
+            peopleNotAllowed.setFriendsIds(id);
+            if (accountMapper.updateFriendJurisdictionForSingleCondition(peopleNotAllowed) == 0){
+                return DtoUtil.getFalseDto("修改"+peopleNotAllowed.getUpdateType()+"失败",50003);
+            }
+        }
+        return DtoUtil.getSuccessDto("修改"+peopleNotAllowed.getUpdateType()+"成功",100000);
     }
 
     @Override

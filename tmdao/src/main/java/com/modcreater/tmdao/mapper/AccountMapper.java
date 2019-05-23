@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.LoginVo;
+import com.modcreater.tmbeans.vo.usersettings.PeopleNotAllowed;
 import com.modcreater.tmbeans.vo.uservo.BuildFriendshipVo;
 import com.modcreater.tmbeans.vo.uservo.DeleteFriendshipVo;
 import com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo;
@@ -109,6 +110,13 @@ public interface AccountMapper {
      * @return
      */
     int updateFriendJurisdiction(UpdateFriendJurisdictionVo jurisdictionVo);
+
+    /**
+     * 修改限制(好友的邀请或支持权限)
+     * @param peopleNotAllowed
+     * @return
+     */
+    int updateFriendJurisdictionForSingleCondition(PeopleNotAllowed peopleNotAllowed);
 
     /**
      * 解除好友关系
