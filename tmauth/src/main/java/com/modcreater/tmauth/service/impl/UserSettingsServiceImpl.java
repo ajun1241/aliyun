@@ -31,6 +31,31 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
+    public Dto updateUserSettings(int status, String userId, String type, String token) {
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        String redisToken=stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
+            return DtoUtil.getSuccessDto("修改成功",100000);
+        }
+        return DtoUtil.getFalseDto("修改失败",50001);
+    }
+
+    @Override
+    public Dto updateNotAllowedInvited(String userId, String friendsIds, String token) {
+        return null;
+    }
+
+    @Override
+    public Dto updateNotAllowedSupported(String userId, String friendsIds, String token) {
+        return null;
+    }
+
+    @Override
     public Dto updateReceiveNewMessage(String userId, int status, String token) {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
@@ -472,21 +497,6 @@ public class UserSettingsServiceImpl implements UserSettingsService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         String type = "Font";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateUserSettings(int status, String userId, String type, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
         if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
             return DtoUtil.getSuccessDto("修改成功",100000);
         }

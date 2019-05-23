@@ -52,7 +52,7 @@ public interface AchievementMapper {
      * @param userId
      * @return
      */
-    int addNewAchievement(@Param("id") Long id, @Param("userId") String userId);
+    int addNewAchievement(@Param("id") Long id, @Param("userId") String userId,@Param("createDate") String createDate);
 
     /**
      * 修改用户统计表

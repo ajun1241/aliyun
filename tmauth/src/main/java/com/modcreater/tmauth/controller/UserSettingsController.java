@@ -2,8 +2,8 @@ package com.modcreater.tmauth.controller;
 
 import com.modcreater.tmauth.service.UserSettingsService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.usersettings.PeopleNotAllowed;
 import com.modcreater.tmbeans.vo.usersettings.UserSettingsIdAndStatus;
-import com.modcreater.tmbeans.vo.usersettings.UserSettingsIdAndTime;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,7 +27,41 @@ public class UserSettingsController {
     @Resource
     private UserSettingsService userSettingsService;
 
-    @RequestMapping(value = "updateReceiveNewMessage", method = RequestMethod.POST)
+    /**
+     * 用户设置上传
+     * @param idAndStatus
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "updateUserSettings",method = RequestMethod.POST)
+    public Dto updateUserSettings(@RequestBody UserSettingsIdAndStatus idAndStatus,HttpServletRequest request){
+        return userSettingsService.updateUserSettings(idAndStatus.getStatus(),idAndStatus.getUserId(),idAndStatus.getType(),request.getHeader("token"));
+    }
+
+    /**
+     * 修改不想被邀请的好友
+     * @param peopleNotAllowed
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "updatenotallowedinvited",method = RequestMethod.POST)
+    public Dto updateNotAllowedInvited(@RequestBody PeopleNotAllowed peopleNotAllowed, HttpServletRequest request){
+        return userSettingsService.updateNotAllowedInvited(peopleNotAllowed.getUserId(),peopleNotAllowed.getFriendsIds(),request.getHeader("token"));
+    }
+
+    /**
+     * 修改不想被支持的好友
+     * @param peopleNotAllowed
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "updatenotallowedsupported",method = RequestMethod.POST)
+    public Dto updateNotAllowedSupported(@RequestBody PeopleNotAllowed peopleNotAllowed, HttpServletRequest request){
+        return userSettingsService.updateNotAllowedSupported(peopleNotAllowed.getUserId(),peopleNotAllowed.getFriendsIds(),request.getHeader("token"));
+    }
+
+
+    /*@RequestMapping(value = "updateReceiveNewMessage", method = RequestMethod.POST)
     public Dto updateReceiveNewMessage(@RequestBody UserSettingsIdAndStatus idAndStatus, HttpServletRequest request) {
         return userSettingsService.updateReceiveNewMessage(idAndStatus.getUserId(), idAndStatus.getStatus(), request.getHeader("token"));
     }
@@ -166,10 +200,5 @@ public class UserSettingsController {
     @RequestMapping(value = "updateFont", method = RequestMethod.POST)
     public Dto updateFont(@RequestBody UserSettingsIdAndStatus idAndStatus, HttpServletRequest request) {
         return userSettingsService.updateFont(idAndStatus.getUserId(), idAndStatus.getStatus(), request.getHeader("token"));
-    }
-
-    @RequestMapping(value = "updateUserSettings",method = RequestMethod.POST)
-    public Dto updateUserSettings(@RequestBody UserSettingsIdAndStatus idAndStatus,HttpServletRequest request){
-        return userSettingsService.updateUserSettings(idAndStatus.getStatus(),idAndStatus.getUserId(),idAndStatus.getType(),request.getHeader("token"));
-    }
+    }*/
 }

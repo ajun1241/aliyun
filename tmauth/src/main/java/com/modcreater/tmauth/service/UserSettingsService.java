@@ -13,6 +13,34 @@ import com.modcreater.tmbeans.dto.Dto;
 public interface UserSettingsService {
 
     /**
+     * 修改用户设置
+     * @param status
+     * @param userId
+     * @param type
+     * @param token
+     * @return
+     */
+    Dto updateUserSettings(int status, String userId, String type, String token);
+
+    /**
+     * 修改不想被邀请的好友
+     * @param userId
+     * @param friendsIds
+     * @param token
+     * @return
+     */
+    Dto updateNotAllowedInvited(String userId, String friendsIds, String token);
+
+    /**
+     * 修改不想被支持的好友
+     * @param userId
+     * @param friendsIds
+     * @param token
+     * @return
+     */
+    Dto updateNotAllowedSupported(String userId, String friendsIds, String token);
+
+    /**
      * 修改是否接收新消息
      * @param userId
      * @param status
@@ -263,14 +291,4 @@ public interface UserSettingsService {
      * @return
      */
     Dto updateFont(String userId, int status, String token);
-
-    /**
-     * 修改用户设置
-     * @param status
-     * @param userId
-     * @param type
-     * @param token
-     * @return
-     */
-    Dto updateUserSettings(int status, String userId, String type, String token);
 }

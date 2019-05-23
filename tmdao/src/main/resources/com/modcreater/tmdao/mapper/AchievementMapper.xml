@@ -10,7 +10,7 @@
         id,name,imgUrl,loggedDaysCondition,finishedEventsCondition
     </sql>
     <insert id="addNewAchievement">
-        insert into userachievement (userId, achievementId, createDate)values (null,#{userId},#{id},null )
+        insert into userachievement values (null,#{userId},#{id},#{createDate} )
     </insert>
     <insert id="addNewUserStatistics">
         insert into userstatistics (userId) values (#{userId})
