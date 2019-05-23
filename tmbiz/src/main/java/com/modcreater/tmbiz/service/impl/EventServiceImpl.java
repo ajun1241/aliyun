@@ -413,14 +413,14 @@ public class EventServiceImpl implements EventService {
                 //按周查询单一事件
                 List<DayEvents> dayEventsList = new ArrayList<>();
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                Calendar calendar = Calendar.getInstance();
+                try {
+                    calendar.setTime(simpleDateFormat.parse(searchEventVo.getDayEventId()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 for (int i = 0; i <= 6; i++) {
                     DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
-                    Calendar calendar = Calendar.getInstance();
-                    try {
-                        calendar.setTime(simpleDateFormat.parse(searchEventVo.getDayEventId()));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
                     calendar.add(Calendar.DATE,1);
                     String dayEventId = simpleDateFormat.format(calendar.getTime());
                     singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
