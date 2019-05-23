@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.UserSettings;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,4 +30,11 @@ public interface UserSettingsMapper {
      * @return
      */
     int updateUserSettings(@Param("type") String type,@Param("userId") String userId,@Param("status") int status);
+
+    /**
+     * 拉取用户设置
+     * @param userId
+     * @return
+     */
+    UserSettings queryAllSettings(String userId);
 }

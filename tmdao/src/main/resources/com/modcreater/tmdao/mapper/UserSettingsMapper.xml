@@ -8,4 +8,7 @@
     <update id="updateUserSettings" statementType="STATEMENT">
         update usersettings set ${type} = ${status} where userId = ${userId}
     </update>
+    <select id="queryAllSettings" resultType="com.modcreater.tmbeans.pojo.UserSettings">
+        select * from usersettings where userId = #{userId}
+    </select>
 </mapper>

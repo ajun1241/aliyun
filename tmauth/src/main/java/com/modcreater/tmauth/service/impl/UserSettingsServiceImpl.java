@@ -3,6 +3,7 @@ package com.modcreater.tmauth.service.impl;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmauth.service.UserSettingsService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.UserSettings;
 import com.modcreater.tmbeans.vo.usersettings.PeopleNotAllowed;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.UserSettingsMapper;
@@ -11,6 +12,7 @@ import com.modcreater.tmutils.SingleEventUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -80,7 +82,18 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Override
     public Dto getUserSettings(String userId, String token) {
-        return null;
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        String redisToken=stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        UserSettings userSettings = userSettingsMapper.queryAllSettings(userId);
+        if (ObjectUtils.isEmpty(userSettings)){
+            return DtoUtil.getFalseDto("获取用户云端设置信息失败",50004);
+        }
+        return DtoUtil.getSuccesWithDataDto("获取用户设置成功",userSettings,100000);
     }
 
     @Override
