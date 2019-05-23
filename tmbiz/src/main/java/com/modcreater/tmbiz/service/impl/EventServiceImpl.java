@@ -586,6 +586,7 @@ public class EventServiceImpl implements EventService {
             statisticsTable.setCreatorId(singleEvent.getUserid());
             statisticsTable.setChoose(Long.parseLong(feedbackEventInviteVo.getChoose()));
             statisticsTable.setModify(1);
+            System.out.println("jijijijijijijijjijiji="+statisticsTable.toString());
             statisticsMapper.updateStatistics(statisticsTable);
             //查询是否所有人都给了反馈
             int i=statisticsMapper.queryStatisticsCount(statisticsTable);
