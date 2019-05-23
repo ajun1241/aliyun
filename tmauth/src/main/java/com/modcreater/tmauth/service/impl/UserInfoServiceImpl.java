@@ -57,6 +57,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     private StringRedisTemplate stringRedisTemplate;
 
     private static final String[] TYPE = {"a","b","c","d","e","f","g","h"};
+    private static final String[] ONEWEEKINNUM = {"a","b","c","d","e","f","g"};
 
     @Override
     public Dto showUserDetails(String userId, String token) {
@@ -266,21 +267,27 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         SingleEvent condition = new SingleEvent();
         condition.setUserid(Long.valueOf(userId));
+        List<List<ShowSingleEvent>> weekLists = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-        for (int i = 0; i <= 6; i++) {
-            Calendar calendar = Calendar.getInstance();
-            try {
-                calendar.setTime(simpleDateFormat.parse(userId));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            calendar.add(Calendar.DATE,1);
-            StringBuffer startDate = new StringBuffer(simpleDateFormat.format(calendar.getTime()));
-            condition.setYear(Long.valueOf(startDate.substring(0,4)));
-            condition.setMonth(Long.valueOf(startDate.substring(4,6)));
-            condition.setDay(Long.valueOf(startDate.substring(6,8)));
-            List<ShowSingleEvent> showSingleEventList = SingleEventUtil.getShowSingleEventList(eventMapper.queryEvents(condition));
+        Calendar calendar = Calendar.getInstance();
+        try {
+            calendar.setTime((simpleDateFormat).parse(simpleDateFormat.format(new Date())));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        return null;
+        for (int i = 0; i <= 6; i++) {
+            if (i != 0) {
+                calendar.add(Calendar.DATE, -1);
+            }
+            StringBuffer startDate = new StringBuffer(simpleDateFormat.format(calendar.getTime()));
+            condition.setYear(Long.valueOf(startDate.substring(0, 4)));
+            condition.setMonth(Long.valueOf(startDate.substring(4, 6)));
+            condition.setDay(Long.valueOf(startDate.substring(6, 8)));
+            weekLists.add(SingleEventUtil.getShowSingleEventList(eventMapper.queryEvents(condition)));
+        }
+        if (weekLists.size() == 0) {
+            return DtoUtil.getSuccessDto("未查询到数据", 100000);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询我的一周成功", weekLists, 100000);
     }
 }

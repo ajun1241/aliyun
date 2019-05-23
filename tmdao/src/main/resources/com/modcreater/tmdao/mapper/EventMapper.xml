@@ -119,7 +119,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue in (1,0) and isLoop = 1
+            and isOverdue in (1,0) and isLoop = 0
         </where>
 
         order by day asc ,startTime asc
