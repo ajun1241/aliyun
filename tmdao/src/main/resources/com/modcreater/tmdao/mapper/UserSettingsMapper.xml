@@ -2,6 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.UserSettingsMapper">
 
+    <resultMap id="forGetInviteFriendList" type="com.modcreater.tmbeans.show.usersettings.ShowFriendListForInvite">
+        <result property="userCode" column="userCode"/>
+        <result property="userName" column="userCode"/>
+        <result property="headImgUrl" column="userCode"/>
+        <result property="gender" column="userCode"/>
+        <collection property="status" column="invite" select="com.modcreater.tmbeans.pojo.Friendship"/>
+    </resultMap>
+    <resultMap id="forGetSupportFriendList" type="com.modcreater.tmbeans.show.usersettings.ShowFriendListForSupport">
+        <result property="userCode" column="userCode"/>
+        <result property="userName" column="userCode"/>
+        <result property="headImgUrl" column="userCode"/>
+        <result property="gender" column="userCode"/>
+        <collection property="status" column="sustain" select="com.modcreater.tmbeans.pojo.Friendship"/>
+    </resultMap>
+
+
     <insert id="addNewUserSettings">
         insert into usersettings (userId) values (#{userId})
     </insert>
@@ -10,5 +26,11 @@
     </update>
     <select id="queryAllSettings" resultType="com.modcreater.tmbeans.pojo.UserSettings">
         select * from usersettings where userId = #{userId}
+    </select>
+    <select id="getInviteFriendList" resultMap="forGetInviteFriendList">
+        select userCode,headImgUrl,userName,gender,status,invite from account a,friendship f where a.id = #{userId} and a.id = f.userId
+    </select>
+    <select id="getSupportFriendList" resultMap="forGetSupportFriendList">
+        select userCode,headImgUrl,userName,gender,status,sustain from account a,friendship f where a.id = #{userId} and a.id = f.userId
     </select>
 </mapper>

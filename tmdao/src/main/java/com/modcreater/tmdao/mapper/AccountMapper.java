@@ -4,7 +4,7 @@ import com.modcreater.tmbeans.dto.MyDetail;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.vo.LoginVo;
-import com.modcreater.tmbeans.vo.usersettings.PeopleNotAllowed;
+import com.modcreater.tmbeans.vo.usersettings.GetFriendListInSettings;
 import com.modcreater.tmbeans.vo.uservo.FriendshipVo;
 import com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -109,10 +109,10 @@ public interface AccountMapper {
 
     /**
      * 修改限制(好友的邀请或支持权限)
-     * @param peopleNotAllowed
+     * @param getFriendListInSettings
      * @return
      */
-    int updateFriendJurisdictionForSingleCondition(PeopleNotAllowed peopleNotAllowed);
+    int updateFriendJurisdictionForSingleCondition(GetFriendListInSettings getFriendListInSettings);
 
     /**
      * 解除好友关系

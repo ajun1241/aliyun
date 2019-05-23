@@ -1,8 +1,13 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.UserSettings;
+import com.modcreater.tmbeans.show.usersettings.ShowFriendListForInvite;
+import com.modcreater.tmbeans.show.usersettings.ShowFriendListForSupport;
+import com.modcreater.tmbeans.vo.usersettings.GetFriendListInSettings;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,4 +42,19 @@ public interface UserSettingsMapper {
      * @return
      */
     UserSettings queryAllSettings(String userId);
+
+    /**
+     * 获取邀请权限好友列表
+     * @param userId
+     * @return
+     */
+    List<ShowFriendListForInvite> getInviteFriendList(String userId);
+
+    /**
+     * 获取支持权限好友列表
+     * @param userId
+     * @return
+     */
+    List<ShowFriendListForSupport> getSupportFriendList(String userId);
+
 }

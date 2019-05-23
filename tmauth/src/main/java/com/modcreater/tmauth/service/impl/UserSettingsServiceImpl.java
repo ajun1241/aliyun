@@ -1,10 +1,14 @@
 package com.modcreater.tmauth.service.impl;
 
-import com.modcreater.tmauth.service.UserInfoService;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmauth.service.UserSettingsService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserSettings;
-import com.modcreater.tmbeans.vo.usersettings.PeopleNotAllowed;
+import com.modcreater.tmbeans.show.usersettings.ShowFriendListForInvite;
+import com.modcreater.tmbeans.show.usersettings.ShowFriendListForSupport;
+import com.modcreater.tmbeans.vo.usersettings.GetFriendListInSettings;
+import com.modcreater.tmbeans.vo.usersettings.ReceivedShowFriendList;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.UserSettingsMapper;
 import com.modcreater.tmutils.DtoUtil;
@@ -16,6 +20,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,28 +61,31 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     }
 
     @Override
-    public Dto updateNotAllowed(PeopleNotAllowed peopleNotAllowed, String token) {
+    public Dto updateNotAllowed(ReceivedShowFriendList receivedShowFriendList, String token) {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(peopleNotAllowed.getUserId());
+        String redisToken=stringRedisTemplate.opsForValue().get(receivedShowFriendList.getId());
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        List<String> conditions = new ArrayList<>();
-        conditions.add("appType");
-        conditions.add("friendsIds");
-        if (!StringUtils.hasText(peopleNotAllowed.getFriendsIds()) || SingleEventUtil.isAllPropertiesEmpty(peopleNotAllowed,conditions)){
-            return DtoUtil.getFalseDto("条件接收失败",50002);
-        }
-        String[] friends = peopleNotAllowed.getFriendsIds().split(",");
-        for (String id : friends){
-            peopleNotAllowed.setFriendsIds(id);
-            if (accountMapper.updateFriendJurisdictionForSingleCondition(peopleNotAllowed) == 0){
-                return DtoUtil.getFalseDto("修改"+peopleNotAllowed.getUpdateType()+"失败",50003);
+        if (receivedShowFriendList.getShowFriendList().indexOf("invite") >= 0){
+            List<ShowFriendListForInvite> showFriendListForInviteList = new ArrayList<>();
+            ArrayList<String> list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
+            for (String s : list){
+                ShowFriendListForInvite showFriendListForInvite = JSONObject.parseObject(s,ShowFriendListForInvite.class);
+                showFriendListForInviteList.add(showFriendListForInvite);
+            }
+
+        }else {
+            List<ShowFriendListForSupport> showFriendListForSupportList = new ArrayList<>();
+            ArrayList<String> list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
+            for (String s : list){
+                ShowFriendListForSupport showFriendListForSupport = JSONObject.parseObject(s,ShowFriendListForSupport.class);
+                showFriendListForSupportList.add(showFriendListForSupport);
             }
         }
-        return DtoUtil.getSuccessDto("修改"+peopleNotAllowed.getUpdateType()+"成功",100000);
+        return null;
     }
 
     @Override
@@ -97,450 +105,31 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     }
 
     @Override
-    public Dto updateReceiveNewMessage(String userId, int status, String token) {
+    public Dto getFriendList(GetFriendListInSettings getFriendListInSettings, String token) {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
+        String redisToken=stringRedisTemplate.opsForValue().get(getFriendListInSettings.getUserId());
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        String type = "ReceiveNewMessage";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateNewMessageDetails(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "NewMessageDetails";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateNewMessageSystemNotify(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "NewMessageSystemNotify";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateNewMessageForChat(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "NewMessageForChat";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateDND(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "DND";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateDNDStartTime(String userId, int time, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "DNDStartTime";
-        if (userSettingsMapper.updateUserSettings(type,userId,time) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateDNDEndTime(String userId, int time, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "DNDEndTime";
-        if (userSettingsMapper.updateUserSettings(type,userId,time) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateImportantAndUrgent(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "ImportantAndUrgent";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateImportant(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "Important";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateUrgent(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "Urgent";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateNotImportantAndUrgent(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "NotImportantAndUrgent";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateOptional(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "Optional";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateFriendInvite(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "FriendInvite";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateFriendSupport(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "FriendSupport";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updatePhoneNumInvite(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "PhoneNumInvite";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateWechatNumInvite(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "WechatNumInvite";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateQQNumInvite(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "QQNumInvite";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateGroupInvite(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "GroupInvite";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateMyIdInvite(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "MyIdInvite";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateOnlyWiFi(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "OnlyWiFi";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateSimplifiedChinese(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "SimplifiedChinese";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateChineseTraditionalForHongKong(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "ChineseTraditionalForHongKong";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateChineseTraditionalForTaiWan(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "ChineseTraditionalForTaiWan";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateForEnglish(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "ForEnglish";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateIndonesia(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "Indonesia";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateJapanese(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "Japanese";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateFrench(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "French";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
-    }
-
-    @Override
-    public Dto updateFont(String userId, int status, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        String type = "Font";
-        if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
-        }
-        return DtoUtil.getFalseDto("修改失败",50001);
+        if ("invite".equals(getFriendListInSettings.getUpdateType())){
+            List<ShowFriendListForInvite> showFriendListForInviteList = userSettingsMapper.getInviteFriendList(getFriendListInSettings.getUserId());
+            if (showFriendListForInviteList.size() != 0){
+                for (ShowFriendListForInvite showFriendListForInvite : showFriendListForInviteList){
+                    showFriendListForInvite.setUpdateType("invite");
+                }
+                return DtoUtil.getSuccesWithDataDto("加载好友列表成功",showFriendListForInviteList,100000);
+            }
+        }else {
+            List<ShowFriendListForSupport> showFriendListForSupportList = userSettingsMapper.getSupportFriendList(getFriendListInSettings.getUserId());
+            if (showFriendListForSupportList.size() != 0){
+                for (ShowFriendListForSupport showFriendListForSupport : showFriendListForSupportList){
+                    showFriendListForSupport.setUpdateType("sustain");
+                }
+                return DtoUtil.getSuccesWithDataDto("加载好友列表成功",showFriendListForSupportList,100000);
+            }
+        }
+        return DtoUtil.getFalseDto("未找到好友",100000);
     }
 }
