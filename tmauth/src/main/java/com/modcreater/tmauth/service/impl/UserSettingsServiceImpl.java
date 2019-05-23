@@ -79,6 +79,11 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     }
 
     @Override
+    public Dto getUserSettings(String userId, String token) {
+        return null;
+    }
+
+    @Override
     public Dto updateReceiveNewMessage(String userId, int status, String token) {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);

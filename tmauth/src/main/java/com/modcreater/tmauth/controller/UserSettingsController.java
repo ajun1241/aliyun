@@ -2,6 +2,7 @@ package com.modcreater.tmauth.controller;
 
 import com.modcreater.tmauth.service.UserSettingsService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.usersettings.PeopleNotAllowed;
 import com.modcreater.tmbeans.vo.usersettings.UserSettingsIdAndStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +48,11 @@ public class UserSettingsController {
     @RequestMapping(value = "updatenotallowedinvited",method = RequestMethod.POST)
     public Dto updateNotAllowed(@RequestBody PeopleNotAllowed peopleNotAllowed, HttpServletRequest request){
         return userSettingsService.updateNotAllowed(peopleNotAllowed,request.getHeader("token"));
+    }
+
+    @RequestMapping(value = "getusersettings",method = RequestMethod.POST)
+    public Dto getUserSettings(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
+        return userSettingsService.getUserSettings(receivedId.getUserId(),request.getHeader("token"));
     }
 
     /*@RequestMapping(value = "updateReceiveNewMessage", method = RequestMethod.POST)

@@ -32,6 +32,14 @@ public interface UserSettingsService {
     Dto updateNotAllowed(PeopleNotAllowed peopleNotAllowed, String token);
 
     /**
+     * 用户获取云端设置
+     * @param userId
+     * @param token
+     * @return
+     */
+    Dto getUserSettings(String userId, String token);
+
+    /**
      * 修改是否接收新消息
      * @param userId
      * @param status

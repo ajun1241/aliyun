@@ -259,8 +259,10 @@
         where userId = #{userId} and isOverdue in (1,0) group by type
     </select>
     <select id="getMaxSingleEventType" resultType="java.lang.Long">
-        select max(endTime-startTime) from singleevent
-        where userId = #{userId} and isOverdue in (1,0)
+        select type from singleevent
+        where userId = #{userId} and isOverdue in (1,0) and
+        (select max(endTime-startTime) from singevent
+        where userId = #{userId} and isOverdue in (1,0))
     </select>
     <select id="getMinSingleEventType" resultType="java.lang.Long">
         select min(endTime-startTime) from singleevent
