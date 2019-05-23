@@ -34,7 +34,7 @@ public class UserSettingsController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "updateUserSettings",method = RequestMethod.POST)
+    @RequestMapping(value = "updateusersettings",method = RequestMethod.POST)
     public Dto updateUserSettings(@RequestBody UserSettingsIdAndStatus idAndStatus,HttpServletRequest request){
         return userSettingsService.updateUserSettings(idAndStatus.getStatus(),idAndStatus.getUserId(),idAndStatus.getType(),request.getHeader("token"));
     }
@@ -50,6 +50,12 @@ public class UserSettingsController {
         return userSettingsService.updateNotAllowed(peopleNotAllowed,request.getHeader("token"));
     }
 
+    /**
+     * 获取用户设置
+     * @param receivedId
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "getusersettings",method = RequestMethod.POST)
     public Dto getUserSettings(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
         return userSettingsService.getUserSettings(receivedId.getUserId(),request.getHeader("token"));
