@@ -122,7 +122,7 @@
         update friendship set #{updateType} = #{status} where userId = #{userId} and friendId = #{friendsIds}
     </update>
 
-    <delete id="deleteFriendship" parameterType="com.modcreater.tmbeans.vo.uservo.DeleteFriendshipVo">
+    <delete id="deleteFriendship" parameterType="com.modcreater.tmbeans.vo.uservo.FriendshipVo">
         delete from friendship where userId=#{userId} and friendId=#{friendId}
     </delete>
 

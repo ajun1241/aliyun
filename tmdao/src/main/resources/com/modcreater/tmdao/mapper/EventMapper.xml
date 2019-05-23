@@ -261,13 +261,13 @@
     <select id="getMaxSingleEventType" resultType="java.lang.Long">
         select type from singleevent
         where userId = #{userId} and isOverdue in (1,0) and
-        (select max(endTime-startTime) from singevent
+        (select max(endTime-startTime) from singleevent
         where userId = #{userId} and isOverdue in (1,0))
     </select>
     <select id="getMinSingleEventType" resultType="java.lang.Long">
         select type from singleevent
         where userId = #{userId} and isOverdue in (1,0) and
-        (select min(endTime-startTime) from singevent
+        (select min(endTime-startTime) from singleevent
         where userId = #{userId} and isOverdue in (1,0))
     </select>
     <select id="countEvents" resultType="java.lang.Long">

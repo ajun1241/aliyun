@@ -64,8 +64,14 @@ public class AccountController {
 
     @PostMapping("sendfriendresponse")
     @ApiOperation("发送同意添加好友请求")
-    public Dto sendFriendResponse(@RequestBody SendFriendResponseVo responseVo, HttpServletRequest request){
+    public Dto sendFriendResponse(@RequestBody FriendshipVo responseVo, HttpServletRequest request){
         return userService.sendFriendResponse(responseVo,request.getHeader("token"));
+    }
+
+    @PostMapping("queryfrienddetails")
+    @ApiOperation("查询好友详情")
+    public Dto queryFriendDetails(@RequestBody FriendshipVo queFridenVo, HttpServletRequest request){
+        return userService.queryFriendDetails(queFridenVo,request.getHeader("token"));
     }
 
     @PostMapping("queryFriendList")
@@ -82,7 +88,7 @@ public class AccountController {
 
     @PostMapping("deleteFriendship")
     @ApiOperation("解除好友关系")
-    public Dto deleteFriendship(@RequestBody DeleteFriendshipVo deleteFriendshipVo, HttpServletRequest request){
+    public Dto deleteFriendship(@RequestBody FriendshipVo deleteFriendshipVo, HttpServletRequest request){
         return userService.deleteFriendship(deleteFriendshipVo,request.getHeader("token"));
     }
 }

@@ -69,7 +69,7 @@ public interface AccountService {
      * @param token
      * @return
      */
-    Dto sendFriendResponse(SendFriendResponseVo sendFriendResponseVo,String token);
+    Dto sendFriendResponse(FriendshipVo sendFriendResponseVo,String token);
 
 
     /**
@@ -82,10 +82,11 @@ public interface AccountService {
 
     /**
      * 查看好友详情
-     * @param UserId
+     * @param queFridenVo
+     * @param token
      * @return
      */
-    Dto queryFriendDetails(String UserId);
+    Dto queryFriendDetails(FriendshipVo queFridenVo, String token);
 
     /**
      * 修改好友权限
@@ -101,6 +102,6 @@ public interface AccountService {
      * @param token
      * @return
      */
-    Dto deleteFriendship(DeleteFriendshipVo deleteFriendshipVo, String token);
+    Dto deleteFriendship(FriendshipVo deleteFriendshipVo, String token);
 
 }

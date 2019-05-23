@@ -1,20 +1,16 @@
 package com.modcreater.tmdao.mapper;
 
-import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.dto.MyDetail;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
-import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.usersettings.PeopleNotAllowed;
-import com.modcreater.tmbeans.vo.uservo.BuildFriendshipVo;
-import com.modcreater.tmbeans.vo.uservo.DeleteFriendshipVo;
+import com.modcreater.tmbeans.vo.uservo.FriendshipVo;
 import com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface AccountMapper {
@@ -123,7 +119,7 @@ public interface AccountMapper {
      * @param deleteFriendshipVo
      * @return
      */
-    int deleteFriendship(DeleteFriendshipVo deleteFriendshipVo);
+    int deleteFriendship(FriendshipVo deleteFriendshipVo);
 
     /**
      * 增加实名认证
