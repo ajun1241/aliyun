@@ -421,7 +421,9 @@ public class EventServiceImpl implements EventService {
                 }
                 for (int i = 0; i <= 6; i++) {
                     DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
-                    calendar.add(Calendar.DATE,1);
+                    if (i != 0) {
+                        calendar.add(Calendar.DATE, 1);
+                    }
                     String dayEventId = simpleDateFormat.format(calendar.getTime());
                     singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
                     List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);

@@ -83,6 +83,12 @@ public class UserInfoController {
         return userInfoService.queryUserAchievement(receivedId.getUserId(),request.getHeader("token"));
     }
 
+    /**
+     * 查询我的一周
+     * @param receivedId
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "myweek",method = RequestMethod.POST)
     public Dto myWeek(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.myWeek(receivedId.getUserId(),request.getHeader("token"));
