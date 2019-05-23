@@ -24,5 +24,9 @@ public class UserAchievement {
      * 成就ID
      */
     private Long achievementId;
+    /**
+     * 成就获得时间(时间戳)
+     */
+    private String createDate;
 
 }
