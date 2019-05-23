@@ -512,6 +512,7 @@ public class EventServiceImpl implements EventService {
         }
         //保存这条事件
         SingleEvent singleEvent=JSONObject.parseObject(addInviteEventVo.getSingleEvent(),SingleEvent.class);
+        singleEvent.setUserid(Long.parseLong(addInviteEventVo.getUserId()));
         String[] persons=singleEvent.getPerson().split(",");
         String redisKey=addInviteEventVo.getUserId()+singleEvent.getEventid();
         stringRedisTemplate.opsForValue().set(redisKey,addInviteEventVo.getSingleEvent());
@@ -566,6 +567,7 @@ public class EventServiceImpl implements EventService {
         }
         //拿到发起者的事件
         SingleEvent singleEvent=JSONObject.parseObject(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getExtraData()),SingleEvent.class);
+        System.out.println("22222223333333=="+singleEvent.toString());
         String[] persons=singleEvent.getPerson().split(",");
         StatisticsTable statisticsTable=new StatisticsTable();
         //通过判断所有用户是否都答复决定是否发送消息给事件发起者
@@ -584,16 +586,25 @@ public class EventServiceImpl implements EventService {
             statisticsTable.setCreatorId(singleEvent.getUserid());
             statisticsTable.setChoose(Long.parseLong(feedbackEventInviteVo.getChoose()));
             statisticsTable.setModify(1);
+            System.out.println("jijijijijijijijjijiji="+statisticsTable.toString());
             statisticsMapper.updateStatistics(statisticsTable);
             //查询是否所有人都给了反馈
             int i=statisticsMapper.queryStatisticsCount(statisticsTable);
-            //所有的反馈都收到了
-            if (i>=persons.length){
+            //所有的反馈都收到了 或者  通过判断timeUp字段决定是否发送消息给事件发起者
+            if (i>=persons.length || Long.parseLong(feedbackEventInviteVo.getTimeUp())==1){
                 //发送统计结果给事件发起者
                 RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+                //查询统计结果
+                Map map=statisticsMapper.queryFeedbackStatistics(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
+                System.out.println("*****************************************");
+                System.out.println(map.get("agree"));
+                System.out.println(map.get("refuse"));
+                System.out.println(map.get("noReply"));
+                System.out.println("*****************************************");
                 /*InviteMessage inviteMessage=new InviteMessage();
                 rongCloudMethodUtil.sendSystemMessage();*/
             }
+            return DtoUtil.getFalseDto("信息已发出",100000);
         }
         //通过判断timeUp字段决定是否发送消息给事件发起者
 

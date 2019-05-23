@@ -262,13 +262,15 @@
         select type from singleevent
         where userId = #{userId} and isOverdue in (1,0) and
         (select max(endTime-startTime) from singleevent
-        where userId = #{userId} and isOverdue in (1,0))
+        where userId = #{userId} and isOverdue in (1,0) limit 1)
+        limit 1
     </select>
     <select id="getMinSingleEventType" resultType="java.lang.Long">
         select type from singleevent
         where userId = #{userId} and isOverdue in (1,0) and
         (select min(endTime-startTime) from singleevent
-        where userId = #{userId} and isOverdue in (1,0))
+        where userId = #{userId} and isOverdue in (1,0) limit 1)
+        limit 1
     </select>
     <select id="countEvents" resultType="java.lang.Long">
         select count(id) from singleevent where userId = #{userId} and isOverdue in (1,0)
@@ -278,13 +280,14 @@
         update draft set `data`=concat(`data`,#{data})
         where phoneNum=#{phoneNum}
     </update>
-    <select id="queryClashEventList " parameterType="com.modcreater.tmbeans.pojo.SingleEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+
+    <select id="queryClashEventList" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select * from singleevent
         where
-        userId = #{userid} and
-        and month = #{month} and
-        and day = #{day} and
-        and year = #{year} and
+        userId = #{userid}
+        and month = #{month}
+        and day = #{day}
+        and year = #{year}
         and ((startTime &gt; #{starttime} and endTime &lt; #{endtime})
         or
         (startTime &gt; #{starttime} and startTime &lt; #{endtime})
@@ -293,6 +296,7 @@
         or
         (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}))
     </select>
+
     <select id="queryEventsByDayForIOS" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
 
     </select>
