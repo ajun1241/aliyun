@@ -293,5 +293,8 @@
         or
         (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}))
     </select>
+    <select id="queryEventsByDayForIOS" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+
+    </select>
 
 </mapper>

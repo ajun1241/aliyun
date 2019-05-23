@@ -117,4 +117,15 @@ public class EventController {
     public Dto addInviteEvent(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){
         return eventService.addInviteEvent(addInviteEventVo,request.getHeader("token"));
     }
+
+    /**
+     * 根据天条件查询forIOS
+     * @param searchConditionsForIOS
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "seabydayforios",method = RequestMethod.POST)
+    public Dto searchByDayForIOS(@RequestBody SearchConditionsForIOS searchConditionsForIOS,HttpServletRequest request){
+        return eventService.searchByDayForIOS(searchConditionsForIOS,request.getHeader("token"));
+    }
 }

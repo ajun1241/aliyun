@@ -61,6 +61,13 @@ public interface EventMapper {
     ArrayList<SingleEvent> queryEvents(SingleEvent singleEvent);
 
     /**
+     * 按天查询事件forIOS
+     * @param singleEvent
+     * @return
+     */
+    ArrayList<SingleEvent> queryEventsByDayForIOS(SingleEvent singleEvent);
+
+    /**
      * 根据用户id查询事件
      * @param userId
      * @return

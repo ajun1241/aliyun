@@ -102,4 +102,12 @@ public interface EventService {
      * @return
      */
     Dto eventCreatorChoose(EventCreatorChooseVo eventCreatorChooseVo,String token);
+
+    /**
+     * 根据天条件查询forIOS
+     * @param searchConditionsForIOS
+     * @param token
+     * @return
+     */
+    Dto searchByDayForIOS(SearchConditionsForIOS searchConditionsForIOS, String token);
 }

@@ -613,4 +613,27 @@ public class EventServiceImpl implements EventService {
         return null;
     }
 
+    @Override
+    public Dto searchByDayForIOS(SearchConditionsForIOS searchConditionsForIOS, String token) {
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(searchConditionsForIOS.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        SingleEvent singleEvent = new SingleEvent();
+        StringBuffer stringBuffer = new StringBuffer(searchConditionsForIOS.getDate());
+        singleEvent.setUserid(Long.valueOf(searchConditionsForIOS.getUserId()));
+        singleEvent.setIsOverdue((long)searchConditionsForIOS.getStatus());
+        singleEvent.setIsLoop(searchConditionsForIOS.getIsLoop());
+        singleEvent.setYear(Long.valueOf(stringBuffer.substring(0,4)));
+        singleEvent.setMonth(Long.valueOf(stringBuffer.substring(4,6)));
+        singleEvent.setDay(Long.valueOf(stringBuffer.substring(6,8)));
+        List<SingleEvent> singleEventList = eventMapper.queryEventsByDayForIOS(singleEvent);
+        if (singleEventList.size() != 0){
+            return DtoUtil.getSuccesWithDataDto("查询成功",SingleEventUtil.getShowSingleEventList(singleEventList),100000);
+        }
+        return DtoUtil.getFalseDto("未查询到数据",100000);
+    }
+
 }
