@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.pojo.StatisticsTable;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description:
@@ -33,5 +34,13 @@ public interface StatisticsMapper {
      * @return
      */
     int queryStatisticsCount(StatisticsTable statisticsTable);
+
+    /**
+     * 查询最终统计结果
+     * @param creatorId
+     * @param eventId
+     * @return
+     */
+    Map<String,String> queryFeedbackStatistics(String creatorId,String eventId);
 
 }

@@ -108,6 +108,16 @@ public class EventController {
         return eventService.searchByDayEventIdsInWeek(searchEventVo,request.getHeader("token"));
     }
     /**
+     * 回应一条邀请事件
+     * @param feedbackEventInviteVo
+     * @return
+     */
+    @PostMapping(value = "feedbackeventinvite")
+    @ApiOperation("回应一条邀请事件")
+    public Dto feedbackEventInvite(@RequestBody FeedbackEventInviteVo feedbackEventInviteVo, HttpServletRequest request){
+        return eventService.feedbackEventInvite(feedbackEventInviteVo,request.getHeader("token"));
+    }
+    /**
      * 添加一条邀请事件
      * @param addInviteEventVo
      * @return

@@ -79,10 +79,10 @@ public class AccountServiceImpl implements AccountService {
                 map.put("birthday",result.getBirthday());
                 map.put("headImgUrl",result.getHeadImgUrl());
 
-                map.put("IDCard",result.getIDCard());
+               /* map.put("IDCard",result.getIDCard());
                 map.put("userType",result.getUserType());
                 map.put("realName",result.getRealName());
-                map.put("userAddress",result.getUserAddress());
+                map.put("userAddress",result.getUserAddress());*/
                 map.put("userSign",result.getUserSign());
                 return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
             }
@@ -115,10 +115,10 @@ public class AccountServiceImpl implements AccountService {
             map.put("gender",result.getGender());
             map.put("birthday",result.getBirthday());
             map.put("headImgUrl",result.getHeadImgUrl());
-            map.put("IDCard",result.getIDCard());
+            /*map.put("IDCard",result.getIDCard());
             map.put("userType",result.getUserType());
             map.put("realName",result.getRealName());
-            map.put("userAddress",result.getUserAddress());
+            map.put("userAddress",result.getUserAddress());*/
             map.put("userSign",result.getUserSign());
             map.put("token",token);
             result.setToken(token);
@@ -155,10 +155,10 @@ public class AccountServiceImpl implements AccountService {
         map.put("gender",result.getGender());
         map.put("birthday",result.getBirthday());
         map.put("headImgUrl",result.getHeadImgUrl());
-        map.put("IDCard",result.getIDCard());
+        /*map.put("IDCard",result.getIDCard());
         map.put("userType",result.getUserType());
         map.put("realName",result.getRealName());
-        map.put("userAddress",result.getUserAddress());
+        map.put("userAddress",result.getUserAddress());*/
         map.put("userSign",result.getUserSign());
         return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
     }
@@ -285,6 +285,7 @@ public class AccountServiceImpl implements AccountService {
             map.put("monthPlan",result.getMonth());
             map.put("finish",userStatistics.getCompleted().toString());
             map.put("achievement",achievement);
+            map.put("isFriend",1);
             return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
         }
         //其他表信息
@@ -300,6 +301,7 @@ public class AccountServiceImpl implements AccountService {
         map.put("dayPlan",result.getDay());
         map.put("monthPlan",result.getMonth());
         map.put("finish",userStatistics.getCompleted().toString());
+        map.put("isFriend",0);
         return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
     }
 
@@ -472,7 +474,7 @@ public class AccountServiceImpl implements AccountService {
         //好友表信息
         Account account=accountMapper.queryAccount(queFridenVo.getFriendId());
         if (ObjectUtils.isEmpty(account)){
-            return DtoUtil.getFalseDto("搜索好友失败",200000);
+            return DtoUtil.getFalseDto("查询好友详情失败",200000);
         }
         //日规划,月规划
         MyDetail result=accountMapper.queryPlanByDayAndMonth(account.getId().toString(),myDate[2],myDate[0],myDate[1]);
@@ -497,7 +499,7 @@ public class AccountServiceImpl implements AccountService {
         map.put("monthPlan",result.getMonth());
         map.put("finish",userStatistics.getCompleted().toString());
         map.put("achievement",achievement);
-        return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
+        return DtoUtil.getSuccesWithDataDto("查询好友详情成功",map,100000);
     }
 
     /**

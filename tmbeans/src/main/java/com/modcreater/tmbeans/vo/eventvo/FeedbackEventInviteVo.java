@@ -13,6 +13,9 @@ import java.io.Serializable;
 @Data
 public class FeedbackEventInviteVo implements Serializable {
     private String appType;
+    /**
+     * 0 ：时间没到；1：时间到了
+     */
     private String timeUp;
     private String choose;
     private String userId;

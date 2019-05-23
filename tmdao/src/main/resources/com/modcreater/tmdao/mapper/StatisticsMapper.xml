@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.StatisticsMapper">
+    <resultMap id="queryFeedbackStatisticsMap" type="String">
+        <result column="agree" property="agree" />
+        <result column="refuse" property="refuse" />
+        <result column="noReply" property="noReply" />
+    </resultMap>
     <insert id="createStatistics" parameterType="com.modcreater.tmbeans.pojo.StatisticsTable">
         insert into statisticstable
         (creatorId, eventId, userId)
@@ -32,5 +37,12 @@
             eventId=#{eventId}
         and
             modify=1
+    </select>
+    <select id="queryFeedbackStatistics" resultMap="queryFeedbackStatisticsMap">
+        SELECT
+            (SELECT COUNT(1) FROM statisticstable WHERE creatorId=100033 AND eventId=1557468410 AND choose=0) AS agree,
+            (SELECT COUNT(1) FROM statisticstable WHERE creatorId=100033 AND eventId=1557468410 AND choose=1) AS refuse,
+            (SELECT COUNT(1) FROM statisticstable WHERE creatorId=100033 AND eventId=1557468410 AND choose=2) AS noReply
+         FROM statisticstable LIMIT 1
     </select>
 </mapper>
