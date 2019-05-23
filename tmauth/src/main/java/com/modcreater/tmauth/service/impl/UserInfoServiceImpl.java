@@ -271,7 +271,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         SingleEvent condition = new SingleEvent();
         condition.setUserid(Long.valueOf(userId));
-        List<List<ShowSingleEvent>> weekLists = new ArrayList<>();
+        List<ShowSingleEvent> weekLists = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar calendar = Calendar.getInstance();
         try {
@@ -287,7 +287,12 @@ public class UserInfoServiceImpl implements UserInfoService {
             condition.setYear(Long.valueOf(startDate.substring(0, 4)));
             condition.setMonth(Long.valueOf(startDate.substring(4, 6)));
             condition.setDay(Long.valueOf(startDate.substring(6, 8)));
-            weekLists.add(SingleEventUtil.getShowSingleEventList(eventMapper.queryEvents(condition)));
+            List<SingleEvent> singleEventList = eventMapper.queryEvents(condition);
+            if (singleEventList.size() > 0){
+                for (SingleEvent singleEvent : singleEventList){
+                    weekLists.add(SingleEventUtil.getShowSingleEvent(singleEvent));
+                }
+            }
         }
         if (weekLists.size() == 0) {
             return DtoUtil.getSuccessDto("未查询到数据", 100000);
