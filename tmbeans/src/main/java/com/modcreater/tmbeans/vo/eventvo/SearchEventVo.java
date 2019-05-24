@@ -18,10 +18,16 @@ public class SearchEventVo implements Serializable {
      * 用户Id
      */
     private String userId;
+
+    /**
+     * 好友ID
+     */
+    private String friendId;
     /**
      * 事件的时间(20190430)
      */
     private String dayEventId;
+
     /**
      *
      */

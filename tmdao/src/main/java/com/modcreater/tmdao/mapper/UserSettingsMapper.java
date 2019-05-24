@@ -1,9 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.UserSettings;
-import com.modcreater.tmbeans.show.usersettings.ShowFriendListForInvite;
-import com.modcreater.tmbeans.show.usersettings.ShowFriendListForSupport;
-import com.modcreater.tmbeans.vo.usersettings.GetFriendListInSettings;
+import com.modcreater.tmbeans.show.usersettings.ShowFriendList;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -48,13 +46,27 @@ public interface UserSettingsMapper {
      * @param userId
      * @return
      */
-    List<ShowFriendListForInvite> getInviteFriendList(String userId);
+    List<ShowFriendList> getInviteFriendList(String userId);
 
     /**
      * 获取支持权限好友列表
      * @param userId
      * @return
      */
-    List<ShowFriendListForSupport> getSupportFriendList(String userId);
+    List<ShowFriendList> getSupportFriendList(String userId);
 
+    /**
+     * 获取查看事件权限好友列表
+     * @param userId
+     * @return
+     */
+    List<ShowFriendList> getHideFriendList(String userId);
+
+    /**
+     * 获取好友查看权限
+     * @param userId
+     * @param friendId
+     * @return
+     */
+    int getIsHideFromFriend(String userId, String friendId);
 }

@@ -1,18 +1,15 @@
 package com.modcreater.tmauth.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmauth.service.UserSettingsService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserSettings;
-import com.modcreater.tmbeans.show.usersettings.ShowFriendListForInvite;
-import com.modcreater.tmbeans.show.usersettings.ShowFriendListForSupport;
+import com.modcreater.tmbeans.show.usersettings.ShowFriendList;
 import com.modcreater.tmbeans.vo.usersettings.GetFriendListInSettings;
 import com.modcreater.tmbeans.vo.usersettings.ReceivedShowFriendList;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.UserSettingsMapper;
 import com.modcreater.tmutils.DtoUtil;
-import com.modcreater.tmutils.SingleEventUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +17,10 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -73,14 +71,20 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         if (receivedShowFriendList.getShowFriendList().contains("invite")){
             ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
             for (Object o : list){
-                ShowFriendListForInvite showFriendListForInvite = JSONObject.parseObject((String) o,ShowFriendListForInvite.class);
-                result = (userSettingsMapper.updateUserSettings("invite",showFriendListForInvite.getUserId(),Integer.valueOf(showFriendListForInvite.getStatus()))) > 0;
+                ShowFriendList showFriendList = JSONObject.parseObject((String) o, ShowFriendList.class);
+                result = (userSettingsMapper.updateUserSettings("invite", showFriendList.getUserId(),Integer.valueOf(showFriendList.getStatus()))) > 0;
             }
-        }else {
+        }else if (receivedShowFriendList.getShowFriendList().contains("sustain")){
             ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
             for (Object o : list){
-                ShowFriendListForSupport showFriendListForSupport = JSONObject.parseObject((String) o,ShowFriendListForSupport.class);
+                ShowFriendList showFriendListForSupport = JSONObject.parseObject((String) o,ShowFriendList.class);
                 result = (userSettingsMapper.updateUserSettings("sustain",showFriendListForSupport.getUserId(),Integer.valueOf(showFriendListForSupport.getStatus()))) > 0;
+            }
+        }else if (receivedShowFriendList.getShowFriendList().contains("hide")){
+            ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
+            for (Object o : list){
+                ShowFriendList showFriendListForHide = JSONObject.parseObject((String) o,ShowFriendList.class);
+                result = (userSettingsMapper.updateUserSettings("hide",showFriendListForHide.getUserId(),Integer.valueOf(showFriendListForHide.getStatus()))) > 0;
             }
         }
         if (result){
@@ -114,21 +118,33 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
+        Map<String,Object> result = new HashMap<>(1);
         if ("invite".equals(getFriendListInSettings.getUpdateType())){
-            List<ShowFriendListForInvite> showFriendListForInviteList = userSettingsMapper.getInviteFriendList(getFriendListInSettings.getUserId());
+            List<ShowFriendList> showFriendListForInviteList = userSettingsMapper.getInviteFriendList(getFriendListInSettings.getUserId());
             if (showFriendListForInviteList.size() != 0){
-                for (ShowFriendListForInvite showFriendListForInvite : showFriendListForInviteList){
-                    showFriendListForInvite.setUpdateType("invite");
+                for (ShowFriendList showFriendList : showFriendListForInviteList){
+                    showFriendList.setUpdateType("invite");
                 }
-                return DtoUtil.getSuccesWithDataDto("加载好友列表成功",showFriendListForInviteList,100000);
+                result.put("friendList",showFriendListForInviteList);
+                return DtoUtil.getSuccesWithDataDto("加载好友列表成功",result,100000);
             }
-        }else {
-            List<ShowFriendListForSupport> showFriendListForSupportList = userSettingsMapper.getSupportFriendList(getFriendListInSettings.getUserId());
+        }else if ("sustain".equals(getFriendListInSettings.getUpdateType())){
+            List<ShowFriendList> showFriendListForSupportList = userSettingsMapper.getSupportFriendList(getFriendListInSettings.getUserId());
             if (showFriendListForSupportList.size() != 0){
-                for (ShowFriendListForSupport showFriendListForSupport : showFriendListForSupportList){
-                    showFriendListForSupport.setUpdateType("sustain");
+                for (ShowFriendList showFriendList : showFriendListForSupportList){
+                    showFriendList.setUpdateType("sustain");
                 }
-                return DtoUtil.getSuccesWithDataDto("加载好友列表成功",showFriendListForSupportList,100000);
+                result.put("friendList",showFriendListForSupportList);
+                return DtoUtil.getSuccesWithDataDto("加载好友列表成功",result,100000);
+            }
+        }else if ("hide".equals(getFriendListInSettings.getUpdateType())){
+            List<ShowFriendList> showFriendListForHideList = userSettingsMapper.getHideFriendList(getFriendListInSettings.getUserId());
+            if (showFriendListForHideList.size() != 0){
+                for (ShowFriendList showFriendList : showFriendListForHideList){
+                    showFriendList.setUpdateType("hide");
+                }
+                result.put("friendList",showFriendListForHideList);
+                return DtoUtil.getSuccesWithDataDto("加载好友列表成功",result,100000);
             }
         }
         return DtoUtil.getFalseDto("未找到好友",100000);

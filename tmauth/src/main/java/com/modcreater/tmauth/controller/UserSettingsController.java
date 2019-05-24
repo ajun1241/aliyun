@@ -58,4 +58,15 @@ public class UserSettingsController {
     public Dto getUserSettings(@RequestBody ReceivedId receivedId ,HttpServletRequest request) {
         return userSettingsService.getUserSettings(receivedId.getUserId(), request.getHeader("token"));
     }
+
+    /**
+     * 获取好友列表
+     * @param getFriendListInSettings
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "getfriendlist")
+    public Dto getFriendList(@RequestBody GetFriendListInSettings getFriendListInSettings,HttpServletRequest request){
+        return userSettingsService.getFriendList(getFriendListInSettings,request.getHeader("token"));
+    }
 }

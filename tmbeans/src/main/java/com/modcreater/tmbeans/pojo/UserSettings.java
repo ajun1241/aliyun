@@ -98,6 +98,18 @@ public class UserSettings {
      */
     private long myIdInvite;
     /**
+     * 加我为好友时是否需要验证
+     */
+    private long beFriendNeedVerification;
+    /**
+     * 是否能向用户推荐通讯录朋友
+     */
+    private long recommendContacts;
+    /**
+     *
+     */
+    private long permissionToView;
+    /**
      * 只在WIFI下更新
      */
     private long onlyWiFi;

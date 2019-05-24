@@ -70,7 +70,7 @@ public interface EventMapper {
     ArrayList<SingleEvent> queryEventsByDayForIOS(SingleEvent singleEvent);
 
     /**
-     * 根据用户id查询事件
+     * 根据用户id查询事件总数
      * @param userId
      * @return
      */

@@ -8,10 +8,7 @@ import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbiz.service.EventService;
-import com.modcreater.tmdao.mapper.AccountMapper;
-import com.modcreater.tmdao.mapper.AchievementMapper;
-import com.modcreater.tmdao.mapper.EventMapper;
-import com.modcreater.tmdao.mapper.StatisticsMapper;
+import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.*;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -48,6 +45,9 @@ public class EventServiceImpl implements EventService {
 
     @Resource
     private AchievementMapper achievementMapper;
+
+    @Resource
+    private UserSettingsMapper userSettingsMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -498,6 +498,101 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("请先登录", 21011);
     }
 
+    @Override
+    public Dto seaByWeekWithPrivatePermission(SearchEventVo searchEventVo,String token) {
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        if (!ObjectUtils.isEmpty(searchEventVo)) {
+            System.out.println("按周查" + searchEventVo.toString());
+            Map<String,Object> result = new HashMap<>(3);
+            if (userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(),searchEventVo.getFriendId()) == 1){
+                result.put("userPrivatePermission",1);
+            }else {
+                result.put("userPrivatePermission",0);
+                return DtoUtil.getSuccesWithDataDto("该用户设置了查看权限",result,100000);
+            }
+            SingleEvent singleEvent;
+            //按周查询单一事件
+            List<DayEvents> dayEventsList = new ArrayList<>();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+            Calendar calendar = Calendar.getInstance();
+            try {
+                calendar.setTime(simpleDateFormat.parse(searchEventVo.getDayEventId()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i <= 6; i++) {
+                DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
+                if (i != 0) {
+                    calendar.add(Calendar.DATE, 1);
+                }
+                String dayEventId = simpleDateFormat.format(calendar.getTime());
+                singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
+                List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+                ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
+                dayEvents.setMySingleEventList(showSingleEventList);
+                dayEvents.setTotalNum(dayEvents.getMySingleEventList().size());
+                dayEvents.setUserId(Integer.valueOf(searchEventVo.getUserId()));
+                dayEvents.setDayEventId(Integer.valueOf(dayEventId));
+                dayEventsList.add(dayEvents);
+            }
+            //按周查询重复事件
+            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
+            //创建七个几个代表一周七天
+            List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> monShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> tueShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> wedShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
+            List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
+            for (SingleEvent singleEvent1 : loopEventListInDataBase) {
+                ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+                Boolean[] booleans = showSingleEvent.getRepeaTtime();
+                //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
+                for (int i = 0; i <= 6; i++) {
+                    if (i == 0 && booleans[i]) {
+                        sunShowLoopEventList.add(showSingleEvent);
+                    }
+                    if (i == 1 && booleans[i]) {
+                        monShowLoopEventList.add(showSingleEvent);
+                    }
+                    if (i == 2 && booleans[i]) {
+                        tueShowLoopEventList.add(showSingleEvent);
+                    }
+                    if (i == 3 && booleans[i]) {
+                        wedShowLoopEventList.add(showSingleEvent);
+                    }
+                    if (i == 4 && booleans[i]) {
+                        thuShowLoopEventList.add(showSingleEvent);
+                    }
+                    if (i == 5 && booleans[i]) {
+                        friShowLoopEventList.add(showSingleEvent);
+                    }
+                    if (i == 6 && booleans[i]) {
+                        satShowLoopEventList.add(showSingleEvent);
+                    }
+                }
+            }
+            loopEventList.add(sunShowLoopEventList);
+            loopEventList.add(monShowLoopEventList);
+            loopEventList.add(tueShowLoopEventList);
+            loopEventList.add(wedShowLoopEventList);
+            loopEventList.add(thuShowLoopEventList);
+            loopEventList.add(friShowLoopEventList);
+            loopEventList.add(satShowLoopEventList);
+            result.put("dayEventsList", dayEventsList);
+            result.put("loopEventList", loopEventList);
+            return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+        }
+        return DtoUtil.getFalseDto("查询条件接收失败", 21004);
+    }
+
     /**
      * 添加一条邀请事件
      * @param addInviteEventVo
@@ -654,5 +749,4 @@ public class EventServiceImpl implements EventService {
         }
         return DtoUtil.getFalseDto("未查询到数据",100000);
     }
-
 }

@@ -110,4 +110,12 @@ public interface EventService {
      * @return
      */
     Dto searchByDayForIOS(SearchConditionsForIOS searchConditionsForIOS, String token);
+
+    /**
+     * 根据"周"查询事件排序并带有用户是否给予他人查看权限
+     * @param searchEventVo
+     * @param token
+     * @return
+     */
+    Dto seaByWeekWithPrivatePermission(SearchEventVo searchEventVo,String token);
 }

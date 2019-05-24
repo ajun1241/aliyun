@@ -1,6 +1,5 @@
 package com.modcreater.tmbeans.vo.usersettings;
 
-import com.modcreater.tmbeans.show.usersettings.ShowFriendListForInvite;
 import lombok.Data;
 
 /**

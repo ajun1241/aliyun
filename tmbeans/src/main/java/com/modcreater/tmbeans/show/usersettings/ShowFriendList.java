@@ -11,7 +11,7 @@ import lombok.Data;
  * Time: 15:47
  */
 @Data
-public class ShowFriendListForInvite {
+public class ShowFriendList {
 
     private String userId;
 

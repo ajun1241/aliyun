@@ -15,7 +15,7 @@ public class GetFriendListInSettings {
 
     private String userId;
     /**
-     * 要操作的类型(invite:限制邀请操作;sustain:限制支持操作)
+     * 要操作的类型(invite:限制邀请操作;sustain:限制支持操作;hide:限制查看操作)
      */
     private String updateType;
 

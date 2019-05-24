@@ -107,6 +107,16 @@ public class EventController {
     public Dto searchByWeek(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
         return eventService.searchByDayEventIdsInWeek(searchEventVo,request.getHeader("token"));
     }
+
+    /**
+     * 根据"周"查询事件排序并带有用户是否给予他人查看权限
+     * @return
+     */
+    @PostMapping(value = "seabyweekwithprivatepermission")
+    public Dto seaByWeekWithPrivatePermission(@RequestBody SearchEventVo searchEventVo,HttpServletRequest request){
+        return eventService.seaByWeekWithPrivatePermission(searchEventVo,request.getHeader("token"));
+    }
+
     /**
      * 回应一条邀请事件
      * @param feedbackEventInviteVo
