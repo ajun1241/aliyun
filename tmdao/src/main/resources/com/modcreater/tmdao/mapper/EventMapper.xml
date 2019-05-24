@@ -213,7 +213,7 @@
         from singleevent
         where userId = #{userId}
         and isOverdue = #{isOverdue}
-        order by year desc,month desc,day desc limit #{pageIndex},#{pageSize}
+        order by year desc,month desc,day desc limit #{pageNum},#{pageSize}
     </select>
 
     <select id="queryEventsByConditions" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
