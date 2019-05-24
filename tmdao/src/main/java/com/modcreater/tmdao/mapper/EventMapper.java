@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.vo.eventvo.DeleteEventVo;
 import com.modcreater.tmbeans.vo.eventvo.DraftVo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -139,11 +140,10 @@ public interface EventMapper {
 
     /**
      * 根据userId和完成状态查询单一事件表
-     * @param userId
-     * @param isOverdue
+     * @param receivedIdIsOverdue
      * @return
      */
-    List<SingleEvent> queryUserEventsByUserIdIsOverdue(@Param("userId") String userId, @Param("isOverdue") String isOverdue);
+    List<SingleEvent> queryUserEventsByUserIdIsOverdue(ReceivedIdIsOverdue receivedIdIsOverdue);
 
     /**
      * 根据筛选条件查询事件

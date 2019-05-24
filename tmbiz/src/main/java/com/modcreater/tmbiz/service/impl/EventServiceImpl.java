@@ -384,14 +384,22 @@ public class EventServiceImpl implements EventService {
                             DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
                             dayEvents.setUserId(singleEvent.getUserid().intValue());
                             dayEvents.setTotalNum(singleEventList.size());
-                            dayEvents.setDayEventId(Integer.valueOf(singleEvent.getYear().toString() + singleEvent.getMonth().toString() + singleEvent.getDay().toString()));
+                            String month = singleEvent.getMonth().toString();
+                            String day1 = singleEvent.getDay().toString();
+                            if (month.length() == 1){
+                                month = "0" + month;
+                            }
+                            if (day1.length() == 1){
+                                day1 = "0" + day1;
+                            }
+                            dayEvents.setDayEventId(Integer.valueOf(singleEvent.getYear().toString() + month +day1));
                             dayEvents.setMySingleEventList(showSingleEventList);
                             dayEventsList.add(dayEvents);
                         }
                     }
                     return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
                 }
-                return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
+                return DtoUtil.getFalseDto("暂无数据", 200000);
             }
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }

@@ -213,7 +213,7 @@
         from singleevent
         where userId = #{userId}
         and isOverdue = #{isOverdue}
-        order by year desc,month desc,day desc limit 0,7
+        order by year desc,month desc,day desc limit #{pageIndex},#{pageSize}
     </select>
 
     <select id="queryEventsByConditions" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
@@ -298,7 +298,30 @@
     </select>
 
     <select id="queryEventsByDayForIOS" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
+        <where>
+            <if test="userid != null">
+                userid = #{userid}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            <if test="isOverdue != null">
+                and isOverdue = #{isOverdue}
+            </if>
+            <if test="isLoop != null">
+                and isLoop = 0
+            </if>
+        </where>
+        order by day asc ,startTime asc
     </select>
 
 </mapper>

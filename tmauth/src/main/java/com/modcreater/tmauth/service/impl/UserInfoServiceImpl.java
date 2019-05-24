@@ -13,6 +13,7 @@ import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
@@ -87,19 +88,23 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public Dto showUserEvents(String userId,String isOverdue, String token) {
+    public Dto showUserEvents(ReceivedIdIsOverdue receivedIdIsOverdue, String token) {
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
+        String redisToken=stringRedisTemplate.opsForValue().get(receivedIdIsOverdue.getUserId());
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        if (!StringUtils.hasText(isOverdue)){
+        if (!StringUtils.hasText(receivedIdIsOverdue.getIsOverdue())){
             return DtoUtil.getFalseDto("事件状态未获取到",40005);
         }
-        //查询用户已完成的事件(根据事件排序,只显示7条)
-        List<SingleEvent> singleEventList = eventMapper.queryUserEventsByUserIdIsOverdue(userId,isOverdue);
+        //查询用户已完成的事件(根据时间排序,如果用户未开通该服务,则只显示7条)
+        if (1==1){
+            receivedIdIsOverdue.setPageNum("0");
+            receivedIdIsOverdue.setPageSize("7");
+        }
+        List<SingleEvent> singleEventList = eventMapper.queryUserEventsByUserIdIsOverdue(receivedIdIsOverdue);
         if (singleEventList.size() != 0){
             List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
             for (SingleEvent singleEvent : singleEventList){
@@ -175,7 +180,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         list.add("isOverdue");
         //判断条件除userId和appType是否全部为空
         if (SingleEventUtil.isAllPropertiesEmpty(receivedEventConditions,list)){
-            return showUserEvents(receivedEventConditions.getUserId(),receivedEventConditions.getIsOverdue(),token);
+            ReceivedIdIsOverdue receivedIdIsOverdue = new ReceivedIdIsOverdue();
+            receivedIdIsOverdue.setUserId(receivedEventConditions.getUserId());
+            receivedIdIsOverdue.setIsOverdue(receivedEventConditions.getIsOverdue());
+            return showUserEvents(,token);
         }
         if (!StringUtils.hasText(receivedEventConditions.getStartTime())){
             return DtoUtil.getFalseDto("开始时间不能为空",40001);

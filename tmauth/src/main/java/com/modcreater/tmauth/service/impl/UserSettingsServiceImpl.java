@@ -69,23 +69,24 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        if (receivedShowFriendList.getShowFriendList().indexOf("invite") >= 0){
-            List<ShowFriendListForInvite> showFriendListForInviteList = new ArrayList<>();
-            ArrayList<String> list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
-            for (String s : list){
-                ShowFriendListForInvite showFriendListForInvite = JSONObject.parseObject(s,ShowFriendListForInvite.class);
-                showFriendListForInviteList.add(showFriendListForInvite);
+        boolean result = false;
+        if (receivedShowFriendList.getShowFriendList().contains("invite")){
+            ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
+            for (Object o : list){
+                ShowFriendListForInvite showFriendListForInvite = JSONObject.parseObject((String) o,ShowFriendListForInvite.class);
+                result = (userSettingsMapper.updateUserSettings("invite",showFriendListForInvite.getUserId(),Integer.valueOf(showFriendListForInvite.getStatus()))) > 0;
             }
-
         }else {
-            List<ShowFriendListForSupport> showFriendListForSupportList = new ArrayList<>();
-            ArrayList<String> list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
-            for (String s : list){
-                ShowFriendListForSupport showFriendListForSupport = JSONObject.parseObject(s,ShowFriendListForSupport.class);
-                showFriendListForSupportList.add(showFriendListForSupport);
+            ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
+            for (Object o : list){
+                ShowFriendListForSupport showFriendListForSupport = JSONObject.parseObject((String) o,ShowFriendListForSupport.class);
+                result = (userSettingsMapper.updateUserSettings("sustain",showFriendListForSupport.getUserId(),Integer.valueOf(showFriendListForSupport.getStatus()))) > 0;
             }
         }
-        return null;
+        if (result){
+            return DtoUtil.getSuccessDto("修改成功",100000);
+        }
+        return DtoUtil.getFalseDto("修改失败",50005);
     }
 
     @Override

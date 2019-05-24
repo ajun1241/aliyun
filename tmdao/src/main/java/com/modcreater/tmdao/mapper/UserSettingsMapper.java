@@ -29,7 +29,7 @@ public interface UserSettingsMapper {
 
     /**
      * 根据字段userId修改设置
-     * @param type
+     * @param type 要修改的设置字段(invite/sustain)
      * @param userId
      * @param status
      * @return

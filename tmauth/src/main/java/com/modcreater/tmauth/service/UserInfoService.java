@@ -3,6 +3,7 @@ package com.modcreater.tmauth.service;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserAchievement;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
 
 import java.util.List;
 
@@ -26,12 +27,11 @@ public interface UserInfoService {
 
     /**
      * 查询用户已完成的事件
-     * @param userId
-     * @param isOverdue
+     * @param receivedIdIsOverdue
      * @param token
      * @return
      */
-    Dto showUserEvents(String userId,String isOverdue, String token);
+    Dto showUserEvents(ReceivedIdIsOverdue receivedIdIsOverdue, String token);
 
     /**
      * 筛选已完成的事件

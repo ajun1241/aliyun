@@ -47,7 +47,7 @@ public class UserInfoController {
      */
     @RequestMapping(value = "showuserevents",method = RequestMethod.POST)
     public Dto showUserEvents(@RequestBody ReceivedIdIsOverdue receivedIdIsOverdue, HttpServletRequest request){
-        return userInfoService.showUserEvents(receivedIdIsOverdue.getUserId(),receivedIdIsOverdue.getIsOverdue(),request.getHeader("token"));
+        return userInfoService.showUserEvents(receivedIdIsOverdue,request.getHeader("token"));
     }
 
     /**

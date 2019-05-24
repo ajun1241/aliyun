@@ -21,5 +21,15 @@ public class ReceivedIdIsOverdue {
      * 事件状态
      */
     private String isOverdue;
+    /**
+     * 当前页码
+     */
+    private String pageNum;
+    /**
+     * 每页显示的条数
+     */
+    private String pageSize;
+
+    private String appType;
 
 }
