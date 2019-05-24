@@ -139,6 +139,17 @@ public class EventController {
     }
 
     /**
+     * 创建者选择
+     * @param eventCreatorChooseVo
+     * @return
+     */
+    @PostMapping(value = "eventcreatorchoose")
+    @ApiOperation("创建者选择")
+    public Dto eventCreatorChoose(@RequestBody EventCreatorChooseVo eventCreatorChooseVo, HttpServletRequest request){
+        return eventService.eventCreatorChoose(eventCreatorChooseVo,request.getHeader("token"));
+    }
+
+    /**
      * 根据天条件查询forIOS
      * @param searchConditionsForIOS
      * @param request

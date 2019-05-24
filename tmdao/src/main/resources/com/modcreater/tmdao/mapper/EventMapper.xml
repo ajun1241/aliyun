@@ -173,13 +173,27 @@
         select count(1) from singleevent where userId=#{userId}
     </select>
 
-    <insert id="uplDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo">
-        /*insert into draft values
-        (null ,
-        #{userId},
-        #{phoneNum},
-        #{data}
-        )*/
+    <insert id="uplDraft" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
+        insert into draft values
+            (null ,
+            #{eventid} ,
+            #{userid},
+            #{eventname},
+            #{starttime},
+            #{endtime},
+            #{address},
+            #{level},
+            #{flag},
+            #{person},
+            #{remarks},
+            #{repeaTtime},
+            #{isOverdue},
+            #{remindTime},
+            #{day},
+            #{month},
+            #{year},
+            #{type},
+            #{isLoop})
     </insert>
 
     <select id="queryDraftByPhone" parameterType="String" resultType="String">
@@ -322,6 +336,13 @@
             </if>
         </where>
         order by day asc ,startTime asc
+    </select>
+
+    <select id="queryEventOne" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
+        where userId=#{userId} and eventId=#{eventId} and isOverdue &lt;&gt; 2
     </select>
 
 </mapper>

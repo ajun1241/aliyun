@@ -14,9 +14,10 @@ import java.io.Serializable;
 public class EventCreatorChooseVo implements Serializable {
     private String appType;
     /**
-     * 0 保留； 1 取消
+     * 1 保留； 0 取消
      */
     private String choose;
     private String userId;
-    private String eventId;
+
+    private String extraData;
 }

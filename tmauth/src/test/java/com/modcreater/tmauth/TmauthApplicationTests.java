@@ -9,6 +9,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -17,11 +19,18 @@ public class TmauthApplicationTests {
 
     @Test
     public void contextLoads() {
-        int a=180;
-        int b=a/60;
-        int c=a%60;
-        System.out.println("b"+b);
-        System.out.println("c"+c);
+        List<String> list=new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        list.add("d");
+        list.add("e");
+//        list.toArray();
+        String[] l={"a","b","c","d","e"};
+        System.out.println(list.toString());
+        System.out.println("***************************");
+        String s=String.join(",",list);
+        System.out.println("ssdasdasdas===="+s);
     }
 
 }

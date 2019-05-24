@@ -78,10 +78,10 @@ public interface EventMapper {
 
     /**
      * 上传草稿
-     * @param draftVo
+     * @param singleEvent
      * @return
      */
-    int uplDraft(DraftVo draftVo);
+    int uplDraft(SingleEvent singleEvent);
 
     /**
      * 查询草稿
@@ -187,4 +187,12 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> queryClashEventList(SingleEvent singleEvent);
+
+    /**
+     * 根据userId和eventId查询一条事件
+     * @param userId
+     * @param eventId
+     * @return
+     */
+    SingleEvent queryEventOne(String userId,String eventId);
 }
