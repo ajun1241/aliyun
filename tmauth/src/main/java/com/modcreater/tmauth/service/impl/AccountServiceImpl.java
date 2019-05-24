@@ -12,6 +12,7 @@ import com.modcreater.tmbeans.vo.QueryUserVo;
 import com.modcreater.tmbeans.vo.uservo.*;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
+import com.modcreater.tmdao.mapper.SystemMsgMapper;
 import com.modcreater.tmdao.mapper.UserSettingsMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
@@ -51,6 +52,8 @@ public class AccountServiceImpl implements AccountService {
     private UserSettingsMapper userSettingsMapper;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private SystemMsgMapper systemMsgMapper;
 
     RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
     /**
@@ -338,7 +341,7 @@ public class AccountServiceImpl implements AccountService {
                 return DtoUtil.getFalseDto("发送请求失败",17002);
             }
             //消息保存在服务器
-
+//            systemMsgMapper.addNewMsg()
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("出现错误了",233);
