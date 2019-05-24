@@ -337,6 +337,8 @@ public class AccountServiceImpl implements AccountService {
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送请求失败",17002);
             }
+            //消息保存在服务器
+
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("出现错误了",233);

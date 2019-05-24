@@ -4,23 +4,23 @@
 
     <resultMap id="forGetInviteFriendList" type="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
         <result property="userCode" column="userCode"/>
-        <result property="userName" column="userCode"/>
-        <result property="headImgUrl" column="userCode"/>
-        <result property="gender" column="userCode"/>
+        <result property="userName" column="userName"/>
+        <result property="headImgUrl" column="headImgUrl"/>
+        <result property="gender" column="gender"/>
         <collection property="status" column="invite" select="com.modcreater.tmbeans.pojo.Friendship"/>
     </resultMap>
     <resultMap id="forGetSupportFriendList" type="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
         <result property="userCode" column="userCode"/>
-        <result property="userName" column="userCode"/>
-        <result property="headImgUrl" column="userCode"/>
-        <result property="gender" column="userCode"/>
+        <result property="userName" column="userName"/>
+        <result property="headImgUrl" column="headImgUrl"/>
+        <result property="gender" column="gender"/>
         <collection property="status" column="sustain" select="com.modcreater.tmbeans.pojo.Friendship"/>
     </resultMap>
     <resultMap id="forGetHideFriendList" type="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
         <result property="userCode" column="userCode"/>
-        <result property="userName" column="userCode"/>
-        <result property="headImgUrl" column="userCode"/>
-        <result property="gender" column="userCode"/>
+        <result property="userName" column="userName"/>
+        <result property="headImgUrl" column="headImgUrl"/>
+        <result property="gender" column="gender"/>
         <collection property="status" column="hide" select="com.modcreater.tmbeans.pojo.Friendship"/>
     </resultMap>
 

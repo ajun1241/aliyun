@@ -243,7 +243,7 @@ public class EventServiceImpl implements EventService {
         //查看草稿是否已存在
         String data = eventMapper.queryDraftByPhone(draftVo.getPhoneNum());
         UserStatistics userStatistics = new UserStatistics();
-        StringBuffer dataNum = new StringBuffer(draftVo.getData());
+        /*StringBuffer dataNum = new StringBuffer(draftVo.getData());
         Long times =0L;
         String condition = "eventid";
         for(int i=0;i<dataNum.length();i++) {
@@ -253,7 +253,7 @@ public class EventServiceImpl implements EventService {
             }
         }
         userStatistics.setUserId(Long.valueOf(draftVo.getUserId()));
-        userStatistics.setDrafts(times);
+        userStatistics.setDrafts(times);*/
         if (achievementMapper.updateUserStatistics(userStatistics,userStatistics.getUserId().toString()) == 0){
             return DtoUtil.getFalseDto("草稿箱数据计数失败",27004);
         }
