@@ -43,4 +43,12 @@ public interface StatisticsMapper {
      */
     Map<String,String> queryFeedbackStatistics(String creatorId,String eventId);
 
+    /**
+     * 查询选择的人都有谁
+     * @param choose
+     * @param creatorId
+     * @param eventId
+     * @return
+     */
+    List<String> queryChooser(String choose,String creatorId,String eventId);
 }
