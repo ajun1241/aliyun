@@ -533,6 +533,7 @@ public class EventServiceImpl implements EventService {
                 }
                 String dayEventId = simpleDateFormat.format(calendar.getTime());
                 singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
+                singleEvent.setUserid(Long.parseLong(searchEventVo.getFriendId()));
                 List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
                 ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
                 dayEvents.setMySingleEventList(showSingleEventList);
@@ -542,7 +543,7 @@ public class EventServiceImpl implements EventService {
                 dayEventsList.add(dayEvents);
             }
             //按周查询重复事件
-            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
+            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getFriendId());
             List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
             //创建七个几个代表一周七天
             List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();

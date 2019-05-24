@@ -327,12 +327,12 @@ public class AccountServiceImpl implements AccountService {
         if (accountMapper.queryFriendRel(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId())>0){
             return DtoUtil.getFalseDto("你们已经是好友了不能添加",17006);
         }
-//        sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
         //发送添加信息
         ResponseResult result;
         try {
+            sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
             String[] friendId={sendFriendRequestVo.getFriendId()};
-            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("Request","",sendFriendRequestVo.getUserId(), sendFriendRequestVo.getFriendId(), sendFriendRequestVo.getContent());
+            TxtMessage contactNtfMessage=new TxtMessage(sendFriendRequestVo.getContent(),"");
             result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送请求失败",17002);

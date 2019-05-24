@@ -23,6 +23,7 @@ public class SearchEventVo implements Serializable {
      * 好友ID
      */
     private String friendId;
+
     /**
      * 事件的时间(20190430)
      */
