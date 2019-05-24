@@ -183,7 +183,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             ReceivedIdIsOverdue receivedIdIsOverdue = new ReceivedIdIsOverdue();
             receivedIdIsOverdue.setUserId(receivedEventConditions.getUserId());
             receivedIdIsOverdue.setIsOverdue(receivedEventConditions.getIsOverdue());
-            return showUserEvents(,token);
+            receivedIdIsOverdue.setPageNum("0");
+            receivedIdIsOverdue.setPageSize("7");
+            return showUserEvents(receivedIdIsOverdue,token);
         }
         if (!StringUtils.hasText(receivedEventConditions.getStartTime())){
             return DtoUtil.getFalseDto("开始时间不能为空",40001);
