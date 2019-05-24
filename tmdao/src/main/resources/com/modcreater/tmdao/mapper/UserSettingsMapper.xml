@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.UserSettingsMapper">
 
-    <resultMap id="forGetInviteFriendList" type="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
+    <!--<resultMap id="forGetInviteFriendList" type="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
         <result property="userCode" column="userCode"/>
         <result property="userName" column="userName"/>
         <result property="headImgUrl" column="headImgUrl"/>
@@ -22,7 +22,7 @@
         <result property="headImgUrl" column="headImgUrl"/>
         <result property="gender" column="gender"/>
         <collection property="status" column="hide" select="com.modcreater.tmbeans.pojo.Friendship"/>
-    </resultMap>
+    </resultMap>-->
 
 
     <insert id="addNewUserSettings">
@@ -34,14 +34,14 @@
     <select id="queryAllSettings" resultType="com.modcreater.tmbeans.pojo.UserSettings">
         select * from usersettings where userId = #{userId}
     </select>
-    <select id="getInviteFriendList" resultMap="forGetInviteFriendList">
-        select userCode,headImgUrl,userName,gender,status,invite from account a,friendship f where a.id = #{userId} and a.id = f.userId
+    <select id="getInviteFriendList" resultType="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
+        select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.invite 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId}
     </select>
-    <select id="getSupportFriendList" resultMap="forGetSupportFriendList">
-        select userCode,headImgUrl,userName,gender,status,sustain from account a,friendship f where a.id = #{userId} and a.id = f.userId
+    <select id="getSupportFriendList" resultType="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
+        select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.sustain 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId}
     </select>
     <select id="getHideFriendList" resultType="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
-        select userCode,headImgUrl,userName,gender,status,hide from account a,friendship f where a.id = #{userId} and a.id = f.userId
+        select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.hide 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId}
     </select>
     <select id="getIsHideFromFriend" resultType="java.lang.Integer">
         select hide from friendship where userId = #{userId} and friendId = #{friendId}
