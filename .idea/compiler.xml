@@ -11,6 +11,7 @@
         <module name="tmbiz" />
         <module name="tmchat" />
         <module name="tmdao" />
+        <module name="tmtrade" />
         <module name="tmutils" />
       </profile>
     </annotationProcessing>
@@ -23,6 +24,7 @@
       <module name="tmbiz" options="-parameters" />
       <module name="tmchat" options="-parameters" />
       <module name="tmdao" options="-parameters" />
+      <module name="tmtrade" options="-parameters" />
       <module name="tmutils" options="-parameters" />
     </option>
   </component>
