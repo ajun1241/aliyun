@@ -337,7 +337,7 @@ public class EventServiceImpl implements EventService {
                 if (!ObjectUtils.isEmpty(dayEvents) ) {
                     return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
                 }
-                return DtoUtil.getFalseDto("查询失败,没有数据", 200000);
+                return DtoUtil.getFalseDto("没有数据", 100000);
             }
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }
