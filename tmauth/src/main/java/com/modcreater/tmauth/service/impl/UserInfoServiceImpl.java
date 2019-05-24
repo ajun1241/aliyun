@@ -102,8 +102,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         //查询用户已完成的事件(根据时间排序,如果用户未开通该服务,则只显示7条)
         if (1==1){
-            receivedIdIsOverdue.setPageNum("0");
-            receivedIdIsOverdue.setPageSize("7");
+            receivedIdIsOverdue.setPageNum(0L);
+            receivedIdIsOverdue.setPageSize(7L);
         }
         List<SingleEvent> singleEventList = eventMapper.queryUserEventsByUserIdIsOverdue(receivedIdIsOverdue);
         if (singleEventList.size() != 0){
@@ -188,7 +188,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             ReceivedIdIsOverdue receivedIdIsOverdue = new ReceivedIdIsOverdue();
             receivedIdIsOverdue.setUserId(receivedEventConditions.getUserId());
             receivedIdIsOverdue.setIsOverdue(receivedEventConditions.getIsOverdue());
-            receivedIdIsOverdue.setPageNum(receivedEventConditions.getPageNum());
+            receivedIdIsOverdue.setPageNum((receivedEventConditions.getPageNum()-1)*receivedEventConditions.getPageSize());
             receivedIdIsOverdue.setPageSize(receivedEventConditions.getPageSize());
             return showUserEvents(receivedIdIsOverdue,token);
         }
@@ -213,7 +213,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
         singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
         singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
-        singleEventCondition.setPageNum(receivedEventConditions.getPageNum());
+        singleEventCondition.setPageNum((receivedEventConditions.getPageNum()-1)*receivedEventConditions.getPageSize());
         singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
         List<SingleEvent> singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
         if (singleEventList.size() != 0){

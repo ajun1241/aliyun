@@ -174,12 +174,12 @@
     </select>
 
     <insert id="uplDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo">
-        insert into draft values
+        /*insert into draft values
         (null ,
         #{userId},
         #{phoneNum},
         #{data}
-        )
+        )*/
     </insert>
 
     <select id="queryDraftByPhone" parameterType="String" resultType="String">
@@ -277,8 +277,8 @@
     </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo" >
-        update draft set `data`=concat(`data`,#{data})
-        where phoneNum=#{phoneNum}
+        /*update draft set `data`=concat(`data`,#{data})
+        where phoneNum=#{phoneNum}*/
     </update>
 
     <select id="queryClashEventList" resultType="com.modcreater.tmbeans.pojo.SingleEvent">

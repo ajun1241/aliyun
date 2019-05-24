@@ -51,11 +51,11 @@ public class ReceivedEventConditions {
     /**
      * 当前页
      */
-    private String pageNum;
+    private Long pageNum;
     /**
      * 每页显示的条数
      */
-    private String pageSize;
+    private Long pageSize;
 
     private String appType;
 }

@@ -14,8 +14,8 @@ import lombok.Data;
 @Data
 public class QueryEventsCondition extends SingleEvent {
 
-    private String pageNum;
+    private Long pageNum;
 
-    private String pageSize;
+    private Long pageSize;
 
 }
