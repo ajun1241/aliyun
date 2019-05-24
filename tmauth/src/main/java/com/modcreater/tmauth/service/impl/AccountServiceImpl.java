@@ -4,11 +4,10 @@ import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.dto.MyDetail;
 import com.modcreater.tmbeans.pojo.Account;
+import com.modcreater.tmbeans.pojo.SystemMsgRecord;
 import com.modcreater.tmbeans.pojo.UserStatistics;
-import com.modcreater.tmbeans.vo.AccountVo;
-import com.modcreater.tmbeans.vo.AddPwdVo;
-import com.modcreater.tmbeans.vo.LoginVo;
-import com.modcreater.tmbeans.vo.QueryUserVo;
+import com.modcreater.tmbeans.vo.*;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
@@ -332,6 +331,7 @@ public class AccountServiceImpl implements AccountService {
         }
         //发送添加信息
         ResponseResult result;
+        Map<String,String> map=new HashMap<>();
         try {
             sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
             String[] friendId={sendFriendRequestVo.getFriendId()};
@@ -341,7 +341,11 @@ public class AccountServiceImpl implements AccountService {
                 return DtoUtil.getFalseDto("发送请求失败",17002);
             }
             //消息保存在服务器
-//            systemMsgMapper.addNewMsg()
+            map.put("userId",sendFriendRequestVo.getFriendId());
+            map.put("msgContent",contactNtfMessage.getContent());
+            map.put("msgType","newFriend");
+            map.put("fromId",sendFriendRequestVo.getUserId());
+            systemMsgMapper.addNewMsg(map);
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("出现错误了",233);
@@ -568,6 +572,44 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("删除好友失败",16008);
         }
         return DtoUtil.getSuccessDto("删除好友成功",100000);
+    }
+
+    /**
+     * 查询所有未读消息
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto queryAllUnreadMsg(ReceivedId receivedId, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(receivedId)){
+            return DtoUtil.getFalseDto("查询所有未读消息数据未获取到",16007);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        Map<String,Object> map=new HashMap<>();
+        List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"0");
+        if (systemMsgRecordList.size()==0){
+            return DtoUtil.getFalseDto("没有未读消息",200000);
+        }
+        map.put("count",systemMsgRecordList.size());
+        List list=new ArrayList();
+        for (SystemMsgRecord systemMsgRecord:systemMsgRecordList) {
+            MsgVo msgVo=new MsgVo();
+            Account account=accountMapper.queryAccount(systemMsgRecord.getFromId().toString());
+            msgVo.setHeadImgUrl(account.getHeadImgUrl());
+            msgVo.setUserName(account.getUserName());
+            msgVo.setMsgContent(systemMsgRecord.getMsgContent());
+            list.add(msgVo);
+        }
+        map.put("msgList",list);
+        //修改消息状态
+        systemMsgMapper.updateUnreadMsg(receivedId.getUserId());
+        return DtoUtil.getSuccesWithDataDto("未读消息获取成功",map,100000);
     }
 
     @Override

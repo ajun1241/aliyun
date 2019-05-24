@@ -5,6 +5,8 @@ import com.modcreater.tmbeans.vo.eventvo.UploadingEventVo;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import io.rong.RongCloud;
+import io.rong.messages.ContactNtfMessage;
+import io.rong.messages.TxtMessage;
 import io.rong.messages.VoiceMessage;
 import io.rong.methods.message._private.Private;
 import io.rong.methods.message.chatroom.Chatroom;
@@ -91,8 +93,10 @@ public class TmbizApplicationTests {
         RongCloud rongCloud = RongCloud.getInstance("0vnjpoad03rzz", "BbTOtrRIF5MOA");
         //自定义 api 地址方式
         //RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret,api);
+        String[] targetIds = {"100033"};
+//        String operation, String extra, String sourceUserId, String targetUserId, String message
 
-        VoiceMessage voiceMessage = new VoiceMessage("花花说的很好打啊实打实大大大", "helloExtra", 20L);
+        ContactNtfMessage voiceMessage = new ContactNtfMessage("","","100023","100033", "花花说的很好打啊实打实大大大");
         Private Private = rongCloud.message.msgPrivate;
         MsgSystem system = rongCloud.message.system;
         Group group = rongCloud.message.group;
@@ -104,7 +108,7 @@ public class TmbizApplicationTests {
          *
          * 发送单聊消息
          * */
-        String[] targetIds = {"100033"};
+
         PrivateMessage privateMessage = new PrivateMessage()
                 .setSenderId("100023")
                 .setTargetId(targetIds)

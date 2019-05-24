@@ -1,7 +1,9 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.SystemMsgRecord;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,4 +20,19 @@ public interface SystemMsgMapper {
      * @return
      */
     int addNewMsg(Map<String,String> map);
+
+    /**
+     * 查询所有未读消息
+     * @param userId
+     * @param msgStatus
+     * @return
+     */
+    List<SystemMsgRecord> queryAllUnreadMsg(String userId,String msgStatus);
+
+    /**
+     *修改未读消息为已读
+     * @param userId
+     * @return
+     */
+    int updateUnreadMsg(String userId);
 }

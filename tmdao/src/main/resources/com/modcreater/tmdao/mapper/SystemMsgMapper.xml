@@ -2,6 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.SystemMsgMapper">
     <insert id="addNewMsg">
-        insert into systemmsgrecord (userId, msgContent, msgType) values (#{userId},#{msgContent},#{msgType});
+        insert into systemmsgrecord (userId, msgContent, msgType,fromId) values (#{userId},#{msgContent},#{msgType},#{fromId});
     </insert>
+
+    <update id="updateUnreadMsg">
+        update systemmsgrecord set msgStatus=1 where userId=#{userId} and msgType="newFriend"
+    </update>
+
+    <select id="queryAllUnreadMsg" resultType="com.modcreater.tmbeans.pojo.SystemMsgRecord">
+        select * from systemmsgrecord where userId=#{userId} and msgStatus=#{msgStatus}
+    </select>
 </mapper>
