@@ -1,6 +1,7 @@
 package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.UserInfoService;
+import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Achievement;
@@ -174,6 +175,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
+        //此处判断用户是否开启了该项服务
+        if (1==0){
+            return DtoUtil.getSuccessDto("您还没有开通该服务",100000);
+        }
         List<String> list = new ArrayList();
         list.add("userId");
         list.add("appType");
@@ -183,8 +188,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             ReceivedIdIsOverdue receivedIdIsOverdue = new ReceivedIdIsOverdue();
             receivedIdIsOverdue.setUserId(receivedEventConditions.getUserId());
             receivedIdIsOverdue.setIsOverdue(receivedEventConditions.getIsOverdue());
-            receivedIdIsOverdue.setPageNum("0");
-            receivedIdIsOverdue.setPageSize("7");
+            receivedIdIsOverdue.setPageNum(receivedEventConditions.getPageNum());
+            receivedIdIsOverdue.setPageSize(receivedEventConditions.getPageSize());
             return showUserEvents(receivedIdIsOverdue,token);
         }
         if (!StringUtils.hasText(receivedEventConditions.getStartTime())){
@@ -193,7 +198,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!StringUtils.hasText(receivedEventConditions.getEndTime())){
             return DtoUtil.getFalseDto("结束时间不能为空",40004);
         }
-        SingleEvent singleEventCondition = new SingleEvent();
+        QueryEventsCondition singleEventCondition = new QueryEventsCondition();
         singleEventCondition.setEventname(receivedEventConditions.getEventName());
         singleEventCondition.setType(Long.valueOf(receivedEventConditions.getEventType()));
         singleEventCondition.setLevel(Long.valueOf(receivedEventConditions.getEventLevel()));
@@ -208,10 +213,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
         singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
         singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
+        singleEventCondition.setPageNum(receivedEventConditions.getPageNum());
+        singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
         List<SingleEvent> singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
-        /**
-         * 可能要做重复事件
-         */
         if (singleEventList.size() != 0){
             List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
             for (SingleEvent singleEvent : singleEventList){

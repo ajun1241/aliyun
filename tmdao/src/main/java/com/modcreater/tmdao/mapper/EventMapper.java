@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
@@ -150,7 +151,7 @@ public interface EventMapper {
      * @param singleEvent
      * @return
      */
-    List<SingleEvent> queryEventsByConditions(SingleEvent singleEvent);
+    List<SingleEvent> queryEventsByConditions(QueryEventsCondition singleEvent);
 
     /**
      * 统计单一事件类型数量及用时分钟总和
