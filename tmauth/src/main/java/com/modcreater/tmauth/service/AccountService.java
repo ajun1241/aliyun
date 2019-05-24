@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
 
 public interface AccountService {
@@ -103,5 +104,13 @@ public interface AccountService {
      * @return
      */
     Dto deleteFriendship(FriendshipVo deleteFriendshipVo, String token);
+
+    /**
+     * 查询所有未读消息
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto queryAllUnreadMsg(ReceivedId receivedId,String token);
 
 }

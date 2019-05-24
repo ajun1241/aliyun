@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -90,5 +91,11 @@ public class AccountController {
     @ApiOperation("解除好友关系")
     public Dto deleteFriendship(@RequestBody FriendshipVo deleteFriendshipVo, HttpServletRequest request){
         return userService.deleteFriendship(deleteFriendshipVo,request.getHeader("token"));
+    }
+
+    @PostMapping("queryallunreadmsg")
+    @ApiOperation("拉取所有未读消息")
+    public Dto queryAllUnreadMsg(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return userService.queryAllUnreadMsg(receivedId,request.getHeader("token"));
     }
 }
