@@ -69,4 +69,11 @@ public interface UserSettingsMapper {
      * @return
      */
     int getIsHideFromFriend(String userId, String friendId);
+
+    /**
+     * 获取用户设置列表中的friendHide属性值
+     * @param friendId
+     * @return
+     */
+    int getFriendHide(String friendId);
 }

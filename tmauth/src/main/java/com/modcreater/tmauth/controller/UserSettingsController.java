@@ -43,7 +43,7 @@ public class UserSettingsController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "updatenotallowedinvited",method = RequestMethod.POST)
+    @RequestMapping(value = "updatenotallowed",method = RequestMethod.POST)
     public Dto updateNotAllowed(@RequestBody ReceivedShowFriendList receivedShowFriendList, HttpServletRequest request){
         return userSettingsService.updateNotAllowed(receivedShowFriendList,request.getHeader("token"));
     }

@@ -46,4 +46,7 @@
     <select id="getIsHideFromFriend" resultType="java.lang.Integer">
         select hide from friendship where userId = #{userId} and friendId = #{friendId}
     </select>
+    <select id="getFriendHide" resultType="java.lang.Integer">
+        select friendHide from usersettings where userId = #{friendId}
+    </select>
 </mapper>

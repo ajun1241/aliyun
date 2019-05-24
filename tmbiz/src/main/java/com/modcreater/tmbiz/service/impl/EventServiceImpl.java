@@ -509,7 +509,7 @@ public class EventServiceImpl implements EventService {
         if (!ObjectUtils.isEmpty(searchEventVo)) {
             System.out.println("按周查" + searchEventVo.toString());
             Map<String,Object> result = new HashMap<>(3);
-            if (userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(),searchEventVo.getFriendId()) == 1){
+            if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 || userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(),searchEventVo.getFriendId()) == 1){
                 result.put("userPrivatePermission",1);
             }else {
                 result.put("userPrivatePermission",0);
