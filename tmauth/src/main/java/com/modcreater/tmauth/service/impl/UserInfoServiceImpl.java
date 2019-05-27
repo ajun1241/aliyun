@@ -212,7 +212,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         }
         if (receivedEventConditions.getStartDate().length() != 8){
-            return DtoUtil.getFalseDto("日期格式异常",40003);
+            receivedEventConditions.setStartDate(new SimpleDateFormat("yyyyMMdd").format(new Date()));
         }
         StringBuilder startDate = new StringBuilder(receivedEventConditions.getStartDate());
         singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
