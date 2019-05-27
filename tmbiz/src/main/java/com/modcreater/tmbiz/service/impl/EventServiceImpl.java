@@ -351,7 +351,7 @@ public class EventServiceImpl implements EventService {
                 if (!ObjectUtils.isEmpty(dayEvents) ) {
                     return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
                 }
-                return DtoUtil.getFalseDto("没有数据", 100000);
+                return DtoUtil.getSuccessDto("没有数据", 200000);
             }
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }
@@ -414,7 +414,7 @@ public class EventServiceImpl implements EventService {
                     }
                     return DtoUtil.getSuccesWithDataDto("查询成功", dayEventsList, 100000);
                 }
-                return DtoUtil.getFalseDto("暂无数据", 200000);
+                return DtoUtil.getSuccessDto("没有数据", 200000);
             }
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }
@@ -503,6 +503,9 @@ public class EventServiceImpl implements EventService {
                 loopEventList.add(thuShowLoopEventList);
                 loopEventList.add(friShowLoopEventList);
                 loopEventList.add(satShowLoopEventList);
+                if ((dayEventsList.size() + loopEventList.size()) == 0){
+                    return DtoUtil.getSuccessDto("没有数据", 200000);
+                }
                 Map<String,Object> result = new HashMap<>(2);
                 result.put("dayEventsList", dayEventsList);
                 result.put("loopEventList", loopEventList);
@@ -602,6 +605,9 @@ public class EventServiceImpl implements EventService {
             loopEventList.add(thuShowLoopEventList);
             loopEventList.add(friShowLoopEventList);
             loopEventList.add(satShowLoopEventList);
+            if ((dayEventsList.size() + loopEventList.size()) == 0){
+                return DtoUtil.getSuccessDto("没有数据", 200000);
+            }
             result.put("dayEventsList", dayEventsList);
             result.put("loopEventList", loopEventList);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
