@@ -253,7 +253,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             return DtoUtil.getSuccesWithDataDto("筛选已完成事件成功",showCompletedEventsList,100000);
         }
-        return DtoUtil.getSuccessDto("没有查询到事件",100000);
+        return DtoUtil.getSuccessDto("没有查询到事件",200000);
     }
 
     @Override
