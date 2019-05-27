@@ -34,5 +34,12 @@ public interface SystemMsgMapper {
      * @param userId
      * @return
      */
-    int updateUnreadMsg(String userId);
+    int updateUnreadMsg(String userId,String fromId,String msgStatus);
+
+    /**
+     * 查询一条好友请求消息
+     * @param systemMsgRecord
+     * @return
+     */
+    int queryMsgByUserIdFriendIdMsgType(SystemMsgRecord systemMsgRecord);
 }

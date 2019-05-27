@@ -2,6 +2,8 @@ package com.modcreater.tmbeans.vo.userinfovo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -11,7 +13,7 @@ import lombok.Data;
  * Time: 13:58
  */
 @Data
-public class ReceivedEventConditions {
+public class ReceivedEventConditions implements Serializable {
     /**
      * 用户ID
      */

@@ -26,8 +26,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -335,17 +341,27 @@ public class AccountServiceImpl implements AccountService {
         try {
             sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
             String[] friendId={sendFriendRequestVo.getFriendId()};
-            TxtMessage contactNtfMessage=new TxtMessage(sendFriendRequestVo.getContent(),"");
+            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("","",sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
             result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送请求失败",17002);
             }
             //消息保存在服务器
             map.put("userId",sendFriendRequestVo.getFriendId());
-            map.put("msgContent",contactNtfMessage.getContent());
+            map.put("msgContent",contactNtfMessage.getMessage());
             map.put("msgType","newFriend");
             map.put("fromId",sendFriendRequestVo.getUserId());
-            systemMsgMapper.addNewMsg(map);
+            SystemMsgRecord systemMsgRecord=new SystemMsgRecord();
+            systemMsgRecord.setUserId(Long.parseLong(sendFriendRequestVo.getFriendId()));
+            systemMsgRecord.setFromId(Long.parseLong(sendFriendRequestVo.getUserId()));
+            systemMsgRecord.setMsgType("newFriend");
+            if (systemMsgMapper.queryMsgByUserIdFriendIdMsgType(systemMsgRecord)==0){
+                //第一次发送
+                systemMsgMapper.addNewMsg(map);
+            }else {
+                //多次发送
+                systemMsgMapper.updateUnreadMsg(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"0");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("出现错误了",233);
@@ -608,8 +624,62 @@ public class AccountServiceImpl implements AccountService {
         }
         map.put("msgList",list);
         //修改消息状态
-        systemMsgMapper.updateUnreadMsg(receivedId.getUserId());
+        systemMsgMapper.updateUnreadMsg(receivedId.getUserId(),"","1");
         return DtoUtil.getSuccesWithDataDto("未读消息获取成功",map,100000);
+    }
+
+    /**
+     * 上传头像
+     * @param request
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto uplHeadImg(String userId,MultipartFile headImg,HttpServletRequest request, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (StringUtils.isEmpty(userId)){
+            return DtoUtil.getFalseDto("userId未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userId))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        if (ObjectUtils.isEmpty(headImg)){
+            return DtoUtil.getFalseDto("图片为空",23001);
+        }
+        // 文件类型
+        String type=null;
+        // 文件原名称
+        String fileName=headImg.getOriginalFilename();
+        System.out.println("上传的文件原名称:"+fileName);
+        type=fileName.indexOf(".")!=-1?fileName.substring(fileName.lastIndexOf(".")+1, fileName.length()):null;
+        if (StringUtils.isEmpty(type)){
+            return DtoUtil.getFalseDto("文件类型为空",23002);
+        }
+        if ("GIF".equals(type.toUpperCase())||"PNG".equals(type.toUpperCase())||"JPG".equals(type.toUpperCase())) {
+                // 项目在容器中实际发布运行的根路径
+                String realPath="E:\\tomcat";
+                System.out.println("项目在容器中实际发布运行的根路径--->"+realPath);
+                // 自定义的文件名称
+                String newFileName=UUID.randomUUID().toString().replaceAll("-","");
+                System.out.println("上传的文件新名称"+newFileName);
+                File file=new File(realPath);
+                // 转存文件到指定的路径
+                try {
+                    headImg.transferTo(new File(file,"/"+newFileName+"."+type));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return DtoUtil.getFalseDto("上传图片失败",23004);
+                }
+                //文件路径保存在数据库
+
+
+
+            }else {
+                return DtoUtil.getFalseDto("文件类型不匹配",23003);
+            }
+        return DtoUtil.getSuccessDto("图片上传成功",100000);
     }
 
     @Override

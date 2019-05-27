@@ -160,8 +160,21 @@ public class EventController {
         return eventService.searchByDayForIOS(searchConditionsForIOS,request.getHeader("token"));
     }
 
+    /**
+     * 根据天条件查询forIOS
+     * @param addbackerVo
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "addeventbacker")
+    @ApiOperation("添加一条事件支持")
+    public Dto addEventBacker(@RequestBody AddbackerVo addbackerVo,HttpServletRequest request){
+        return eventService.addEventBacker(addbackerVo,request.getHeader("token"));
+    }
+
     @PostMapping(value = "searchonce")
     public Dto searchOnce(@RequestBody ReceivedSearchOnce receivedSearchOnce,HttpServletRequest request){
         return eventService.searchOnce(receivedSearchOnce,request.getHeader("token"));
     }
+
 }

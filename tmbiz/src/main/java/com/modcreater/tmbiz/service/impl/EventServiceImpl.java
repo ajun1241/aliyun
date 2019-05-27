@@ -50,6 +50,9 @@ public class EventServiceImpl implements EventService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    @Resource
+    private BackerMapper backerMapper;
+
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo,String token) {
         if (StringUtils.hasText(uploadingEventVo.getUserId())) {
@@ -631,6 +634,78 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
+     * 添加事件支持者
+     * @param addbackerVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto addEventBacker(AddbackerVo addbackerVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(addbackerVo)){
+            return DtoUtil.getFalseDto("添加邀请事件数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(addbackerVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(addbackerVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        if (StringUtils.isEmpty(addbackerVo.getFriendIds())){
+            return DtoUtil.getFalseDto("支持者不能空",25002);
+        }
+        String[] backers=addbackerVo.getFriendIds().split(",");
+        //添加事件进数据库
+        SingleEvent singleEvent=JSONObject.parseObject(addbackerVo.getSingleEvent(),SingleEvent.class);
+        singleEvent.setUserid(Long.parseLong(addbackerVo.getUserId()));
+        //事件时间冲突判断
+
+
+        if (eventMapper.uploadingEvents(singleEvent)==0){
+            return DtoUtil.getFalseDto("事件添加失败",25001);
+        }
+        //添加支持者状态
+        backerMapper.addBackers(addbackerVo.getUserId(),backers,singleEvent.getEventid().toString());
+        //发送信息给被邀请者
+        try {
+            Account account=accountMapper.queryAccount(addbackerVo.getUserId());
+            RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+            String content=account.getUserName()+"邀请你支持他在"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+"的"+singleEvent.getEventname()+"活动;"+"时间"+Integer.parseInt(singleEvent.getStarttime())/60+":"+Integer.parseInt(singleEvent.getStarttime())%60+"至"+Integer.parseInt(singleEvent.getEndtime())/60+":"+Integer.parseInt(singleEvent.getEndtime())%60+"；你将在事件开始前"+singleEvent.getRemindTime()+"收到提醒。";
+            System.out.println("消息内容"+content);
+            InviteMessage inviteMessage=new InviteMessage(content,"",addbackerVo.getSingleEvent());
+            rongCloudMethodUtil.sendSystemMessage(addbackerVo.getUserId(),backers,inviteMessage,"","");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("消息发送出错",26002);
+        }
+        return DtoUtil.getSuccessDto("消息发送成功",100000);
+    }
+
+    /**
+     * 回应事件支持
+     * @return
+     */
+    @Override
+    public Dto feedbackEventBacker(FeedbackEventBackerVo feedbackEventBackerVo,String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(feedbackEventBackerVo)){
+            return DtoUtil.getFalseDto("添加邀请事件数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(feedbackEventBackerVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(feedbackEventBackerVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+
+        return null;
+    }
+
+    /**
      * 添加一条邀请事件
      * @param addInviteEventVo
      * @param token
@@ -842,6 +917,10 @@ public class EventServiceImpl implements EventService {
                 //修改
                 eventMapper.alterEventsByUserId(singleEvent);
             }
+            //事件时间冲突判断
+
+
+
             eventMapper.uploadingEvents(singleEvent);
             //判断同意该事件的人，他们的事件表是否有冲突事件
             for (String userId:agrees) {
@@ -927,4 +1006,5 @@ public class EventServiceImpl implements EventService {
         }
         return DtoUtil.getFalseDto("未查询到数据",100000);
     }
+
 }

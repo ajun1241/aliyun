@@ -29,6 +29,8 @@ public class TmchatApplicationTests {
     public void contextLoads() throws Exception {
         System.out.println("定时器工作了");
     }
+
+
     @Test
     public void test1(){
         VoiceMessage voiceMessage = new VoiceMessage("hello", "helloExtra", 20L);

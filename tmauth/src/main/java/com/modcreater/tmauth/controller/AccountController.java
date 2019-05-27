@@ -10,6 +10,7 @@ import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -97,5 +98,11 @@ public class AccountController {
     @ApiOperation("拉取所有未读消息")
     public Dto queryAllUnreadMsg(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return userService.queryAllUnreadMsg(receivedId,request.getHeader("token"));
+    }
+
+    @PostMapping("uplheadimg")
+    @ApiOperation("上传头像")
+    public Dto uplHeadImg(String userId, MultipartFile image, HttpServletRequest request){
+        return userService.uplHeadImg(userId,image,request,request.getHeader("token"));
     }
 }

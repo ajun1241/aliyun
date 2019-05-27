@@ -1,12 +1,17 @@
 package com.modcreater.tmauth;
 
+import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -32,5 +37,7 @@ public class TmauthApplicationTests {
         String s=String.join(",",list);
         System.out.println("ssdasdasdas===="+s);
     }
-
+    @Test
+    public void test(){
+    }
 }

@@ -7,6 +7,9 @@ import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.QueryUserVo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 public interface AccountService {
 
@@ -113,4 +116,13 @@ public interface AccountService {
      */
     Dto queryAllUnreadMsg(ReceivedId receivedId,String token);
 
+    /**
+     * 上传头像
+     * @param userId
+     * @param image
+     * @param request
+     * @param token
+     * @return
+     */
+    Dto uplHeadImg(String userId,MultipartFile image, HttpServletRequest request, String token);
 }
