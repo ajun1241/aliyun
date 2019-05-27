@@ -188,18 +188,29 @@ public class UserInfoServiceImpl implements UserInfoService {
             ReceivedIdIsOverdue receivedIdIsOverdue = new ReceivedIdIsOverdue();
             receivedIdIsOverdue.setUserId(receivedEventConditions.getUserId());
             receivedIdIsOverdue.setIsOverdue(receivedEventConditions.getIsOverdue());
-            receivedIdIsOverdue.setPageNum((receivedEventConditions.getPageNum()-1)*receivedEventConditions.getPageSize());
-            receivedIdIsOverdue.setPageSize(receivedEventConditions.getPageSize());
+            receivedIdIsOverdue.setPageNum(0L);
+            receivedIdIsOverdue.setPageSize(7L);
             return showUserEvents(receivedIdIsOverdue,token);
         }
         QueryEventsCondition singleEventCondition = new QueryEventsCondition();
-        singleEventCondition.setEventname(receivedEventConditions.getEventName());
-        singleEventCondition.setType(Long.valueOf(receivedEventConditions.getEventType()));
-        singleEventCondition.setLevel(Long.valueOf(receivedEventConditions.getEventLevel()));
-        singleEventCondition.setStarttime(receivedEventConditions.getStartTime());
-        singleEventCondition.setEndtime(receivedEventConditions.getEndTime());
-        singleEventCondition.setPerson(receivedEventConditions.getPerson());
-        singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
+        if (receivedEventConditions.getEventName() != null && !"".equals(receivedEventConditions.getEventName())){
+            singleEventCondition.setEventname(receivedEventConditions.getEventName());
+        }
+        if (receivedEventConditions.getEventType() != null && !"".equals(receivedEventConditions.getEventType())){
+            singleEventCondition.setType(Long.valueOf(receivedEventConditions.getEventType()));
+        }
+        if (receivedEventConditions.getEventLevel() != null && !"".equals(receivedEventConditions.getEventLevel())){
+            singleEventCondition.setLevel(Long.valueOf(receivedEventConditions.getEventLevel()));
+        }
+        if (receivedEventConditions.getStartTime() != null && !"".equals(receivedEventConditions.getStartTime())){
+            singleEventCondition.setStarttime(receivedEventConditions.getStartTime());
+        }
+        if (receivedEventConditions.getEndTime() != null && !"".equals(receivedEventConditions.getEndTime())){
+            singleEventCondition.setEndtime(receivedEventConditions.getEndTime());
+        }
+        if (receivedEventConditions.getIsOverdue() != null && !"".equals(receivedEventConditions.getIsOverdue())){
+            singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
+        }
         if (receivedEventConditions.getStartDate().length() != 8){
             return DtoUtil.getFalseDto("日期格式异常",40003);
         }
@@ -207,18 +218,38 @@ public class UserInfoServiceImpl implements UserInfoService {
         singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
         singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
         singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
+        if (receivedEventConditions.getPageNum() == 0){
+            receivedEventConditions.setPageNum(1L);
+        }
         singleEventCondition.setPageNum((receivedEventConditions.getPageNum()-1)*receivedEventConditions.getPageSize());
         singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
         List<SingleEvent> singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
         if (singleEventList.size() != 0){
             List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
             for (SingleEvent singleEvent : singleEventList){
-                ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
-                showCompletedEvents.setEventId(singleEvent.getEventid().toString());
-                showCompletedEvents.setUserId(singleEvent.getUserid().toString());
-                showCompletedEvents.setEventName(singleEvent.getEventname());
-                showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
-                showCompletedEventsList.add(showCompletedEvents);
+                if (receivedEventConditions.getPerson() != null && !"".equals(receivedEventConditions.getPerson())){
+                    String[] persons = receivedEventConditions.getPerson().split(",");
+                    String[] personsInResult = singleEvent.getPerson().split(",");
+                    if (persons.length > personsInResult.length){
+                        continue;
+                    }
+                    int i = 0;
+                    for (String sOut : persons){
+                        for (String sInside :personsInResult){
+                            if (sOut.equals(sInside)){
+                                i += 1;
+                            }
+                        }
+                    }
+                    if (i == persons.length){
+                        ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
+                        showCompletedEvents.setEventId(singleEvent.getEventid().toString());
+                        showCompletedEvents.setUserId(singleEvent.getUserid().toString());
+                        showCompletedEvents.setEventName(singleEvent.getEventname());
+                        showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
+                        showCompletedEventsList.add(showCompletedEvents);
+                    }
+                }
             }
             return DtoUtil.getSuccesWithDataDto("筛选已完成事件成功",showCompletedEventsList,100000);
         }

@@ -231,7 +231,7 @@
     </select>
 
     <select id="queryEventsByConditions" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select eventId,userId,eventName,day,month,year
+        select eventId,userId,eventName,person,day,month,year
         from singleevent
         <where>
             1 = 1
@@ -244,9 +244,6 @@
             <if test="level != null and level != ''">
                 and level = #{level}
             </if>
-            <if test="person != null and person != ''">
-                and #{person} in person
-            </if>
             <if test="year != null and year != ''">
                 and year = #{year}
             </if>
@@ -256,7 +253,7 @@
             <if test="day != null and day != ''">
                 and day = #{day}
             </if>
-            <if test="isOverdue != null">
+            <if test="isOverdue != null and isOverdue != ''">
                 and isOverdue = #{isOverdue}
             </if>
             <if test="starttime != null and starttime != 0 and endtime != null and endtime != 0">
@@ -268,6 +265,9 @@
         </where>
         and isLoop = 0
         order by year desc,month desc,day desc
+        <if test="pageSize != 0 and pageSize != ''">
+            limit #{pageNum},#{pageSize}
+        </if>
     </select>
     <select id="getUserEventsGroupByType" resultType="com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType">
         select type ,sum(endTime-startTime) totalMinutes ,count(type) num from singleevent
