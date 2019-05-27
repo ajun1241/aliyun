@@ -18,6 +18,7 @@ import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
+import com.modcreater.tmdao.mapper.UserServiceMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.SingleEventUtil;
@@ -50,7 +51,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     private AchievementMapper achievementMapper;
 
     @Resource
-    private AccountMapper accountMapper;
+    private UserServiceMapper userServiceMapper;
 
     @Resource
     private EventMapper eventMapper;
@@ -181,8 +182,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         //此处判断用户是否开启了该项服务
-        if (1==0){
-            return DtoUtil.getSuccessDto("您还没有开通该服务",100000);
+        if (userServiceMapper.getSearchServie(receivedEventConditions.getUserId()) != 1){
+            return DtoUtil.getSuccessDto("抱歉,您还没有开通该服务",100000);
         }
         QueryEventsCondition singleEventCondition = new QueryEventsCondition();
         if (receivedEventConditions.getUserId() == null || "".equals(receivedEventConditions.getUserId())){
