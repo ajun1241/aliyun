@@ -12,7 +12,27 @@ import lombok.Data;
  */
 @Data
 public class ReceivedOrderInfo {
+    /**
+     * 用户ID
+     */
+    private String userId;
+    /**
+     * 服务类型
+     */
+    private String serviceId;
+    /**
+     * 订单标题
+     */
+    private String orderTitle;
+    /**
+     * 订单类型(time:次卡;month:月卡;year:年卡;)
+     */
+    private String orderType;
+    /**
+     * 用户备注
+     */
+    private String userRemark;
 
-
+    private String appType;
 
 }

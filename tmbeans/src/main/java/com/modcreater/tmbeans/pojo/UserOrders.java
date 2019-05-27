@@ -1,6 +1,8 @@
 package com.modcreater.tmbeans.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,6 +13,8 @@ import lombok.Data;
  * Time: 9:46
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserOrders {
     /**
      * 用户ID

@@ -221,6 +221,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (receivedEventConditions.getPageNum() == 0){
             receivedEventConditions.setPageNum(1L);
         }
+        if (receivedEventConditions.getPageNum() == null){
+            singleEventCondition.setPageNum(0L);
+        }
+        if (receivedEventConditions.getPageSize() == null){
+            singleEventCondition.setPageSize(7L);
+        }
         singleEventCondition.setPageNum((receivedEventConditions.getPageNum()-1)*receivedEventConditions.getPageSize());
         singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
         List<SingleEvent> singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
