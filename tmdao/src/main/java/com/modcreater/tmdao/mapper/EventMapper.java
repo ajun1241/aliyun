@@ -85,10 +85,11 @@ public interface EventMapper {
 
     /**
      * 查询草稿
-     * @param phone
+     * @param userId
+     * @param eventId
      * @return
      */
-    String queryDraftByPhone(String phone);
+    int queryDraftCount(String userId,String eventId);
 
     /**
      * 第二次上传修改草稿

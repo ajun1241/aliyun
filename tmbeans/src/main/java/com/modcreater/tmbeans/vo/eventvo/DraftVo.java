@@ -10,7 +10,6 @@ import java.io.Serializable;
 @Data
 public class DraftVo implements Serializable {
     private String userId;
-    private String phoneNum;
-    private String singleEvent;
+    private String singleEvents;
     private String apptype;
 }

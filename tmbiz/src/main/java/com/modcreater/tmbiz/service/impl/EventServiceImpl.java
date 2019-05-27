@@ -1,10 +1,7 @@
 package com.modcreater.tmbiz.service.impl;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.pojo.Account;
-import com.modcreater.tmbeans.pojo.SingleEvent;
-import com.modcreater.tmbeans.pojo.StatisticsTable;
-import com.modcreater.tmbeans.pojo.UserStatistics;
+import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbiz.service.EventService;
@@ -240,8 +237,36 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(draftVo)) {
             return DtoUtil.getFalseDto("上传草稿未获取到", 27001);
         }
-        //查看草稿是否已存在
-        String data = eventMapper.queryDraftByPhone(draftVo.getPhoneNum());
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (StringUtils.isEmpty(draftVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(draftVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        ArrayList<Object> drafts=JSONObject.parseObject(draftVo.getSingleEvents(),ArrayList.class);
+        for (Object draft:drafts) {
+            System.out.println(draft);
+            SingleEvent draft1=JSONObject.parseObject(draft.toString(),SingleEvent.class);
+            //查看草稿是否已存在
+            if (eventMapper.queryDraftCount(draftVo.getUserId(),draft1.getEventid().toString())==0){
+                //上传
+                draft1.setUserid(Long.parseLong(draftVo.getUserId()));
+                if (SingleEventUtil.isLoopEvent(draft1.getRepeaTtime())) {
+                    draft1.setIsLoop(1);
+                } else {
+                    draft1.setIsLoop(0);
+                }
+                if(eventMapper.uplDraft(draft1)==0){
+                    return DtoUtil.getFalseDto("上传草稿失败",27002);
+                }
+            }else {
+                return DtoUtil.getFalseDto("该草稿已存在",27003);
+            }
+        }
+
         UserStatistics userStatistics = new UserStatistics();
         /*StringBuffer dataNum = new StringBuffer(draftVo.getData());
         Long times =0L;
@@ -256,17 +281,6 @@ public class EventServiceImpl implements EventService {
         userStatistics.setDrafts(times);*/
         if (achievementMapper.updateUserStatistics(userStatistics,userStatistics.getUserId().toString()) == 0){
             return DtoUtil.getFalseDto("草稿箱数据计数失败",27004);
-        }
-        if (StringUtils.isEmpty(data)) {
-            //第一次上传草稿
-            /*if (eventMapper.uplDraft(draftVo) <= 0) {
-                return DtoUtil.getFalseDto("第一次上传草稿失败", 27002);
-            }*/
-        } else {
-            //不是第一次上传
-            if (eventMapper.updateDraft(draftVo) <= 0) {
-                return DtoUtil.getFalseDto("非第一次上传草稿失败", 27003);
-            }
         }
         return DtoUtil.getSuccessDto("上传草稿成功", 100000);
     }

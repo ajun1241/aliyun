@@ -196,8 +196,8 @@
             #{isLoop})
     </insert>
 
-    <select id="queryDraftByPhone" parameterType="String" resultType="String">
-        select data from draft where phoneNum=#{phoneNum}
+    <select id="queryDraftCount" parameterType="String" resultType="java.lang.Integer">
+        select count(1) from draft where userId=#{userId} and eventId=#{eventId}
     </select>
 
     <select id="queryLoopEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
