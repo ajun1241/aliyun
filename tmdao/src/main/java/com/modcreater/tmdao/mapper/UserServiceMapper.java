@@ -41,4 +41,11 @@ public interface UserServiceMapper {
      * @return
      */
     int getBackupService(String userId);
+
+    /**
+     * 为用户添加一条服务监测
+     * @param userId
+     * @return
+     */
+    int addNewUserService(String userId);
 }

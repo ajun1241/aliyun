@@ -9,10 +9,7 @@ import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
-import com.modcreater.tmdao.mapper.AccountMapper;
-import com.modcreater.tmdao.mapper.AchievementMapper;
-import com.modcreater.tmdao.mapper.SystemMsgMapper;
-import com.modcreater.tmdao.mapper.UserSettingsMapper;
+import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
@@ -57,6 +54,8 @@ public class AccountServiceImpl implements AccountService {
     private UserSettingsMapper userSettingsMapper;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private UserServiceMapper userServiceMapper;
     @Resource
     private SystemMsgMapper systemMsgMapper;
 
@@ -236,6 +235,9 @@ public class AccountServiceImpl implements AccountService {
         }
         if (userSettingsMapper.addNewUserSettings(addPwdVo.getUserId()) == 0){
             return DtoUtil.getFalseDto("为用户添加设置失败",15006);
+        }
+        if (userServiceMapper.addNewUserService(addPwdVo.getUserId()) == 0){
+            return DtoUtil.getFalseDto("为用户添加服务失败",15007);
         }
         return DtoUtil.getSuccesWithDataDto("添加密码成功",map,100000);
     }
