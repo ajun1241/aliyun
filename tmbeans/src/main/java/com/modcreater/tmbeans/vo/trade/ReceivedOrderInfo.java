@@ -29,6 +29,10 @@ public class ReceivedOrderInfo {
      */
     private String orderType;
     /**
+     * 支付金额
+     */
+    private Double paymentAmount;
+    /**
      * 用户备注
      */
     private String userRemark;

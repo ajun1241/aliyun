@@ -615,6 +615,21 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
 
+    @Override
+    public Dto searchOnce(ReceivedSearchOnce receivedSearchOnce, String token) {
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedSearchOnce.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        SingleEvent singleEvent = eventMapper.queryEventOne(receivedSearchOnce.getUserId(),receivedSearchOnce.getEventId());
+        if (singleEvent != null){
+            return DtoUtil.getSuccesWithDataDto("查询成功",singleEvent,100000);
+        }
+        return DtoUtil.getSuccessDto("未查询到事件",200000);
+    }
+
     /**
      * 添加一条邀请事件
      * @param addInviteEventVo

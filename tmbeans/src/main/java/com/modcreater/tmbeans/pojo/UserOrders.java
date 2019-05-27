@@ -35,11 +35,11 @@ public class UserOrders {
     /**
      * 支付金额
      */
-    private String paymentAmount;
+    private Double paymentAmount;
     /**
      * 创建时间
      */
-    private String createDate;
+    private Long createDate;
     /**
      * 支付时间
      */

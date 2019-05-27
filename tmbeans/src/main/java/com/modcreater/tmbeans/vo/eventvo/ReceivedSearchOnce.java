@@ -9,19 +9,16 @@ import java.io.Serializable;
  * Description:
  *
  * @Author: Goku_yi
- * @Date: 2019-04-30
- * Time: 16:58
+ * @Date: 2019-05-27
+ * Time: 15:09
  */
 @Data
-public class ContrastTimestampVo implements Serializable {
-    /**
-     * 用户ID
-     */
+public class ReceivedSearchOnce implements Serializable {
+
     private String userId;
 
-    /**
-     * 时间戳(1556614847)
-     */
-    private String time;
+    private String eventId;
+
+    private String appType;
 
 }

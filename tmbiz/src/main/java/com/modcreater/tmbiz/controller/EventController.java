@@ -159,4 +159,9 @@ public class EventController {
     public Dto searchByDayForIOS(@RequestBody SearchConditionsForIOS searchConditionsForIOS,HttpServletRequest request){
         return eventService.searchByDayForIOS(searchConditionsForIOS,request.getHeader("token"));
     }
+
+    @PostMapping(value = "searchonce")
+    public Dto searchOnce(@RequestBody ReceivedSearchOnce receivedSearchOnce,HttpServletRequest request){
+        return eventService.searchOnce(receivedSearchOnce,request.getHeader("token"));
+    }
 }

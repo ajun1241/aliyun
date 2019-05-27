@@ -39,13 +39,16 @@ public class OrderServiceImpl implements OrderService {
         userOrders.setUserId(receivedOrderInfo.getUserId());
         userOrders.setServiceId(receivedOrderInfo.getServiceId());
         userOrders.setOrderTitle(receivedOrderInfo.getOrderTitle());
-        userOrders.setPaymentAmount();
-        userOrders.setCreateDate();
-        userOrders.setPayTime();
-        userOrders.setPayChannel();
-        userOrders.setOutTradeNo();
-        userOrders.setOrderStatus();
-        userOrders.setRemark();
-        return null;
+        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(),receivedOrderInfo.getOrderType());
+        if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0){
+            return DtoUtil.getFalseDto("订单金额错误",60001);
+        }
+        userOrders.setPaymentAmount(amount);
+        userOrders.setCreateDate(System.currentTimeMillis()/1000);
+        userOrders.setRemark(receivedOrderInfo.getUserRemark());
+        if (orderMapper.addNewOrder(userOrders) > 0){
+            return DtoUtil.getSuccessDto("订单生成成功,请及时支付",100000);
+        }
+        return DtoUtil.getFalseDto("订单生成失败",60002);
     }
 }

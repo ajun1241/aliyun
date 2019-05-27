@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.OrderMapper">
+    <insert id="addNewOrder">
+        insert into userorders values
+         (null,
+         #{userId},
+         #{serviceId},
+         #{orderTitle},
+         #{paymentAmount},
+         #{createDate},
+         null,
+         null,
+         null,
+         0,
+         #{remark})
+    </insert>
 
+    <select id="getPaymentAmount" resultType="java.lang.Double">
+        select
+        <if test="orderType == 'month'">
+            monthCardPrice
+        </if>
+        <if test="orderType == 'time'">
+            timeCardPrice
+        </if>
+        <if test="orderType == 'year'">
+            yearCardPrice
+        </if>
+        from servicefunction where id = #{serviceId}
+    </select>
 </mapper>

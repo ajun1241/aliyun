@@ -118,4 +118,12 @@ public interface EventService {
      * @return
      */
     Dto seaByWeekWithPrivatePermission(SearchEventVo searchEventVo,String token);
+
+    /**
+     * 查询一个事件
+     * @param receivedSearchOnce
+     * @param token
+     * @return
+     */
+    Dto searchOnce(ReceivedSearchOnce receivedSearchOnce, String token);
 }
