@@ -320,6 +320,9 @@
             <if test="userid != null">
                 userid = #{userid}
             </if>
+            <if test="eventid != null">
+                eventId &lt; #{eventid}
+            </if>
             <if test="day != null">
                 and day = #{day}
             </if>
@@ -344,6 +347,13 @@
         <include refid="Base_Column_List"/>
         from singleevent
         where userId=#{userId} and eventId=#{eventId} and isOverdue &lt;&gt; 2
+    </select>
+    <select id="queryDraft" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select eventId,userId,eventName,day,month,year
+        from singleevent
+        where userId = #{userId}
+        and isOverdue = #{isOverdue}
+        order by year desc,month desc,day desc limit #{pageNum},#{pageSize}
     </select>
 
 </mapper>

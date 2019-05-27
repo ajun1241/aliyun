@@ -90,7 +90,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto showUserEvents(ReceivedIdIsOverdue receivedIdIsOverdue, String token) {
-        if (!StringUtils.hasText(token)){
+        /*if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
         String redisToken=stringRedisTemplate.opsForValue().get(receivedIdIsOverdue.getUserId());
@@ -101,11 +101,16 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("事件状态未获取到",40005);
         }
         //查询用户已完成的事件(根据时间排序,如果用户未开通该服务,则只显示7条)
-        if (1==1){
+        if ("是否开通服务".equals("是否开通服务")){
             receivedIdIsOverdue.setPageNum(0L);
             receivedIdIsOverdue.setPageSize(7L);
         }
-        List<SingleEvent> singleEventList = eventMapper.queryUserEventsByUserIdIsOverdue(receivedIdIsOverdue);
+        List<SingleEvent> singleEventList;
+        if ("9".equals(receivedIdIsOverdue.getIsOverdue())){
+            singleEventList = eventMapper.queryDraft(receivedIdIsOverdue);
+        }else {
+            singleEventList = eventMapper.queryUserEventsByUserIdIsOverdue(receivedIdIsOverdue);
+        }
         if (singleEventList.size() != 0){
             List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
             for (SingleEvent singleEvent : singleEventList){
@@ -117,7 +122,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 showCompletedEventsList.add(showCompletedEvents);
             }
             return DtoUtil.getSuccesWithDataDto("查询用户事件成功",showCompletedEventsList,100000);
-        }
+        }*/
         return DtoUtil.getSuccessDto("未查到用户事件",100000);
     }
 
@@ -179,20 +184,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (1==0){
             return DtoUtil.getSuccessDto("您还没有开通该服务",100000);
         }
-        List<String> list = new ArrayList();
-        list.add("userId");
-        list.add("appType");
-        list.add("isOverdue");
-        //判断条件除userId和appType是否全部为空
-        if (SingleEventUtil.isAllPropertiesEmpty(receivedEventConditions,list)){
-            ReceivedIdIsOverdue receivedIdIsOverdue = new ReceivedIdIsOverdue();
-            receivedIdIsOverdue.setUserId(receivedEventConditions.getUserId());
-            receivedIdIsOverdue.setIsOverdue(receivedEventConditions.getIsOverdue());
-            receivedIdIsOverdue.setPageNum(0L);
-            receivedIdIsOverdue.setPageSize(7L);
-            return showUserEvents(receivedIdIsOverdue,token);
-        }
         QueryEventsCondition singleEventCondition = new QueryEventsCondition();
+        if (receivedEventConditions.getUserId() == null || "".equals(receivedEventConditions.getUserId())){
+            return DtoUtil.getFalseDto("条件缺失",40006);
+        }
+        singleEventCondition.setUserid(Long.valueOf(receivedEventConditions.getUserId()));
+        if (receivedEventConditions.getIsOverdue() == null || "".equals(receivedEventConditions.getIsOverdue())){
+            return DtoUtil.getFalseDto("条件缺失",40006);
+        }
+        singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         if (receivedEventConditions.getEventName() != null && !"".equals(receivedEventConditions.getEventName())){
             singleEventCondition.setEventname(receivedEventConditions.getEventName());
         }
@@ -212,34 +212,45 @@ public class UserInfoServiceImpl implements UserInfoService {
             singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         }
         if (receivedEventConditions.getStartDate().length() != 8){
-            receivedEventConditions.setStartDate(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+            singleEventCondition.setEventid(System.currentTimeMillis()/1000);
+        }else {
+            StringBuilder startDate = new StringBuilder(receivedEventConditions.getStartDate());
+            singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
+            singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
+            singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
         }
-        StringBuilder startDate = new StringBuilder(receivedEventConditions.getStartDate());
-        singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
-        singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
-        singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
-        if (receivedEventConditions.getPageNum() == 0){
+        if (receivedEventConditions.getPageNum() == 0 ||receivedEventConditions.getPageNum() == null){
             receivedEventConditions.setPageNum(1L);
         }
-        if (receivedEventConditions.getPageNum() == null){
-            singleEventCondition.setPageNum(0L);
-        }
-        if (receivedEventConditions.getPageSize() == null){
+        if (receivedEventConditions.getPageSize() == 0 || receivedEventConditions.getPageSize() == null){
             singleEventCondition.setPageSize(7L);
         }
         singleEventCondition.setPageNum((receivedEventConditions.getPageNum()-1)*receivedEventConditions.getPageSize());
         singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
-        List<SingleEvent> singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
+        List<SingleEvent> singleEventList;
+        List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
+        if ("9".equals(singleEventCondition.getIsOverdue())){
+            singleEventList = eventMapper.queryDraft(singleEventCondition);
+            for (SingleEvent singleEvent : singleEventList){
+                ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
+                showCompletedEvents.setEventId(singleEvent.getEventid().toString());
+                showCompletedEvents.setUserId(singleEvent.getUserid().toString());
+                showCompletedEvents.setEventName(singleEvent.getEventname());
+                showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
+                showCompletedEventsList.add(showCompletedEvents);
+            }
+        }else {
+            singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
+        }
         if (singleEventList.size() != 0){
-            List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
             for (SingleEvent singleEvent : singleEventList){
                 if (receivedEventConditions.getPerson() != null && !"".equals(receivedEventConditions.getPerson())){
                     String[] persons = receivedEventConditions.getPerson().split(",");
                     String[] personsInResult = singleEvent.getPerson().split(",");
+                    int i = 0;
                     if (persons.length > personsInResult.length){
                         continue;
                     }
-                    int i = 0;
                     for (String sOut : persons){
                         for (String sInside :personsInResult){
                             if (sOut.equals(sInside)){
@@ -256,6 +267,12 @@ public class UserInfoServiceImpl implements UserInfoService {
                         showCompletedEventsList.add(showCompletedEvents);
                     }
                 }
+                ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
+                showCompletedEvents.setEventId(singleEvent.getEventid().toString());
+                showCompletedEvents.setUserId(singleEvent.getUserid().toString());
+                showCompletedEvents.setEventName(singleEvent.getEventname());
+                showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
+                showCompletedEventsList.add(showCompletedEvents);
             }
             return DtoUtil.getSuccesWithDataDto("筛选已完成事件成功",showCompletedEventsList,100000);
         }

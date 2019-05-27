@@ -196,4 +196,11 @@ public interface EventMapper {
      * @return
      */
     SingleEvent queryEventOne(String userId,String eventId);
+
+    /**
+     * 查询草稿箱
+     * @param singleEvent
+     * @return
+     */
+    List<SingleEvent> queryDraft(QueryEventsCondition singleEvent);
 }
