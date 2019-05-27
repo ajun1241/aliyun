@@ -453,6 +453,9 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         int pageSize=Integer.parseInt(userIdVo.getPageSize());
+        if (StringUtils.isEmpty(userIdVo.getPageNumber())){
+            userIdVo.setPageNumber("1");
+        }
         int pageIndex=(Integer.parseInt(userIdVo.getPageNumber())-1)*pageSize;
         List<Account> accountList=accountMapper.queryFriendList(userIdVo.getUserId(),pageIndex,pageSize);
         List<Map> maps=new ArrayList<>();
