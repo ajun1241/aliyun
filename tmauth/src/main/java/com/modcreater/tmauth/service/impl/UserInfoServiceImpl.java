@@ -232,12 +232,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if ("9".equals(singleEventCondition.getIsOverdue())){
             singleEventList = eventMapper.queryDraft(singleEventCondition);
             for (SingleEvent singleEvent : singleEventList){
-                ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
-                showCompletedEvents.setEventId(singleEvent.getEventid().toString());
-                showCompletedEvents.setUserId(singleEvent.getUserid().toString());
-                showCompletedEvents.setEventName(singleEvent.getEventname());
-                showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
-                showCompletedEventsList.add(showCompletedEvents);
+                showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
             }
         }else {
             singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
@@ -259,20 +254,11 @@ public class UserInfoServiceImpl implements UserInfoService {
                         }
                     }
                     if (i == persons.length){
-                        ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
-                        showCompletedEvents.setEventId(singleEvent.getEventid().toString());
-                        showCompletedEvents.setUserId(singleEvent.getUserid().toString());
-                        showCompletedEvents.setEventName(singleEvent.getEventname());
-                        showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
-                        showCompletedEventsList.add(showCompletedEvents);
+                        showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
                     }
+                }else {
+                    showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
                 }
-                ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
-                showCompletedEvents.setEventId(singleEvent.getEventid().toString());
-                showCompletedEvents.setUserId(singleEvent.getUserid().toString());
-                showCompletedEvents.setEventName(singleEvent.getEventname());
-                showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
-                showCompletedEventsList.add(showCompletedEvents);
             }
             return DtoUtil.getSuccesWithDataDto("筛选已完成事件成功",showCompletedEventsList,100000);
         }

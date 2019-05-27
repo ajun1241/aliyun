@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
+import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
@@ -187,5 +188,14 @@ public class SingleEventUtil {
             }
         }
         return flag;
+    }
+
+    public static ShowCompletedEvents getShowCompleted(SingleEvent singleEvent) {
+        ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
+        showCompletedEvents.setEventId(singleEvent.getEventid().toString());
+        showCompletedEvents.setUserId(singleEvent.getUserid().toString());
+        showCompletedEvents.setEventName(singleEvent.getEventname());
+        showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
+        return showCompletedEvents;
     }
 }
