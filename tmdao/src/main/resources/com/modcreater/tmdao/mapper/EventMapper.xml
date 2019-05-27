@@ -10,7 +10,7 @@
     <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
             insert into singleevent values
             (null ,
-            #{eventid} ,
+            #{eventid},
             #{userid},
             #{eventname},
             #{starttime},
@@ -263,7 +263,7 @@
                 (startTime &gt;= #{starttime} and endTime &lt;= #{endtime}))
             </if>
         </where>
-        and isLoop = 0
+        and isLoop = 0 and userId = #{userid}
         order by year desc,month desc,day desc
         <if test="pageSize != 0 and pageSize != ''">
             limit #{pageNum},#{pageSize}
@@ -349,11 +349,43 @@
         where userId=#{userId} and eventId=#{eventId} and isOverdue &lt;&gt; 2
     </select>
     <select id="queryDraft" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select eventId,userId,eventName,day,month,year
-        from singleevent
-        where userId = #{userId}
-        and isOverdue = #{isOverdue}
-        order by year desc,month desc,day desc limit #{pageNum},#{pageSize}
+        select eventId,userId,eventName,person,day,month,year
+        from draft
+        <where>
+            1 = 1
+            <if test="eventname != null and eventname != ''">
+                and eventName like "%"#{eventname}"%"
+            </if>
+            <if test="type != null and type != ''">
+                and type = #{type}
+            </if>
+            <if test="level != null and level != ''">
+                and level = #{level}
+            </if>
+            <if test="year != null and year != ''">
+                and year = #{year}
+            </if>
+            <if test="month != null and month != ''">
+                and month = #{month}
+            </if>
+            <if test="day != null and day != ''">
+                and day = #{day}
+            </if>
+            <if test="isOverdue != null and isOverdue != ''">
+                and isOverdue = #{isOverdue}
+            </if>
+            <if test="starttime != null and starttime != 0 and endtime != null and endtime != 0">
+                and ((startTime &gt;= #{starttime} and startTime &lt;= #{endtime}) or
+                (endTime &gt;= #{starttime} and endTime &lt;= #{endtime}) or
+                (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}) or
+                (startTime &gt;= #{starttime} and endTime &lt;= #{endtime}))
+            </if>
+        </where>
+        and isLoop = 0 and userId = #{userid}
+        order by year desc,month desc,day desc
+        <if test="pageSize != 0 and pageSize != ''">
+            limit #{pageNum},#{pageSize}
+        </if>
     </select>
 
 </mapper>

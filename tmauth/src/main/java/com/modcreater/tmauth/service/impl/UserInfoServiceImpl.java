@@ -227,15 +227,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         singleEventCondition.setPageNum((receivedEventConditions.getPageNum()-1)*receivedEventConditions.getPageSize());
         singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
-        List<SingleEvent> singleEventList;
+        List<SingleEvent> singleEventList = new ArrayList<>();
         List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
-        if ("9".equals(singleEventCondition.getIsOverdue())){
-            singleEventList = eventMapper.queryDraft(singleEventCondition);
-            for (SingleEvent singleEvent : singleEventList){
-                showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
-            }
-        }else {
+        if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("0")){
             singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
+        }else if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("1")){
+            singleEventList = eventMapper.queryDraft(singleEventCondition);
+        }else {
+            return DtoUtil.getFalseDto("searchType未接收到",40005);
         }
         if (singleEventList.size() != 0){
             for (SingleEvent singleEvent : singleEventList){
@@ -260,7 +259,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
                 }
             }
-            return DtoUtil.getSuccesWithDataDto("筛选已完成事件成功",showCompletedEventsList,100000);
+            return DtoUtil.getSuccesWithDataDto("筛选事件成功",showCompletedEventsList,100000);
         }
         return DtoUtil.getSuccessDto("没有查询到事件",200000);
     }

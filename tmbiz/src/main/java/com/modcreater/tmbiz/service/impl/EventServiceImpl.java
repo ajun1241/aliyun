@@ -625,7 +625,7 @@ public class EventServiceImpl implements EventService {
         }
         SingleEvent singleEvent = eventMapper.queryEventOne(receivedSearchOnce.getUserId(),receivedSearchOnce.getEventId());
         if (singleEvent != null){
-            return DtoUtil.getSuccesWithDataDto("查询成功",singleEvent,100000);
+            return DtoUtil.getSuccesWithDataDto("查询成功",SingleEventUtil.getShowSingleEvent(singleEvent),100000);
         }
         return DtoUtil.getSuccessDto("未查询到事件",200000);
     }

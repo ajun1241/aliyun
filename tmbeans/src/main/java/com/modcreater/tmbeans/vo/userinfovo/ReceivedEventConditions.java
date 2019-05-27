@@ -49,6 +49,10 @@ public class ReceivedEventConditions {
      */
     private String isOverdue;
     /**
+     * 要查询的类型(0:普通事件1:草稿箱)
+     */
+    private String searchType;
+    /**
      * 当前页
      */
     private Long pageNum;
