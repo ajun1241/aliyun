@@ -192,12 +192,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             receivedIdIsOverdue.setPageSize(receivedEventConditions.getPageSize());
             return showUserEvents(receivedIdIsOverdue,token);
         }
-        if (!StringUtils.hasText(receivedEventConditions.getStartTime())){
-            return DtoUtil.getFalseDto("开始时间不能为空",40001);
-        }
-        if (!StringUtils.hasText(receivedEventConditions.getEndTime())){
-            return DtoUtil.getFalseDto("结束时间不能为空",40004);
-        }
         QueryEventsCondition singleEventCondition = new QueryEventsCondition();
         singleEventCondition.setEventname(receivedEventConditions.getEventName());
         singleEventCondition.setType(Long.valueOf(receivedEventConditions.getEventType()));

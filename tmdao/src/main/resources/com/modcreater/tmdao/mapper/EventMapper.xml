@@ -234,8 +234,9 @@
         select eventId,userId,eventName,day,month,year
         from singleevent
         <where>
+            1 = 1
             <if test="eventname != null and eventname != ''">
-                eventName like "%"#{eventname}"%"
+                and eventName like "%"#{eventname}"%"
             </if>
             <if test="type != null and type != ''">
                 and type = #{type}
@@ -244,7 +245,7 @@
                 and level = #{level}
             </if>
             <if test="person != null and person != ''">
-                and person = #{person}
+                and #{person} in person
             </if>
             <if test="year != null and year != ''">
                 and year = #{year}
