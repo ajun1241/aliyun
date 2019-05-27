@@ -19,5 +19,26 @@ public interface UserServiceMapper {
      * @param userId
      * @return
      */
-    int getSearchServie(String userId);
+    int getSearchService(String userId);
+
+    /**
+     * 判断用户是否开启了好友权限
+     * @param userId
+     * @return
+     */
+    int getFriendService(String userId);
+
+    /**
+     * 判断用户是否开启了年报权限
+     * @param userId
+     * @return
+     */
+    int getAnnualReportingService(String userId);
+
+    /**
+     * 判断用户是否开启了备份权限
+     * @param userId
+     * @return
+     */
+    int getBackupService(String userId);
 }
