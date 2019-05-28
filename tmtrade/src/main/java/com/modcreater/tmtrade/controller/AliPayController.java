@@ -90,7 +90,7 @@ public class AliPayController {
         model.setSubject("手机端"+userOrder.getOrderTitle()+"移动支付");
         model.setTotalAmount(userOrder.getPaymentAmount().toString());
         model.setBody("您花费"+userOrder.getPaymentAmount()+"元");
-        model.setTimeExpire("30m");
+        model.setTimeoutExpress("30m");
         model.setProductCode("QUICK_MSECURITY_PAY");
         model.setSellerId(SELLER_ID);
         request.setBizModel(model);
