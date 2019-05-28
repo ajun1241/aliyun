@@ -302,9 +302,53 @@
         select count(id) from singleevent where userId = #{userId} and isOverdue in (1,0)
     </select>
 
-    <update id="updateDraft" parameterType="com.modcreater.tmbeans.vo.eventvo.DraftVo" >
-        /*update draft set `data`=concat(`data`,#{data})
-        where phoneNum=#{phoneNum}*/
+    <update id="updateDraft" parameterType="com.modcreater.tmbeans.pojo.SingleEvent" >
+        update draft
+            <set>
+                <if test="eventName != null and eventName !='' ">
+                    eventName=#{eventName}
+                </if>
+                <if test="startTime != null and startTime !='' ">
+                    startTime=#{startTime}
+                </if>
+                <if test="endTime != null and endTime !='' ">
+                    endTime=#{endTime}
+                </if>
+                <if test="address != null and address !='' ">
+                    address=#{address}
+                </if>
+                <if test="level > 0 ">
+                    level=#{level}
+                </if>
+                <if test="remindTime != null and remindTime !='' ">
+                    remindTime=#{remindTime}
+                </if>
+                <if test="remarks != null and remarks !='' ">
+                    remarks=#{remarks}
+                </if>
+                <if test="person != null and person !='' ">
+                    person=#{person}
+                </if>
+                <if test="repeatTime != null and repeatTime !='' ">
+                    repeatTime=#{repeatTime}
+                </if>
+                <if test="day >0 ">
+                    day=#{day}
+                </if>
+                <if test="month >0 ">
+                    month=#{month}
+                </if>
+                <if test="year >0 ">
+                    year=#{year}
+                </if>
+                <if test="type >0 ">
+                    type=#{type}
+                </if>
+                 <if test="isLoop >0 ">
+                     isLoop=#{isLoop}
+                </if>
+            </set>
+        where eventId=#{eventId} and userId=#{userId}
     </update>
 
     <select id="queryClashEventList" resultType="com.modcreater.tmbeans.pojo.SingleEvent">

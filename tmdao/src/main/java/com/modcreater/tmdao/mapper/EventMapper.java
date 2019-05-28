@@ -92,7 +92,7 @@ public interface EventMapper {
     int queryDraftCount(String userId,String eventId);
 
     /**
-     * 第二次上传修改草稿
+     * 修改草稿
      * @param draftVo
      * @return
      */

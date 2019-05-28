@@ -291,6 +291,33 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccessDto("上传草稿成功", 100000);
     }
 
+    /**
+     * 修改一个草稿
+     * @param addInviteEventVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto updDraft(AddInviteEventVo addInviteEventVo, String token) {
+        if (ObjectUtils.isEmpty(addInviteEventVo)) {
+            return DtoUtil.getFalseDto("修改草稿未获取到", 27001);
+        }
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (StringUtils.isEmpty(addInviteEventVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        SingleEvent singleEvent=JSONObject.parseObject(addInviteEventVo.getSingleEvent(),SingleEvent.class);
+        System.out.println("修改草稿:"+singleEvent.toString());
+
+        return null;
+    }
+
+
     @Override
     public Dto searchByDayEventIds(SearchEventVo searchEventVo, String token) {
         if (StringUtils.hasText(searchEventVo.getUserId())) {

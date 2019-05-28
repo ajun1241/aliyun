@@ -56,6 +56,15 @@ public interface EventService {
      * @return
      */
     Dto uplDraft(DraftVo draftVo, String token);
+
+    /**
+     * 修改一个草稿
+     * @param addInviteEventVo
+     * @param token
+     * @return
+     */
+    Dto updDraft(AddInviteEventVo addInviteEventVo,String token);
+
     /**
      * 根据日期查询事件并排序(单位:日)
      * @param searchEventVo
