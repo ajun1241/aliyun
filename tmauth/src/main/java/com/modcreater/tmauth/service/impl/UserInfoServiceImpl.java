@@ -212,7 +212,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (receivedEventConditions.getIsOverdue() != null && !"".equals(receivedEventConditions.getIsOverdue())){
             singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         }
-        if (receivedEventConditions.getStartDate().length() != 8){
+        if (!StringUtils.hasText(receivedEventConditions.getStartDate()) || receivedEventConditions.getStartDate().length() != 8){
             singleEventCondition.setEventid(System.currentTimeMillis()/1000);
         }else {
             StringBuilder startDate = new StringBuilder(receivedEventConditions.getStartDate());
