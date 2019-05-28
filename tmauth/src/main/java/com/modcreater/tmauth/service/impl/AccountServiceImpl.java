@@ -24,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -640,16 +638,19 @@ public class AccountServiceImpl implements AccountService {
      * @return
      */
     @Override
-    public Dto uplHeadImg(String userId,MultipartFile headImg,HttpServletRequest request, String token) {
+    public Dto uplHeadImg(HeadImgVo headImgVo,HttpServletRequest request, String token) {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        if (StringUtils.isEmpty(userId)){
+        if (StringUtils.isEmpty(headImgVo)){
             return DtoUtil.getFalseDto("userId未获取到",21013);
         }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(userId))){
+        if (!token.equals(stringRedisTemplate.opsForValue().get(headImgVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
+
+        MultipartFile headImg=headImgVo.getHeadImg();
+
         if (ObjectUtils.isEmpty(headImg)){
             return DtoUtil.getFalseDto("图片为空",23001);
         }

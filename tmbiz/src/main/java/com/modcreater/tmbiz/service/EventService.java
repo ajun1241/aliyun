@@ -89,6 +89,22 @@ public interface EventService {
     Dto addInviteEvent(AddInviteEventVo addInviteEventVo,String token);
 
     /**
+     * 修改一条邀请事件
+     * @param addInviteEventVo
+     * @param token
+     * @return
+     */
+    Dto updInviteEvent(AddInviteEventVo addInviteEventVo,String token);
+
+    /**
+     * 删除一条邀请事件
+     * @param receivedSearchOnce
+     * @param token
+     * @return
+     */
+    Dto delInviteEvent(ReceivedSearchOnce receivedSearchOnce,String token);
+
+    /**
      * 回应事件邀请
      * @param feedbackEventInviteVo
      * @param token
@@ -130,6 +146,8 @@ public interface EventService {
 
     /**
      * 回应事件支持
+     * @param feedbackEventBackerVo
+     * @param token
      * @return
      */
     Dto feedbackEventBacker(FeedbackEventBackerVo feedbackEventBackerVo,String token);

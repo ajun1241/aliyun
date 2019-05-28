@@ -21,12 +21,6 @@ public class AccountController {
     @Resource
     private AccountService userService;
 
-   /* @PostMapping("dologin")
-    @ApiOperation("登录")
-    public Dto dologin(@RequestBody LoginVo loginVo){
-        return userService.doLogin(loginVo);
-    }*/
-
     @PostMapping("addpwd")
     @ApiOperation("添加密码")
     public Dto addPassword(@RequestBody AddPwdVo addPwdVo){
@@ -102,7 +96,7 @@ public class AccountController {
 
     @PostMapping("uplheadimg")
     @ApiOperation("上传头像")
-    public Dto uplHeadImg(String userId, MultipartFile image, HttpServletRequest request){
-        return userService.uplHeadImg(userId,image,request,request.getHeader("token"));
+    public Dto uplHeadImg(@RequestBody HeadImgVo headImgVo, HttpServletRequest request){
+        return userService.uplHeadImg(headImgVo,request,request.getHeader("token"));
     }
 }

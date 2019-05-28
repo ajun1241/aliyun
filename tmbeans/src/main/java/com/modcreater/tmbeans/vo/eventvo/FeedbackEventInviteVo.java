@@ -19,7 +19,6 @@ public class FeedbackEventInviteVo implements Serializable {
     private String timeUp;
     private String choose;
     private String userId;
-    private String eventId;
     /**
      * 发送邀请时的扩展数据
      */

@@ -1,5 +1,6 @@
 package com.modcreater.tmbiz.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
@@ -663,8 +664,9 @@ public class EventServiceImpl implements EventService {
         SingleEvent singleEvent=JSONObject.parseObject(addbackerVo.getSingleEvent(),SingleEvent.class);
         singleEvent.setUserid(Long.parseLong(addbackerVo.getUserId()));
         //事件时间冲突判断
-
-
+        if (eventMapper.countIdByDate(singleEvent) != 0){
+            return DtoUtil.getFalseDto("时间段冲突,无法添加",21012);
+        }
         if (eventMapper.uploadingEvents(singleEvent)==0){
             return DtoUtil.getFalseDto("事件添加失败",25001);
         }
@@ -729,15 +731,16 @@ public class EventServiceImpl implements EventService {
         }
         //保存这条事件
         SingleEvent singleEvent=JSONObject.parseObject(addInviteEventVo.getSingleEvent(),SingleEvent.class);
+        singleEvent.setUserid(Long.parseLong(addInviteEventVo.getUserId()));
         //判断是否有冲突事件
         int y=eventMapper.countIdByDate(singleEvent);
-        if (y>0){
+        boolean m=stringRedisTemplate.hasKey(addInviteEventVo.getUserId()+singleEvent.getEventid().toString());
+        if (y>0 || m){
             return DtoUtil.getFalseDto("该时间段内已有事件不能添加",21012);
         }
-        singleEvent.setUserid(Long.parseLong(addInviteEventVo.getUserId()));
         String[] persons=singleEvent.getPerson().split(",");
         String redisKey=addInviteEventVo.getUserId()+singleEvent.getEventid();
-        stringRedisTemplate.opsForValue().set(redisKey,addInviteEventVo.getSingleEvent());
+        stringRedisTemplate.opsForValue().set(redisKey,JSON.toJSONString(singleEvent));
         //生成统计表
         List<StatisticsTable> tables=new ArrayList<>();
         for (String userId:persons) {
@@ -757,13 +760,40 @@ public class EventServiceImpl implements EventService {
             RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
             String content=account.getUserName()+"邀请你参加"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+"的"+singleEvent.getEventname()+"活动;"+"时间"+Integer.parseInt(singleEvent.getStarttime())/60+":"+Integer.parseInt(singleEvent.getStarttime())%60+"至"+Integer.parseInt(singleEvent.getEndtime())/60+":"+Integer.parseInt(singleEvent.getEndtime())%60;
             System.out.println("消息内容"+content);
-            InviteMessage inviteMessage=new InviteMessage(content,"",redisKey);
+            InviteMessage inviteMessage=new InviteMessage(content,"", JSON.toJSONString(singleEvent));
             rongCloudMethodUtil.sendSystemMessage(addInviteEventVo.getUserId(),persons,inviteMessage,"","");
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("消息发送出错",26002);
         }
         return DtoUtil.getSuccessDto("消息发送成功",100000);
+    }
+
+    /**
+     * 修改一条邀请事件
+     * @param addInviteEventVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto updInviteEvent(AddInviteEventVo addInviteEventVo, String token) {
+        //发起修改请求
+        //生成投票
+        return null;
+    }
+
+    /**
+     * 删除一条邀请事件
+     * @param receivedSearchOnce
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto delInviteEvent(ReceivedSearchOnce receivedSearchOnce, String token) {
+        //从自己的时间轴删除
+        //其他参与者的事件里删除本参与者
+        //通知其他参与者
+        return null;
     }
 
     /**
@@ -787,7 +817,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("token过期请先登录",21013);
         }
         //拿到发起者的事件
-        SingleEvent singleEvent=JSONObject.parseObject(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getExtraData()),SingleEvent.class);
+        SingleEvent singleEvent=JSONObject.parseObject(feedbackEventInviteVo.getExtraData(),SingleEvent.class);
         System.out.println("22222223333333=="+singleEvent.toString());
         String[] persons=singleEvent.getPerson().split(",");
         StatisticsTable statisticsTable=new StatisticsTable();
@@ -799,7 +829,7 @@ public class EventServiceImpl implements EventService {
             List<SingleEvent> singleEvents=eventMapper.queryClashEventList(singleEvent);
             //如果有冲突反馈给该用户
             if (singleEvents.size()>0){
-                return DtoUtil.getSuccesWithDataDto("当前时间段已有事件",singleEvents,100000);
+                return DtoUtil.getFalseDto("当前时间段已有事件",21016);
             }
             //更改反馈统计表
             statisticsTable.setUserId(Long.parseLong(feedbackEventInviteVo.getUserId()));
@@ -901,7 +931,8 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("token过期请先登录",21013);
         }
         //先拿到事件
-        SingleEvent singleEvent=JSONObject.parseObject(stringRedisTemplate.opsForValue().get(eventCreatorChooseVo.getExtraData()),SingleEvent.class);
+        SingleEvent singleEvent=JSONObject.parseObject(eventCreatorChooseVo.getExtraData(),SingleEvent.class);
+        System.out.println(eventCreatorChooseVo.getExtraData());
         System.out.println("22222223333333=="+singleEvent.toString());
         RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
         String[] persons=singleEvent.getPerson().split(",");
@@ -913,16 +944,17 @@ public class EventServiceImpl implements EventService {
             String finalPerson=String.join(",",agrees);
             System.out.println("最终参与者"+finalPerson);
             singleEvent.setPerson(finalPerson);
+
+            //事件时间冲突判断
+            if (eventMapper.countIdByDate(singleEvent) != 0){
+                return DtoUtil.getFalseDto("时间段冲突,无法添加",21012);
+            }
             //把该事件添加进发起者事件列表(修改这件事)
             SingleEvent sEvent=eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
             if (!ObjectUtils.isEmpty(sEvent)){
                 //修改
                 eventMapper.alterEventsByUserId(singleEvent);
             }
-            //事件时间冲突判断
-
-
-
             eventMapper.uploadingEvents(singleEvent);
             //判断同意该事件的人，他们的事件表是否有冲突事件
             for (String userId:agrees) {
@@ -969,7 +1001,7 @@ public class EventServiceImpl implements EventService {
         }else {
             //不保留
             //删除该事件
-            boolean result=stringRedisTemplate.delete(eventCreatorChooseVo.getExtraData());
+            boolean result=stringRedisTemplate.delete(singleEvent.getUserid().toString()+singleEvent.getEventid().toString());
             if (!result){
                 return DtoUtil.getFalseDto("删除失败",21014);
             }
