@@ -13,6 +13,7 @@ import com.modcreater.tmbeans.show.ShowUserAnalysis;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
 import com.modcreater.tmdao.mapper.AccountMapper;
@@ -228,7 +229,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         singleEventCondition.setPageNum((receivedEventConditions.getPageNum()-1)*receivedEventConditions.getPageSize());
         singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
-        List<SingleEvent> singleEventList = new ArrayList<>();
+        List<SingleEvent> singleEventList;
         List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
         if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("0")){
             singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);

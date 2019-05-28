@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.OrderMapper">
+
+    <sql id="userOrders">
+        id,userId,serviceId,orderTitle,paymentAmount,createDate,payTime,payChannel,outTradeNo,orderStatus,remark
+    </sql>
+
     <insert id="addNewOrder">
         insert into userorders values
          (null,
@@ -28,5 +33,8 @@
             yearCardPrice
         </if>
         from servicefunction where id = #{serviceId}
+    </select>
+    <select id="getUserOrder" resultType="com.modcreater.tmbeans.pojo.UserOrders">
+        select <include refid="userOrders"/> from userorders where id = #{tradeId} and userId = #{userId}
     </select>
 </mapper>

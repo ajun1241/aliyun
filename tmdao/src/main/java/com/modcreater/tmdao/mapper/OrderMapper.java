@@ -29,4 +29,12 @@ public interface OrderMapper {
      * @return
      */
     int addNewOrder(UserOrders userOrders);
+
+    /**
+     * 查询用户的一条订单
+     * @param userId
+     * @param tradeId
+     * @return
+     */
+    UserOrders getUserOrder(@Param("userId") String userId,@Param("tradeId") String tradeId);
 }

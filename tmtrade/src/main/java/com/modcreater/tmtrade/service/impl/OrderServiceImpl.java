@@ -3,10 +3,12 @@ package com.modcreater.tmtrade.service.impl;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
+import com.modcreater.tmbeans.vo.trade.ReceivedUserIdTradeId;
 import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmtrade.service.OrderService;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -50,5 +52,16 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getSuccessDto("订单生成成功,请及时支付",100000);
         }
         return DtoUtil.getFalseDto("订单生成失败",60002);
+    }
+
+    @Override
+    public UserOrders getUserOrder(ReceivedUserIdTradeId receivedUserIdTradeId, String token) {
+        if (!StringUtils.hasText(token)){
+            return null;
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedUserIdTradeId.getUserId()))){
+            return null;
+        }
+        return orderMapper.getUserOrder(receivedUserIdTradeId.getUserId(),receivedUserIdTradeId.getTradeId());
     }
 }

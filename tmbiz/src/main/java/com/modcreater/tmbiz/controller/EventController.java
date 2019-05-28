@@ -2,6 +2,7 @@ package com.modcreater.tmbiz.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.eventvo.*;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbiz.service.EventService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -172,9 +173,25 @@ public class EventController {
         return eventService.addEventBacker(addbackerVo,request.getHeader("token"));
     }
 
+    /**
+     * 查询一条数据
+     * @param receivedSearchOnce
+     * @param request
+     * @return
+     */
     @PostMapping(value = "searchonce")
     public Dto searchOnce(@RequestBody ReceivedSearchOnce receivedSearchOnce,HttpServletRequest request){
         return eventService.searchOnce(receivedSearchOnce,request.getHeader("token"));
     }
 
+    /**
+     * 批量删除
+     * @param receivedDeleteEventIds
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "deleteinbatches")
+    public Dto deleteInBatches(@RequestBody ReceivedDeleteEventIds receivedDeleteEventIds, HttpServletRequest request){
+        return eventService.deleteInBatches(receivedDeleteEventIds,request.getHeader("token"));
+    }
 }

@@ -2,6 +2,7 @@ package com.modcreater.tmbiz.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.eventvo.*;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 
 /**
  * Created with IntelliJ IDEA.
@@ -141,4 +142,13 @@ public interface EventService {
      * @return
      */
     Dto searchOnce(ReceivedSearchOnce receivedSearchOnce, String token);
+
+
+    /**
+     * 根据Id的数组批量删除事件
+     * @param receivedDeleteEventIds
+     * @param token
+     * @return
+     */
+    Dto deleteInBatches(ReceivedDeleteEventIds receivedDeleteEventIds, String token);
 }

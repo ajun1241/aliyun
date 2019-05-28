@@ -29,6 +29,17 @@
             #{type},
             #{isLoop})
     </insert>
+    <update id="deleteByDeleteType">
+        update
+         <if test="deleteType == 'singleevent'">
+             singleevent
+         </if>
+         <if test="deleteType == 'draft'">
+             draft
+         </if>
+         set isOverdue = 2
+         where eventId = #{eventId}
+    </update>
 
     <select id="countIdByDate" resultType="java.lang.Integer">
         select count(id) from singleevent

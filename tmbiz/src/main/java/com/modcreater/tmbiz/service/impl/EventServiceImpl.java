@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.eventvo.*;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.*;
@@ -11,6 +12,7 @@ import io.rong.messages.TxtMessage;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
@@ -1007,4 +1009,30 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("未查询到数据",100000);
     }
 
+    @Override
+    public Dto deleteInBatches(ReceivedDeleteEventIds receivedDeleteEventIds, String token) {
+        try {
+            if (!StringUtils.hasText(token)) {
+                return DtoUtil.getFalseDto("token未获取到", 21013);
+            }
+            if (!token.equals(stringRedisTemplate.opsForValue().get(receivedDeleteEventIds.getUserId()))) {
+                return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            }
+            if (receivedDeleteEventIds.getDeleteType().equals("0")){
+                receivedDeleteEventIds.setDeleteType("singleevent");
+            }
+            if (receivedDeleteEventIds.getDeleteType().equals("1")){
+                receivedDeleteEventIds.setDeleteType("draft");
+            }
+            for (Long l : receivedDeleteEventIds.getEventIds()){
+                if (eventMapper.deleteByDeleteType(l,receivedDeleteEventIds.getDeleteType()) == 0){
+                    return DtoUtil.getFalseDto("删除失败",21016);
+                }
+            }
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("批量删除失败,请重新删除",21015);
+        }
+        return DtoUtil.getSuccessDto("批量删除成功",100000);
+    }
 }
