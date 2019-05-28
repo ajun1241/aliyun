@@ -27,7 +27,7 @@ public class AliPayConfig {
     /**
      * 支付宝公钥
      */
-    public static final String ALIPAY_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtqeK0KpKP/xujYGPzm1OmyCZ8aqOKqHHHiw6kGxToxQm7J9XnGYaFwh6GkIrlHOlaa0P9/wTNuTiWSYX/RAoE+KwGYZPsFbXI7A5ah25LV4yhy36rYJKfLpfVe9nKdWpNrxttSYll6BKoDIc/Y3f2mGORB2t/99+G2w5wv8vSWdbmYuoZi3/rF4ptxG3axCvRH031LClAi2hjGf4XmNGwprbdVlIJVYz7Yts1nutmrY0o91Tm72aQ00Dy+oKseykfYJbzO2WwvjNRCKO6ln78RrVzSJ75ftquykRlR02JVDvHMOh9g7nf2l1W/6k1HcR1/PRkm4e7VZOGCUWeOxSOQIDAQAB";
+    public static final String ALIPAY_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq0v1G5XmG71grmkRpmY8rac2rxpIZtPOAZcuBjsYtleo34jlsTqzjVU6Wif6VRGmyVluEno81KvxbDOcT/dKgmP7P/HW+EbmaenyWnvugAlI0KRFmIOPG5S8hFBkyyT8kG2smsSQ/ZEp0npCJrXYeMpVn0sAD2CJaGL3pumtgrwAk7r8LFg1r5bdbTvaeuHSXGucOAebgmoEad5bKQpq9i6NVI1GLqsgbCP9vgqKvHfGOvpLnxBzySzEn7ptKlMi9d0C7HCbReDXaTtM6inf+te0uv6qMgAiF9N5IhuFUTDtE80U9sE5BB5hl8nDGeARTDHNNWB6Ix6nnM8p+R8u7QIDAQAB";
 
     /**
      * 服务器异步通知页面路径 需http://或者https://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
