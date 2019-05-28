@@ -169,4 +169,12 @@ public interface EventService {
      * @return
      */
     Dto deleteInBatches(ReceivedDeleteEventIds receivedDeleteEventIds, String token);
+
+    /**
+     * 查询一个草稿事件
+     * @param receivedSearchOnce
+     * @param token
+     * @return
+     */
+    Dto searchDraftOnce(ReceivedSearchOnce receivedSearchOnce, String token);
 }

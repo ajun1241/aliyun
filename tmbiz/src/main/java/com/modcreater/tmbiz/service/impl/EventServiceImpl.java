@@ -1188,4 +1188,19 @@ public class EventServiceImpl implements EventService {
         }
         return DtoUtil.getSuccessDto("批量删除成功",100000);
     }
+
+    @Override
+    public Dto searchDraftOnce(ReceivedSearchOnce receivedSearchOnce, String token) {
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedSearchOnce.getUserId()))) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+        }
+        SingleEvent singleEvent = eventMapper.queryDraftOne(receivedSearchOnce.getUserId(),receivedSearchOnce.getEventId());
+        if (singleEvent != null){
+            return DtoUtil.getSuccesWithDataDto("查询成功",SingleEventUtil.getShowSingleEvent(singleEvent),100000);
+        }
+        return DtoUtil.getSuccessDto("未查询到事件",200000);
+    }
 }

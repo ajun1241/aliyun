@@ -93,10 +93,12 @@ public class AliPayController {
         model.setTimeoutExpress("30m");
         model.setProductCode("QUICK_MSECURITY_PAY");
         model.setSellerId(SELLER_ID);
+        request.setNotifyUrl(NOTIFY_URL);
         request.setBizModel(model);
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
+            System.out.println(response);
             return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功",response.getBody(),100000);
         } catch (AlipayApiException e) {
             e.printStackTrace();

@@ -32,12 +32,12 @@ public class AliPayConfig {
     /**
      * 服务器异步通知页面路径 需http://或者https://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
      */
-    public static final String NOTIFY_URL = "http:// http://bkb23i.natappfree.cc/alipay/notify_url.do";
+    public static final String NOTIFY_URL = "http://bu6d5r.natappfree.cc/alipay/notify_url.do";
 
     /**
      * 页面跳转同步通知页面路径 需http://或者https://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问 商户可以自定义同步跳转地址
      */
-    public static final String RETURN_URL = "http:// http://bkb23i.natappfree.cc/alipay/return_url.do";
+    public static final String RETURN_URL = "http://bu6d5r.natappfree.cc/alipay/return_url.do";
 
     /**
      * 请求网关地址

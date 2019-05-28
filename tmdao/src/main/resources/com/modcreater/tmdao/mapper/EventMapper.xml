@@ -399,5 +399,11 @@
             limit #{pageNum},#{pageSize}
         </if>
     </select>
+    <select id="queryDraftOne" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select
+        <include refid="Base_Column_List"/>
+        from draft
+        where userId=#{userId} and eventId=#{eventId} and isOverdue &lt;&gt; 2
+    </select>
 
 </mapper>

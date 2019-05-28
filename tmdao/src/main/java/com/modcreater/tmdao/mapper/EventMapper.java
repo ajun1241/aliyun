@@ -206,9 +206,17 @@ public interface EventMapper {
 
     /**
      * 根据删除类型删除(普通事件草稿箱)
-     * @param l
+     * @param eventId
      * @param deleteType
      * @return
      */
     int deleteByDeleteType(@Param("eventId") Long eventId,@Param("deleteType") String deleteType);
+
+    /**
+     * 查询一个草稿事件
+     * @param userId
+     * @param eventId
+     * @return
+     */
+    SingleEvent queryDraftOne(String userId, String eventId);
 }

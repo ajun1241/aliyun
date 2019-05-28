@@ -206,6 +206,11 @@ public class EventController {
         return eventService.searchOnce(receivedSearchOnce,request.getHeader("token"));
     }
 
+    @PostMapping(value = "searchdraftonce")
+    public Dto searchDraftOnce(@RequestBody ReceivedSearchOnce receivedSearchOnce,HttpServletRequest request){
+        return eventService.searchDraftOnce(receivedSearchOnce,request.getHeader("token"));
+    }
+
     /**
      * 批量删除
      * @param receivedDeleteEventIds
