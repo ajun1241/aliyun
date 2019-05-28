@@ -74,8 +74,7 @@ public class AliPayController {
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            System.out.println(response.getBody());
-            return DtoUtil.getSuccessDto("支付宝订单创建成功,正在等待回调",100000);
+            return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功",response.getBody(),100000);
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }
