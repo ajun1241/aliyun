@@ -10,11 +10,15 @@ import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserOrders;
+import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedUserIdTradeId;
+import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmtrade.config.AliPayConfig;
 import com.modcreater.tmtrade.service.OrderService;
 import com.modcreater.tmutils.DtoUtil;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -42,13 +46,32 @@ import static com.modcreater.tmtrade.config.AliPayConfig.*;
 public class AliPayController {
 
     @Resource
-    private OrderService orderService;
+    private OrderMapper orderMapper;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @PostMapping(value = "appalipay")
-    public Dto aliPayOrderSubmitted(@RequestBody ReceivedUserIdTradeId receivedUserIdTradeId, HttpServletRequest httpServletRequest) throws Exception{
-        UserOrders userOrder = orderService.getUserOrder(receivedUserIdTradeId,httpServletRequest.getHeader("token"));
-        if (ObjectUtils.isEmpty(userOrder)){
-            return DtoUtil.getFalseDto("token过期或不存在,也可能是订单未查询到",70002);
+    public Dto aliPayOrderSubmitted(@RequestBody ReceivedOrderInfo receivedOrderInfo, HttpServletRequest httpServletRequest) throws Exception{
+        String token = httpServletRequest.getHeader("token");
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        UserOrders userOrder = new UserOrders();
+        userOrder.setUserId(receivedOrderInfo.getUserId());
+        userOrder.setServiceId(receivedOrderInfo.getServiceId());
+        userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
+        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(),receivedOrderInfo.getOrderType());
+        if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0){
+            return DtoUtil.getFalseDto("订单金额错误",60001);
+        }
+        userOrder.setPaymentAmount(amount);
+        userOrder.setCreateDate(System.currentTimeMillis()/1000);
+        userOrder.setRemark(receivedOrderInfo.getUserRemark());
+        if (orderMapper.addNewOrder(userOrder) == 0){
+            return DtoUtil.getFalseDto("订单生成失败",60002);
         }
         AlipayClient alipayClient = new DefaultAlipayClient(URL, APPID, RSA_PRIVATE_KEY, FORMAT, AliPayConfig.CHARSET, ALIPAY_PUBLIC_KEY, SIGNTYPE);
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
