@@ -38,7 +38,7 @@ import static com.modcreater.tmtrade.config.AliPayConfig.*;
  * Time: 17:42
  */
 @RestController
-@RequestMapping(value = "/api/alipay/")
+@RequestMapping(value = "/pay/")
 public class AliPayController {
 
     @Resource
@@ -81,7 +81,7 @@ public class AliPayController {
         return DtoUtil.getFalseDto("支付宝订单创建异常",70001);
     }
 
-    @PostMapping(value = "notify_url")
+    /*@PostMapping(value = "notify_url")
     public String notify(HttpServletRequest request, HttpServletResponse response){
         Map<String, String> params = new HashMap<String, String>();
         Map<String, String[]> requestParams = request.getParameterMap();
@@ -143,6 +143,6 @@ public class AliPayController {
             System.err.println("验签失败");
             return "fail";
         }
-    }
+    }*/
 
 }
