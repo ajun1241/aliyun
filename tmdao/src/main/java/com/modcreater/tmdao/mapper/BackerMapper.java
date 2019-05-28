@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.Backers;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -18,4 +19,11 @@ public interface BackerMapper {
      * @return
      */
     int addBackers(String userId,String[] backerId,String eventId);
+
+    /**
+     * 修改支持者回应
+     * @param backers
+     * @return
+     */
+    int updateBacker(Backers backers);
 }

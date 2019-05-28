@@ -182,6 +182,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
+        System.out.println("查询草稿箱");
         //此处判断用户是否开启了该项服务
         if (userServiceMapper.getSearchService(receivedEventConditions.getUserId()) != 1){
             return DtoUtil.getSuccessDto("抱歉,您还没有开通该服务",100000);

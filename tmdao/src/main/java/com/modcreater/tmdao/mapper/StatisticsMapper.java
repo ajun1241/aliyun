@@ -29,6 +29,13 @@ public interface StatisticsMapper {
     int updateStatistics(StatisticsTable statisticsTable);
 
     /**
+     * 回滚统计表
+     * @param statisticsTable
+     * @return
+     */
+    int rollbackStatistics(StatisticsTable statisticsTable);
+
+    /**
      * 查询统计总条数
      * @param statisticsTable
      * @return

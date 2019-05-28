@@ -138,6 +138,16 @@ public class EventController {
     public Dto addInviteEvent(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){
         return eventService.addInviteEvent(addInviteEventVo,request.getHeader("token"));
     }
+    /**
+     * 修改邀请事件
+     * @param addInviteEventVo
+     * @return
+     */
+    @PostMapping(value = "updinviteevent")
+    @ApiOperation("修改邀请事件")
+    public Dto updInviteEvent(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){
+        return eventService.updInviteEvent(addInviteEventVo,request.getHeader("token"));
+    }
 
     /**
      * 创建者选择
@@ -162,7 +172,7 @@ public class EventController {
     }
 
     /**
-     * 根据天条件查询forIOS
+     *
      * @param addbackerVo
      * @param request
      * @return
@@ -171,6 +181,18 @@ public class EventController {
     @ApiOperation("添加一条事件支持")
     public Dto addEventBacker(@RequestBody AddbackerVo addbackerVo,HttpServletRequest request){
         return eventService.addEventBacker(addbackerVo,request.getHeader("token"));
+    }
+
+    /**
+     *
+     * @param feedbackEventBackerVo
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "feedbackeventbacker")
+    @ApiOperation("回应事件支持")
+    public Dto feedbackEventBacker(@RequestBody FeedbackEventBackerVo feedbackEventBackerVo,HttpServletRequest request){
+        return eventService.feedbackEventBacker(feedbackEventBackerVo,request.getHeader("token"));
     }
 
     /**

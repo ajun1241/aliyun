@@ -28,6 +28,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -68,8 +69,13 @@ public class TmbizApplicationTests {
 
     @Test
     public void test2() {
-        String s = "20190512";
-        System.out.println(DateUtil.stringToWeek(s));
+        String[] s ={"1","2","3","4","5"};
+        String[] x=new String[s.length+1];
+        for (int i = 0; i <x.length-1 ; i++) {
+            x[i]=s[i];
+        }
+        x[x.length-1]="6";
+        System.out.println(Arrays.toString(x));
     }
 
     @Test

@@ -359,6 +359,7 @@
         from singleevent
         where userId=#{userId} and eventId=#{eventId} and isOverdue &lt;&gt; 2
     </select>
+
     <select id="queryDraft" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select eventId,userId,eventName,person,day,month,year
         from draft
