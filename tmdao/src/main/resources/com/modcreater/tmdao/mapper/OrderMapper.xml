@@ -20,6 +20,20 @@
          0,
          #{remark})
     </insert>
+    <update id="updateUserOrder">
+        update userorders set
+        userId = #{userId},
+        serviceId = #{serviceId},
+        orderTitle = #{orderTitle},
+        paymentAmount = #{paymentAmount},
+        createDate = #{createDate},
+        payTime = #{payTime},
+        payChannel = #{payChannel},
+        outTradeNo = #{outTradeNo},
+        orderStatus = #{orderStatus},
+        remark = #{remark}
+        where id = #{id}
+    </update>
 
     <select id="getPaymentAmount" resultType="java.lang.Double">
         select
@@ -35,6 +49,6 @@
         from servicefunction where id = #{serviceId}
     </select>
     <select id="getUserOrder" resultType="com.modcreater.tmbeans.pojo.UserOrders">
-        select <include refid="userOrders"/> from userorders where id = #{tradeId} and userId = #{userId}
+        select <include refid="userOrders"/> from userorders where id = #{tradeId}
     </select>
 </mapper>

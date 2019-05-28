@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
  * @Date: 2019-05-27
  * Time: 14:04
  */
-@Service
 public interface OrderService {
 
     /**
@@ -32,4 +31,18 @@ public interface OrderService {
      * @return
      */
     UserOrders getUserOrder(ReceivedUserIdTradeId receivedUserIdTradeId, String token);
+
+    /**
+     * 通过订单号查询订单
+     * @param tradeId
+     * @return
+     */
+    UserOrders getUserOrderById(String tradeId);
+
+    /**
+     * 修改订单
+     * @param userOrders
+     * @return
+     */
+    int updateOrderStatusToPrepaid(UserOrders userOrders);
 }

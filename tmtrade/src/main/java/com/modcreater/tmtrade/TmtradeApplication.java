@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.modcreater.tmtrade.*"})
 @MapperScan("com.modcreater.**.mapper")
 @EnableTransactionManagement
 public class TmtradeApplication {

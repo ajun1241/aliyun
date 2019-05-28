@@ -14,6 +14,10 @@ public class AliPayConfig {
      * 商户appid
      */
     public static final String APPID = "2016092400587194";
+    /**
+     * 商家ID
+     */
+    public static final String SELLER_ID = "2088102177092670";
 
     /**
      * 私钥 pkcs8格式的

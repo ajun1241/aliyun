@@ -32,9 +32,15 @@ public interface OrderMapper {
 
     /**
      * 查询用户的一条订单
-     * @param userId
      * @param tradeId
      * @return
      */
-    UserOrders getUserOrder(@Param("userId") String userId,@Param("tradeId") String tradeId);
+    UserOrders getUserOrder(String tradeId);
+
+    /**
+     * 修改订单
+     * @param userOrders
+     * @return
+     */
+    int updateUserOrder(UserOrders userOrders);
 }

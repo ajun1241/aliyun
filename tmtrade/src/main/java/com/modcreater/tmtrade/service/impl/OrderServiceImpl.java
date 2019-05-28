@@ -8,6 +8,7 @@ import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmtrade.service.OrderService;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -21,6 +22,7 @@ import javax.annotation.Resource;
  * @Date: 2019-05-27
  * Time: 14:04
  */
+@Service
 public class OrderServiceImpl implements OrderService {
 
     @Resource
@@ -62,6 +64,22 @@ public class OrderServiceImpl implements OrderService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedUserIdTradeId.getUserId()))){
             return null;
         }
-        return orderMapper.getUserOrder(receivedUserIdTradeId.getUserId(),receivedUserIdTradeId.getTradeId());
+        return orderMapper.getUserOrder(receivedUserIdTradeId.getTradeId());
+    }
+
+    @Override
+    public UserOrders getUserOrderById(String tradeId) {
+        if (StringUtils.hasText(tradeId)){
+            return orderMapper.getUserOrder(tradeId);
+        }
+        return null;
+    }
+
+    @Override
+    public int updateOrderStatusToPrepaid(UserOrders userOrders) {
+        if (!ObjectUtils.isEmpty(userOrders)){
+            return orderMapper.updateUserOrder(userOrders);
+        }
+        return 0;
     }
 }
