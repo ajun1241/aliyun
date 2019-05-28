@@ -10,8 +10,10 @@ import io.rong.models.message.PrivateMessage;
 import io.rong.models.response.ResponseResult;
 import io.rong.models.response.TokenResult;
 import io.rong.models.user.UserModel;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -58,7 +60,9 @@ public class TmchatApplicationTests {
     }
     @Test
     public void test2() throws Exception {
-        RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
-        rongCloudMethodUtil.addBlackList("100023","100024");
+
+
+
+
     }
 }

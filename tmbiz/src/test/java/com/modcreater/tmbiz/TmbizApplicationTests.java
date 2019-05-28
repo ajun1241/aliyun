@@ -16,10 +16,15 @@ import io.rong.methods.message.history.History;
 import io.rong.methods.message.system.MsgSystem;
 import io.rong.models.message.PrivateMessage;
 import io.rong.models.response.ResponseResult;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
@@ -29,6 +34,7 @@ import java.util.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class TmbizApplicationTests {
+
 
     @Resource
     private EventMapper eventMapper;

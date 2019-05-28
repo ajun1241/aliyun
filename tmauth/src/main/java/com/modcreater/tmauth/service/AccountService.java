@@ -118,11 +118,11 @@ public interface AccountService {
 
     /**
      * 上传头像
-     * @param userId
-     * @param image
+     * @param headImgVo
+     * @param
      * @param request
      * @param token
      * @return
      */
-    Dto uplHeadImg(String userId,MultipartFile image, HttpServletRequest request, String token);
+    Dto uplHeadImg(HeadImgVo headImgVo, HttpServletRequest request, String token);
 }
