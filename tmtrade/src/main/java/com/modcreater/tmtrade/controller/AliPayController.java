@@ -75,17 +75,9 @@ public class AliPayController {
         if (orderMapper.addNewOrder(userOrder) == 0){
             return DtoUtil.getFalseDto("订单生成失败",60002);
         }
-        AlipayClient alipayClient = new DefaultAlipayClient(URL, APPID, RSA_PRIVATE_KEY, FORMAT, AliPayConfig.CHARSET, ALIPAY_PUBLIC_KEY, SIGNTYPE);
+        AlipayClient alipayClient = new DefaultAlipayClient(URL,APPID,RSA_PRIVATE_KEY,FORMAT,AliPayConfig.CHARSET,ALIPAY_PUBLIC_KEY,SIGNTYPE);
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
-        /*Map<String,String> bizModel = new LinkedHashMap<String,String>();
-        bizModel.put("app_id",APPID);
-        bizModel.put("method",URL);
-        bizModel.put("format",FORMAT);
-        bizModel.put("return_url",RETURN_URL);
-        bizModel.put("private_key",RSA_PRIVATE_KEY);
-        bizModel.put("seller_id",SELLER_ID);
-        bizModel.put("sign_type",SIGNTYPE+"");*/
         model.setOutTradeNo(userOrder.getId());
         model.setSubject("手机端"+userOrder.getOrderTitle()+"移动支付");
         model.setTotalAmount(userOrder.getPaymentAmount().toString());
