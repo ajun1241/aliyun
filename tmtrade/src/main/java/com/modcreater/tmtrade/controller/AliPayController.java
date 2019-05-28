@@ -12,6 +12,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedUserIdTradeId;
+import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
 import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmtrade.config.AliPayConfig;
 import com.modcreater.tmtrade.service.OrderService;
@@ -42,15 +43,16 @@ import static com.modcreater.tmtrade.config.AliPayConfig.*;
  * Time: 17:42
  */
 @RestController
-@RequestMapping(value = "/pay/")
 public class AliPayController {
 
     @Resource
     private OrderMapper orderMapper;
     @Resource
+    private OrderService orderService;
+    @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-    @PostMapping(value = "appalipay")
+    @PostMapping(value = "/pay/appalipay")
     public Dto aliPayOrderSubmitted(@RequestBody ReceivedOrderInfo receivedOrderInfo, HttpServletRequest httpServletRequest) throws Exception{
         String token = httpServletRequest.getHeader("token");
         if (!StringUtils.hasText(token)){
@@ -92,8 +94,6 @@ public class AliPayController {
         model.setProductCode("QUICK_MSECURITY_PAY");
         model.setSellerId(SELLER_ID);
         request.setBizModel(model);
-        request.setNotifyUrl(NOTIFY_URL);
-        request.setReturnUrl(RETURN_URL);
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
@@ -104,7 +104,12 @@ public class AliPayController {
         return DtoUtil.getFalseDto("支付宝订单创建异常",70001);
     }
 
-    /*@PostMapping(value = "notify_url")
+    @PostMapping(value = "/pay/payinfoverify")
+    public Dto payInfoVerify(@RequestBody ReceivedVerifyInfo receivedVerifyInfo, HttpServletRequest request){
+        return orderService.payInfoVerify(receivedVerifyInfo,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "api/alipay/notify_url")
     public String notify(HttpServletRequest request, HttpServletResponse response){
         Map<String, String> params = new HashMap<String, String>();
         Map<String, String[]> requestParams = request.getParameterMap();
@@ -166,6 +171,6 @@ public class AliPayController {
             System.err.println("验签失败");
             return "fail";
         }
-    }*/
+    }
 
 }

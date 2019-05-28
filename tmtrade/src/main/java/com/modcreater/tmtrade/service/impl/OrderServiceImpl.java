@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedUserIdTradeId;
+import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
 import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmtrade.service.OrderService;
 import com.modcreater.tmutils.DtoUtil;
@@ -81,5 +82,10 @@ public class OrderServiceImpl implements OrderService {
             return orderMapper.updateUserOrder(userOrders);
         }
         return 0;
+    }
+
+    @Override
+    public Dto payInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token) {
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedUserIdTradeId;
+import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
 import org.springframework.stereotype.Service;
 
 /**
@@ -45,4 +46,6 @@ public interface OrderService {
      * @return
      */
     int updateOrderStatusToPrepaid(UserOrders userOrders);
+
+    Dto payInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token);
 }
