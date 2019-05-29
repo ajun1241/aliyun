@@ -8,7 +8,7 @@
 
     <insert id="addNewOrder">
         insert into userorders values
-         (null,
+         (#{id},
          #{userId},
          #{serviceId},
          #{orderTitle},
