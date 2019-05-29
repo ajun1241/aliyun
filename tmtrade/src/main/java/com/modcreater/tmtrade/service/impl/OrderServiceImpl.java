@@ -58,17 +58,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public UserOrders getUserOrder(ReceivedUserIdTradeId receivedUserIdTradeId, String token) {
-        if (!StringUtils.hasText(token)){
-            return null;
-        }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedUserIdTradeId.getUserId()))){
-            return null;
-        }
-        return orderMapper.getUserOrder(receivedUserIdTradeId.getTradeId());
-    }
-
-    @Override
     public UserOrders getUserOrderById(String tradeId) {
         if (StringUtils.hasText(tradeId)){
             return orderMapper.getUserOrder(tradeId);
@@ -86,6 +75,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto payInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token) {
+        if (!StringUtils.hasText(token)){
+            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedVerifyInfo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        /*if (receivedVerifyInfo.getId() != null && )*/
         return null;
     }
 }

@@ -62,8 +62,8 @@ public class AliPayController {
     public static String sign_type="RSA2";
     public static String CHARSET="utf-8";
     public static String url = "https://openapi.alipay.com/gateway.do";
-    public static String NOTIFY_URL = "http://www.modcreater.com/B/index.html/alipay/notify_url.do";
-    public static String RETURN_URL = "http://www.modcreater.com/B/index.html/return_url.do";
+    public static String NOTIFY_URL = "http://7y85xn.natappfree.cc/notify_url";
+    public static String RETURN_URL = "http://7y85xn.natappfree.cc/return_url";
 
     AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY,sign_type);
     AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
@@ -177,12 +177,7 @@ public class AliPayController {
         return DtoUtil.getFalseDto("支付宝订单创建异常",70001);
     }
 
-    @PostMapping(value = "/pay/payinfoverify")
-    public Dto payInfoVerify(@RequestBody ReceivedVerifyInfo receivedVerifyInfo, HttpServletRequest request){
-        return orderService.payInfoVerify(receivedVerifyInfo,request.getHeader("token"));
-    }
-
-    @PostMapping(value = "/alipay/notify_url")
+    @PostMapping(value = "/notify_url")
     public String notify(HttpServletRequest request, HttpServletResponse response){
         System.out.println("调用了异步接口");
         Map<String, String> params = new HashMap<String, String>();
@@ -208,7 +203,7 @@ public class AliPayController {
         String trade_no = request.getParameter("trade_no");
         //卖家ID
         String seller_id = request.getParameter("seller_id");
-        if (!seller_id.equals(SELLER_ID)){
+        if (!PID.equals(seller_id)){
             return "fail";
         }
         //3.签名验证(对支付宝返回的数据验证，确定是支付宝返回的)
@@ -242,9 +237,13 @@ public class AliPayController {
             }
         } else {
             //验签不通过
-            System.err.println("验签失败");
             return "fail";
         }
+    }
+
+    @PostMapping(value = "/pay/payinfoverify")
+    public Dto payInfoVerify(@RequestBody ReceivedVerifyInfo receivedVerifyInfo, HttpServletRequest request){
+        return orderService.payInfoVerify(receivedVerifyInfo,request.getHeader("token"));
     }
 
 }

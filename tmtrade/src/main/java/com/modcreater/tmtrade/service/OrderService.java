@@ -26,14 +26,6 @@ public interface OrderService {
     Dto createNewOrder(ReceivedOrderInfo receivedOrderInfo, String token);
 
     /**
-     * 查询用户订单
-     * @param receivedUserIdTradeId
-     * @param token
-     * @return
-     */
-    UserOrders getUserOrder(ReceivedUserIdTradeId receivedUserIdTradeId, String token);
-
-    /**
      * 通过订单号查询订单
      * @param tradeId
      * @return
