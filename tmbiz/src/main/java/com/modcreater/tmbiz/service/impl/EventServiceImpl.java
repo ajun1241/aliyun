@@ -82,7 +82,6 @@ public class EventServiceImpl implements EventService {
                     singleEvent.setIsLoop(0);
                 }
                 //如果查询Id的数量为0才能继续添加的操作(单一事件)
-                System.out.println("singleEvent=======>"+singleEvent.toString());
                 if (eventMapper.countIdByDate(singleEvent) != 0){
                     return DtoUtil.getFalseDto("时间段冲突,无法添加",21012);
                 }
