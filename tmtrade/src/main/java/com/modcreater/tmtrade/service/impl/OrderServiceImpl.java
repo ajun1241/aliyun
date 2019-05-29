@@ -81,7 +81,26 @@ public class OrderServiceImpl implements OrderService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedVerifyInfo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        /*if (receivedVerifyInfo.getId() != null && )*/
-        return null;
+        boolean tradeStatus = StringUtils.hasText(receivedVerifyInfo.getId());
+        boolean serviceIdStatus = StringUtils.hasText(receivedVerifyInfo.getServiceId());
+        boolean orderTitleStatus = StringUtils.hasText(receivedVerifyInfo.getOrderTitle());
+        boolean paymentAmountStatus = receivedVerifyInfo.getPaymentAmount() != 0;
+        boolean payChannelStatus = StringUtils.hasText(receivedVerifyInfo.getPayChannel());
+        boolean outTradeNoStatus = StringUtils.hasText(receivedVerifyInfo.getOutTradeNo());
+        if (tradeStatus && serviceIdStatus && orderTitleStatus && paymentAmountStatus && payChannelStatus && outTradeNoStatus){
+            UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
+            if (!ObjectUtils.isEmpty(userOrders)){
+                tradeStatus = userOrders.getId().equals(receivedVerifyInfo.getId());
+                serviceIdStatus = userOrders.getServiceId().equals(receivedVerifyInfo.getServiceId());
+                orderTitleStatus = userOrders.getOrderTitle().equals(receivedVerifyInfo.getOrderTitle());
+                paymentAmountStatus = userOrders.getPaymentAmount().equals(userOrders.getPaymentAmount());
+                payChannelStatus = userOrders.getPayChannel().equals(receivedVerifyInfo.getPayChannel());
+                outTradeNoStatus = userOrders.getOutTradeNo().equals(receivedVerifyInfo.getOutTradeNo());
+                if (tradeStatus && serviceIdStatus && orderTitleStatus && paymentAmountStatus && payChannelStatus && outTradeNoStatus){
+                    return DtoUtil.getSuccessDto("订单支付成功",100000);
+                }
+            }
+        }
+        return DtoUtil.getFalseDto("订单支付失败",60003);
     }
 }

@@ -26,7 +26,4 @@ public class ReceivedVerifyInfo {
     private String payChannel;
 
     private String outTradeNo;
-
-    private String remark;
-
 }
