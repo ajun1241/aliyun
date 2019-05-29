@@ -47,5 +47,11 @@ public interface OrderService {
      */
     int updateOrderStatusToPrepaid(UserOrders userOrders);
 
+    /**
+     * 支付信息校验
+     * @param receivedVerifyInfo
+     * @param token
+     * @return
+     */
     Dto payInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token);
 }

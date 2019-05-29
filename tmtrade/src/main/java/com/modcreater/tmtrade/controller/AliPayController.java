@@ -17,6 +17,7 @@ import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmtrade.config.AliPayConfig;
 import com.modcreater.tmtrade.service.OrderService;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.RandomNumber;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -58,6 +59,7 @@ public class AliPayController {
     public static String sign_type="RSA2";
     public static String CHARSET="utf-8";
     public static String url = "https://openapi.alipay.com/gateway.do";
+    public static String SELLER_ID = "2088531247419714";
 
     AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY,sign_type);
     AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
@@ -75,6 +77,7 @@ public class AliPayController {
         userOrder.setUserId(receivedOrderInfo.getUserId());
         userOrder.setServiceId(receivedOrderInfo.getServiceId());
         userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
+        userOrder.setId(""+System.currentTimeMillis()/1000+ RandomNumber.getFour());
         double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(),receivedOrderInfo.getOrderType());
         if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0){
             return DtoUtil.getFalseDto("订单金额错误",60001);
@@ -93,6 +96,7 @@ public class AliPayController {
         model.setBody("您花费"+userOrder.getPaymentAmount()+"元");
         model.setTimeoutExpress("30m");
         model.setProductCode("QUICK_MSECURITY_PAY");
+        request.setNotifyUrl("http://vmbb6m.natappfree.cc/alipay/notify_url.do");
         request.setBizModel(model);
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
@@ -109,7 +113,7 @@ public class AliPayController {
         return orderService.payInfoVerify(receivedVerifyInfo,request.getHeader("token"));
     }
 
-    /*@PostMapping(value = "api/alipay/notify_url")
+    @PostMapping(value = "api/alipay/notify_url")
     public String notify(HttpServletRequest request, HttpServletResponse response){
         Map<String, String> params = new HashMap<String, String>();
         Map<String, String[]> requestParams = request.getParameterMap();
@@ -141,7 +145,7 @@ public class AliPayController {
         boolean signVerified = false;
         try {
             //3.1调用SDK验证签名
-            signVerified = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, AliPayConfig.CHARSET, SIGNTYPE);
+            signVerified = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, CHARSET, sign_type);
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }
@@ -171,6 +175,6 @@ public class AliPayController {
             System.err.println("验签失败");
             return "fail";
         }
-    }*/
+    }
 
 }
