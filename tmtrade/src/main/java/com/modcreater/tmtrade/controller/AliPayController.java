@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.alipay.api.AlipayConstants.CHARSET;
+import static com.alipay.api.AlipayConstants.*;
 import static com.modcreater.tmtrade.config.AliPayConfig.*;
 
 /**
@@ -75,7 +75,7 @@ public class AliPayController {
         if (orderMapper.addNewOrder(userOrder) == 0){
             return DtoUtil.getFalseDto("订单生成失败",60002);
         }
-        AlipayClient alipayClient = new DefaultAlipayClient(URL,APPID,RSA_PRIVATE_KEY,FORMAT,AliPayConfig.CHARSET,ALIPAY_PUBLIC_KEY,SIGNTYPE);
+        AlipayClient alipayClient = new DefaultAlipayClient(URL,APPID,RSA_PRIVATE_KEY,FORMAT_JSON,AliPayConfig.CHARSET,ALIPAY_PUBLIC_KEY,SIGN_TYPE_RSA);
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         model.setOutTradeNo(userOrder.getId());
@@ -85,12 +85,10 @@ public class AliPayController {
         model.setTimeoutExpress("30m");
         model.setProductCode("QUICK_MSECURITY_PAY");
         model.setSellerId(SELLER_ID);
-        request.setNotifyUrl(NOTIFY_URL);
         request.setBizModel(model);
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            System.out.println(response);
             return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功",response.getBody(),100000);
         } catch (AlipayApiException e) {
             e.printStackTrace();
@@ -135,7 +133,7 @@ public class AliPayController {
         boolean signVerified = false;
         try {
             //3.1调用SDK验证签名
-            signVerified = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, CHARSET, SIGNTYPE);
+            signVerified = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, AliPayConfig.CHARSET, SIGNTYPE);
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }
