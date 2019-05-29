@@ -97,6 +97,7 @@ public class AliPayController {
         model.setTimeoutExpress("30m");
         model.setProductCode("QUICK_MSECURITY_PAY");
         request.setNotifyUrl("http://vmbb6m.natappfree.cc/alipay/notify_url.do");
+        System.out.println(model.toString());
         request.setBizModel(model);
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
