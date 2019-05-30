@@ -2,6 +2,7 @@ package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.dto.MyDetail;
 import com.modcreater.tmbeans.pojo.Account;
+import com.modcreater.tmbeans.pojo.Friendship;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.vo.LoginVo;
 import com.modcreater.tmbeans.vo.usersettings.GetFriendListInSettings;
@@ -86,9 +87,20 @@ public interface AccountMapper {
      * 建立好友关系
      * @param userId
      * @param friendId
+     * @param status
      * @return
      */
-    int buildFriendship(String userId,String friendId);
+    int buildFriendship(String userId,String friendId,String status);
+
+
+    /**
+     * 修改好友关系状态
+     * @param userId
+     * @param friendId
+     * @param status
+     * @return
+     */
+    int updateFriendship(String userId,String friendId,String status);
 
     /**
      * 查询好友列表
@@ -152,4 +164,12 @@ public interface AccountMapper {
      * @return
      */
     MyDetail queryPlanByDayAndMonth(String  userId, String  day, String year , String  month);
+
+    /**
+     * 查询两人的好友详细信息
+     * @param userId
+     * @param friendId
+     * @return
+     */
+    Friendship queryFriendshipDetail(String userId,String friendId);
 }

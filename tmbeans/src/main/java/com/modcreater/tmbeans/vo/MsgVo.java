@@ -12,7 +12,18 @@ import java.io.Serializable;
  */
 @Data
 public class MsgVo implements Serializable {
+
     private String headImgUrl;
     private String userName;
     private String msgContent;
+    private String gender;
+    private String status;
+    private String friendId;
+    //日计划
+    private String dayPlan;
+    //月计划
+    private String monthPlan;
+    //已完成
+    private String finish;
+
 }

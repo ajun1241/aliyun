@@ -4,6 +4,7 @@ import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.dto.MyDetail;
 import com.modcreater.tmbeans.pojo.Account;
+import com.modcreater.tmbeans.pojo.Friendship;
 import com.modcreater.tmbeans.pojo.SystemMsgRecord;
 import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmbeans.vo.*;
@@ -21,6 +22,7 @@ import io.rong.models.response.ResponseResult;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -129,43 +131,44 @@ public class AccountServiceImpl implements AccountService {
             result.setToken(token);
             result.setUserPassword(null);
             return DtoUtil.getSuccesWithDataDto("登录成功",result,100000);
+        }else {
+            //未注册时
+            account.setUserCode(loginVo.getUserCode());
+            account.setUserType(loginVo.getUserType());
+            account.setUserName(loginVo.getUserCode());
+            account.setGender(0L);
+            try {
+                account.setBirthday(DateUtil.dateToStamp(new Date()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            account.setIDCard("");
+            account.setOfflineTime(null);
+            account.setHeadImgUrl("");
+            int add= accountMapper.register(account);
+            if (add<=0){
+                return DtoUtil.getFalseDto("注册失败！",14003);
+            }
+            result= accountMapper.checkCode(loginVo.getUserCode());
+            //注册时添加用户权限信息
+            accountMapper.insertUserRight(result.getId().toString());
+            if (ObjectUtils.isEmpty(result)){
+                return DtoUtil.getFalseDto("注册时查找用户失败",14004);
+            }
+            map.put("id",result.getId());
+            map.put("userCode",result.getUserCode());
+            map.put("isFirst",result.getIsFirst());
+            map.put("userName",result.getUserName());
+            map.put("gender",result.getGender());
+            map.put("birthday",result.getBirthday());
+            map.put("headImgUrl",result.getHeadImgUrl());
+            /*map.put("IDCard",result.getIDCard());
+            map.put("userType",result.getUserType());
+            map.put("realName",result.getRealName());
+            map.put("userAddress",result.getUserAddress());*/
+            map.put("userSign",result.getUserSign());
+            return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
         }
-        //未注册时
-        account.setUserCode(loginVo.getUserCode());
-        account.setUserType(loginVo.getUserType());
-        account.setUserName(loginVo.getUserCode());
-        account.setGender(0L);
-        try {
-            account.setBirthday(DateUtil.dateToStamp(new Date()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        account.setIDCard("");
-        account.setOfflineTime(null);
-        account.setHeadImgUrl("");
-        int add= accountMapper.register(account);
-        if (add<=0){
-            return DtoUtil.getFalseDto("注册失败！",14003);
-        }
-        result= accountMapper.checkCode(loginVo.getUserCode());
-        //注册时添加用户权限信息
-        accountMapper.insertUserRight(result.getId().toString());
-        if (ObjectUtils.isEmpty(result)){
-            return DtoUtil.getFalseDto("注册时查找用户失败",14004);
-        }
-        map.put("id",result.getId());
-        map.put("userCode",result.getUserCode());
-        map.put("isFirst",result.getIsFirst());
-        map.put("userName",result.getUserName());
-        map.put("gender",result.getGender());
-        map.put("birthday",result.getBirthday());
-        map.put("headImgUrl",result.getHeadImgUrl());
-        /*map.put("IDCard",result.getIDCard());
-        map.put("userType",result.getUserType());
-        map.put("realName",result.getRealName());
-        map.put("userAddress",result.getUserAddress());*/
-        map.put("userSign",result.getUserSign());
-        return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
     }
 
     /**
@@ -275,7 +278,9 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("好友其他信息失败",200000);
         }
         //判断这俩人是不是已经是好友
-        if (accountMapper.queryFriendRel(queFridenVo.getUserId(),account.getId().toString())>0){
+        int i=accountMapper.queryFriendRel(queFridenVo.getUserId(),account.getId().toString());
+        int j=accountMapper.queryFriendRel(account.getId().toString(),queFridenVo.getUserId());
+        if (i>0 && j>0){
             //已经是好友时
             //成就
             List<String> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
@@ -332,8 +337,69 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         //判断这俩人是不是已经是好友
-        if (accountMapper.queryFriendRel(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId())>0){
-            return DtoUtil.getFalseDto("你们已经是好友了不能添加",17006);
+        Friendship friendship=accountMapper.queryFriendshipDetail(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId());
+        Friendship friendship1=accountMapper.queryFriendshipDetail(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId());
+        //不是第一次添加
+        if (!ObjectUtils.isEmpty(friendship)|| !ObjectUtils.isEmpty(friendship1)){
+            //这时不能添加
+            if (friendship.getStatus()==20 && friendship1.getStatus()==20){
+                return DtoUtil.getFalseDto("你们已经是好友了不能添加",17006);
+            }
+            //修改好友状态
+            int i=accountMapper.updateFriendship(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),"10");
+            int j=accountMapper.updateFriendship(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"11");
+            if (i<=0||j<=0){
+                //回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("添加好友失败",16003);
+            }
+            //发送添加信息
+            ResponseResult result;
+            Map<String,String> map=new HashMap<>();
+            try {
+                sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
+                String[] friendId={sendFriendRequestVo.getFriendId()};
+                //发送消息未读条数
+                List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0");
+                Integer count;
+                if (ObjectUtils.isEmpty(systemMsgRecordList)){
+                    count=1;
+                }else {
+                    count=systemMsgRecordList.size()+1;
+                }
+                ContactNtfMessage contactNtfMessage=new ContactNtfMessage("",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
+                result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
+                if (result.getCode()!=200){
+                    return DtoUtil.getFalseDto("发送请求失败",17002);
+                }
+                //消息保存在服务器
+                map.put("userId",sendFriendRequestVo.getFriendId());
+                map.put("msgContent",contactNtfMessage.getMessage());
+                map.put("msgType","newFriend");
+                map.put("fromId",sendFriendRequestVo.getUserId());
+                SystemMsgRecord systemMsgRecord=new SystemMsgRecord();
+                systemMsgRecord.setUserId(Long.parseLong(sendFriendRequestVo.getFriendId()));
+                systemMsgRecord.setFromId(Long.parseLong(sendFriendRequestVo.getUserId()));
+                systemMsgRecord.setMsgType("newFriend");
+                if (systemMsgMapper.queryMsgByUserIdFriendIdMsgType(systemMsgRecord)==0){
+                    //第一次发送
+                    systemMsgMapper.addNewMsg(map);
+                }else {
+                    //多次发送
+                    systemMsgMapper.updateUnreadMsg(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"0",sendFriendRequestVo.getContent());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return DtoUtil.getFalseDto("出现错误了",233);
+            }
+        }
+        //建立好友关系(10:请求  11：被请求)
+        int i=accountMapper.buildFriendship(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),"10");
+        int j=accountMapper.buildFriendship(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"11");
+        if (i<=0||j<=0){
+            //回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("添加好友失败",16003);
         }
         //发送添加信息
         ResponseResult result;
@@ -341,7 +407,15 @@ public class AccountServiceImpl implements AccountService {
         try {
             sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
             String[] friendId={sendFriendRequestVo.getFriendId()};
-            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("","",sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
+            //发送消息未读条数
+            List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0");
+            Integer count;
+            if (ObjectUtils.isEmpty(systemMsgRecordList)){
+                count=1;
+            }else {
+                count=systemMsgRecordList.size()+1;
+            }
+            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
             result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送请求失败",17002);
@@ -360,7 +434,7 @@ public class AccountServiceImpl implements AccountService {
                 systemMsgMapper.addNewMsg(map);
             }else {
                 //多次发送
-                systemMsgMapper.updateUnreadMsg(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"0");
+                systemMsgMapper.updateUnreadMsg(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"0",sendFriendRequestVo.getContent());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -387,7 +461,14 @@ public class AccountServiceImpl implements AccountService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(sendFriendResponseVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        //更新双方的status
+        //修改好友关系
+        int i=accountMapper.updateFriendship(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),"20");
+        int j=accountMapper.updateFriendship(sendFriendResponseVo.getFriendId(),sendFriendResponseVo.getUserId(),"20");
+        if (i<=0||j<=0){
+            //回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("添加好友失败",16003);
+        }
         //给请求者 发一条消息说，我同意你的请求了
         Account user = accountMapper.queryAccount(sendFriendResponseVo.getUserId());
         Account friend = accountMapper.queryAccount(sendFriendResponseVo.getFriendId());
@@ -395,13 +476,15 @@ public class AccountServiceImpl implements AccountService {
         try {
             String[] friendId={sendFriendResponseVo.getFriendId()};
             ContactNtfMessage contactNtfMessage=new ContactNtfMessage("Request",extra,sendFriendResponseVo.getUserId(), sendFriendResponseVo.getFriendId(), "我是"+user.getUserName()+"，我已经同意你的好友请求了");
-            rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),friendId,contactNtfMessage,"","");
+            ResponseResult result=rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),friendId,contactNtfMessage,"","");
+            if (result.getCode()!=200){
+                return DtoUtil.getFalseDto("发送请求失败",17002);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         ResponseResult result1;
         ResponseResult result2;
-        ResponseResult result3;
         try {
             //小灰条通知
             result1=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),new InfoNtfMessage("你已添加了"+ friend.getUserName() +"，现在可以开始聊天了。",""));
@@ -413,22 +496,13 @@ public class AccountServiceImpl implements AccountService {
             if (result2.getCode()!=200){
                 return DtoUtil.getFalseDto("发送文本result2消息失败",17004);
             }
-            result3=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getFriendId(),sendFriendResponseVo.getUserId(),new TxtMessage(friend.getUserName(),""));
-            if (result3.getCode()!=200){
-                return DtoUtil.getFalseDto("发送文本result3消息失败",17005);
-            }
+            //移除黑名单
+            rongCloudMethodUtil.removeBlackList(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId());
+            rongCloudMethodUtil.removeBlackList(sendFriendResponseVo.getFriendId(),sendFriendResponseVo.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("出现错误了",233);
         }
-        //建立好友关系
-        int i=accountMapper.buildFriendship(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId());
-        int j=accountMapper.buildFriendship(sendFriendResponseVo.getFriendId(),sendFriendResponseVo.getUserId());
-        if (i<=0||j<=0){
-            return DtoUtil.getFalseDto("添加好友失败",16003);
-        }
-        //移除黑名单
-
         return DtoUtil.getSuccessDto("添加好友成功",100000);
     }
 
@@ -571,30 +645,35 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         //判断这俩人是不是好友
-        if (accountMapper.queryFriendRel(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId())<=0){
+        int i=accountMapper.queryFriendRel(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId());
+        int j=accountMapper.queryFriendRel(deleteFriendshipVo.getFriendId(),deleteFriendshipVo.getUserId());
+        if (i<=0||j<=0){
             return DtoUtil.getFalseDto("你们不是好友不能执行相关操作",16009);
+        }
+        //双向删除
+        i=accountMapper.deleteFriendship(deleteFriendshipVo);
+        String temp=deleteFriendshipVo.getUserId();
+        deleteFriendshipVo.setUserId(deleteFriendshipVo.getFriendId());
+        deleteFriendshipVo.setFriendId(temp);
+        j=accountMapper.deleteFriendship(deleteFriendshipVo);
+        if (i<=0||j<=0){
+            //回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("删除好友失败",16008);
         }
         //加入到融云的黑名单
         try {
             rongCloudMethodUtil.addBlackList(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId());
+            rongCloudMethodUtil.addBlackList(deleteFriendshipVo.getFriendId(),deleteFriendshipVo.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("拉黑操作出错",233);
-        }
-        //双向删除
-        int i=accountMapper.deleteFriendship(deleteFriendshipVo);
-        String temp=deleteFriendshipVo.getUserId();
-        deleteFriendshipVo.setUserId(deleteFriendshipVo.getFriendId());
-        deleteFriendshipVo.setFriendId(temp);
-        int j=accountMapper.deleteFriendship(deleteFriendshipVo);
-        if (i<=0||j<=0){
-            return DtoUtil.getFalseDto("删除好友失败",16008);
         }
         return DtoUtil.getSuccessDto("删除好友成功",100000);
     }
 
     /**
-     * 查询所有未读消息
+     * 查询所有系统消息
      * @param receivedId
      * @param token
      * @return
@@ -611,24 +690,76 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         Map<String,Object> map=new HashMap<>();
+
+        Date date=new Date();
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+        String[] myDate=sdf.format(date).split("-");
+        for (int i = 0; i < myDate.length; i++) {
+            System.out.println("今天的日期"+myDate[i]);
+        }
+
+        //查询所有未读消息
+        List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"-1");
+        if (systemMsgRecordList.size()==0){
+            return DtoUtil.getFalseDto("没有好友请求消息",200000);
+        }
+        List list=new ArrayList();
+        for (SystemMsgRecord systemMsgRecord:systemMsgRecordList) {
+            System.out.println("我要的数据"+systemMsgRecord.toString());
+            MsgVo msgVo=new MsgVo();
+            //查询用户信息
+            Account account=accountMapper.queryAccount(systemMsgRecord.getFromId().toString());
+            //查询好友信息
+            Friendship friendship=accountMapper.queryFriendshipDetail(systemMsgRecord.getUserId().toString(),systemMsgRecord.getFromId().toString());
+            //日规划,月规划
+            MyDetail result=accountMapper.queryPlanByDayAndMonth(account.getId().toString(),myDate[2],myDate[0],myDate[1]);
+            //已完成
+            UserStatistics userStatistics=achievementMapper.queryUserStatistics(account.getId().toString());
+            if (ObjectUtils.isEmpty(userStatistics)|| ObjectUtils.isEmpty(result)){
+                return DtoUtil.getFalseDto("好友其他信息失败",200000);
+            }
+            msgVo.setHeadImgUrl(account.getHeadImgUrl());
+            msgVo.setUserName(account.getUserName());
+            msgVo.setMsgContent(systemMsgRecord.getMsgContent());
+            msgVo.setGender(account.getGender().toString());
+            msgVo.setStatus(friendship.getStatus().toString());
+            msgVo.setFriendId(systemMsgRecord.getFromId().toString());
+            msgVo.setDayPlan(result.getDay());
+            msgVo.setMonthPlan(result.getMonth());
+            msgVo.setFinish(userStatistics.getCompleted().toString());
+            list.add(msgVo);
+        }
+        map.put("msgList",list);
+        //修改消息状态
+        systemMsgMapper.updateUnreadMsg(receivedId.getUserId(),"","1",null);
+        return DtoUtil.getSuccesWithDataDto("好友请求消息获取成功",map,100000);
+    }
+
+
+    /**
+     * 查询所有未读条数
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto queryAllUnreadMsgCount(ReceivedId receivedId, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(receivedId)){
+            return DtoUtil.getFalseDto("查询所有未读消息数据未获取到",16007);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        Map<String,Object> map=new HashMap<>();
         List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"0");
         if (systemMsgRecordList.size()==0){
             return DtoUtil.getFalseDto("没有未读消息",200000);
         }
         map.put("count",systemMsgRecordList.size());
-        List list=new ArrayList();
-        for (SystemMsgRecord systemMsgRecord:systemMsgRecordList) {
-            MsgVo msgVo=new MsgVo();
-            Account account=accountMapper.queryAccount(systemMsgRecord.getFromId().toString());
-            msgVo.setHeadImgUrl(account.getHeadImgUrl());
-            msgVo.setUserName(account.getUserName());
-            msgVo.setMsgContent(systemMsgRecord.getMsgContent());
-            list.add(msgVo);
-        }
-        map.put("msgList",list);
-        //修改消息状态
-        systemMsgMapper.updateUnreadMsg(receivedId.getUserId(),"","1");
-        return DtoUtil.getSuccesWithDataDto("未读消息获取成功",map,100000);
+        return DtoUtil.getSuccesWithDataDto("未读消息条数获取成功",map,100000);
     }
 
     /**

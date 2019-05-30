@@ -56,7 +56,9 @@
             (SELECT COUNT(1) FROM statisticstable WHERE creatorId=#{creatorId} AND eventId=#{eventId} AND choose=2) AS noReply
          FROM statisticstable LIMIT 1
     </select>
+
     <select id="queryChooser" resultType="java.lang.String">
           select userId from statisticstable where creatorId=#{creatorId} AND eventId=#{eventId} AND choose=#{choose}
     </select>
+
 </mapper>

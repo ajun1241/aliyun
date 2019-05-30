@@ -78,6 +78,17 @@ public class EventController {
         return eventService.uplDraft(draftVo,request.getHeader("token"));
     }
 
+    /**
+     * 草稿修改
+     * @param addInviteEventVo
+     * @return
+     */
+    @RequestMapping(value = "upddraft",method = RequestMethod.POST)
+    @ApiOperation("修改草稿")
+    public Dto updDraft(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){
+        return eventService.updDraft(addInviteEventVo,request.getHeader("token"));
+    }
+
 
     /**
      * 根据"日"查找事件
@@ -194,6 +205,18 @@ public class EventController {
     public Dto feedbackEventBacker(@RequestBody FeedbackEventBackerVo feedbackEventBackerVo,HttpServletRequest request){
         return eventService.feedbackEventBacker(feedbackEventBackerVo,request.getHeader("token"));
     }
+
+    /**
+     * 将事件从事件表移除到草稿箱
+     * @param addInviteEventVo
+     * @param request
+     * @return
+     */
+    /*@PostMapping(value = "eventmovetodraft")
+    @ApiOperation("将事件从事件表移除到草稿箱")
+    public Dto eventRemoveDraft(@RequestBody AddInviteEventVo addInviteEventVo,HttpServletRequest request){
+        return eventService.eventRemoveDraft(addInviteEventVo,request.getHeader("token"));
+    }*/
 
     /**
      * 查询一条数据

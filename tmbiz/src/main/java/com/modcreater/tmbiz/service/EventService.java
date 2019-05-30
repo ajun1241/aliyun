@@ -122,12 +122,28 @@ public interface EventService {
     Dto feedbackEventInvite(FeedbackEventInviteVo feedbackEventInviteVo,String token);
 
     /**
-     * 创建者选择
+     * 回应修改事件邀请
+     * @param feedbackEventInviteVo
+     * @param token
+     * @return
+     */
+//    Dto feedbackUpdEventInvite(FeedbackEventInviteVo feedbackEventInviteVo,String token);
+
+    /**
+     * 创建事件时创建者选择
      * @param eventCreatorChooseVo
      * @param token
      * @return
      */
     Dto eventCreatorChoose(EventCreatorChooseVo eventCreatorChooseVo,String token);
+
+    /**
+     * 修改事件时创建者选择
+     * @param eventCreatorChooseVo
+     * @param token
+     * @return
+     */
+    Dto eventUpdChoose(EventCreatorChooseVo eventCreatorChooseVo,String token);
 
     /**
      * 根据天条件查询forIOS
@@ -186,4 +202,12 @@ public interface EventService {
      * @return
      */
     Dto searchDraftOnce(ReceivedSearchOnce receivedSearchOnce, String token);
+
+    /**
+     * 将事件从事件表移除到草稿箱
+     * @param addInviteEventVo
+     * @param token
+     * @return
+     */
+    Dto eventRemoveDraft(AddInviteEventVo addInviteEventVo,String token);
 }

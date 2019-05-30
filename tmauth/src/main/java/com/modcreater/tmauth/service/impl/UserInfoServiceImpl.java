@@ -4,10 +4,7 @@ import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.pojo.Achievement;
-import com.modcreater.tmbeans.pojo.SingleEvent;
-import com.modcreater.tmbeans.pojo.UserAchievement;
-import com.modcreater.tmbeans.pojo.UserStatistics;
+import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.show.ShowUserAnalysis;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
@@ -57,6 +54,10 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Resource
     private EventMapper eventMapper;
 
+
+    @Resource
+    private AccountMapper accountMapper;
+
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -75,6 +76,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         if (StringUtils.hasText(userId)){
             UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
+            Account account=accountMapper.queryAccount(userId);
             ShowUserStatistics showUserStatistics= new ShowUserStatistics();
             showUserStatistics.setCompleted(userStatistics.getCompleted());
             showUserStatistics.setUnfinished(userStatistics.getUnfinished());
@@ -85,6 +87,12 @@ public class UserInfoServiceImpl implements UserInfoService {
             result.put("userStatistics",showUserStatistics);
             //用户所有成就
             result.put("imgUrlList",imgUrlList);
+            //头像
+            result.put("headImgUrl",account.getHeadImgUrl());
+            //签名
+            result.put("userSign",account.getUserSign());
+            //昵称
+            result.put("userName",account.getUserName());
             return DtoUtil.getSuccesWithDataDto("查询用户详情成功",result,100000);
         }
         return DtoUtil.getSuccessDto("没有查询到用户信息",100000);

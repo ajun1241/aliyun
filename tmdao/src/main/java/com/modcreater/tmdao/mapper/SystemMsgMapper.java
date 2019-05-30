@@ -32,9 +32,12 @@ public interface SystemMsgMapper {
     /**
      *修改未读消息为已读
      * @param userId
+     * @param fromId
+     * @param msgContent
+     * @param msgStatus
      * @return
      */
-    int updateUnreadMsg(String userId,String fromId,String msgStatus);
+    int updateUnreadMsg(String userId,String fromId,String msgStatus,String msgContent);
 
     /**
      * 查询一条好友请求消息
@@ -42,4 +45,11 @@ public interface SystemMsgMapper {
      * @return
      */
     int queryMsgByUserIdFriendIdMsgType(SystemMsgRecord systemMsgRecord);
+
+    /**
+     * 查询一条好友请求消息详情
+     * @param systemMsgRecord
+     * @return
+     */
+    SystemMsgRecord queryMsgByUserIdFriendIdMsgTypeDetial(SystemMsgRecord systemMsgRecord);
 }

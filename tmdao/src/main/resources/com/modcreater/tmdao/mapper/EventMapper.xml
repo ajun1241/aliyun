@@ -29,6 +29,7 @@
             #{type},
             #{isLoop})
     </insert>
+
     <update id="deleteByDeleteType">
         update
          <if test="deleteType == 'singleevent'">
@@ -40,6 +41,22 @@
          set isOverdue = 2
          where eventId = #{eventId}
     </update>
+
+    <delete id="deleteSingleEvent">
+        delete from singleevent
+        where
+          eventId = #{eventid}
+        and
+          userId = #{userid}
+    </delete>
+
+    <delete id="deleteDraft">
+        delete from draft
+        where
+          eventId = #{eventid}
+        and
+          userId = #{userid}
+    </delete>
 
     <select id="countIdByDate" resultType="java.lang.Integer">
         select count(id) from singleevent
@@ -305,50 +322,50 @@
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.pojo.SingleEvent" >
         update draft
             <set>
-                <if test="eventName != null and eventName !='' ">
-                    eventName=#{eventName}
+                <if test="eventname != null and eventname !='' ">
+                    eventName=#{eventname},
                 </if>
-                <if test="startTime != null and startTime !='' ">
-                    startTime=#{startTime}
+                <if test="starttime != null and starttime !='' ">
+                    startTime=#{starttime},
                 </if>
-                <if test="endTime != null and endTime !='' ">
-                    endTime=#{endTime}
+                <if test="endtime != null and endtime !='' ">
+                    endTime=#{endtime},
                 </if>
                 <if test="address != null and address !='' ">
-                    address=#{address}
+                    address=#{address},
                 </if>
                 <if test="level > 0 ">
-                    level=#{level}
+                    level=#{level},
                 </if>
                 <if test="remindTime != null and remindTime !='' ">
-                    remindTime=#{remindTime}
+                    remindTime=#{remindTime},
                 </if>
                 <if test="remarks != null and remarks !='' ">
-                    remarks=#{remarks}
+                    remarks=#{remarks},
                 </if>
                 <if test="person != null and person !='' ">
-                    person=#{person}
+                    person=#{person},
                 </if>
-                <if test="repeatTime != null and repeatTime !='' ">
-                    repeatTime=#{repeatTime}
+                <if test="repeaTtime != null and repeaTtime !='' ">
+                    repeatTime=#{repeaTtime},
                 </if>
                 <if test="day >0 ">
-                    day=#{day}
+                    day=#{day},
                 </if>
                 <if test="month >0 ">
-                    month=#{month}
+                    month=#{month},
                 </if>
                 <if test="year >0 ">
-                    year=#{year}
+                    year=#{year},
                 </if>
                 <if test="type >0 ">
-                    type=#{type}
+                    type=#{type},
                 </if>
                  <if test="isLoop >0 ">
                      isLoop=#{isLoop}
                 </if>
             </set>
-        where eventId=#{eventId} and userId=#{userId}
+        where eventId=#{eventid} and userId=#{userid}
     </update>
 
     <select id="queryClashEventList" resultType="com.modcreater.tmbeans.pojo.SingleEvent">

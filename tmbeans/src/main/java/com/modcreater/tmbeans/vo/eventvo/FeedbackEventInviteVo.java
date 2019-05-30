@@ -17,6 +17,9 @@ public class FeedbackEventInviteVo implements Serializable {
      * 0 ：时间没到；1：时间到了
      */
     private String timeUp;
+    /**
+     * 选择（0；同意; 1：不同意; 2：未回应）
+     */
     private String choose;
     private String userId;
     /**
@@ -27,4 +30,9 @@ public class FeedbackEventInviteVo implements Serializable {
      * 拒绝理由
      */
     private String rejectContent;
+
+    /**
+     * 忽略冲突任然添加(0:拒绝；1：确认)
+     */
+    private String isHold;
 }

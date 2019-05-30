@@ -1,6 +1,7 @@
 package com.modcreater.tmbiz;
 
 //import com.modcreater.tmbeans.pojo.TestSingEvent;
+import com.alibaba.fastjson.JSON;
 import com.modcreater.tmbeans.vo.eventvo.UploadingEventVo;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
@@ -26,6 +27,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Array;
@@ -79,18 +81,34 @@ public class TmbizApplicationTests {
     }
 
     @Test
-    public void test3() {/*
-        TestSingEvent testSingEvent = new TestSingEvent();
-        SingleEvent singleEvent = new SingleEvent();
-        singleEvent.setUserid(11111L);
-        testSingEvent.setSingleEvent(singleEvent);
-        System.out.println(testSingEvent.getSingleEvent().getUserid());*/
+    public void test3() {
+        Map<String,Object> m1=new HashMap<>();
+        m1.put("1","1");
+        m1.put("2","2");
+        m1.put("3","asd");
+        m1.put("4","gd");
+        m1.put("5","dfg");
+        //原来的信息
+        Map<String,Object> m2=new HashMap<>();
+        m2.put("1","1");
+        m2.put("2","2");
+        m2.put("3","3");
+        m2.put("4","4");
+        m2.put("5","5");
+        //比较差异
+        StringBuffer different=new StringBuffer();
+        for (String key: m1.keySet()) {
+            if (!m1.get(key).equals(m2.get(key))){
+                different.append(key+"更改为"+m1.get(key)+";");
+            }
+        }
+        System.out.println(different.replace(different.length()-1,different.length(),"."));
     }
     @Test
     public void test4() {
-        UploadingEventVo uploadingEventVo=new UploadingEventVo();
-        uploadingEventVo.setUserId("10019");
-//        System.out.println(SingleEventUtil.checkLogin(uploadingEventVo).toString());
+        StringBuffer stringBuffer=new StringBuffer();
+
+        System.out.println(StringUtils.isEmpty(stringBuffer.toString()));
     }
 
     @Test

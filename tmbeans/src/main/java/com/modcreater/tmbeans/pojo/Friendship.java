@@ -3,19 +3,32 @@ package com.modcreater.tmbeans.pojo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 好友关系表
  * @Author: AJun
+ * id
+ * userId
+ * friendId
+ * invite
+ * sustain
+ * hide
+ * status
+ * cerateDate
+ * remark
  */
 @Data
 public class Friendship implements Serializable {
 
-  private long id;
-  private long userId;
-  private long friendId;
-  private long invite;
-  private long sustain;
-  private long hide;
+  private Long id;
+  private Long userId;
+  private Long friendId;
+  private Long invite;
+  private Long sustain;
+  private Long hide;
+  private Long status;
+  private Date cerateDate;
+  private String remark;
 
 }

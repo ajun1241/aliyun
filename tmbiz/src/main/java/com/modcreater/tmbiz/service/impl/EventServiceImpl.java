@@ -10,6 +10,7 @@ import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.*;
 import io.rong.messages.TxtMessage;
+import io.rong.models.response.ResponseResult;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,9 @@ public class EventServiceImpl implements EventService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private EventViceMapper eventViceMapper;
 
     @Resource
     private BackerMapper backerMapper;
@@ -174,11 +178,16 @@ public class EventServiceImpl implements EventService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(synchronousUpdateVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
+        //判断上传有没有数据
+
+
+
         //判断是否第一次上传
         int ie=eventMapper.queryEventByUserId(synchronousUpdateVo.getUserId());
         if ( ie> 0 ) {
             return DtoUtil.getFalseDto("该用户已经上传过了", 26003);
         }
+
         boolean flag=false;
         if (!StringUtils.isEmpty(synchronousUpdateVo.getDayEventList())){
             //转换集合
@@ -312,8 +321,13 @@ public class EventServiceImpl implements EventService {
         }
         SingleEvent singleEvent=JSONObject.parseObject(addInviteEventVo.getSingleEvent(),SingleEvent.class);
         System.out.println("修改草稿:"+singleEvent.toString());
-
-        return null;
+        if (ObjectUtils.isEmpty(singleEvent)){
+            return DtoUtil.getFalseDto("获取草稿失败",21111);
+        }
+        if (eventMapper.updateDraft(singleEvent)==0){
+            return DtoUtil.getFalseDto("修改草稿失败",21112);
+        }
+        return DtoUtil.getSuccessDto("修改草稿成功",10000);
     }
 
 
@@ -705,7 +719,10 @@ public class EventServiceImpl implements EventService {
             String content=account.getUserName()+"邀请你支持他在"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+"的"+singleEvent.getEventname()+"活动;"+"时间"+Integer.parseInt(singleEvent.getStarttime())/60+":"+Integer.parseInt(singleEvent.getStarttime())%60+"至"+Integer.parseInt(singleEvent.getEndtime())/60+":"+Integer.parseInt(singleEvent.getEndtime())%60+"；你将在事件开始前"+singleEvent.getRemindTime()+"收到提醒。";
             System.out.println("消息内容"+content);
             InviteMessage inviteMessage=new InviteMessage(content,"",addbackerVo.getSingleEvent());
-            rongCloudMethodUtil.sendSystemMessage(addbackerVo.getUserId(),backers,inviteMessage,"","");
+            ResponseResult result=rongCloudMethodUtil.sendSystemMessage(addbackerVo.getUserId(),backers,inviteMessage,"","");
+            if (result.getCode()!=200){
+                return DtoUtil.getFalseDto("发送消息失败",17002);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("消息发送出错",26002);
@@ -758,7 +775,10 @@ public class EventServiceImpl implements EventService {
             System.out.println("消息内容："+inviteMessage.getContent());
             String[] targetId={singleEvent.getUserid().toString()};
             try {
-                rongCloudMethodUtil.sendSystemMessage(feedbackEventBackerVo.getUserId(),targetId,inviteMessage,"","");
+                ResponseResult result=rongCloudMethodUtil.sendSystemMessage(feedbackEventBackerVo.getUserId(),targetId,inviteMessage,"","");
+                if (result.getCode()!=200){
+                    return DtoUtil.getFalseDto("发送消息失败",17002);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return DtoUtil.getFalseDto("消息发送失败",26002);
@@ -787,7 +807,10 @@ public class EventServiceImpl implements EventService {
             System.out.println("消息内容："+inviteMessage.getContent());
             String[] targetId={singleEvent.getUserid().toString()};
             try {
-                rongCloudMethodUtil.sendSystemMessage(feedbackEventBackerVo.getUserId(),targetId,inviteMessage,"","");
+                ResponseResult result=rongCloudMethodUtil.sendSystemMessage(feedbackEventBackerVo.getUserId(),targetId,inviteMessage,"","");
+                if (result.getCode()!=200){
+                    return DtoUtil.getFalseDto("发送消息失败",17002);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return DtoUtil.getFalseDto("消息发送失败",26002);
@@ -848,7 +871,10 @@ public class EventServiceImpl implements EventService {
             String content=account.getUserName()+"邀请你参加"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+"的"+singleEvent.getEventname()+"活动;"+"时间"+Integer.parseInt(singleEvent.getStarttime())/60+":"+Integer.parseInt(singleEvent.getStarttime())%60+"至"+Integer.parseInt(singleEvent.getEndtime())/60+":"+Integer.parseInt(singleEvent.getEndtime())%60;
             System.out.println("消息内容"+content);
             InviteMessage inviteMessage=new InviteMessage(content,"", JSON.toJSONString(singleEvent));
-            rongCloudMethodUtil.sendSystemMessage(addInviteEventVo.getUserId(),persons,inviteMessage,"","");
+            ResponseResult result=rongCloudMethodUtil.sendSystemMessage(addInviteEventVo.getUserId(),persons,inviteMessage,"","");
+            if (result.getCode()!=200){
+                return DtoUtil.getFalseDto("发送消息失败",17002);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("消息发送出错",26002);
@@ -876,7 +902,18 @@ public class EventServiceImpl implements EventService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21013);
         }
+        //接收到的修改信息
         SingleEvent singleEvent=JSONObject.parseObject(addInviteEventVo.getSingleEvent(),SingleEvent.class);
+        Map<String,Object> m1=SingleEvent.toMap(singleEvent);
+        //原来的信息
+        SingleEvent singleEventOld=eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
+        Map<String,Object> m2=SingleEvent.toMap(singleEventOld);
+        //比较差异
+        StringBuffer different=SingleEventUtil.eventDifferent(m1,m2);
+
+        if (StringUtils.isEmpty(different)){
+            return DtoUtil.getFalseDto("没有任何更改",29102);
+        }
         System.out.println("修改事件邀请"+singleEvent.toString());
         String redisKey=singleEvent.getUserid().toString()+singleEvent.getEventid();
         stringRedisTemplate.opsForValue().set(redisKey,JSON.toJSONString(singleEvent));
@@ -899,7 +936,7 @@ public class EventServiceImpl implements EventService {
             Account account=accountMapper.queryAccount(addInviteEventVo.getUserId());
             RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
             //内容修改
-            String content=account.getUserName()+"请求修改"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+"的"+singleEvent.getEventname()+"活动。";
+            String content=account.getUserName()+"请求修改事件"+singleEventOld.getEventname()+"："+different.replace(different.length()-1,different.length(),"。");
             System.out.println("消息内容==>"+content);
             InviteMessage inviteMessage=new InviteMessage(content,"", JSON.toJSONString(singleEvent));
             //接收人员变动
@@ -908,7 +945,10 @@ public class EventServiceImpl implements EventService {
                     persons[i]=singleEvent.getUserid().toString();
                 }
             }
-            rongCloudMethodUtil.sendSystemMessage(addInviteEventVo.getUserId(),persons,inviteMessage,"","");
+            ResponseResult result=rongCloudMethodUtil.sendSystemMessage(addInviteEventVo.getUserId(),persons,inviteMessage,"","");
+            if (result.getCode()!=200){
+                return DtoUtil.getFalseDto("发送消息失败",17002);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("消息发送出错",26002);
@@ -974,9 +1014,12 @@ public class EventServiceImpl implements EventService {
             //判断接受者的事件列表是否有冲突
             //查到冲突的事件集合
             List<SingleEvent> singleEvents=eventMapper.queryClashEventList(singleEvent);
-            //如果有冲突反馈给该用户
-            if (singleEvents.size()>0){
-                return DtoUtil.getFalseDto("当前时间段已有事件",21016);
+            //判断是否忽略冲突任然添加
+            if (Integer.parseInt(feedbackEventInviteVo.getIsHold())==0){
+                //如果有冲突反馈给该用户
+                if (singleEvents.size()>0){
+                    return DtoUtil.getFalseDto("当前时间段已有事件",21016);
+                }
             }
             //更改反馈统计表
             statisticsTable.setUserId(Long.parseLong(feedbackEventInviteVo.getUserId()));
@@ -999,7 +1042,10 @@ public class EventServiceImpl implements EventService {
                 System.out.println("消息内容："+inviteMessage.getContent());
                 String[] targetId={singleEvent.getUserid().toString()};
                 try {
-                    rongCloudMethodUtil.sendSystemMessage(feedbackEventInviteVo.getUserId(),targetId,inviteMessage,"","");
+                    ResponseResult result=rongCloudMethodUtil.sendSystemMessage(feedbackEventInviteVo.getUserId(),targetId,inviteMessage,"","");
+                    if (result.getCode()!=200){
+                        return DtoUtil.getFalseDto("发送消息失败",17002);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     return DtoUtil.getFalseDto("消息发送失败",26002);
@@ -1029,7 +1075,10 @@ public class EventServiceImpl implements EventService {
                 System.out.println("消息内容："+inviteMessage.getContent());
                 String[] targetId={singleEvent.getUserid().toString()};
                 try {
-                    rongCloudMethodUtil.sendSystemMessage(feedbackEventInviteVo.getUserId(),targetId,inviteMessage,"","");
+                    ResponseResult result=rongCloudMethodUtil.sendSystemMessage(feedbackEventInviteVo.getUserId(),targetId,inviteMessage,"","");
+                    if (result.getCode()!=200){
+                        return DtoUtil.getFalseDto("发送消息失败",17002);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     return DtoUtil.getFalseDto("消息发送失败",26002);
@@ -1047,7 +1096,10 @@ public class EventServiceImpl implements EventService {
             System.out.println("时间到，消息内容："+inviteMessage.getContent());
             String[] targetId={singleEvent.getUserid().toString()};
             try {
-                rongCloudMethodUtil.sendSystemMessage(feedbackEventInviteVo.getUserId(),targetId,inviteMessage,"","");
+                ResponseResult result=rongCloudMethodUtil.sendSystemMessage(feedbackEventInviteVo.getUserId(),targetId,inviteMessage,"","");
+                if (result.getCode()!=200){
+                    return DtoUtil.getFalseDto("发送消息失败",17002);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return DtoUtil.getFalseDto("消息发送失败",26002);
@@ -1057,8 +1109,11 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("反馈内容未识别",26010);
     }
 
+
+
+
     /**
-     * 创建者选择
+     * 创建事件时创建者选择
      * @param eventCreatorChooseVo
      * @param token
      * @return
@@ -1101,8 +1156,20 @@ public class EventServiceImpl implements EventService {
             if (!ObjectUtils.isEmpty(sEvent)){
                 //修改
                 eventMapper.alterEventsByUserId(singleEvent);
+                //在事件副表插入创建者
+                SingleEventVice singleEventVice=new SingleEventVice();
+                singleEventVice.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
+                singleEventVice.setUserId(singleEvent.getUserid());
+                singleEventVice.setEventId(singleEvent.getEventid());
+                eventViceMapper.createEventVice(singleEventVice);
             }
             eventMapper.uploadingEvents(singleEvent);
+            //在事件副表插入创建者
+            SingleEventVice singleEventVice=new SingleEventVice();
+            singleEventVice.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
+            singleEventVice.setUserId(singleEvent.getUserid());
+            singleEventVice.setEventId(singleEvent.getEventid());
+            eventViceMapper.createEventVice(singleEventVice);
             //判断同意该事件的人，他们的事件表是否有冲突事件
             for (String userId:agrees) {
                 singleEvent.setUserid(Long.parseLong(userId));
@@ -1119,26 +1186,48 @@ public class EventServiceImpl implements EventService {
                         eventMapper.withdrawEventsByUserId(deleteEventVo);
                     }
                     //把该事件添加到该好友的事件表
+                    //参与者变更(把参与者里的自己替换成创建者)
+                    singleEvent.setPerson(singleEvent.getPerson().replace(userId,eventCreatorChooseVo.getUserId()));
                     eventMapper.uploadingEvents(singleEvent);
+                    //在事件副表插入创建者
+                    SingleEventVice singleEventVice1=new SingleEventVice();
+                    singleEventVice1.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
+                    singleEventVice1.setUserId(singleEvent.getUserid());
+                    singleEventVice1.setEventId(singleEvent.getEventid());
+                    eventViceMapper.createEventVice(singleEventVice1);
                     //通知该好友事件已修改
                     TxtMessage txtMessage=new TxtMessage(account.getUserName()+"发起的事件"+singleEvent.getEventname()+"已添至你的事件表","");
                     System.out.println("消息内容："+txtMessage.getContent());
                     try {
                         String[] targetId={userId};
-                        rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(),targetId,txtMessage,"","");
+                        ResponseResult result=rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(),targetId,txtMessage,"","");
+                        if (result.getCode()!=200){
+                            return DtoUtil.getFalseDto("发送消息失败",17002);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         return DtoUtil.getFalseDto("消息发送失败",26002);
                     }
                 }
                 //不冲突直接添加
+                //参与者变更(把参与者里的自己替换成创建者)
+                singleEvent.setPerson(singleEvent.getPerson().replace(userId,eventCreatorChooseVo.getUserId()));
                 eventMapper.uploadingEvents(singleEvent);
+                //在事件副表插入创建者
+                SingleEventVice singleEventVice1=new SingleEventVice();
+                singleEventVice1.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
+                singleEventVice1.setUserId(singleEvent.getUserid());
+                singleEventVice1.setEventId(singleEvent.getEventid());
+                eventViceMapper.createEventVice(singleEventVice1);
                 //通知该好友事件已修改
                 TxtMessage txtMessage=new TxtMessage(account.getUserName()+"发起的事件"+singleEvent.getEventname()+"已添至你的事件表","");
                 System.out.println("消息内容："+txtMessage.getContent());
                 try {
                     String[] targetId={userId};
-                    rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(),targetId,txtMessage,"","");
+                    ResponseResult result=rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(),targetId,txtMessage,"","");
+                    if (result.getCode()!=200){
+                        return DtoUtil.getFalseDto("发送消息失败",17002);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     return DtoUtil.getFalseDto("消息发送失败",26002);
@@ -1156,7 +1245,145 @@ public class EventServiceImpl implements EventService {
             TxtMessage txtMessage=new TxtMessage("由"+account.getUserName()+"发起的事件"+singleEvent.getEventname()+"已被取消","");
             System.out.println("创建者选择消息内容："+txtMessage.getContent());
             try {
-                rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(),persons,txtMessage,"","");
+                ResponseResult result1=rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(),persons,txtMessage,"","");
+                if (result1.getCode()!=200){
+                    return DtoUtil.getFalseDto("发送消息失败",17002);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return DtoUtil.getFalseDto("消息发送失败",26002);
+            }
+        }
+        return DtoUtil.getSuccessDto("消息发送成功",100000);
+    }
+
+    /**
+     * 修改事件时创建者选择
+     * @param eventCreatorChooseVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto eventUpdChoose(EventCreatorChooseVo eventCreatorChooseVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(eventCreatorChooseVo)){
+            return DtoUtil.getFalseDto("创建者选择数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(eventCreatorChooseVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(eventCreatorChooseVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        //先拿到事件
+        SingleEvent singleEvent=JSONObject.parseObject(eventCreatorChooseVo.getExtraData(),SingleEvent.class);
+        Map<String,Object> m1=SingleEvent.toMap(singleEvent);
+        //原来的信息
+        SingleEvent singleEventOld=eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
+        Map<String,Object> m2=SingleEvent.toMap(singleEventOld);
+        //比较差异
+        StringBuffer different=SingleEventUtil.eventDifferent(m1,m2);
+
+        System.out.println(eventCreatorChooseVo.getExtraData());
+        System.out.println("22222223333333=="+singleEvent.toString());
+        RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+        String[] persons=singleEvent.getPerson().split(",");
+        Account account=accountMapper.queryAccount(eventCreatorChooseVo.getUserId());
+        //判断选择
+        if (Integer.parseInt(eventCreatorChooseVo.getChoose())==1){
+            //保留
+            List<String> agrees=statisticsMapper.queryChooser("1",singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
+            //把拒绝的和未回应的人的该条事件从事件表移入草稿箱
+            List<String> reject=statisticsMapper.queryChooser("0",singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
+            reject.addAll(statisticsMapper.queryChooser("2",singleEvent.getUserid().toString(),singleEvent.getEventid().toString()));
+
+
+
+
+            String finalPerson=String.join(",",agrees);
+            System.out.println("最终参与者"+finalPerson);
+            singleEvent.setPerson(finalPerson);
+            //事件时间冲突判断
+            if (eventMapper.countIdByDate(singleEvent) != 0){
+                return DtoUtil.getFalseDto("时间段冲突,无法添加",21012);
+            }
+            //修改
+            eventMapper.alterEventsByUserId(singleEvent);
+            //判断同意该事件的人，他们的事件表是否有冲突事件
+            for (String userId:agrees) {
+                singleEvent.setUserid(Long.parseLong(userId));
+                List<SingleEvent> singleEvents=eventMapper.queryClashEventList(singleEvent);
+                if (singleEvents.size()>0){
+                    for (SingleEvent se:singleEvents) {
+                        //把冲突事件移入草稿箱
+                        eventMapper.uplDraft(se);
+                        //从事件表删除
+                        DeleteEventVo deleteEventVo=new DeleteEventVo();
+                        deleteEventVo.setEventId(se.getEventid().toString());
+                        deleteEventVo.setUserId(se.getUserid().toString());
+                        deleteEventVo.setEventStatus("2");
+                        eventMapper.withdrawEventsByUserId(deleteEventVo);
+                    }
+                    //把该事件添加到该好友的事件表
+                    //参与者变更(把参与者里的自己替换成创建者)
+                    singleEvent.setPerson(singleEvent.getPerson().replace(userId,eventCreatorChooseVo.getUserId()));
+                    eventMapper.uploadingEvents(singleEvent);
+                    //通知该好友事件已修改
+                    TxtMessage txtMessage=new TxtMessage(singleEvent.getEventname()+"事件已修改为："+"："+different.replace(different.length()-1,different.length(),"。"),"");
+                    System.out.println("消息内容："+txtMessage.getContent());
+                    try {
+                        String[] targetId={userId};
+                        ResponseResult result=rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(),targetId,txtMessage,"","");
+                        if (result.getCode()!=200){
+                            return DtoUtil.getFalseDto("发送消息失败",17002);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return DtoUtil.getFalseDto("消息发送失败",26002);
+                    }
+                }
+                //不冲突直接添加
+                //参与者变更(把参与者里的自己替换成创建者)
+                singleEvent.setPerson(singleEvent.getPerson().replace(userId,eventCreatorChooseVo.getUserId()));
+                eventMapper.uploadingEvents(singleEvent);
+                //在事件副表插入创建者
+                SingleEventVice singleEventVice1=new SingleEventVice();
+                singleEventVice1.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
+                singleEventVice1.setUserId(singleEvent.getUserid());
+                singleEventVice1.setEventId(singleEvent.getEventid());
+                eventViceMapper.createEventVice(singleEventVice1);
+                //通知该好友事件已修改
+                TxtMessage txtMessage=new TxtMessage(singleEvent.getEventname()+"事件已修改为："+"："+different.replace(different.length()-1,different.length(),"。"),"");
+                System.out.println("消息内容："+txtMessage.getContent());
+                try {
+                    String[] targetId={userId};
+                    ResponseResult result=rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(),targetId,txtMessage,"","");
+                    if (result.getCode()!=200){
+                        return DtoUtil.getFalseDto("发送消息失败",17002);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return DtoUtil.getFalseDto("消息发送失败",26002);
+                }
+            }
+            return DtoUtil.getSuccessDto("消息发送成功",100000);
+        }else {
+            //不保留
+            //删除该事件
+            boolean result=stringRedisTemplate.delete(singleEvent.getUserid().toString()+singleEvent.getEventid().toString());
+            if (!result){
+                return DtoUtil.getFalseDto("删除失败",21014);
+            }
+            //通知被邀请者
+            TxtMessage txtMessage=new TxtMessage("修改事件"+singleEvent.getEventname()+"已被取消","");
+            System.out.println("创建者选择消息内容："+txtMessage.getContent());
+            try {
+                ResponseResult result1=rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(),persons,txtMessage,"","");
+                if (result1.getCode()!=200){
+                    return DtoUtil.getFalseDto("发送消息失败",17002);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return DtoUtil.getFalseDto("消息发送失败",26002);
@@ -1215,6 +1442,12 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccessDto("批量删除成功",100000);
     }
 
+    /**
+     * 查询一个草稿事件
+     * @param receivedSearchOnce
+     * @param token
+     * @return
+     */
     @Override
     public Dto searchDraftOnce(ReceivedSearchOnce receivedSearchOnce, String token) {
         if (!StringUtils.hasText(token)) {
@@ -1228,5 +1461,41 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getSuccesWithDataDto("查询成功",SingleEventUtil.getShowSingleEvent(singleEvent),100000);
         }
         return DtoUtil.getSuccessDto("未查询到事件",200000);
+    }
+
+    /**
+     * 将事件从事件表移除到草稿箱
+     * @param addInviteEventVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto eventRemoveDraft(AddInviteEventVo addInviteEventVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(addInviteEventVo)){
+            return DtoUtil.getFalseDto("创建者选择数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(addInviteEventVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        SingleEvent singleEvent=JSONObject.parseObject(addInviteEventVo.getSingleEvent(),SingleEvent.class);
+        if (ObjectUtils.isEmpty(singleEvent)){
+            return DtoUtil.getFalseDto("事件格式错误",23001);
+        }
+        //将该事件放入草稿箱
+        int i=eventMapper.uplDraft(singleEvent);
+        //将该事件从事件表彻底删除
+        int j=eventMapper.deleteSingleEvent(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
+        if (i<=0 || j<= 0){
+            //回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("事件移动到草稿箱失败",23002);
+        }
+        return DtoUtil.getSuccessDto("事件移动到草稿箱成功",100000);
     }
 }

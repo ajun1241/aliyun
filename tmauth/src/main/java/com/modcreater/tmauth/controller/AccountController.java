@@ -94,6 +94,12 @@ public class AccountController {
         return userService.queryAllUnreadMsg(receivedId,request.getHeader("token"));
     }
 
+    @PostMapping("queryallunreadmsgcount")
+    @ApiOperation("拉取所有未读消息条数")
+    public Dto queryAllUnreadMsgCount(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return userService.queryAllUnreadMsgCount(receivedId,request.getHeader("token"));
+    }
+
     @PostMapping("uplheadimg")
     @ApiOperation("上传头像")
     public Dto uplHeadImg(@RequestBody HeadImgVo headImgVo, HttpServletRequest request){

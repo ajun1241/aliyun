@@ -92,11 +92,11 @@
     </select>
 
     <insert id="buildFriendship" parameterType="String">
-        insert into friendship (userId,friendId) values (#{userId},#{friendId})
+        insert into friendship (userId,friendId,status) values (#{userId},#{friendId},#{status})
     </insert>
 
     <select id="queryFriendList"  resultType="com.modcreater.tmbeans.pojo.Account">
-        SELECT * FROM account WHERE id IN (SELECT friendId FROM friendship WHERE userId=#{userId})
+        SELECT * FROM account WHERE id IN (SELECT friendId FROM friendship WHERE userId=#{userId} and status=20)
         <if test=" pageIndex>=0 and pageSize>0">
             limit #{pageIndex},#{pageSize}
         </if>
@@ -115,15 +115,16 @@
                  hide=#{hide},
             </if>
         </set>
-        where userId=#{userId} and friendId=#{friendId}
+        where userId=#{userId} and friendId=#{friendId} and status=20
     </update>
 
     <update id="updateFriendJurisdictionForSingleCondition" statementType="STATEMENT">
-        update friendship set #{updateType} = #{status} where userId = #{userId} and friendId = #{friendsIds}
+        update friendship set #{updateType} = #{status} where userId = #{userId} and friendId = #{friendsIds} and status=20
     </update>
 
     <delete id="deleteFriendship" parameterType="com.modcreater.tmbeans.vo.uservo.FriendshipVo">
-        delete from friendship where userId=#{userId} and friendId=#{friendId}
+        update friendship set status=30
+        where userId=#{userId} and friendId=#{friendId}
     </delete>
 
     <insert id="insertUserRight" parameterType="String">
@@ -134,17 +135,25 @@
         update userright set realNameAuthentication = #{realNameAuthentication} where userId=#{userId}
     </update>
 
-
+    <update id="updateFriendship">
+        update friendship set status=#{status}
+        where userId=#{userId} and friendId=#{friendId}
+    </update>
 
     <select id="queryUserDetails" resultType="com.modcreater.tmbeans.show.userinfo.ShowUserDetails">
         select userName,userSign,headImgUrl "userHeadPortrait" from account where id = #{userId}
     </select>
 
     <select id="queryFriendRel" parameterType="String" resultType="int">
-        select count(1) from friendship where userId=#{userId} and  friendId=#{friendId}
+        select count(1) from friendship where userId=#{userId} and  friendId=#{friendId} and status=20
     </select>
     <select id="queryPlanByDayAndMonth" resultType="com.modcreater.tmbeans.dto.MyDetail" >
         SELECT (SELECT COUNT(1) FROM singleevent WHERE  userId=#{userId} AND `day`=#{day} AND `year`=#{year} AND `month`= #{month} AND isOverdue=0)AS day,
         (SELECT COUNT(1) FROM singleevent WHERE  userId=#{userId}  AND `year`=#{year} AND `month`= #{month} AND isOverdue=0)AS month FROM singleevent LIMIT 1
     </select>
+
+    <select id="queryFriendshipDetail" resultType="com.modcreater.tmbeans.pojo.Friendship">
+        select * from friendship where userId=#{userId} and friendId=#{friendId}
+    </select>
+
 </mapper>

@@ -84,7 +84,7 @@ public interface EventMapper {
     int uplDraft(SingleEvent singleEvent);
 
     /**
-     * 查询草稿
+     * 查询草稿条数
      * @param userId
      * @param eventId
      * @return
@@ -96,7 +96,7 @@ public interface EventMapper {
      * @param draftVo
      * @return
      */
-    int updateDraft(DraftVo draftVo);
+    int updateDraft(SingleEvent draftVo);
     /**
      * 根据"日"查找事件并根据事件等级(level)排序
      * @param singleEvent
@@ -198,7 +198,7 @@ public interface EventMapper {
     SingleEvent queryEventOne(String userId,String eventId);
 
     /**
-     * 查询草稿箱
+     * 查询所有草稿箱
      * @param singleEvent
      * @return
      */
@@ -219,4 +219,20 @@ public interface EventMapper {
      * @return
      */
     SingleEvent queryDraftOne(String userId, String eventId);
+
+    /**
+     * 从事件表彻底删除事件
+     * @param userId
+     * @param eventId
+     * @return
+     */
+    int deleteSingleEvent(String userId,String eventId);
+
+    /**
+     * 从草稿箱彻底删除事件
+     *@param userId
+     *@param eventId
+     * @return
+     */
+    int deleteDraft(String userId,String eventId);
 }

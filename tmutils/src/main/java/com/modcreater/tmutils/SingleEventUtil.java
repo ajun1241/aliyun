@@ -11,6 +11,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -197,5 +198,76 @@ public class SingleEventUtil {
         showCompletedEvents.setEventName(singleEvent.getEventname());
         showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
         return showCompletedEvents;
+    }
+
+    /**
+     * 用于比较两个事件差异的部分，转化为描述语句
+     * @return
+     */
+    public static StringBuffer eventDifferent(Map<String,Object> m1,Map<String,Object> m2){
+        //比较差异
+        StringBuffer different=new StringBuffer();
+        for (String key: m1.keySet()) {
+            if (!m1.get(key).equals(m2.get(key))){
+                if (("开始时间").equals(key)){
+                    different.append(key+"更改为："+Long.parseLong(m1.get(key).toString())/60+":"+Long.parseLong(m1.get(key).toString())%60+"；");
+                }else if (("结束时间").equals(key)){
+                    different.append(key+"更改为："+Long.parseLong(m1.get(key).toString())/60+":"+Long.parseLong(m1.get(key).toString())%60+"；");
+                }else if (("优先级").equals(key)){
+                    //2：不紧迫也不重要；3：紧迫但不重要；4：重要又不紧迫；5：重要又紧迫
+                    if ("2".equals(m1.get(key))){
+                        different.append(key+"更改为：不紧迫也不重要；");
+                    }else if ("3".equals(m1.get(key))){
+                        different.append(key+"更改为：紧迫但不重要；");
+                    }else if ("4".equals(m1.get(key))){
+                        different.append(key+"更改为：重要又不紧迫；");
+                    }else if ("5".equals(m1.get(key))){
+                        different.append(key+"更改为：重要又紧迫；");
+                    }
+                }else if (("重复次数").equals(key)){
+                    String[] arr=m1.get(key).toString().replace("[","").replace("]","").split(",");
+                    StringBuffer stringBuffer=new StringBuffer();
+                    for (int i = 0; i <arr.length ; i++) {
+                        if ("true".equals(arr[i])){
+                            stringBuffer.append(i+"、");
+                        }
+                    }
+                    if (StringUtils.isEmpty(stringBuffer)) {
+                        different.append(key + "更改为：不重复事件；");
+                    } else {
+                        different.append(key + "更改为：每周" + stringBuffer.replace(stringBuffer.length()-1,stringBuffer.length(),"")+ "重复；");
+                    }
+                }else if (("提醒时间").equals(key)){
+                    different.append(key + "更改为：时间开始前"+m1.get(key)+"分钟；");
+                }else if (("年").equals(key)){
+                    different.append(key + "更改为："+m1.get(key)+"年；");
+                }else if (("月").equals(key)){
+                    different.append(key + "更改为："+m1.get(key)+"月；");
+                }else if (("日").equals(key)){
+                    different.append(key + "更改为："+m1.get(key)+"日；");
+                }else if (("事件类型").equals(key)){
+                    //0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他
+                    if ("0".equals(m1.get(key))){
+                        different.append(key+"更改为：学习；");
+                    }if ("1".equals(m1.get(key))){
+                        different.append(key+"更改为：工作；");
+                    }if ("2".equals(m1.get(key))){
+                        different.append(key+"更改为：商务；");
+                    }if ("3".equals(m1.get(key))){
+                        different.append(key+"更改为：休闲；");
+                    }if ("4".equals(m1.get(key))){
+                        different.append(key+"更改为：家庭；");
+                    }if ("5".equals(m1.get(key))){
+                        different.append(key+"更改为：节日；");
+                    }if ("6".equals(m1.get(key))){
+                        different.append(key+"更改为：假期；");
+                    }if ("7".equals(m1.get(key))){
+                        different.append(key+"更改为：其他；");
+                    }
+                }
+                different.append(key+"更改为："+m1.get(key)+"；");
+            }
+        }
+        return different;
     }
 }

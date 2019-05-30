@@ -4,6 +4,8 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class SingleEvent implements Serializable {
@@ -111,5 +113,23 @@ public class SingleEvent implements Serializable {
                 ", day=" + day +
                 ", type=" + type +
                 '}';
+    }
+
+    //将对象中的属性存入集合作比较
+    public static Map<String,Object> toMap(SingleEvent singleEvent){
+        Map<String,Object> map=new HashMap<>();
+        map.put("事件名称",singleEvent.getEventname());
+        map.put("开始时间",singleEvent.getStarttime());
+        map.put("结束时间",singleEvent.getEndtime());
+        map.put("地址",singleEvent.getAddress());
+        map.put("优先级",singleEvent.getLevel());
+        map.put("备注",singleEvent.getRemarks());
+        map.put("重复次数",singleEvent.getRepeaTtime());
+        map.put("提醒时间",singleEvent.getRemindTime());
+        map.put("年",singleEvent.getYear());
+        map.put("月",singleEvent.getMonth());
+        map.put("日",singleEvent.getDay());
+        map.put("事件类型",singleEvent.getType());
+        return map;
     }
 }

@@ -6,17 +6,30 @@
     </insert>
 
     <update id="updateUnreadMsg">
-        update systemmsgrecord set msgStatus=#{msgStatus} where userId=#{userId} and msgType="newFriend"
-        <if test="fromId != null and fromId != ''">
-            and fromId=#{fromId}
-        </if>
+        update systemmsgrecord set msgStatus=#{msgStatus}
+            <if test="msgContent != null and msgContent != ''">
+                and msgContent=#{msgContent}
+            </if>
+        where userId=#{userId} and msgType="newFriend"
+            <if test="fromId != null and fromId != ''">
+                and fromId=#{fromId}
+            </if>
     </update>
 
     <select id="queryAllUnreadMsg" resultType="com.modcreater.tmbeans.pojo.SystemMsgRecord">
-        select * from systemmsgrecord where userId=#{userId} and msgStatus=#{msgStatus}
+        select * from systemmsgrecord where userId=#{userId}
+        <if test="msgStatus >=0 ">
+            and  msgStatus=#{msgStatus}
+        </if>
+        order by createDate desc
     </select>
 
     <select id="queryMsgByUserIdFriendIdMsgType" resultType="java.lang.Integer">
         select count(1) from systemmsgrecord where userId=#{userId} and fromId=#{fromId} and msgType=#{msgType}
+    </select>
+
+    <select id="queryMsgByUserIdFriendIdMsgTypeDetial"
+            resultType="com.modcreater.tmbeans.pojo.SystemMsgRecord">
+        select * from systemmsgrecord where userId=#{userId} and fromId=#{fromId} and msgType=#{msgType}
     </select>
 </mapper>

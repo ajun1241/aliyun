@@ -117,9 +117,16 @@ public interface AccountService {
     Dto queryAllUnreadMsg(ReceivedId receivedId,String token);
 
     /**
+     * 查询所有未读条数
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto queryAllUnreadMsgCount(ReceivedId receivedId,String token);
+
+    /**
      * 上传头像
      * @param headImgVo
-     * @param
      * @param request
      * @param token
      * @return
