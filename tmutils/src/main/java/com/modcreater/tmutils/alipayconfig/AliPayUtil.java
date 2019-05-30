@@ -1,4 +1,4 @@
-package com.modcreater.tmutils;
+package com.modcreater.tmutils.alipayconfig;
 
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 

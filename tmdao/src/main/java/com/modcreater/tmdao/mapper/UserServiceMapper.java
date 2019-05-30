@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Service;
 
@@ -48,4 +49,11 @@ public interface UserServiceMapper {
      * @return
      */
     int addNewUserService(String userId);
+
+    /**
+     * 获取用户服务剩余时间
+     * @param receivedOrderInfo
+     * @return
+     */
+    long getTimeRemaining(ReceivedOrderInfo receivedOrderInfo);
 }

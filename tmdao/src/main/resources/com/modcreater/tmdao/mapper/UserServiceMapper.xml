@@ -17,4 +17,7 @@
     <select id="getBackupService" resultType="java.lang.Integer">
         select backupService from userservice where userId = #{userId}
     </select>
+    <select id="getTimeRemaining" resultType="java.lang.Long">
+        select timeRemaining from serviceremainingtime where userId = #{userId} and serviceId = #{serviceId}
+    </select>
 </mapper>

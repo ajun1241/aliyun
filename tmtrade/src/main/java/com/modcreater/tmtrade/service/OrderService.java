@@ -63,4 +63,12 @@ public interface OrderService {
      * @return
      */
     Dto alipay(ReceivedOrderInfo receivedOrderInfo, String token);
+
+    /**
+     * 微信生成预付单
+     * @param receivedOrderInfo
+     * @param token
+     * @return
+     */
+    Dto wxPayOrderSubmitted(ReceivedOrderInfo receivedOrderInfo, String token) throws Exception;
 }
