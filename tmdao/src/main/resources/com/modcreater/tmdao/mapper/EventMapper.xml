@@ -438,7 +438,7 @@
             </if>
         </where>
         and isLoop = 0 and userId = #{userid}
-        order by year desc,month desc,day desc
+        order by year asc,month asc,day asc
         <if test="pageSize != 0 and pageSize != ''">
             limit #{pageNum},#{pageSize}
         </if>

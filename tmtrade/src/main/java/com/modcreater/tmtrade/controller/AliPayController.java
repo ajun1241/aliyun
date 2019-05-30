@@ -83,72 +83,20 @@ public class AliPayController {
             return DtoUtil.getFalseDto("订单生成失败",60002);
         }
 
-        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
-        model.setOutTradeNo(userOrder.getId());
-        model.setSubject("手机端"+userOrder.getOrderTitle()+"移动支付");
-        model.setTotalAmount(userOrder.getPaymentAmount().toString());
-        model.setBody("您花费"+userOrder.getPaymentAmount()+"元");
-        model.setTimeoutExpress("30m");
-        model.setProductCode("QUICK_MSECURITY_PAY");
-        request.setNotifyUrl(NOTIFY_URL);
-        System.out.println(model.toString());
-        request.setBizModel(model);
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功",response.getBody(),100000);
+            if (response.isSuccess()){
+                Map<String ,String> map = AliPayUtil.buildOrderParamMap(APP_ID,userOrder.getId(),userOrder.getOrderTitle(),"您花费"+userOrder.getPaymentAmount()+"元",userOrder.getPaymentAmount().toString());
+                String orderInfo = AliPayUtil.getSign(map,APP_PRIVATE_KEY);
+                return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功",orderInfo,100000);
+            }
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }
         return DtoUtil.getFalseDto("支付宝订单创建异常",70001);
     }
 
-    @PostMapping(value = "/pay/appalipay2")
-    public Dto aliPayOrderSubmitted2(@RequestBody ReceivedOrderInfo receivedOrderInfo, HttpServletRequest httpServletRequest) throws Exception{
-        String token = httpServletRequest.getHeader("token");
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
-        }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        UserOrders userOrder = new UserOrders();
-        userOrder.setUserId(receivedOrderInfo.getUserId());
-        userOrder.setServiceId(receivedOrderInfo.getServiceId());
-        userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
-        userOrder.setId(""+System.currentTimeMillis()/1000+ RandomNumber.getFour());
-        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(),receivedOrderInfo.getOrderType());
-        if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0){
-            return DtoUtil.getFalseDto("订单金额错误",60001);
-        }
-        String orderString = "app_id="+APP_ID+"&\n" +
-                "auth_app_id="+APP_ID+"&\n" +
-                "body=购买0.01元礼包&\n" +
-                "buyer_id="+PID+"&\n" +
-                "buyer_logon_id="+SELLER_ID+"&\n" +
-                "buyer_pay_amount="+userOrder.getPaymentAmount()+"&\n" +
-                "charset=utf-8&\n" +
-                "fund_bill_list=[{\"amount\":\""+userOrder.getPaymentAmount()+"\",\"fundChannel\":\"ALIPAYACCOUNT\"}]&\n" +
-                "gmt_create="+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+"&\n" +
-                "gmt_payment="+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+"&\n" +
-                "out_trade_no="+userOrder.getId()+"&\n" +
-                "point_amount=0.00&\n" +
-                "receipt_amount="+userOrder.getPaymentAmount()+"&\n" +
-                "seller_email="+SELLER_ID+"&\n" +
-                "seller_id="+PID+"&\n" +
-                "subject="+userOrder.getOrderTitle()+"&\n" +
-                "total_amount="+userOrder.getPaymentAmount()+"&\n" +
-                "version=1.0";
-        System.out.println(orderString);
-        try {
-            //这里和普通的接口调用不同，使用的是sdkExecute
-            AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功",orderString,100000);
-        } catch (AlipayApiException e) {
-            e.printStackTrace();
-        }
-        return DtoUtil.getFalseDto("支付宝订单创建异常",70001);
-    }
 
     @PostMapping(value = "/notify_url")
     public String notify(HttpServletRequest request, HttpServletResponse response){
