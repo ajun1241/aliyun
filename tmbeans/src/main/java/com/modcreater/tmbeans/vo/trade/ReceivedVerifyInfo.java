@@ -13,17 +13,17 @@ import lombok.Data;
 @Data
 public class ReceivedVerifyInfo {
 
-    private String userId;
-
     private String id;
 
-    private String serviceId;
-
-    private String orderTitle;
+    private String userId;
 
     private Double paymentAmount;
 
-    private String payChannel;
-
     private String outTradeNo;
+
+    private String appId;
+
+    private String sellerId;
+
+    private String appType;
 }
