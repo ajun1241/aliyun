@@ -7,6 +7,8 @@ import com.modcreater.tmbeans.vo.trade.ReceivedUserIdTradeId;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -46,4 +48,11 @@ public interface OrderService {
      * @return
      */
     Dto payInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token);
+
+    /**
+     * 支付宝异步通知
+     * @param request
+     * @return
+     */
+    String alipayNotify(HttpServletRequest request);
 }

@@ -1,5 +1,7 @@
 package com.modcreater.tmtrade.service.impl;
 
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.internal.util.AlipaySignature;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
@@ -14,6 +16,12 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import static com.modcreater.tmtrade.config.AliPayConfig.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -81,26 +89,91 @@ public class OrderServiceImpl implements OrderService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedVerifyInfo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        boolean tradeStatus = StringUtils.hasText(receivedVerifyInfo.getId());
-        boolean serviceIdStatus = StringUtils.hasText(receivedVerifyInfo.getServiceId());
-        boolean orderTitleStatus = StringUtils.hasText(receivedVerifyInfo.getOrderTitle());
-        boolean paymentAmountStatus = receivedVerifyInfo.getPaymentAmount() != 0;
-        boolean payChannelStatus = StringUtils.hasText(receivedVerifyInfo.getPayChannel());
-        boolean outTradeNoStatus = StringUtils.hasText(receivedVerifyInfo.getOutTradeNo());
-        if (tradeStatus && serviceIdStatus && orderTitleStatus && paymentAmountStatus && payChannelStatus && outTradeNoStatus){
-            UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
-            if (!ObjectUtils.isEmpty(userOrders)){
-                tradeStatus = userOrders.getId().equals(receivedVerifyInfo.getId());
-                serviceIdStatus = userOrders.getServiceId().equals(receivedVerifyInfo.getServiceId());
-                orderTitleStatus = userOrders.getOrderTitle().equals(receivedVerifyInfo.getOrderTitle());
-                paymentAmountStatus = userOrders.getPaymentAmount().equals(userOrders.getPaymentAmount());
-                payChannelStatus = userOrders.getPayChannel().equals(receivedVerifyInfo.getPayChannel());
-                outTradeNoStatus = userOrders.getOutTradeNo().equals(receivedVerifyInfo.getOutTradeNo());
-                if (tradeStatus && serviceIdStatus && orderTitleStatus && paymentAmountStatus && payChannelStatus && outTradeNoStatus){
-                    return DtoUtil.getSuccessDto("订单支付成功",100000);
+        UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
+        if (userOrders.getOrderStatus().equals("1")){
+            boolean tradeStatus = StringUtils.hasText(receivedVerifyInfo.getId());
+            boolean serviceIdStatus = StringUtils.hasText(receivedVerifyInfo.getServiceId());
+            boolean orderTitleStatus = StringUtils.hasText(receivedVerifyInfo.getOrderTitle());
+            boolean paymentAmountStatus = receivedVerifyInfo.getPaymentAmount() != 0;
+            boolean payChannelStatus = StringUtils.hasText(receivedVerifyInfo.getPayChannel());
+            boolean outTradeNoStatus = StringUtils.hasText(receivedVerifyInfo.getOutTradeNo());
+            if (tradeStatus && serviceIdStatus && orderTitleStatus && paymentAmountStatus && payChannelStatus && outTradeNoStatus){
+                if (!ObjectUtils.isEmpty(userOrders)){
+                    tradeStatus = userOrders.getId().equals(receivedVerifyInfo.getId());
+                    serviceIdStatus = userOrders.getServiceId().equals(receivedVerifyInfo.getServiceId());
+                    orderTitleStatus = userOrders.getOrderTitle().equals(receivedVerifyInfo.getOrderTitle());
+                    paymentAmountStatus = userOrders.getPaymentAmount().equals(userOrders.getPaymentAmount());
+                    payChannelStatus = userOrders.getPayChannel().equals(receivedVerifyInfo.getPayChannel());
+                    outTradeNoStatus = userOrders.getOutTradeNo().equals(receivedVerifyInfo.getOutTradeNo());
+                    if (tradeStatus && serviceIdStatus && orderTitleStatus && paymentAmountStatus && payChannelStatus && outTradeNoStatus){
+                        return DtoUtil.getSuccessDto("订单支付成功",100000);
+                    }
                 }
             }
         }
         return DtoUtil.getFalseDto("订单支付失败",60003);
+    }
+
+    @Override
+    public String alipayNotify(HttpServletRequest request) {
+        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String[]> requestParams = request.getParameterMap();
+        //1.从支付宝回调的request域中取值
+        for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
+            String name = iter.next();
+            String[] values = requestParams.get(name);
+            String valueStr = "";
+            for (int i = 0; i < values.length; i++) {
+                valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
+            }
+            // 乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
+            // valueStr = new String(valueStr.getBytes("ISO-8859-1"), "gbk");
+            params.put(name, valueStr);
+        }
+        //2.封装必须参数
+        // 商户订单号
+        String outTradeNo = request.getParameter("out_trade_no");
+        //交易状态
+        String tradeStatus = request.getParameter("trade_status");
+        //支付宝流水号
+        String tradeNo = request.getParameter("trade_no");
+        //卖家ID
+        String sellerId = request.getParameter("seller_id");
+        if (!PID.equals(sellerId)){
+            return "fail";
+        }
+        //3.签名验证(对支付宝返回的数据验证，确定是支付宝返回的)
+        boolean signVerified = false;
+        try {
+            //3.1调用SDK验证签名
+            signVerified = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, CHARSET, sign_type);
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+        //4.对验签进行处理
+        //验签通过
+        if (signVerified) {
+            //只处理支付成功的订单: 修改交易表状态,支付成功
+            //支付完成
+            if(tradeStatus.equals("TRADE_SUCCESS")) {
+                UserOrders userOrders = getUserOrderById(outTradeNo);
+                userOrders.setOrderStatus("1");
+                userOrders.setPayTime(String.valueOf(System.currentTimeMillis()/1000));
+                userOrders.setPayChannel("AliPay");
+                userOrders.setOutTradeNo(tradeNo);
+                //更新交易表中状态
+                int returnResult = updateOrderStatusToPrepaid(userOrders);
+                if(returnResult>0){
+                    return "success";
+                }else{
+                    return "fail";
+                }
+            }else{
+                return "fail";
+            }
+        } else {
+            //验签不通过
+            return "fail";
+        }
     }
 }
