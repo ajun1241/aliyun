@@ -82,6 +82,16 @@ public class AliPayController {
         if (orderMapper.addNewOrder(userOrder) == 0){
             return DtoUtil.getFalseDto("订单生成失败",60002);
         }
+        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+        model.setOutTradeNo(userOrder.getId());
+        model.setSubject("手机端"+userOrder.getOrderTitle()+"移动支付");
+        model.setTotalAmount(userOrder.getPaymentAmount().toString());
+        model.setBody("您花费"+userOrder.getPaymentAmount()+"元");
+        model.setTimeoutExpress("30m");
+        model.setProductCode("QUICK_MSECURITY_PAY");
+        request.setNotifyUrl(NOTIFY_URL);
+        System.out.println(model.toString());
+        request.setBizModel(model);
 
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
