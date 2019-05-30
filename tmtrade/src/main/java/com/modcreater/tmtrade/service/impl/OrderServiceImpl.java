@@ -140,13 +140,14 @@ public class OrderServiceImpl implements OrderService {
         //卖家ID
         String sellerId = request.getParameter("seller_id");
         if (!PID.equals(sellerId)){
+            System.out.println("sellerId验证失败");
             return "fail";
         }
         //3.签名验证(对支付宝返回的数据验证，确定是支付宝返回的)
         boolean signVerified = false;
         try {
             //3.1调用SDK验证签名
-            signVerified = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, CHARSET, sign_type);
+            signVerified = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, "GBK", sign_type);
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }
@@ -166,13 +167,16 @@ public class OrderServiceImpl implements OrderService {
                 if(returnResult>0){
                     return "success";
                 }else{
+                    System.out.println("订单状态修改失败");
                     return "fail";
                 }
             }else{
+                System.out.println("支付失败");
                 return "fail";
             }
         } else {
             //验签不通过
+            System.out.println("验签失败");
             return "fail";
         }
     }
