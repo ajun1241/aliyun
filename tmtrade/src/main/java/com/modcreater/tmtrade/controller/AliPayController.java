@@ -49,62 +49,11 @@ import static com.modcreater.tmtrade.config.AliPayConfig.NOTIFY_URL;
 public class AliPayController {
 
     @Resource
-    private OrderMapper orderMapper;
-    @Resource
     private OrderService orderService;
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
-
-    AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY,sign_type);
-    AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
 
     @PostMapping(value = "/pay/appalipay")
     public Dto aliPayOrderSubmitted(@RequestBody ReceivedOrderInfo receivedOrderInfo, HttpServletRequest httpServletRequest) throws Exception{
-        String token = httpServletRequest.getHeader("token");
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
-        }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        UserOrders userOrder = new UserOrders();
-        userOrder.setUserId(receivedOrderInfo.getUserId());
-        userOrder.setServiceId(receivedOrderInfo.getServiceId());
-        userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
-        userOrder.setId(""+System.currentTimeMillis()/1000+ RandomNumber.getFour());
-        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(),receivedOrderInfo.getOrderType());
-        if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0){
-            return DtoUtil.getFalseDto("订单金额错误",60001);
-        }
-        userOrder.setPaymentAmount(amount);
-        userOrder.setCreateDate(System.currentTimeMillis()/1000);
-        userOrder.setRemark(receivedOrderInfo.getUserRemark());
-        if (orderMapper.addNewOrder(userOrder) == 0){
-            return DtoUtil.getFalseDto("订单生成失败",60002);
-        }
-        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
-        model.setOutTradeNo(userOrder.getId());
-        model.setSubject("手机端"+userOrder.getOrderTitle()+"移动支付");
-        model.setTotalAmount(userOrder.getPaymentAmount().toString());
-        model.setBody("您花费"+userOrder.getPaymentAmount()+"元");
-        model.setTimeoutExpress("30m");
-        model.setProductCode("QUICK_MSECURITY_PAY");
-        request.setNotifyUrl(NOTIFY_URL);
-        System.out.println(model.toString());
-        request.setBizModel(model);
-
-        try {
-            //这里和普通的接口调用不同，使用的是sdkExecute
-            AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            if (response.isSuccess()){
-                Map<String ,String> map = AliPayUtil.buildOrderParamMap(APP_ID,userOrder.getId(),userOrder.getOrderTitle(),"您花费"+userOrder.getPaymentAmount()+"元",userOrder.getPaymentAmount().toString());
-                String orderInfo = AliPayUtil.getSign(map,APP_PRIVATE_KEY);
-                return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功",orderInfo,100000);
-            }
-        } catch (AlipayApiException e) {
-            e.printStackTrace();
-        }
-        return DtoUtil.getFalseDto("支付宝订单创建异常",70001);
+        return orderService.alipay(receivedOrderInfo ,httpServletRequest.getHeader("token"));
     }
 
 

@@ -19,9 +19,9 @@ import java.util.*;
  */
 public class AliPayUtil {
 
-    private static final String ALGORITHM = "RSA2";
+    private static final String ALGORITHM = "RSA";
 
-    private static final String SIGN_ALGORITHMS = "SHA256WithRSA";
+    private static final String SIGN_ALGORITHMS = "SHA1WithRSA";
 
     private static final String DEFAULT_CHARSET = "UTF-8";
 

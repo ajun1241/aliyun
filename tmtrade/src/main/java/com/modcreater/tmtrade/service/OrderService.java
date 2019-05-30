@@ -55,4 +55,12 @@ public interface OrderService {
      * @return
      */
     String alipayNotify(HttpServletRequest request);
+
+    /**
+     * 支付宝支付
+     * @param receivedOrderInfo
+     * @param token
+     * @return
+     */
+    Dto alipay(ReceivedOrderInfo receivedOrderInfo, String token);
 }
