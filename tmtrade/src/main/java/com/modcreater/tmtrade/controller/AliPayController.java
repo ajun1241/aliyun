@@ -95,6 +95,7 @@ public class AliPayController {
         request.setNotifyUrl(NOTIFY_URL);
         System.out.println(model.toString());
         request.setBizModel(model);
+
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
