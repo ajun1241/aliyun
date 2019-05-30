@@ -57,7 +57,7 @@ public class AliPayController {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-    AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", "GBK", ALIPAY_PUBLIC_KEY,sign_type);
+    AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY,sign_type);
     AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
 
     @PostMapping(value = "/pay/appalipay")
@@ -95,7 +95,6 @@ public class AliPayController {
         request.setNotifyUrl(NOTIFY_URL);
         System.out.println(model.toString());
         request.setBizModel(model);
-
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);

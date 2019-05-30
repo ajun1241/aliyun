@@ -147,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
         boolean signVerified = false;
         try {
             //3.1调用SDK验证签名
-            signVerified = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, "GBK", sign_type);
+            signVerified = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, CHARSET, sign_type);
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }

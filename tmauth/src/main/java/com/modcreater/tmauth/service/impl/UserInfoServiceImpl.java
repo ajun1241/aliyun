@@ -346,6 +346,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         if (weekLists.size() == 0) {
             return DtoUtil.getSuccessDto("未查询到数据", 200000);
+
         }
         return DtoUtil.getSuccesWithDataDto("查询我的一周成功", weekLists, 100000);
     }
