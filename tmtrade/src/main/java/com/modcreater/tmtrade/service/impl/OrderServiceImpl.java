@@ -63,14 +63,32 @@ public class OrderServiceImpl implements OrderService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))) {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
-        if (System.currentTimeMillis()/1000 > userServiceMapper.getTimeRemaining(receivedOrderInfo)){
-            return DtoUtil.getFalseDto("请将当前年/月卡使用完毕",60014);
+        /*if (receivedOrderInfo.getServiceType().equals("perpetual")){
+            if (!receivedOrderInfo.getServiceId().equals("1")){
+                return DtoUtil.getFalseDto("服务类型错误",60015);
+            }
         }
+        if (receivedOrderInfo.getServiceType().equals("month") || receivedOrderInfo.getServiceType().equals("year")){
+            if (receivedOrderInfo.getServiceId().equals("1")){
+                return DtoUtil.getFalseDto("服务类型错误",600015);
+            }
+        }
+        String remainingTime = userServiceMapper.getTimeRemaining(receivedOrderInfo);
+        if (receivedOrderInfo.getServiceType().equals("time")){
+            if (receivedOrderInfo.getServiceId().equals("1") || receivedOrderInfo.getServiceId().equals("3")){
+                return DtoUtil.getFalseDto("服务类型错误",600015);
+            }
+            if (StringUtils.hasText(remainingTime) && Long.valueOf(remainingTime) > System.currentTimeMillis() / 1000){
+                return DtoUtil.getFalseDto("当前年/月卡尚未用完",60014);
+            }
+        }
+        */
         UserOrders userOrders = new UserOrders();
         userOrders.setUserId(receivedOrderInfo.getUserId());
         userOrders.setServiceId(receivedOrderInfo.getServiceId());
         userOrders.setOrderTitle(receivedOrderInfo.getOrderTitle());
-        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getOrderType());
+        userOrders.setServiceType(receivedOrderInfo.getServiceType());
+        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
         if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
         }
@@ -136,11 +154,9 @@ public class OrderServiceImpl implements OrderService {
             if (!receivedVerifyInfo.getSellerId().equals(PID)) {
                 return DtoUtil.getFalseDto("金额有误", 60012);
             }
-            if (userOrders.getServiceId().equals("1")) {
-                if (userServiceMapper.updateUserServiceStatus() > 0){
+            /*if (userServiceMapper.updateUserServiceStatus(userOrders.getId(),userOrders.getServiceId(),userOrders.getServiceType()) > 0) {
 
-                }
-            }
+            }*/
             return DtoUtil.getSuccessDto("订单支付成功", 100000);
         }
         return DtoUtil.getFalseDto("订单支付失败", 60003);
@@ -228,7 +244,7 @@ public class OrderServiceImpl implements OrderService {
         userOrder.setServiceId(receivedOrderInfo.getServiceId());
         userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
         userOrder.setId("" + System.currentTimeMillis() / 1000 + RandomNumber.getFour());
-        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getOrderType());
+        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
         if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
         }
@@ -275,7 +291,7 @@ public class OrderServiceImpl implements OrderService {
         userOrder.setServiceId(receivedOrderInfo.getServiceId());
         userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
         userOrder.setId("" + System.currentTimeMillis() / 1000 + RandomNumber.getFour());
-        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getOrderType());
+        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
         if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
         }
@@ -301,8 +317,8 @@ public class OrderServiceImpl implements OrderService {
         data.put("nonce_str", WXPayUtil.generateNonceStr());
         data.put("body", "您花费" + userOrder.getPaymentAmount() + "元");
         data.put("out_trade_no", userOrder.getId());
-        data.put("total_fee", String.valueOf(Math.round(userOrder.getPaymentAmount()*100)));
-        System.out.println(String.valueOf(Math.round(userOrder.getPaymentAmount()*100)));
+        data.put("total_fee", String.valueOf(Math.round(userOrder.getPaymentAmount() * 100)));
+        System.out.println(String.valueOf(Math.round(userOrder.getPaymentAmount() * 100)));
         data.put("spbill_create_ip", WxPayConfig.SPBILL_CREATE_IP);
         data.put("notify_url", WxPayConfig.NOTIFY_URL);
         data.put("trade_type", WxPayConfig.TRADE_TYPE);

@@ -55,5 +55,5 @@ public interface UserServiceMapper {
      * @param receivedOrderInfo
      * @return
      */
-    long getTimeRemaining(ReceivedOrderInfo receivedOrderInfo);
+    String getTimeRemaining(ReceivedOrderInfo receivedOrderInfo);
 }

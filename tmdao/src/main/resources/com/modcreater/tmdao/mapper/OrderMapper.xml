@@ -12,6 +12,7 @@
          #{userId},
          #{serviceId},
          #{orderTitle},
+         #{serviceType},
          #{paymentAmount},
          #{createDate},
          null,
@@ -22,28 +23,22 @@
     </insert>
     <update id="updateUserOrder">
         update userorders set
-        userId = #{userId},
-        serviceId = #{serviceId},
-        orderTitle = #{orderTitle},
-        paymentAmount = #{paymentAmount},
-        createDate = #{createDate},
         payTime = #{payTime},
         payChannel = #{payChannel},
         outTradeNo = #{outTradeNo},
         orderStatus = #{orderStatus},
-        remark = #{remark}
         where id = #{id}
     </update>
 
     <select id="getPaymentAmount" resultType="java.lang.Double">
         select
-        <if test="orderType == 'month'">
+        <if test="serviceType == 'month'">
             monthCardPrice
         </if>
-        <if test="orderType == 'time'">
+        <if test="serviceType == 'time'">
             timeCardPrice
         </if>
-        <if test="orderType == 'year'">
+        <if test="serviceType == 'year'">
             yearCardPrice
         </if>
         from servicefunction where id = #{serviceId}

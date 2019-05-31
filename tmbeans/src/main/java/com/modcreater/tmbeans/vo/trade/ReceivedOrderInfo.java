@@ -27,7 +27,7 @@ public class ReceivedOrderInfo {
     /**
      * 订单类型(time:次卡;month:月卡;year:年卡;)
      */
-    private String orderType;
+    private String serviceType;
     /**
      * 支付金额
      */

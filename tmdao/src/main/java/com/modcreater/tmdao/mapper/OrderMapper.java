@@ -18,10 +18,10 @@ public interface OrderMapper {
     /**
      * 获取订单金额
      * @param serviceId
-     * @param orderType
+     * @param serviceType
      * @return
      */
-    Double getPaymentAmount(@Param("serviceId") String serviceId,@Param("orderType") String orderType);
+    Double getPaymentAmount(@Param("serviceId") String serviceId,@Param("serviceType") String serviceType);
 
     /**
      * 生成新的订单

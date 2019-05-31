@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserOrders {
     /**
-     * 用户ID
+     * 订单ID
      */
     private String id;
     /**
@@ -32,6 +32,10 @@ public class UserOrders {
      * 订单标题(详情)
      */
     private String orderTitle;
+    /**
+     * 服务种类(次卡月卡年卡永久)
+     */
+    private String serviceType;
     /**
      * 支付金额
      */
