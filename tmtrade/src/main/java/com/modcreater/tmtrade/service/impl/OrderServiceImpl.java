@@ -22,6 +22,8 @@ import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.RandomNumber;
 import com.modcreater.tmutils.wxconfig.WxConfig;
 import com.modcreater.tmutils.wxconfig.WxMD5Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -29,6 +31,10 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -61,6 +67,8 @@ public class OrderServiceImpl implements OrderService {
     public static final Long MONTH_TIME = System.currentTimeMillis() / 1000 + 2592000;
     public static final Long YEAR_TIME = System.currentTimeMillis() / 1000 + 31536000;
 
+    private static final Logger logger = LoggerFactory.getLogger("trade");
+
     @Override
     public Dto createNewOrder(ReceivedOrderInfo receivedOrderInfo, String token) {
         if (!StringUtils.hasText(token)) {
@@ -84,13 +92,13 @@ public class OrderServiceImpl implements OrderService {
                 return DtoUtil.getFalseDto("服务类型错误", 600015);
             }
         }
-        String remainingTime = userServiceMapper.getTimeRemaining(receivedOrderInfo);
+        Long remainingTime = userServiceMapper.getTimeRemaining(receivedOrderInfo.getUserId(),receivedOrderInfo.getServiceId());
         if (receivedOrderInfo.getServiceType().equals("time")) {
             if (receivedOrderInfo.getServiceId().equals("1") || receivedOrderInfo.getServiceId().equals("3")) {
                 System.out.println("好友/年报功能没有次卡");
                 return DtoUtil.getFalseDto("服务类型错误", 600015);
             }
-            if (StringUtils.hasText(remainingTime) && Long.valueOf(remainingTime) > System.currentTimeMillis() / 1000) {
+            if (remainingTime != 0 && remainingTime > System.currentTimeMillis() / 1000) {
                 return DtoUtil.getFalseDto("当前年/月卡尚未用完", 60014);
             }
         }
@@ -433,6 +441,107 @@ public class OrderServiceImpl implements OrderService {
             //系统等其他错误的时候
         }
         return DtoUtil.getFalseDto("没有预付订单的数据from未进入微信API调用", 60013);
+    }
+
+    @Override
+    public String wxPayNotify(HttpServletRequest request) {
+        String resXml = "";
+        try {
+            InputStream inputStream = request.getInputStream();
+            //将InputStream转换成xmlString
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            try {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            resXml = sb.toString();
+            String result = payBack(resXml);
+            return result;
+        } catch (Exception e) {
+            System.out.println("微信手机支付失败:" + e.getMessage());
+            String result = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+            return result;
+        }
+    }
+
+    @Override
+    public String payBack(String wxNotifyData) {
+        WxConfig config = null;
+        try {
+            config = new WxConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        WXPay wxpay = new WXPay(config);
+        String xmlBack = "";
+        Map<String, String> notifyMap = null;
+        try {
+            // 调用官方SDK转换成map类型数据
+            notifyMap = WXPayUtil.xmlToMap(wxNotifyData);
+            //验证签名是否有效，有效则进一步处理
+            if (wxpay.isPayResultNotifySignatureValid(notifyMap)) {
+                //状态
+                String returnCode = notifyMap.get("return_code");
+                //商户订单号
+                String tradeNo = notifyMap.get("out_trade_no");
+                //微信支付流水号
+                String transactionId = notifyMap.get("transaction_id");
+                if (returnCode.equals("SUCCESS")) {
+                    UserOrders userOrders = orderMapper.getUserOrder(tradeNo);
+                    if (!ObjectUtils.isEmpty(userOrders)) {
+                        // 注意特殊情况：订单已经退款，但收到了支付结果成功的通知，不应把商户的订单状态从退款改成支付成功
+                        // 注意特殊情况：微信服务端同样的通知可能会多次发送给商户系统，所以数据持久化之前需要检查是否已经处理过了，处理了直接返回成功标志
+                        //业务数据持久化
+                        if (userOrders.getOrderStatus().equals("1")){
+                            return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                        }
+                        userOrders.setOrderStatus("1");
+                        userOrders.setPayTime(String.valueOf(System.currentTimeMillis() / 1000));
+                        userOrders.setPayChannel("WxPay");
+                        userOrders.setOutTradeNo(transactionId);
+                        //更新交易表中状态
+                        int returnResult = updateOrderStatusToPrepaid(userOrders);
+                        if (returnResult == 0) {
+                            return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                        }
+                        System.err.println("支付成功");
+                        logger.info("微信手机支付回调成功订单号:{}", tradeNo);
+                        xmlBack = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                    } else {
+                        logger.info("微信手机支付回调失败订单号:{}", tradeNo);
+                        xmlBack = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                    }
+                }
+                return xmlBack;
+            } else {
+                // 签名错误，如果数据里没有sign字段，也认为是签名错误
+                //失败的数据要不要存储？
+                logger.error("手机支付回调通知签名错误");
+                xmlBack = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                return xmlBack;
+            }
+        } catch (Exception e) {
+            logger.error("手机支付回调通知失败", e);
+            xmlBack = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+        }
+        return xmlBack;
+    }
+
+    @Override
+    public Dto wxPayInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token) {
+
+        return null;
     }
 
     /**

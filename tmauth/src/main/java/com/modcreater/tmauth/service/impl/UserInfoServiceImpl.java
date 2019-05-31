@@ -49,7 +49,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     private AchievementMapper achievementMapper;
 
     @Resource
-    private UserServiceMapper userServiceMapper;
+    private UserServiceJudgeServiceImpl userServiceJudgeService;
 
     @Resource
     private EventMapper eventMapper;
@@ -96,44 +96,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getSuccesWithDataDto("查询用户详情成功",result,100000);
         }
         return DtoUtil.getSuccessDto("没有查询到用户信息",100000);
-    }
-
-    @Override
-    public Dto showUserEvents(ReceivedIdIsOverdue receivedIdIsOverdue, String token) {
-        /*if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
-        }
-        String redisToken=stringRedisTemplate.opsForValue().get(receivedIdIsOverdue.getUserId());
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
-        }
-        if (!StringUtils.hasText(receivedIdIsOverdue.getIsOverdue())){
-            return DtoUtil.getFalseDto("事件状态未获取到",40005);
-        }
-        //查询用户已完成的事件(根据时间排序,如果用户未开通该服务,则只显示7条)
-        if ("是否开通服务".equals("是否开通服务")){
-            receivedIdIsOverdue.setPageNum(0L);
-            receivedIdIsOverdue.setPageSize(7L);
-        }
-        List<SingleEvent> singleEventList;
-        if ("9".equals(receivedIdIsOverdue.getIsOverdue())){
-            singleEventList = eventMapper.queryDraft(receivedIdIsOverdue);
-        }else {
-            singleEventList = eventMapper.queryUserEventsByUserIdIsOverdue(receivedIdIsOverdue);
-        }
-        if (singleEventList.size() != 0){
-            List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
-            for (SingleEvent singleEvent : singleEventList){
-                ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
-                showCompletedEvents.setEventId(singleEvent.getEventid().toString());
-                showCompletedEvents.setUserId(singleEvent.getUserid().toString());
-                showCompletedEvents.setEventName(singleEvent.getEventname());
-                showCompletedEvents.setDate(singleEvent.getYear().toString()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay());
-                showCompletedEventsList.add(showCompletedEvents);
-            }
-            return DtoUtil.getSuccesWithDataDto("查询用户事件成功",showCompletedEventsList,100000);
-        }*/
-        return DtoUtil.getSuccessDto("未查到用户事件",100000);
     }
 
     @Override
@@ -190,10 +152,11 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        System.out.println("查询草稿箱");
-        //此处判断用户是否开启了该项服务
-        if (userServiceMapper.getSearchService(receivedEventConditions.getUserId()) != 1){
-            return DtoUtil.getSuccessDto("抱歉,您还没有开通该服务",100000);
+        System.out.println("查询草稿箱/已完成,未完成");
+        //此处判断用户是否开启了查询服务
+        Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
+        if (dto != null){
+            return dto;
         }
         QueryEventsCondition singleEventCondition = new QueryEventsCondition();
         if (receivedEventConditions.getUserId() == null || "".equals(receivedEventConditions.getUserId())){

@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,7 +35,7 @@ public class TradeController {
     }
 
     @PostMapping(value = "alipay/notify_url")
-    public String notify(HttpServletRequest request, HttpServletResponse response){
+    public String aliPayNotify(HttpServletRequest request){
         System.out.println("调用了异步接口");
         return orderService.alipayNotify(request);
     }
@@ -41,9 +45,19 @@ public class TradeController {
         return orderService.wxPayOrderSubmitted(receivedOrderInfo,httpServletRequest.getHeader("token"));
     }
 
+    @PostMapping(value = "wxpay/notify_url")
+    public String wxPayNotify(HttpServletRequest request){
+        return orderService.wxPayNotify(request);
+    }
+
     @PostMapping(value = "payinfoverify")
     public Dto payInfoVerify(@RequestBody ReceivedVerifyInfo receivedVerifyInfo, HttpServletRequest request){
         return orderService.payInfoVerify(receivedVerifyInfo,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "wxpayinfoverify")
+    public Dto wxPayInfoVerify(@RequestBody ReceivedVerifyInfo receivedVerifyInfo, HttpServletRequest request){
+        return orderService.wxPayInfoVerify(receivedVerifyInfo,request.getHeader("token"));
     }
 
 }

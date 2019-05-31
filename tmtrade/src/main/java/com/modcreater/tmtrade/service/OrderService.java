@@ -42,7 +42,7 @@ public interface OrderService {
     int updateOrderStatusToPrepaid(UserOrders userOrders);
 
     /**
-     * 支付信息校验
+     * 支付宝支付信息校验
      * @param receivedVerifyInfo
      * @param token
      * @return
@@ -71,4 +71,26 @@ public interface OrderService {
      * @return
      */
     Dto wxPayOrderSubmitted(ReceivedOrderInfo receivedOrderInfo, String token) throws Exception;
+
+    /**
+     * 微信支付异步通知
+     * @param request
+     * @return
+     */
+    String wxPayNotify(HttpServletRequest request);
+
+    /**
+     * 效果未知
+     * @param wxNotifyData
+     * @return
+     */
+    String payBack(String wxNotifyData);
+
+    /**
+     * 微信支付数据校验
+     * @param receivedVerifyInfo
+     * @param token
+     * @return
+     */
+    Dto wxPayInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token);
 }

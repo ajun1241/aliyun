@@ -27,14 +27,6 @@ public interface UserInfoService {
     Dto showUserDetails(String userId, String token);
 
     /**
-     * 查询用户已完成的事件
-     * @param receivedIdIsOverdue
-     * @param token
-     * @return
-     */
-    Dto showUserEvents(ReceivedIdIsOverdue receivedIdIsOverdue, String token);
-
-    /**
      * 筛选已完成的事件
      * @param receivedEventConditions
      * @param token

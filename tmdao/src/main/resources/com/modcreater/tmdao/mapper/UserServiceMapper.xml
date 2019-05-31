@@ -5,10 +5,6 @@
     <sql id="serviceRemainingTime">
         id,userId,serviceId,residueDegree,timeRemaining
     </sql>
-
-    <insert id="addNewUserService">
-        insert into userservice (userId) values(#{userId})
-    </insert>
     <insert id="addNewServiceRemainingTime">
         insert into serviceremainingtime (id,userId,serviceId,residueDegree,timeRemaining,storageTime)
         values (null,#{userId},#{serviceId},#{residueDegree},#{timeRemaining},#{storageTime})
@@ -29,19 +25,9 @@
         where userId = #{userId} and serviceId = #{serviceId}
     </update>
 
-    <select id="getSearchService" resultType="java.lang.Integer">
-        select searchService from userservice where userId = #{userId}
-    </select>
-    <select id="getFriendService" resultType="java.lang.Integer">
-        select friendService from userservice where userId = #{userId}
-    </select>
-    <select id="getAnnualReportingService" resultType="java.lang.Integer">
-        select annualReportingService from userservice where userId = #{userId}
-    </select>
-    <select id="getBackupService" resultType="java.lang.Integer">
-        select backupService from userservice where userId = #{userId}
-    </select>
-    <select id="getTimeRemaining" resultType="java.lang.String">
+
+
+    <select id="getTimeRemaining" resultType="java.lang.Long">
         select timeRemaining from serviceremainingtime where userId = #{userId} and serviceId = #{serviceId}
     </select>
     <select id="getServiceRemainingTime" resultType="com.modcreater.tmbeans.pojo.ServiceRemainingTime">

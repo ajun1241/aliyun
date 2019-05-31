@@ -237,9 +237,6 @@ public class AccountServiceImpl implements AccountService {
         if (userSettingsMapper.addNewUserSettings(addPwdVo.getUserId()) == 0){
             return DtoUtil.getFalseDto("为用户添加设置失败",15006);
         }
-        if (userServiceMapper.addNewUserService(addPwdVo.getUserId()) == 0){
-            return DtoUtil.getFalseDto("为用户添加服务失败",15007);
-        }
         return DtoUtil.getSuccesWithDataDto("添加密码成功",map,100000);
     }
 

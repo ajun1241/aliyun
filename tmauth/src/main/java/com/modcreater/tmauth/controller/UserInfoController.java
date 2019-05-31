@@ -38,17 +38,6 @@ public class UserInfoController {
     }
 
     /**
-     * 显示用户事件(已完成,未完成,草稿箱)
-     * @param receivedIdIsOverdue
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "showuserevents",method = RequestMethod.POST)
-    public Dto showUserEvents(@RequestBody ReceivedIdIsOverdue receivedIdIsOverdue, HttpServletRequest request){
-        return userInfoService.showUserEvents(receivedIdIsOverdue,request.getHeader("token"));
-    }
-
-    /**
      * 筛选已完成的事件
      * @param receivedEventConditions
      * @param request
