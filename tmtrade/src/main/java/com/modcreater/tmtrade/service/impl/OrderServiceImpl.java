@@ -88,13 +88,15 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         Long remainingTime = userServiceMapper.getTimeRemaining(receivedOrderInfo.getUserId(),receivedOrderInfo.getServiceId());
-        if (receivedOrderInfo.getServiceType().equals("time")) {
-            if (receivedOrderInfo.getServiceId().equals("1") || receivedOrderInfo.getServiceId().equals("3")) {
-                System.out.println("好友/年报功能没有次卡");
-                return DtoUtil.getFalseDto("服务类型错误", 600015);
-            }
-            if (remainingTime != 0 && remainingTime > System.currentTimeMillis() / 1000) {
-                return DtoUtil.getFalseDto("当前年/月卡尚未用完", 60014);
+        if (remainingTime != null){
+            if (receivedOrderInfo.getServiceType().equals("time")) {
+                if (receivedOrderInfo.getServiceId().equals("1") || receivedOrderInfo.getServiceId().equals("3")) {
+                    System.out.println("好友/年报功能没有次卡");
+                    return DtoUtil.getFalseDto("服务类型错误", 600015);
+                }
+                if (remainingTime != 0 && remainingTime > System.currentTimeMillis() / 1000) {
+                    return DtoUtil.getFalseDto("当前年/月卡尚未用完", 60014);
+                }
             }
         }
         UserOrders userOrder = new UserOrders();
