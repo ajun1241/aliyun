@@ -210,7 +210,7 @@ public interface EventMapper {
      * @param deleteType
      * @return
      */
-    int deleteByDeleteType(@Param("eventId") Long eventId,@Param("deleteType") String deleteType);
+    int deleteByDeleteType(@Param("eventId") Long eventId,@Param("deleteType") String deleteType,@Param("userId") String userId);
 
     /**
      * 查询一个草稿事件

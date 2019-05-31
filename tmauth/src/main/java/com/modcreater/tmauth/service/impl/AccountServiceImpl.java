@@ -336,6 +336,8 @@ public class AccountServiceImpl implements AccountService {
         //判断这俩人是不是已经是好友
         Friendship friendship=accountMapper.queryFriendshipDetail(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId());
         Friendship friendship1=accountMapper.queryFriendshipDetail(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId());
+        System.out.println("xxxxxxxxxxxx   "+friendship);
+        System.out.println("ccccccccccc  "+friendship1);
         //不是第一次添加
         if (!ObjectUtils.isEmpty(friendship)|| !ObjectUtils.isEmpty(friendship1)){
             //这时不能添加
@@ -364,7 +366,7 @@ public class AccountServiceImpl implements AccountService {
                 }else {
                     count=systemMsgRecordList.size()+1;
                 }
-                ContactNtfMessage contactNtfMessage=new ContactNtfMessage("",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
+                ContactNtfMessage contactNtfMessage=new ContactNtfMessage("1",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
                 result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
                 if (result.getCode()!=200){
                     return DtoUtil.getFalseDto("发送请求失败",17002);
@@ -389,53 +391,54 @@ public class AccountServiceImpl implements AccountService {
                 e.printStackTrace();
                 return DtoUtil.getFalseDto("出现错误了",233);
             }
-        }
-        //建立好友关系(10:请求  11：被请求)
-        int i=accountMapper.buildFriendship(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),"10");
-        int j=accountMapper.buildFriendship(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"11");
-        if (i<=0||j<=0){
-            //回滚
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return DtoUtil.getFalseDto("添加好友失败",16003);
-        }
-        //发送添加信息
-        ResponseResult result;
-        Map<String,String> map=new HashMap<>();
-        try {
-            sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
-            String[] friendId={sendFriendRequestVo.getFriendId()};
-            //发送消息未读条数
-            List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0");
-            Integer count;
-            if (ObjectUtils.isEmpty(systemMsgRecordList)){
-                count=1;
-            }else {
-                count=systemMsgRecordList.size()+1;
+        }else {
+            //建立好友关系(10:请求  11：被请求)
+            int i=accountMapper.buildFriendship(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),"10");
+            int j=accountMapper.buildFriendship(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"11");
+            if (i<=0||j<=0){
+                //回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("添加好友失败",16003);
             }
-            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
-            result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
-            if (result.getCode()!=200){
-                return DtoUtil.getFalseDto("发送请求失败",17002);
+            //发送添加信息
+            ResponseResult result;
+            Map<String,String> map=new HashMap<>();
+            try {
+                sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
+                String[] friendId={sendFriendRequestVo.getFriendId()};
+                //发送消息未读条数
+                List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0");
+                Integer count;
+                if (ObjectUtils.isEmpty(systemMsgRecordList)){
+                    count=1;
+                }else {
+                    count=systemMsgRecordList.size()+1;
+                }
+                ContactNtfMessage contactNtfMessage=new ContactNtfMessage("1",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
+                result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
+                if (result.getCode()!=200){
+                    return DtoUtil.getFalseDto("发送请求失败",17002);
+                }
+                //消息保存在服务器
+                map.put("userId",sendFriendRequestVo.getFriendId());
+                map.put("msgContent",contactNtfMessage.getMessage());
+                map.put("msgType","newFriend");
+                map.put("fromId",sendFriendRequestVo.getUserId());
+                SystemMsgRecord systemMsgRecord=new SystemMsgRecord();
+                systemMsgRecord.setUserId(Long.parseLong(sendFriendRequestVo.getFriendId()));
+                systemMsgRecord.setFromId(Long.parseLong(sendFriendRequestVo.getUserId()));
+                systemMsgRecord.setMsgType("newFriend");
+                if (systemMsgMapper.queryMsgByUserIdFriendIdMsgType(systemMsgRecord)==0){
+                    //第一次发送
+                    systemMsgMapper.addNewMsg(map);
+                }else {
+                    //多次发送
+                    systemMsgMapper.updateUnreadMsg(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"0",sendFriendRequestVo.getContent());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return DtoUtil.getFalseDto("出现错误了",233);
             }
-            //消息保存在服务器
-            map.put("userId",sendFriendRequestVo.getFriendId());
-            map.put("msgContent",contactNtfMessage.getMessage());
-            map.put("msgType","newFriend");
-            map.put("fromId",sendFriendRequestVo.getUserId());
-            SystemMsgRecord systemMsgRecord=new SystemMsgRecord();
-            systemMsgRecord.setUserId(Long.parseLong(sendFriendRequestVo.getFriendId()));
-            systemMsgRecord.setFromId(Long.parseLong(sendFriendRequestVo.getUserId()));
-            systemMsgRecord.setMsgType("newFriend");
-            if (systemMsgMapper.queryMsgByUserIdFriendIdMsgType(systemMsgRecord)==0){
-                //第一次发送
-                systemMsgMapper.addNewMsg(map);
-            }else {
-                //多次发送
-                systemMsgMapper.updateUnreadMsg(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId(),"0",sendFriendRequestVo.getContent());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return DtoUtil.getFalseDto("出现错误了",233);
         }
         return DtoUtil.getSuccessDto("发送成功",100000);
     }
@@ -472,7 +475,7 @@ public class AccountServiceImpl implements AccountService {
         String extra = "";
         try {
             String[] friendId={sendFriendResponseVo.getFriendId()};
-            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("Request",extra,sendFriendResponseVo.getUserId(), sendFriendResponseVo.getFriendId(), "我是"+user.getUserName()+"，我已经同意你的好友请求了");
+            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("2",extra,sendFriendResponseVo.getUserId(), sendFriendResponseVo.getFriendId(), "我是"+user.getUserName()+"，我已经同意你的好友请求了");
             ResponseResult result=rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),friendId,contactNtfMessage,"","");
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送请求失败",17002);

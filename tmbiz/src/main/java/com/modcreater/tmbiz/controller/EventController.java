@@ -5,10 +5,13 @@ import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbiz.service.EventService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 /**
  * Created with IntelliJ IDEA.
@@ -172,6 +175,17 @@ public class EventController {
     }
 
     /**
+     * 修改事件时创建者选择
+     * @param eventCreatorChooseVo
+     * @return
+     */
+    @PostMapping(value = "eventupdchoose")
+    @ApiOperation("修改事件时创建者选择")
+    public Dto eventUpdChoose(@RequestBody EventCreatorChooseVo eventCreatorChooseVo, HttpServletRequest request){
+        return eventService.eventUpdChoose(eventCreatorChooseVo,request.getHeader("token"));
+    }
+
+    /**
      * 根据天条件查询forIOS
      * @param searchConditionsForIOS
      * @param request
@@ -244,4 +258,6 @@ public class EventController {
     public Dto deleteInBatches(@RequestBody ReceivedDeleteEventIds receivedDeleteEventIds, HttpServletRequest request){
         return eventService.deleteInBatches(receivedDeleteEventIds,request.getHeader("token"));
     }
+
+
 }

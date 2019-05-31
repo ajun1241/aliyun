@@ -39,7 +39,7 @@
              draft
          </if>
          set isOverdue = 2
-         where eventId = #{eventId}
+         where eventId = #{eventId} and userId=#{userId}
     </update>
 
     <delete id="deleteSingleEvent">

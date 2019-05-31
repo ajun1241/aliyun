@@ -27,7 +27,7 @@ public class TmchatApplicationTests {
 
 
     @Test
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "*/5 * * * * ?")
     public void contextLoads() throws Exception {
         System.out.println("定时器工作了");
     }

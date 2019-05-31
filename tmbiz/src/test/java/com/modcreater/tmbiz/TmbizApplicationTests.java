@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Array;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -112,10 +113,11 @@ public class TmbizApplicationTests {
     }
 
     @Test
-    public void test5(){
-        String repeatTime="[false,true,true,true,true,false,false]";
-        String x=repeatTime.substring(1,(repeatTime.length()-1));
-        System.out.println(x);
+    public void test5() throws ParseException {
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+        String t=simpleDateFormat.format(new Date());
+        Date date=simpleDateFormat.parse(t);
+        System.out.println(date);
     }
 
     @Test
