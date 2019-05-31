@@ -22,10 +22,9 @@ public interface OrderService {
     /**
      * 生成新的订单
      * @param receivedOrderInfo
-     * @param token
      * @return
      */
-    Dto createNewOrder(ReceivedOrderInfo receivedOrderInfo, String token);
+    Dto createNewOrder(ReceivedOrderInfo receivedOrderInfo);
 
     /**
      * 通过订单号查询订单
@@ -69,6 +68,7 @@ public interface OrderService {
      * @param receivedOrderInfo
      * @param token
      * @return
+     * @throws Exception
      */
     Dto wxPayOrderSubmitted(ReceivedOrderInfo receivedOrderInfo, String token) throws Exception;
 

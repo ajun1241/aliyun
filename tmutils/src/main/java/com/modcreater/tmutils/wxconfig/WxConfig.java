@@ -2,8 +2,6 @@ package com.modcreater.tmutils.wxconfig;
 
 import com.github.wxpay.sdk.WXPayConfig;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 

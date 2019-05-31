@@ -70,15 +70,10 @@ public class OrderServiceImpl implements OrderService {
     private static final Logger logger = LoggerFactory.getLogger("trade");
 
     @Override
-    public Dto createNewOrder(ReceivedOrderInfo receivedOrderInfo, String token) {
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
-        }
+    public Dto createNewOrder(ReceivedOrderInfo receivedOrderInfo) {
         if (receivedOrderInfo.getServiceId().equals("1") && !ObjectUtils.isEmpty(userServiceMapper.getServiceRemainingTime(receivedOrderInfo.getUserId(), receivedOrderInfo.getServiceId()))) {
-            System.out.println(DtoUtil.getFalseDto("该用户已经开通了好友服务", 60017));
+            System.out.println("该用户已经开通了好友服务");
+            return DtoUtil.getFalseDto("该用户已经开通了好友服务", 60017);
         }
         if (receivedOrderInfo.getServiceType().equals("perpetual")) {
             if (!receivedOrderInfo.getServiceId().equals("1")) {
@@ -102,22 +97,25 @@ public class OrderServiceImpl implements OrderService {
                 return DtoUtil.getFalseDto("当前年/月卡尚未用完", 60014);
             }
         }
-        UserOrders userOrders = new UserOrders();
-        userOrders.setUserId(receivedOrderInfo.getUserId());
-        userOrders.setServiceId(receivedOrderInfo.getServiceId());
-        userOrders.setOrderTitle(receivedOrderInfo.getOrderTitle());
-        userOrders.setServiceType(receivedOrderInfo.getServiceType());
+        UserOrders userOrder = new UserOrders();
+        userOrder.setUserId(receivedOrderInfo.getUserId());
+        userOrder.setServiceId(receivedOrderInfo.getServiceId());
+        userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
+        userOrder.setId("" + System.currentTimeMillis() / 1000 + RandomNumber.getFour());
+        if (receivedOrderInfo.getServiceType().equals("perpetual")){
+            receivedOrderInfo.setServiceType("year");
+        }
         double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
         if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
         }
-        userOrders.setPaymentAmount(amount);
-        userOrders.setCreateDate(System.currentTimeMillis() / 1000);
-        userOrders.setRemark(receivedOrderInfo.getUserRemark());
-        if (orderMapper.addNewOrder(userOrders) > 0) {
-            return DtoUtil.getSuccessDto("订单生成成功,请及时支付", 100000);
+        userOrder.setPaymentAmount(amount);
+        userOrder.setCreateDate(System.currentTimeMillis() / 1000);
+        userOrder.setRemark(receivedOrderInfo.getUserRemark());
+        if (orderMapper.addNewOrder(userOrder) == 0) {
+            return DtoUtil.getFalseDto("订单生成失败", 60002);
         }
-        return DtoUtil.getFalseDto("订单生成失败", 60002);
+        return DtoUtil.getSuccesWithDataDto("success",userOrder,100000);
     }
 
     @Override
@@ -224,7 +222,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
             if (userOrders.getServiceType().equals("perpetual")) {
-                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, YEAR_TIME)) == 0) {
+                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L)) == 0) {
                     return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                 }
             }
@@ -310,21 +308,11 @@ public class OrderServiceImpl implements OrderService {
         }
         AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY, sign_type);
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-        UserOrders userOrder = new UserOrders();
-        userOrder.setUserId(receivedOrderInfo.getUserId());
-        userOrder.setServiceId(receivedOrderInfo.getServiceId());
-        userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
-        userOrder.setId("" + System.currentTimeMillis() / 1000 + RandomNumber.getFour());
-        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
-        if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0) {
-            return DtoUtil.getFalseDto("订单金额错误", 60001);
+        Dto dto = createNewOrder(receivedOrderInfo);
+        if (dto.getResCode() != 100000){
+            return dto;
         }
-        userOrder.setPaymentAmount(amount);
-        userOrder.setCreateDate(System.currentTimeMillis() / 1000);
-        userOrder.setRemark(receivedOrderInfo.getUserRemark());
-        if (orderMapper.addNewOrder(userOrder) == 0) {
-            return DtoUtil.getFalseDto("订单生成失败", 60002);
-        }
+        UserOrders userOrder = (UserOrders) dto.getData();
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         model.setOutTradeNo(userOrder.getId());
         model.setSubject("手机端" + userOrder.getOrderTitle() + "移动支付");
@@ -339,8 +327,6 @@ public class OrderServiceImpl implements OrderService {
             //这里和普通的接口调用不同，使用的是sdkExecute
             AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
             if (response.isSuccess()) {
-                /*Map<String ,String> map = AliPayUtil.buildOrderParamMap(APP_ID,userOrders.getId(),userOrders.getOrderTitle(),"您花费"+userOrders.getPaymentAmount()+"元",userOrders.getPaymentAmount().toString());
-                String orderInfo = AliPayUtil.getSign(map,APP_PRIVATE_KEY);*/
                 return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功", response.getBody(), 100000);
             }
         } catch (AlipayApiException e) {
@@ -357,21 +343,11 @@ public class OrderServiceImpl implements OrderService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))) {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
-        UserOrders userOrder = new UserOrders();
-        userOrder.setUserId(receivedOrderInfo.getUserId());
-        userOrder.setServiceId(receivedOrderInfo.getServiceId());
-        userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
-        userOrder.setId("" + System.currentTimeMillis() / 1000 + RandomNumber.getFour());
-        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
-        if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0) {
-            return DtoUtil.getFalseDto("订单金额错误", 60001);
+        Dto dto = createNewOrder(receivedOrderInfo);
+        if (dto.getResCode() != 100000){
+            return dto;
         }
-        userOrder.setPaymentAmount(amount);
-        userOrder.setCreateDate(System.currentTimeMillis() / 1000);
-        userOrder.setRemark(receivedOrderInfo.getUserRemark());
-        if (orderMapper.addNewOrder(userOrder) == 0) {
-            return DtoUtil.getFalseDto("订单生成失败", 60002);
-        }
+        UserOrders userOrder = (UserOrders) dto.getData();
         /*以上为订单生成*/
         /*------------------------------------------------------------*/
 
@@ -389,7 +365,6 @@ public class OrderServiceImpl implements OrderService {
         data.put("body", "您花费" + userOrder.getPaymentAmount() + "元");
         data.put("out_trade_no", userOrder.getId());
         data.put("total_fee", String.valueOf(Math.round(userOrder.getPaymentAmount() * 100)));
-        System.out.println(String.valueOf(Math.round(userOrder.getPaymentAmount() * 100)));
         data.put("spbill_create_ip", WxPayConfig.SPBILL_CREATE_IP);
         data.put("notify_url", WxPayConfig.NOTIFY_URL);
         data.put("trade_type", WxPayConfig.TRADE_TYPE);
@@ -547,13 +522,13 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 为ServiceRemainingTime赋值
      *
-     * @param userId
-     * @param serviceId
-     * @param residueDegree
-     * @param timeRemaining
-     * @return
+     * @param userId 用户ID
+     * @param serviceId 服务类型
+     * @param residueDegree 剩余次数
+     * @param timeRemaining 剩余时间
+     * @return ServiceRemainingTime对象
      */
-    public ServiceRemainingTime setServiceRemainingTime(String userId, String serviceId, Long residueDegree, Long timeRemaining) {
+    private ServiceRemainingTime setServiceRemainingTime(String userId, String serviceId, Long residueDegree, Long timeRemaining) {
         ServiceRemainingTime serviceRemainingTime = new ServiceRemainingTime();
         serviceRemainingTime.setUserId(userId);
         serviceRemainingTime.setServiceId(serviceId);
