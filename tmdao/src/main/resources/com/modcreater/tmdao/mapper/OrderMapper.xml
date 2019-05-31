@@ -3,7 +3,7 @@
 <mapper namespace="com.modcreater.tmdao.mapper.OrderMapper">
 
     <sql id="userOrders">
-        id,userId,serviceId,orderTitle,paymentAmount,createDate,payTime,payChannel,outTradeNo,orderStatus,remark
+        id,userId,serviceId,orderTitle,serviceType,paymentAmount,createDate,payTime,payChannel,outTradeNo,orderStatus,remark
     </sql>
 
     <insert id="addNewOrder">
