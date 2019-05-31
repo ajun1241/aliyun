@@ -1,9 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.UserServiceMapper">
+
+    <sql id="serviceRemainingTime">
+        id,userId,serviceId,residueDegree,timeRemaining
+    </sql>
+
     <insert id="addNewUserService">
         insert into userservice (userId) values(#{userId})
     </insert>
+    <insert id="addNewServiceRemainingTime">
+        insert into serviceremainingtime (id,userId,serviceId,residueDegree,timeRemaining,storageTime)
+        values (null,#{userId},#{serviceId},#{residueDegree},#{timeRemaining},#{storageTime})
+    </insert>
+    <update id="updateServiceRemainingTime">
+        update serviceremainingtime
+        <set>
+            <if test="residueDegree != null and residueDegree != 0">
+                residueDegree = #{residueDegree}
+            </if>
+            <if test="timeRemaining != null and timeRemaining != 0">
+                timeRemaining = #{timeRemaining}
+            </if>
+            <if test="storageTime != null and storageTime != 0">
+                storageTime = #{storageTime}
+            </if>
+        </set>
+        where userId = #{userId} and serviceId = #{serviceId}
+    </update>
 
     <select id="getSearchService" resultType="java.lang.Integer">
         select searchService from userservice where userId = #{userId}
@@ -19,5 +43,10 @@
     </select>
     <select id="getTimeRemaining" resultType="java.lang.String">
         select timeRemaining from serviceremainingtime where userId = #{userId} and serviceId = #{serviceId}
+    </select>
+    <select id="getServiceRemainingTime" resultType="com.modcreater.tmbeans.pojo.ServiceRemainingTime">
+        select
+        <include refid="serviceRemainingTime"/>
+        from serviceremainingtime where userId = #{userId} and serviceId = #{serviceId}
     </select>
 </mapper>

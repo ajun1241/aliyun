@@ -19,8 +19,10 @@ public class ServiceRemainingTime {
 
     private String serviceId;
 
-    private String residueDegree;
+    private Long residueDegree;
 
-    private String timeRemaining;
+    private Long timeRemaining;
+
+    private Long storageTime;
 
 }
