@@ -379,6 +379,7 @@ public class OrderServiceImpl implements OrderService {
                     appResult.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
                     //这里不要使用请求预支付订单时返回的签名
                     appResult.put("sign", md5Util.getSign(appResult));
+                    appResult.put("tradeNo",userOrder.toString());
                     /*以上为返回给APP数据赋值*/
                     /*------------------------------------------------------------*/
                     return DtoUtil.getSuccesWithDataDto("获取预付单成功", appResult, 100000);
