@@ -107,6 +107,7 @@ public class OrderServiceImpl implements OrderService {
         if (receivedOrderInfo.getServiceType().equals("perpetual")){
             receivedOrderInfo.setServiceType("year");
         }
+        userOrder.setServiceType(receivedOrderInfo.getServiceType());
         double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
         if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
