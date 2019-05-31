@@ -147,32 +147,8 @@ public class OrderServiceImpl implements OrderService {
         if (!StringUtils.hasText(receivedVerifyInfo.getId())) {
             return DtoUtil.getFalseDto("未获取到订单号", 60004);
         }
-        if (receivedVerifyInfo.getPaymentAmount() == 0) {
-            return DtoUtil.getFalseDto("金额未获取到", 60005);
-        }
-        if (!StringUtils.hasText(receivedVerifyInfo.getOutTradeNo())) {
-            return DtoUtil.getFalseDto("支付平台流水号未获取到", 60006);
-        }
-        if (!StringUtils.hasText(receivedVerifyInfo.getAppId())) {
-            return DtoUtil.getFalseDto("APP_ID未获取到", 60007);
-        }
-        if (!StringUtils.hasText(receivedVerifyInfo.getSellerId())) {
-            return DtoUtil.getFalseDto("SELLER_ID未获取到", 60008);
-        }
         UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
         if (userOrders.getOrderStatus().equals("1")) {
-            if (!receivedVerifyInfo.getPaymentAmount().equals(userOrders.getPaymentAmount())) {
-                return DtoUtil.getFalseDto("金额不一致", 60009);
-            }
-            if (!receivedVerifyInfo.getOutTradeNo().equals(userOrders.getOutTradeNo())) {
-                return DtoUtil.getFalseDto("支付平台流水号不一致", 60010);
-            }
-            if (!receivedVerifyInfo.getAppId().equals(APP_ID)) {
-                return DtoUtil.getFalseDto("金额有误", 60011);
-            }
-            if (!receivedVerifyInfo.getSellerId().equals(PID)) {
-                return DtoUtil.getFalseDto("金额有误", 60012);
-            }
             ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId());
             if (userOrders.getServiceType().equals("time")) {
                 if (ObjectUtils.isEmpty(time)) {

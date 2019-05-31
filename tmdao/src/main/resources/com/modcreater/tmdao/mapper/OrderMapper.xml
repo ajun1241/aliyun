@@ -26,7 +26,7 @@
         payTime = #{payTime},
         payChannel = #{payChannel},
         outTradeNo = #{outTradeNo},
-        orderStatus = #{orderStatus},
+        orderStatus = #{orderStatus}
         where id = #{id}
     </update>
 
