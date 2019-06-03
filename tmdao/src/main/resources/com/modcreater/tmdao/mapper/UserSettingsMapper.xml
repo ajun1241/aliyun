@@ -49,4 +49,7 @@
     <select id="getFriendHide" resultType="java.lang.Integer">
         select friendHide from usersettings where userId = #{friendId}
     </select>
+    <select id="getDND" resultType="java.lang.Integer">
+        select DND from usersettings where userId = #{userId}
+    </select>
 </mapper>

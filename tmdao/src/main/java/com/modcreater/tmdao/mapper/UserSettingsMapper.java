@@ -76,4 +76,11 @@ public interface UserSettingsMapper {
      * @return
      */
     int getFriendHide(String friendId);
+
+    /**
+     * 获取用户是否开启了勿扰模式
+     * @param userId
+     * @return
+     */
+    int getDND(String userId);
 }

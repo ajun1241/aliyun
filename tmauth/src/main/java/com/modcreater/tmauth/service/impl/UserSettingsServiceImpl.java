@@ -147,6 +147,6 @@ public class UserSettingsServiceImpl implements UserSettingsService {
                 return DtoUtil.getSuccesWithDataDto("加载好友列表成功",result,100000);
             }
         }
-        return DtoUtil.getFalseDto("未找到好友",100000);
+        return DtoUtil.getFalseDto("未找到好友",200000);
     }
 }

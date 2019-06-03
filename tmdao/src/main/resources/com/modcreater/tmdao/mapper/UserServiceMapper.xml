@@ -35,4 +35,7 @@
         <include refid="serviceRemainingTime"/>
         from serviceremainingtime where userId = #{userId} and serviceId = #{serviceId}
     </select>
+    <select id="getAllServiceRemainingTime" resultType="com.modcreater.tmbeans.pojo.ServiceRemainingTime">
+        select <include refid="serviceRemainingTime"/> from serviceremainingtime where userId = #{userId}
+    </select>
 </mapper>

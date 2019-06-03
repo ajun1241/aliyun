@@ -1,6 +1,7 @@
 package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.UserInfoService;
+import com.modcreater.tmauth.service.UserServiceJudgeService;
 import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.dto.Dto;
@@ -8,15 +9,9 @@ import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.show.ShowUserAnalysis;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
-import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
-import com.modcreater.tmdao.mapper.AccountMapper;
-import com.modcreater.tmdao.mapper.AchievementMapper;
-import com.modcreater.tmdao.mapper.EventMapper;
-import com.modcreater.tmdao.mapper.UserServiceMapper;
+import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.SingleEventUtil;
@@ -49,71 +44,81 @@ public class UserInfoServiceImpl implements UserInfoService {
     private AchievementMapper achievementMapper;
 
     @Resource
-    private UserServiceJudgeServiceImpl userServiceJudgeService;
+    private UserServiceJudgeService userServiceJudgeService;
 
     @Resource
     private EventMapper eventMapper;
 
+    @Resource
+    private UserSettingsMapper userSettingsMapper;
 
     @Resource
-    private AccountMapper accountMapper;
+    private UserServiceMapper userServiceMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-    private static final String[] TYPE = {"a","b","c","d","e","f","g","h"};
-    private static final String[] ONEWEEKINNUM = {"a","b","c","d","e","f","g"};
+    private static final String[] TYPE = {"a", "b", "c", "d", "e", "f", "g", "h"};
+    private static final String[] ONEWEEKINNUM = {"a", "b", "c", "d", "e", "f", "g"};
 
     @Override
     public Dto showUserDetails(String userId, String token) {
-        System.out.println("查询用户成就==>"+userId);
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
+        System.out.println("查询用户成就==>" + userId);
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
-        if (StringUtils.hasText(userId)){
+        if (StringUtils.hasText(userId)) {
             UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
-            Account account=accountMapper.queryAccount(userId);
-            ShowUserStatistics showUserStatistics= new ShowUserStatistics();
+            ShowUserStatistics showUserStatistics = new ShowUserStatistics();
             showUserStatistics.setCompleted(userStatistics.getCompleted());
             showUserStatistics.setUnfinished(userStatistics.getUnfinished());
             showUserStatistics.setDrafts(userStatistics.getDrafts());
             List<String> imgUrlList = queryUserAchievementInBase(userId);
-            Map<String,Object> result = new HashMap<>(3);
+            Map<String, Object> result = new HashMap<>(3);
             //用户事件状态
-            result.put("userStatistics",showUserStatistics);
+            result.put("userStatistics", showUserStatistics);
             //用户所有成就
-            result.put("imgUrlList",imgUrlList);
-            //头像
-            result.put("headImgUrl",account.getHeadImgUrl());
-            //签名
-            result.put("userSign",account.getUserSign());
-            //昵称
-            result.put("userName",account.getUserName());
-            return DtoUtil.getSuccesWithDataDto("查询用户详情成功",result,100000);
+            result.put("imgUrlList", imgUrlList);
+            result.put("DND", userSettingsMapper.getDND(userId));
+            List<ServiceRemainingTime> timeList = userServiceMapper.getAllServiceRemainingTime(userId);
+            Map<String, String> timeRemaining = new HashMap<>();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            if (timeList.size() != 0) {
+                for (ServiceRemainingTime serviceRemainingTime : timeList) {
+                    if (serviceRemainingTime.getResidueDegree() == 0) {
+                        String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
+                        timeRemaining.put(serviceRemainingTime.getServiceId(), time);
+                    } else {
+                        timeRemaining.put(serviceRemainingTime.getServiceId(), serviceRemainingTime.getResidueDegree().toString());
+                    }
+                }
+            }
+            result.put("serviceResidue", timeRemaining);
+            return DtoUtil.getSuccesWithDataDto("查询用户详情成功", result, 100000);
         }
-        return DtoUtil.getSuccessDto("没有查询到用户信息",100000);
+        return DtoUtil.getSuccessDto("没有查询到用户信息", 200000);
     }
 
     @Override
     public Dto queryUserAchievement(String userId, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
         List<String> result = queryUserAchievementInBase(userId);
-        if (result.size() != 0){
-            Map<String,List<String>> imgUrlList = new HashMap<>();
-            imgUrlList.put("imgUrlList",result);
-            return DtoUtil.getSuccesWithDataDto("查询用户成就成功",imgUrlList,100000);
+        if (result.size() != 0) {
+            Map<String, List<String>> imgUrlList = new HashMap<>();
+            imgUrlList.put("imgUrlList", result);
+            return DtoUtil.getSuccesWithDataDto("查询用户成就成功", imgUrlList, 100000);
         }
-        return DtoUtil.getSuccessDto("该用户还没有任何成就",100000);
+        return DtoUtil.getSuccessDto("该用户还没有任何成就", 100000);
     }
 
     @Override
@@ -127,10 +132,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             for (Achievement achievement : achievementList) {
                 try {
                     if (userStatistics.getLoggedDays() == (achievement.getLoggedDaysCondition()).longValue()) {
-                        achievementMapper.addNewAchievement(achievement.getId(),userId,DateUtil.dateToStamp(new Date()));
+                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                     }
-                    if (userStatistics.getCompleted() == achievement.getFinishedEventsCondition().longValue()){
-                        achievementMapper.addNewAchievement(achievement.getId(),userId,DateUtil.dateToStamp(new Date()));
+                    if (userStatistics.getCompleted() == achievement.getFinishedEventsCondition().longValue()) {
+                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -142,100 +147,100 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto filtrateUserEvents(ReceivedEventConditions receivedEventConditions, String token) {
-        if (!StringUtils.hasText(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
         }
-        if (ObjectUtils.isEmpty(receivedEventConditions)){
-            return DtoUtil.getFalseDto("筛选条件接收失败",40002);
+        if (ObjectUtils.isEmpty(receivedEventConditions)) {
+            return DtoUtil.getFalseDto("筛选条件接收失败", 40002);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(receivedEventConditions.getUserId());
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        String redisToken = stringRedisTemplate.opsForValue().get(receivedEventConditions.getUserId());
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
         System.out.println("查询草稿箱/已完成,未完成");
         //此处判断用户是否开启了查询服务
         Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
-        if (dto != null){
+        if (dto != null) {
             return dto;
         }
         QueryEventsCondition singleEventCondition = new QueryEventsCondition();
-        if (receivedEventConditions.getUserId() == null || "".equals(receivedEventConditions.getUserId())){
-            return DtoUtil.getFalseDto("条件缺失",40006);
+        if (receivedEventConditions.getUserId() == null || "".equals(receivedEventConditions.getUserId())) {
+            return DtoUtil.getFalseDto("条件缺失", 40006);
         }
         singleEventCondition.setUserid(Long.valueOf(receivedEventConditions.getUserId()));
-        if (receivedEventConditions.getIsOverdue() == null || "".equals(receivedEventConditions.getIsOverdue())){
-            return DtoUtil.getFalseDto("条件缺失",40006);
+        if (receivedEventConditions.getIsOverdue() == null || "".equals(receivedEventConditions.getIsOverdue())) {
+            return DtoUtil.getFalseDto("条件缺失", 40006);
         }
         singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
-        if (receivedEventConditions.getEventName() != null && !"".equals(receivedEventConditions.getEventName())){
+        if (receivedEventConditions.getEventName() != null && !"".equals(receivedEventConditions.getEventName())) {
             singleEventCondition.setEventname(receivedEventConditions.getEventName());
         }
-        if (receivedEventConditions.getEventType() != null && !"".equals(receivedEventConditions.getEventType())){
+        if (receivedEventConditions.getEventType() != null && !"".equals(receivedEventConditions.getEventType())) {
             singleEventCondition.setType(Long.valueOf(receivedEventConditions.getEventType()));
         }
-        if (receivedEventConditions.getEventLevel() != null && !"".equals(receivedEventConditions.getEventLevel())){
+        if (receivedEventConditions.getEventLevel() != null && !"".equals(receivedEventConditions.getEventLevel())) {
             singleEventCondition.setLevel(Long.valueOf(receivedEventConditions.getEventLevel()));
         }
-        if (receivedEventConditions.getStartTime() != null && !"".equals(receivedEventConditions.getStartTime())){
+        if (receivedEventConditions.getStartTime() != null && !"".equals(receivedEventConditions.getStartTime())) {
             singleEventCondition.setStarttime(receivedEventConditions.getStartTime());
         }
-        if (receivedEventConditions.getEndTime() != null && !"".equals(receivedEventConditions.getEndTime())){
+        if (receivedEventConditions.getEndTime() != null && !"".equals(receivedEventConditions.getEndTime())) {
             singleEventCondition.setEndtime(receivedEventConditions.getEndTime());
         }
-        if (receivedEventConditions.getIsOverdue() != null && !"".equals(receivedEventConditions.getIsOverdue())){
+        if (receivedEventConditions.getIsOverdue() != null && !"".equals(receivedEventConditions.getIsOverdue())) {
             singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         }
-        if (!StringUtils.hasText(receivedEventConditions.getStartDate()) || receivedEventConditions.getStartDate().length() != 8){
-            singleEventCondition.setEventid(System.currentTimeMillis()/1000);
-        }else {
+        if (!StringUtils.hasText(receivedEventConditions.getStartDate()) || receivedEventConditions.getStartDate().length() != 8) {
+            singleEventCondition.setEventid(System.currentTimeMillis() / 1000);
+        } else {
             StringBuilder startDate = new StringBuilder(receivedEventConditions.getStartDate());
-            singleEventCondition.setYear(Long.valueOf(startDate.substring(0,4)));
-            singleEventCondition.setMonth(Long.valueOf(startDate.substring(4,6)));
-            singleEventCondition.setDay(Long.valueOf(startDate.substring(6,8)));
+            singleEventCondition.setYear(Long.valueOf(startDate.substring(0, 4)));
+            singleEventCondition.setMonth(Long.valueOf(startDate.substring(4, 6)));
+            singleEventCondition.setDay(Long.valueOf(startDate.substring(6, 8)));
         }
-        if (receivedEventConditions.getPageNum() == 0 ||receivedEventConditions.getPageNum() == null){
+        if (receivedEventConditions.getPageNum() == 0 || receivedEventConditions.getPageNum() == null) {
             receivedEventConditions.setPageNum(1L);
         }
-        if (receivedEventConditions.getPageSize() == 0 || receivedEventConditions.getPageSize() == null){
+        if (receivedEventConditions.getPageSize() == 0 || receivedEventConditions.getPageSize() == null) {
             singleEventCondition.setPageSize(7L);
         }
-        singleEventCondition.setPageNum((receivedEventConditions.getPageNum()-1)*receivedEventConditions.getPageSize());
+        singleEventCondition.setPageNum((receivedEventConditions.getPageNum() - 1) * receivedEventConditions.getPageSize());
         singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
         List<SingleEvent> singleEventList;
         List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
-        if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("0")){
+        if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("0")) {
             singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
-        }else if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("1")){
+        } else if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("1")) {
             singleEventList = eventMapper.queryDraft(singleEventCondition);
-        }else {
-            return DtoUtil.getFalseDto("searchType未接收到",40005);
+        } else {
+            return DtoUtil.getFalseDto("searchType未接收到", 40005);
         }
-        if (singleEventList.size() != 0){
-            for (SingleEvent singleEvent : singleEventList){
-                if (receivedEventConditions.getPerson() != null && !"".equals(receivedEventConditions.getPerson())){
+        if (singleEventList.size() != 0) {
+            for (SingleEvent singleEvent : singleEventList) {
+                if (receivedEventConditions.getPerson() != null && !"".equals(receivedEventConditions.getPerson())) {
                     String[] persons = receivedEventConditions.getPerson().split(",");
                     String[] personsInResult = singleEvent.getPerson().split(",");
                     int i = 0;
-                    if (persons.length > personsInResult.length){
+                    if (persons.length > personsInResult.length) {
                         continue;
                     }
-                    for (String sOut : persons){
-                        for (String sInside :personsInResult){
-                            if (sOut.equals(sInside)){
+                    for (String sOut : persons) {
+                        for (String sInside : personsInResult) {
+                            if (sOut.equals(sInside)) {
                                 i += 1;
                             }
                         }
                     }
-                    if (i == persons.length){
+                    if (i == persons.length) {
                         showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
                     }
-                }else {
+                } else {
                     showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
                 }
             }
-            return DtoUtil.getSuccesWithDataDto("筛选事件成功",showCompletedEventsList,100000);
+            return DtoUtil.getSuccesWithDataDto("筛选事件成功", showCompletedEventsList, 100000);
         }
-        return DtoUtil.getSuccessDto("没有查询到事件",200000);
+        return DtoUtil.getSuccessDto("没有查询到事件", 200000);
     }
 
     @Override
@@ -254,20 +259,20 @@ public class UserInfoServiceImpl implements UserInfoService {
         Long totalEvents = eventMapper.countEvents(userId);
         //记录事件的总用时分钟数
         Long totalMinutes = 0L;
-        Map<String,Double> percentResult = new HashMap<>();
-        Map<String,Long> totalMinutesResult = new HashMap<>();
+        Map<String, Double> percentResult = new HashMap<>();
+        Map<String, Long> totalMinutesResult = new HashMap<>();
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
         NumberFormat nf = NumberFormat.getNumberInstance();
         nf.setMaximumFractionDigits(2);
-        for (int i = 0 ;i <= 7; i++){
-            percentResult.put(TYPE[i],null);
-            totalMinutesResult.put(TYPE[i],null);
+        for (int i = 0; i <= 7; i++) {
+            percentResult.put(TYPE[i], null);
+            totalMinutesResult.put(TYPE[i], null);
         }
-        for (GetUserEventsGroupByType type : typeList){
-            for (int i = 0 ;i <= 7; i++){
-                if (type.getType() == i){
-                    percentResult.put(TYPE[i],Double.valueOf(nf.format((double)type.getNum()/totalEvents)));
-                    totalMinutesResult.put(TYPE[i],type.getTotalMinutes());
+        for (GetUserEventsGroupByType type : typeList) {
+            for (int i = 0; i <= 7; i++) {
+                if (type.getType() == i) {
+                    percentResult.put(TYPE[i], Double.valueOf(nf.format((double) type.getNum() / totalEvents)));
+                    totalMinutesResult.put(TYPE[i], type.getTotalMinutes());
                 }
             }
             totalMinutes += type.getTotalMinutes();
@@ -278,7 +283,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         showUserAnalysis.setTotalEvents(totalEvents);
         showUserAnalysis.setTotalMinutesResult(totalMinutesResult);
         showUserAnalysis.setSumMinutes(totalMinutes);
-        return DtoUtil.getSuccesWithDataDto("用户数据统计成功",showUserAnalysis,100000);
+        return DtoUtil.getSuccesWithDataDto("用户数据统计成功", showUserAnalysis, 100000);
     }
 
     @Override
@@ -309,8 +314,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             condition.setMonth(Long.valueOf(startDate.substring(4, 6)));
             condition.setDay(Long.valueOf(startDate.substring(6, 8)));
             List<SingleEvent> singleEventList = eventMapper.queryEvents(condition);
-            if (singleEventList.size() > 0){
-                for (SingleEvent singleEvent : singleEventList){
+            if (singleEventList.size() > 0) {
+                for (SingleEvent singleEvent : singleEventList) {
                     weekLists.add(SingleEventUtil.getShowSingleEvent(singleEvent));
                 }
             }

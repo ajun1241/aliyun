@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -46,4 +48,11 @@ public interface UserServiceMapper {
      * @return
      */
     int updateServiceRemainingTime(ServiceRemainingTime time);
+
+    /**
+     * 查询用户所有服务
+     * @param userId
+     * @return
+     */
+    List<ServiceRemainingTime> getAllServiceRemainingTime(String userId);
 }

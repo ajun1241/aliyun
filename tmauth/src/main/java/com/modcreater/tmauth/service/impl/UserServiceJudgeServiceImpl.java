@@ -29,14 +29,14 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId,"2");
         //用户未开通
         if (ObjectUtils.isEmpty(time)){
-            return DtoUtil.getFalseDto("该用户尚未开通查询功能",40007);
+            return DtoUtil.getSuccessDto("该用户尚未开通查询功能",20000);
         }
         //开通了,查询次卡是否有剩余
         if (time.getResidueDegree() == 0){
             //无剩余,判断剩余年/月卡时间
             Long timeRemaining = time.getTimeRemaining();
             if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis()/1000){
-                return DtoUtil.getFalseDto("该用户尚未开通查询功能",40007);
+                return DtoUtil.getSuccessDto("该用户尚未开通查询功能",20000);
             }
         }else {
             //有剩余,判断此次查询完毕后是否剩余为0次
