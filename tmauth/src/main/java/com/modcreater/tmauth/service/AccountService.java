@@ -127,9 +127,8 @@ public interface AccountService {
     /**
      * 上传头像
      * @param headImgVo
-     * @param request
      * @param token
      * @return
      */
-    Dto uplHeadImg(HeadImgVo headImgVo, HttpServletRequest request, String token);
+    Dto uplHeadImg(HeadImgVo headImgVo,String token);
 }

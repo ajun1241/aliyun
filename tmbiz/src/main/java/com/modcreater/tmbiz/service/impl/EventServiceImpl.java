@@ -687,7 +687,7 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto addEventBacker(AddbackerVo addbackerVo, String token) {
+    public Dto addEventBacker(AddBackerVo addbackerVo, String token) {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -757,9 +757,10 @@ public class EventServiceImpl implements EventService {
             SingleEvent singleEvent=JSONObject.parseObject(feedbackEventBackerVo.getExtraData(),SingleEvent.class);
             Backers backers=new Backers();
             //判断事件是否过期
-
-
-
+            SingleEvent singleEventOld=eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
+            if (ObjectUtils.isEmpty(singleEventOld)){
+                return DtoUtil.getFalseDto("该事件已过期",29003);
+            }
             //同意
             if (Long.parseLong(feedbackEventBackerVo.getChoose())==1){
                 //更改backer表状态
@@ -767,7 +768,7 @@ public class EventServiceImpl implements EventService {
                 backers.setEventId(singleEvent.getEventid());
                 backers.setBackerId(Long.parseLong(feedbackEventBackerVo.getUserId()));
                 backers.setStatus(1L);
-                if (backerMapper.updateBacker(backers)==0){
+                if (backerMapper.updateBackerStatus(backers)==0){
                     return DtoUtil.getFalseDto("回应状态修改失败",29001);
                 }
                 //发送消息给发起者
@@ -802,7 +803,7 @@ public class EventServiceImpl implements EventService {
                 backers.setEventId(singleEvent.getEventid());
                 backers.setBackerId(Long.parseLong(feedbackEventBackerVo.getUserId()));
                 backers.setStatus(2L);
-                if (backerMapper.updateBacker(backers)==0){
+                if (backerMapper.updateBackerStatus(backers)==0){
                     return DtoUtil.getFalseDto("回应状态修改失败",29001);
                 }
                 //发送消息给发起者
@@ -826,6 +827,80 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("消息发送失败",26002);
         }
         return DtoUtil.getSuccessDto("消息发送成功",100000);
+    }
+
+    /**
+     * 修改支持事件
+     * @param addbackerVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto updBackerEvent(AddBackerVo addbackerVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(addbackerVo)){
+            return DtoUtil.getFalseDto("添加邀请事件数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(addbackerVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(addbackerVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        //拿到新事件和支持者列表
+        SingleEvent singleEvent=JSONObject.parseObject(addbackerVo.getSingleEvent(),SingleEvent.class);
+        //拿到旧事件和支持者列表
+        SingleEvent singleEventOld=eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
+        //给新添加的成员发送邀请消息
+
+        //给被移除的成员发送提醒消息
+        //给老成员发送修改详情
+        String[] backers=addbackerVo.getFriendIds().split(",");
+        String[] backersOld=backerMapper.queryBackers(singleEventOld.getUserid().toString(),singleEventOld.getEventid().toString()).toString().replace("[","").replace("]","").split(",");
+        List<String> list=Arrays.asList(backers);
+        List<String> result=new ArrayList<>();
+        for (String oBacker:backersOld) {
+            if (!list.contains(oBacker)){
+
+            }
+        }
+        /*if (!StringUtils.isEmpty(addbackerVo.getFriendIds())){
+            backers=
+        }else {
+            backers=backersOld;
+        }*/
+
+
+
+        //修改事件
+        //把修改内容发送给支持者
+        //定时器修改
+        return null;
+    }
+
+    /**
+     * 删除支持事件
+     * @param deleteEventVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto delBackerEvent(DeleteEventVo deleteEventVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(deleteEventVo)){
+            return DtoUtil.getFalseDto("添加邀请事件数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(deleteEventVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(deleteEventVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        return null;
     }
 
     /**
@@ -1060,6 +1135,7 @@ public class EventServiceImpl implements EventService {
         //拿到发起者的事件
         SingleEvent singleEvent=JSONObject.parseObject(feedbackEventInviteVo.getExtraData(),SingleEvent.class);
         System.out.println("22222223333333=="+singleEvent.toString());
+
         String[] persons=singleEvent.getPerson().split(",");
         StatisticsTable statisticsTable=new StatisticsTable();
         //通过判断所有用户是否都答复决定是否发送消息给事件发起者

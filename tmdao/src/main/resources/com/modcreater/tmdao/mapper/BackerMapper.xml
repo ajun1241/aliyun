@@ -9,8 +9,13 @@
             (#{userId},#{eventId},#{item})
         </foreach>
     </insert>
-    <update id="updateBacker" parameterType="com.modcreater.tmbeans.pojo.Backers">
+
+    <update id="updateBackerStatus" parameterType="com.modcreater.tmbeans.pojo.Backers">
         update backers set status=#{status}
         where userId=#{userId} and eventId=#{eventId} and backerId=#{backerId}
     </update>
+
+    <select id="queryBackers" resultType="java.lang.String">
+        select backerId from backers where userId=#{userId} and eventId=#{eventId}
+    </select>
 </mapper>

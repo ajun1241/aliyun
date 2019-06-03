@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @Date: 2019/5/27 15:53
  */
 @Data
-public class AddbackerVo implements Serializable {
+public class AddBackerVo implements Serializable {
     /**
      * 用户Id
      */

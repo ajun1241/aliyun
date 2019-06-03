@@ -3,6 +3,8 @@ package com.modcreater.tmdao.mapper;
 import com.modcreater.tmbeans.pojo.Backers;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * Description:
  *
@@ -25,5 +27,13 @@ public interface BackerMapper {
      * @param backers
      * @return
      */
-    int updateBacker(Backers backers);
+    int updateBackerStatus(Backers backers);
+
+    /**
+     * 查询一个事件的支持者
+     * @param userId
+     * @param eventId
+     * @return
+     */
+    List<String> queryBackers(String userId,String eventId);
 }

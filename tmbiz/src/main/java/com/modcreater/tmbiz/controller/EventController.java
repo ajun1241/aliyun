@@ -5,13 +5,10 @@ import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbiz.service.EventService;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
 /**
  * Created with IntelliJ IDEA.
@@ -204,7 +201,7 @@ public class EventController {
      */
     @PostMapping(value = "addeventbacker")
     @ApiOperation("添加一条事件支持")
-    public Dto addEventBacker(@RequestBody AddbackerVo addbackerVo,HttpServletRequest request){
+    public Dto addEventBacker(@RequestBody AddBackerVo addbackerVo, HttpServletRequest request){
         return eventService.addEventBacker(addbackerVo,request.getHeader("token"));
     }
 

@@ -15,5 +15,5 @@ import java.io.Serializable;
 public class HeadImgVo implements Serializable {
     private String userId;
     private String appType;
-    private MultipartFile headImg;
+    private String headImgUrl;
 }

@@ -107,9 +107,34 @@ public class TmbizApplicationTests {
     }
     @Test
     public void test4() {
-        StringBuffer stringBuffer=new StringBuffer();
+        String[] as = new String[]{"0","1","2","3"};
+        String[] bs = new String[]{"1","2","5"};
+        List<String> list1 = Arrays.asList(bs);
+        List<String> list2 = Arrays.asList(as);
+        //用来装差集
+        List<String> result1 = new ArrayList<String>();
+        List<String> result2 = new ArrayList<String>();
+        List<String> result3 = new ArrayList<String>();
+        for(String a : as){
+            //判断是否包含
+            if(!list1.contains(a)){
+                result1.add(a);
+            }else {
+                result3.add(a);
+            }
+        }
+        for(String b : bs){
+            //判断是否包含
+            if(!list2.contains(b)){
+                result2.add(b);
+            }
+        }
+        System.out.println(result1);
+        System.out.println("******************************************");
+        System.out.println(result2);
+        System.out.println("******************************************");
+        System.out.println(result3);
 
-        System.out.println(StringUtils.isEmpty(stringBuffer.toString()));
     }
 
     @Test
