@@ -103,6 +103,6 @@ public class AccountController {
     @PostMapping("uplheadimg")
     @ApiOperation("上传头像")
     public Dto uplHeadImg(@RequestBody HeadImgVo headImgVo, HttpServletRequest request){
-        return userService.uplHeadImg(headImgVo,request,request.getHeader("token"));
+        return userService.uplHeadImg(headImgVo,request.getHeader("token"));
     }
 }

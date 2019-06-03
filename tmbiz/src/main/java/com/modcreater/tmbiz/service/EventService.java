@@ -167,7 +167,7 @@ public interface EventService {
      * @param token
      * @return
      */
-    Dto addEventBacker(AddbackerVo addbackerVo,String token);
+    Dto addEventBacker(AddBackerVo addbackerVo, String token);
 
     /**
      * 回应事件支持
@@ -177,6 +177,21 @@ public interface EventService {
      */
     Dto feedbackEventBacker(FeedbackEventBackerVo feedbackEventBackerVo,String token);
 
+    /**
+     * 修改支持事件
+     * @param addbackerVo
+     * @param token
+     * @return
+     */
+    Dto updBackerEvent(AddBackerVo addbackerVo, String token);
+
+    /**
+     * 删除支持事件
+     * @param deleteEventVo
+     * @param token
+     * @return
+     */
+    Dto delBackerEvent(DeleteEventVo deleteEventVo,String token);
 
     /**
      * 查询一个事件

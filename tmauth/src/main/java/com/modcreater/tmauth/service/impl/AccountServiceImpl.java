@@ -769,58 +769,27 @@ public class AccountServiceImpl implements AccountService {
 
     /**
      * 上传头像
-     * @param request
+     * @param headImgVo
      * @param token
      * @return
      */
     @Override
-    public Dto uplHeadImg(HeadImgVo headImgVo,HttpServletRequest request, String token) {
+    public Dto uplHeadImg(HeadImgVo headImgVo, String token) {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        if (StringUtils.isEmpty(headImgVo)){
+        if (ObjectUtils.isEmpty(headImgVo)){
+            return DtoUtil.getFalseDto("上传数据未获取到",21013);
+        }
+        if (StringUtils.isEmpty(headImgVo.getUserId())){
             return DtoUtil.getFalseDto("userId未获取到",21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(headImgVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-
-        MultipartFile headImg=headImgVo.getHeadImg();
-
-        if (ObjectUtils.isEmpty(headImg)){
-            return DtoUtil.getFalseDto("图片为空",23001);
+        if (accountMapper.uplHeadImg(headImgVo.getUserId(),headImgVo.getHeadImgUrl())<=0){
+            return DtoUtil.getSuccessDto("图片上传失败",21017);
         }
-        // 文件类型
-        String type=null;
-        // 文件原名称
-        String fileName=headImg.getOriginalFilename();
-        System.out.println("上传的文件原名称:"+fileName);
-        type=fileName.indexOf(".")!=-1?fileName.substring(fileName.lastIndexOf(".")+1, fileName.length()):null;
-        if (StringUtils.isEmpty(type)){
-            return DtoUtil.getFalseDto("文件类型为空",23002);
-        }
-        if ("GIF".equals(type.toUpperCase())||"PNG".equals(type.toUpperCase())||"JPG".equals(type.toUpperCase())) {
-                // 项目在容器中实际发布运行的根路径
-                String realPath="E:\\tomcat";
-                System.out.println("项目在容器中实际发布运行的根路径--->"+realPath);
-                // 自定义的文件名称
-                String newFileName=UUID.randomUUID().toString().replaceAll("-","");
-                System.out.println("上传的文件新名称"+newFileName);
-                File file=new File(realPath);
-                // 转存文件到指定的路径
-                try {
-                    headImg.transferTo(new File(file,"/"+newFileName+"."+type));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return DtoUtil.getFalseDto("上传图片失败",23004);
-                }
-                //文件路径保存在数据库
-
-
-
-            }else {
-                return DtoUtil.getFalseDto("文件类型不匹配",23003);
-            }
         return DtoUtil.getSuccessDto("图片上传成功",100000);
     }
 

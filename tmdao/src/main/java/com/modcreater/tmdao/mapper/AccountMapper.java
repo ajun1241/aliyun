@@ -172,4 +172,12 @@ public interface AccountMapper {
      * @return
      */
     Friendship queryFriendshipDetail(String userId,String friendId);
+
+    /**
+     * 上传头像图片地址
+     * @param userId
+     * @param headImgUrl
+     * @return
+     */
+    int uplHeadImg(String userId, String headImgUrl);
 }

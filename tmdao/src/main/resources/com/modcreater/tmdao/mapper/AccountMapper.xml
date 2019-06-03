@@ -140,6 +140,11 @@
         where userId=#{userId} and friendId=#{friendId}
     </update>
 
+    <update id="uplHeadImg">
+        update account set headImgUrl=#{headImgUrl}
+        where id=#{userId}
+    </update>
+
     <select id="queryUserDetails" resultType="com.modcreater.tmbeans.show.userinfo.ShowUserDetails">
         select userName,userSign,headImgUrl "userHeadPortrait" from account where id = #{userId}
     </select>

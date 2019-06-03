@@ -67,7 +67,7 @@ public class TimerConfig {
         this.date = date;
     }
 
-    @Scheduled(fixedDelay = 1000)  //间隔1秒
+/*    @Scheduled(fixedDelay = 1000)  //间隔1秒
     public String setTimer() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
         Date date2;
@@ -88,6 +88,6 @@ public class TimerConfig {
         }
         System.out.println("第一个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
         return null;
-    }
+    }*/
 
 }
