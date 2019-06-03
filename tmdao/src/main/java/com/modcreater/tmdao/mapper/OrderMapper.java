@@ -21,7 +21,7 @@ public interface OrderMapper {
      * @param serviceType
      * @return
      */
-    Double getPaymentAmount(@Param("serviceId") String serviceId,@Param("serviceType") String serviceType);
+    Double getUnitPrice(@Param("serviceId") String serviceId,@Param("serviceType") String serviceType);
 
     /**
      * 生成新的订单

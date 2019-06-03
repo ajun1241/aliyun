@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmdao.mapper.AppMapper">
+
+    <sql id="appVersion">
+        id,appName,appVersion,apkUrl,uploadTime,updatedInstructions,functionIntroduction,updateTimes
+    </sql>
+    <update id="updateUpdateTimes">
+        update appversion set updateTimes = #{updateTimes} where uploadTime = #{uploadTime}
+    </update>
+
+    <select id="getAppVersion" resultType="com.modcreater.tmbeans.pojo.AppVersion">
+        select <include refid="appVersion"/> from appversion where uploadTime &lt;= date(#{now}) order by uploadTime desc limit 0,1
+    </select>
+</mapper>

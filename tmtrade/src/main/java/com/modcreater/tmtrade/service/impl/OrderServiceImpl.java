@@ -63,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
     private StringRedisTemplate stringRedisTemplate;
 
     public static final Long MONTH = 2592000L;
-    public static final Long YEAR = 2592000L;
+    public static final Long YEAR = 31536000L;
     public static final Long MONTH_TIME = System.currentTimeMillis() / 1000 + 2592000;
     public static final Long YEAR_TIME = System.currentTimeMillis() / 1000 + 31536000;
 
@@ -80,6 +80,11 @@ public class OrderServiceImpl implements OrderService {
                 System.out.println("只有好友功能才能开通永久");
                 return DtoUtil.getFalseDto("服务类型错误", 60015);
             }
+            if (receivedOrderInfo.getNumber() == null || receivedOrderInfo.getNumber() == 0){
+                receivedOrderInfo.setNumber(1L);
+            }else {
+                return DtoUtil.getFalseDto("数量错误",60018);
+            }
         }
         if (receivedOrderInfo.getServiceType().equals("month") || receivedOrderInfo.getServiceType().equals("year")) {
             if (receivedOrderInfo.getServiceId().equals("1")) {
@@ -87,8 +92,8 @@ public class OrderServiceImpl implements OrderService {
                 return DtoUtil.getFalseDto("服务类型错误", 600015);
             }
         }
-        Long remainingTime = userServiceMapper.getTimeRemaining(receivedOrderInfo.getUserId(),receivedOrderInfo.getServiceId());
-        if (remainingTime != null){
+        Long remainingTime = userServiceMapper.getTimeRemaining(receivedOrderInfo.getUserId(), receivedOrderInfo.getServiceId());
+        if (remainingTime != null) {
             if (receivedOrderInfo.getServiceType().equals("time")) {
                 if (receivedOrderInfo.getServiceId().equals("1") || receivedOrderInfo.getServiceId().equals("3")) {
                     System.out.println("好友/年报功能没有次卡");
@@ -104,21 +109,19 @@ public class OrderServiceImpl implements OrderService {
         userOrder.setServiceId(receivedOrderInfo.getServiceId());
         userOrder.setOrderTitle(receivedOrderInfo.getOrderTitle());
         userOrder.setId("" + System.currentTimeMillis() / 1000 + RandomNumber.getFour());
-        if (receivedOrderInfo.getServiceType().equals("perpetual")){
-            receivedOrderInfo.setServiceType("year");
-        }
+        userOrder.setNumber(receivedOrderInfo.getNumber());
         userOrder.setServiceType(receivedOrderInfo.getServiceType());
-        double amount = orderMapper.getPaymentAmount(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
-        if (amount != 0 && receivedOrderInfo.getPaymentAmount() - (amount) != 0) {
+        double unitPrice = orderMapper.getUnitPrice(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
+        if (unitPrice != 0 && receivedOrderInfo.getPaymentAmount() / userOrder.getNumber() - (unitPrice) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
         }
-        userOrder.setPaymentAmount(amount);
+        userOrder.setPaymentAmount(unitPrice);
         userOrder.setCreateDate(System.currentTimeMillis() / 1000);
         userOrder.setRemark(receivedOrderInfo.getUserRemark());
         if (orderMapper.addNewOrder(userOrder) == 0) {
             return DtoUtil.getFalseDto("订单生成失败", 60002);
         }
-        return DtoUtil.getSuccesWithDataDto("success",userOrder,100000);
+        return DtoUtil.getSuccesWithDataDto("success", userOrder, 100000);
     }
 
     @Override
@@ -149,63 +152,66 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("未获取到订单号", 60004);
         }
         UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
+        if (userOrders.getOrderStatus().equals("2")){
+            return DtoUtil.getFalseDto("订单已完成,请不要重复提交",60019);
+        }
         if (userOrders.getOrderStatus().equals("1")) {
             ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId());
             if (userOrders.getServiceType().equals("time")) {
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 1L, 0L)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), userOrders.getNumber(), 0L,0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
-                    Long residueDegree = time.getResidueDegree() + 1;
+                    Long residueDegree = time.getResidueDegree() + userOrders.getNumber();
                     time.setResidueDegree(residueDegree);
                     if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 }
-            }
-            if (userOrders.getServiceType().equals("month")) {
+            } else if (userOrders.getServiceType().equals("month")) {
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, MONTH_TIME)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber()*MONTH + System.currentTimeMillis()/1000,0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
-                    if (time.getResidueDegree() == 0){
-                        Long timeRemaining = time.getTimeRemaining() + MONTH;
+                    if (time.getResidueDegree() == 0) {
+                        Long timeRemaining = time.getTimeRemaining() + MONTH*userOrders.getNumber();
                         time.setTimeRemaining(timeRemaining);
-                    }else {
-                        Long storageTime = time.getStorageTime() + MONTH;
+                    } else {
+                        Long storageTime = time.getStorageTime() + MONTH*userOrders.getNumber();
                         time.setStorageTime(storageTime);
                     }
                     if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 }
-            }
-            if (userOrders.getServiceType().equals("year")) {
+            } else if (userOrders.getServiceType().equals("year")) {
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, YEAR_TIME)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber()*YEAR + System.currentTimeMillis()/1000,0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
-                    if (time.getResidueDegree() == 0){
-                        Long timeRemaining = time.getTimeRemaining() + YEAR;
+                    if (time.getResidueDegree() == 0) {
+                        Long timeRemaining = time.getTimeRemaining() + YEAR*userOrders.getNumber();
                         time.setTimeRemaining(timeRemaining);
-                    }else {
-                        Long storageTime = time.getStorageTime() + YEAR;
+                    } else {
+                        Long storageTime = time.getStorageTime() + YEAR*userOrders.getNumber();
                         time.setStorageTime(storageTime);
                     }
                     if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 }
-            }
-            if (userOrders.getServiceType().equals("perpetual")) {
-                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L)) == 0) {
+            } else if (userOrders.getServiceType().equals("perpetual")) {
+                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L,0L)) == 0) {
                     return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                 }
             }
-            return DtoUtil.getSuccessDto("订单支付成功", 100000);
+            userOrders.setOrderStatus("2");
+            if (orderMapper.updateUserOrder(userOrders) > 0){
+                return DtoUtil.getSuccessDto("订单支付成功", 100000);
+            }
         }
         return DtoUtil.getFalseDto("订单支付失败", 60003);
     }
@@ -288,7 +294,7 @@ public class OrderServiceImpl implements OrderService {
         AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY, sign_type);
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
         Dto dto = createNewOrder(receivedOrderInfo);
-        if (dto.getResCode() != 100000){
+        if (dto.getResCode() != 100000) {
             return dto;
         }
         UserOrders userOrder = (UserOrders) dto.getData();
@@ -323,7 +329,7 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
         Dto dto = createNewOrder(receivedOrderInfo);
-        if (dto.getResCode() != 100000){
+        if (dto.getResCode() != 100000) {
             return dto;
         }
         UserOrders userOrder = (UserOrders) dto.getData();
@@ -380,7 +386,7 @@ public class OrderServiceImpl implements OrderService {
                     appResult.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
                     //这里不要使用请求预支付订单时返回的签名
                     appResult.put("sign", md5Util.getSign(appResult));
-                    appResult.put("tradeNo",userOrder.getId());
+                    appResult.put("tradeNo", userOrder.getId());
                     /*以上为返回给APP数据赋值*/
                     /*------------------------------------------------------------*/
                     return DtoUtil.getSuccesWithDataDto("获取预付单成功", appResult, 100000);
@@ -458,7 +464,7 @@ public class OrderServiceImpl implements OrderService {
                         // 注意特殊情况：订单已经退款，但收到了支付结果成功的通知，不应把商户的订单状态从退款改成支付成功
                         // 注意特殊情况：微信服务端同样的通知可能会多次发送给商户系统，所以数据持久化之前需要检查是否已经处理过了，处理了直接返回成功标志
                         //业务数据持久化
-                        if (userOrders.getOrderStatus().equals("1")){
+                        if (userOrders.getOrderStatus().equals("1")) {
                             return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
                         }
                         userOrders.setOrderStatus("1");
@@ -502,18 +508,19 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 为ServiceRemainingTime赋值
      *
-     * @param userId 用户ID
-     * @param serviceId 服务类型
+     * @param userId        用户ID
+     * @param serviceId     服务类型
      * @param residueDegree 剩余次数
      * @param timeRemaining 剩余时间
      * @return ServiceRemainingTime对象
      */
-    private ServiceRemainingTime setServiceRemainingTime(String userId, String serviceId, Long residueDegree, Long timeRemaining) {
+    private ServiceRemainingTime setServiceRemainingTime(String userId, String serviceId, Long residueDegree, Long timeRemaining, Long storageTime) {
         ServiceRemainingTime serviceRemainingTime = new ServiceRemainingTime();
         serviceRemainingTime.setUserId(userId);
         serviceRemainingTime.setServiceId(serviceId);
         serviceRemainingTime.setResidueDegree(residueDegree);
         serviceRemainingTime.setTimeRemaining(timeRemaining);
+        serviceRemainingTime.setStorageTime(storageTime);
         return serviceRemainingTime;
     }
 }

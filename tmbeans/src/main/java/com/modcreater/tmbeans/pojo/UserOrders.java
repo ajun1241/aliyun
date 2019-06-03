@@ -41,6 +41,10 @@ public class UserOrders {
      */
     private Double paymentAmount;
     /**
+     * 数量
+     */
+    private Long number;
+    /**
      * 创建时间
      */
     private Long createDate;

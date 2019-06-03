@@ -29,9 +29,13 @@ public class ReceivedOrderInfo {
      */
     private String serviceType;
     /**
-     * 支付金额
+     * 支付总金额
      */
     private Double paymentAmount;
+    /**
+     * 购买数量
+     */
+    private Long number;
     /**
      * 用户备注
      */

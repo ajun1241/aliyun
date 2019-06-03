@@ -3,7 +3,7 @@
 <mapper namespace="com.modcreater.tmdao.mapper.OrderMapper">
 
     <sql id="userOrders">
-        id,userId,serviceId,orderTitle,serviceType,paymentAmount,createDate,payTime,payChannel,outTradeNo,orderStatus,remark
+        id,userId,serviceId,orderTitle,serviceType,paymentAmount,number,createDate,payTime,payChannel,outTradeNo,orderStatus,remark
     </sql>
 
     <insert id="addNewOrder">
@@ -14,6 +14,7 @@
          #{orderTitle},
          #{serviceType},
          #{paymentAmount},
+         #{number},
          #{createDate},
          null,
          null,
@@ -30,7 +31,7 @@
         where id = #{id}
     </update>
 
-    <select id="getPaymentAmount" resultType="java.lang.Double">
+    <select id="getUnitPrice" resultType="java.lang.Double">
         select
         <if test="serviceType == 'month'">
             monthCardPrice
@@ -39,6 +40,9 @@
             timeCardPrice
         </if>
         <if test="serviceType == 'year'">
+            yearCardPrice
+        </if>
+        <if test="serviceType == 'perpetual'">
             yearCardPrice
         </if>
         from servicefunction where id = #{serviceId}
