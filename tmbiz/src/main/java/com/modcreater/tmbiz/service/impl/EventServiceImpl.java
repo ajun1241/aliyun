@@ -61,8 +61,8 @@ public class EventServiceImpl implements EventService {
     @Resource
     private BackerMapper backerMapper;
 
-    @Resource
-    private TimerConfig timerConfig;
+/*    @Resource
+    private TimerConfig timerConfig;*/
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo,String token) {
@@ -788,10 +788,10 @@ public class EventServiceImpl implements EventService {
                 //设置定时给支持者发信息
                 String dateFormat=singleEvent.getYear()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay()+" "+Long.parseLong(singleEvent.getStarttime())/60+"-"+(Long.parseLong(singleEvent.getStarttime())%60L+Long.parseLong(singleEvent.getRemindTime()))+"-00";
                 System.out.println("提醒时间："+dateFormat);
-                timerConfig.setDate(dateFormat);
+                /*timerConfig.setDate(dateFormat);
                 timerConfig.setUserId(feedbackEventBackerVo.getUserId());
                 timerConfig.setFriendId(feedbackEventBackerVo.getUserId());
-                timerConfig.setContent("你支持的事件"+singleEvent.getEventname()+"将在"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+Long.parseLong(singleEvent.getStarttime())/60+"："+Long.parseLong(singleEvent.getStarttime())%60+"开始");
+                timerConfig.setContent("你支持的事件"+singleEvent.getEventname()+"将在"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+Long.parseLong(singleEvent.getStarttime())/60+"："+Long.parseLong(singleEvent.getStarttime())%60+"开始");*/
 //                TimerUtil timerUtil=new TimerUtil();
 //                timerUtil.setTimer(/*sdf.parse(dateFormat)*/);
 
@@ -853,31 +853,38 @@ public class EventServiceImpl implements EventService {
         SingleEvent singleEvent=JSONObject.parseObject(addbackerVo.getSingleEvent(),SingleEvent.class);
         //拿到旧事件和支持者列表
         SingleEvent singleEventOld=eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
-        //给新添加的成员发送邀请消息
-
-        //给被移除的成员发送提醒消息
-        //给老成员发送修改详情
-        String[] backers=addbackerVo.getFriendIds().split(",");
-        String[] backersOld=backerMapper.queryBackers(singleEventOld.getUserid().toString(),singleEventOld.getEventid().toString()).toString().replace("[","").replace("]","").split(",");
-        List<String> list=Arrays.asList(backers);
-        List<String> result=new ArrayList<>();
-        for (String oBacker:backersOld) {
-            if (!list.contains(oBacker)){
-
-            }
-        }
-        /*if (!StringUtils.isEmpty(addbackerVo.getFriendIds())){
-            backers=
-        }else {
-            backers=backersOld;
-        }*/
-
-
-
         //修改事件
+        if (eventMapper.alterEventsByUserId(singleEvent)<=0){
+            return DtoUtil.getFalseDto("修改事件失败",211111);
+        }
         //把修改内容发送给支持者
+        String[] backers=backerMapper.queryBackers(singleEventOld.getUserid().toString(),singleEventOld.getEventid().toString()).toString().replace("[","").replace("]","").split(",");
+        System.out.println("支持者："+backers);
+        StringBuffer different=SingleEventUtil.eventDifferent(SingleEvent.toMap(singleEvent),SingleEvent.toMap(singleEventOld));
+        //发送消息给支持者
+        RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+        Account account=accountMapper.queryAccount(addbackerVo.getUserId());
+        if (ObjectUtils.isEmpty(account)){
+            return DtoUtil.getFalseDto("查询用户失败",29002);
+        }
+        InviteMessage inviteMessage=new InviteMessage(account.getUserName()+"修改了事件"+singleEvent.getEventname()+"，修改内容为："+different.replace(different.length()-1,different.length(),"。"),"","");
+        System.out.println("消息内容："+inviteMessage.getContent());
+        ResponseResult result= null;
+        try {
+            result = rongCloudMethodUtil.sendSystemMessage(addbackerVo.getUserId(),backers,inviteMessage,"","");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("发送消息失败",17002);
+        }
+        if (result.getCode()!=200){
+            return DtoUtil.getFalseDto("发送消息失败",17002);
+        }
         //定时器修改
-        return null;
+
+
+
+
+        return DtoUtil.getSuccessDto("修改事件成功",100000);
     }
 
     /**
@@ -900,7 +907,33 @@ public class EventServiceImpl implements EventService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(deleteEventVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21013);
         }
-        return null;
+        SingleEvent singleEvent=eventMapper.queryEventOne(deleteEventVo.getUserId(),deleteEventVo.getEventId());
+        //删除事件表
+        if (eventMapper.deleteByDeleteType(Long.parseLong(deleteEventVo.getEventId()),"singleevent",deleteEventVo.getUserId())<=0){
+            return DtoUtil.getFalseDto("删除事件失败",22222);
+        }
+        //告知支持者
+        String[] backers=backerMapper.queryBackers(deleteEventVo.getUserId(),deleteEventVo.getEventId()).toString().replace("[","").replace("]","").split(",");
+        System.out.println("支持者："+backers);
+        //发送消息给支持者
+        RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+        Account account=accountMapper.queryAccount(deleteEventVo.getUserId());
+        if (ObjectUtils.isEmpty(account)){
+            return DtoUtil.getFalseDto("查询用户失败",29002);
+        }
+        InviteMessage inviteMessage=new InviteMessage(account.getUserName()+"删除了事件"+singleEvent.getEventname(),"","");
+        System.out.println("消息内容："+inviteMessage.getContent());
+        ResponseResult result= null;
+        try {
+            result = rongCloudMethodUtil.sendSystemMessage(deleteEventVo.getUserId(),backers,inviteMessage,"","");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("发送消息失败",17002);
+        }
+        if (result.getCode()!=200){
+            return DtoUtil.getFalseDto("发送消息失败",17002);
+        }
+        return DtoUtil.getSuccessDto("删除事件成功",100000);
     }
 
     /**
@@ -1073,7 +1106,10 @@ public class EventServiceImpl implements EventService {
         }
         //如果是创建者删除
         if (singleEvent.getUserid().equals(singleEventVice.getCreateBy())){
-
+            //该事件从创建者时间轴删除
+            //其他参与者的该事件变为私有
+            //参与者清空
+            //最高权限表清空
 
 
         }else {
@@ -1135,7 +1171,10 @@ public class EventServiceImpl implements EventService {
         //拿到发起者的事件
         SingleEvent singleEvent=JSONObject.parseObject(feedbackEventInviteVo.getExtraData(),SingleEvent.class);
         System.out.println("22222223333333=="+singleEvent.toString());
-
+        //判断该事件的统计表是否已过期
+        if ("1".equals(statisticsMapper.selectStaIsOverdue(singleEvent.getUserid().toString(),singleEvent.getEventid().toString()))){
+            return DtoUtil.getFalseDto("投票已过期",21013);
+        }
         String[] persons=singleEvent.getPerson().split(",");
         StatisticsTable statisticsTable=new StatisticsTable();
         //通过判断所有用户是否都答复决定是否发送消息给事件发起者
@@ -1156,13 +1195,15 @@ public class EventServiceImpl implements EventService {
             statisticsTable.setEventId(singleEvent.getEventid());
             statisticsTable.setCreatorId(singleEvent.getUserid());
             statisticsTable.setChoose(Long.parseLong(feedbackEventInviteVo.getChoose()));
-            statisticsTable.setModify(1);
+            statisticsTable.setModify(1L);
             System.out.println("jijijijijijijijjijiji="+statisticsTable.toString());
             statisticsMapper.updateStatistics(statisticsTable);
             //查询是否所有人都给了反馈
             int i=statisticsMapper.queryStatisticsCount(statisticsTable);
             //所有的反馈都收到了 或者  通过判断timeUp字段决定是否发送消息给事件发起者
             if (i>=persons.length || Long.parseLong(feedbackEventInviteVo.getTimeUp())==1){
+                //设置统计表为已过期
+                statisticsMapper.updStaIsOverdue(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
                 //发送统计结果给事件发起者
                 RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
                 //查询统计结果
@@ -1189,13 +1230,15 @@ public class EventServiceImpl implements EventService {
             statisticsTable.setEventId(singleEvent.getEventid());
             statisticsTable.setCreatorId(singleEvent.getUserid());
             statisticsTable.setChoose(Long.parseLong(feedbackEventInviteVo.getChoose()));
-            statisticsTable.setModify(1);
+            statisticsTable.setModify(1L);
             System.out.println("ooooooooooooo="+statisticsTable.toString());
             statisticsMapper.updateStatistics(statisticsTable);
             //查询是否所有人都给了反馈
             int i=statisticsMapper.queryStatisticsCount(statisticsTable);
             //所有的反馈都收到了 或者  通过判断timeUp字段决定是否发送消息给事件发起者
             if (i>=persons.length || Long.parseLong(feedbackEventInviteVo.getTimeUp())==1){
+                //设置统计表为已过期
+                statisticsMapper.updStaIsOverdue(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
                 //发送统计结果给事件发起者
                 RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
                 //查询统计结果
@@ -1217,6 +1260,8 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getSuccessDto("信息已发出",100000);
         }else if (Integer.parseInt(feedbackEventInviteVo.getChoose())==2 && Integer.parseInt(feedbackEventInviteVo.getTimeUp())==1){
             //通过判断timeUp字段决定是否发送消息给事件发起者
+            //设置统计表为已过期
+            statisticsMapper.updStaIsOverdue(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
             //发送统计结果给事件发起者
             RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
             //查询统计结果
@@ -1637,5 +1682,91 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("事件移动到草稿箱失败",23002);
         }
         return DtoUtil.getSuccessDto("事件移动到草稿箱成功",100000);
+    }
+
+    /**
+     * 变更邀请事件成员
+     * @param updatePersonsVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto updateInvitePerson(UpdatePersonsVo updatePersonsVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(updatePersonsVo)){
+            return DtoUtil.getFalseDto("数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(updatePersonsVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(updatePersonsVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        SingleEvent singleEvent=eventMapper.queryEventOne(updatePersonsVo.getUserId(),updatePersonsVo.getEventId());
+        if (ObjectUtils.isEmpty(singleEvent)){
+            return DtoUtil.getFalseDto("事件不存在",23333);
+        }
+        //修改后的成员
+        String[] newPersons = updatePersonsVo.getUpdPersons().split(",");
+        //修改前的成员
+        String[] oldPersons = singleEvent.getPerson().split(",");
+        List<String> list1 = Arrays.asList(newPersons);
+        List<String> list2 = Arrays.asList(oldPersons);
+        //被移除的成员的集合
+        List<String> result1 = new ArrayList<String>();
+        //新添加的成员集合
+        List<String> result2 = new ArrayList<String>();
+        for(String old : oldPersons){
+            //判断是否包含
+            if(!list1.contains(old)){
+                result1.add(old);
+            }
+        }
+        for(String newP : newPersons){
+            //判断是否包含
+            if(!list2.contains(newP)){
+                result2.add(newP);
+            }
+        }
+        String[] targetId;
+        if (result2.size()>0){
+            //给新添加的成员发送邀请消息
+            targetId= (String[]) result2.toArray();
+
+        }
+
+        if (result1.size()>0){
+            //给被移除的成员发送提醒消息
+            targetId= (String[]) result1.toArray();
+        }
+        return DtoUtil.getFalseDto("没有成员发生变动",23334);
+    }
+
+    /**
+     * 变更支持事件成员
+     * @param updatePersonsVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto updateBackers(UpdatePersonsVo updatePersonsVo, String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(updatePersonsVo)){
+            return DtoUtil.getFalseDto("数据未获取到",26001);
+        }
+        if (StringUtils.isEmpty(updatePersonsVo.getUserId())){
+            return DtoUtil.getFalseDto("userId不能为空",21011);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(updatePersonsVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        //给新添加的成员发送邀请消息
+
+        //给被移除的成员发送提醒消息
+        return null;
     }
 }

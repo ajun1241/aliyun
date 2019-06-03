@@ -12,16 +12,16 @@ import java.util.Date;
 @Data
 public class StatisticsTable implements Serializable {
 
-  private long id;
-  private long creatorId;
-  private long eventId;
-  private long userId;
+  private Long  id;
+  private Long  creatorId;
+  private Long  eventId;
+  private Long userId;
   /**
    *选择（0；同意; 1：不同意; 2：未回应）
    */
-  private long choose;
-  private long modify;
+  private Long  choose;
+  private Long  modify;
   private Date createDate;
   private String rejectContent;
-
+  private Long isOverdue;
 }

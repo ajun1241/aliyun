@@ -30,13 +30,24 @@
         set
         choose =2,
         modify = null,
-        rejectContent = null
+        rejectContent = null,
+        isOverdue = 0
         where
         creatorId=#{creatorId}
         and
         eventId=#{eventId}
         and
         userId=#{userId}
+    </update>
+
+    <update id="updStaIsOverdue">
+        update statisticstable
+        set
+        isOverdue = 1
+        where
+        creatorId=#{creatorId}
+        and
+        eventId=#{eventId}
     </update>
 
     <select id="queryStatisticsCount" parameterType="com.modcreater.tmbeans.pojo.StatisticsTable" resultType="int">
@@ -59,6 +70,10 @@
 
     <select id="queryChooser" resultType="java.lang.String">
           select userId from statisticstable where creatorId=#{creatorId} AND eventId=#{eventId} AND choose=#{choose}
+    </select>
+
+    <select id="selectStaIsOverdue" resultType="java.lang.String">
+        select isOverdue from statisticstable where creatorId=#{creatorId} AND eventId=#{eventId} limit 1
     </select>
 
 </mapper>

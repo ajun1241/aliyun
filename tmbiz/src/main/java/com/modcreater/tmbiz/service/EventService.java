@@ -225,4 +225,20 @@ public interface EventService {
      * @return
      */
     Dto eventRemoveDraft(AddInviteEventVo addInviteEventVo,String token);
+
+    /**
+     * 变更邀请事件成员
+     * @param updatePersonsVo
+     * @param token
+     * @return
+     */
+    Dto updateInvitePerson(UpdatePersonsVo updatePersonsVo, String token);
+
+    /**
+     * 变更支持事件成员
+     * @param updatePersonsVo
+     * @param token
+     * @return
+     */
+    Dto updateBackers(UpdatePersonsVo updatePersonsVo, String token);
 }

@@ -129,9 +129,9 @@ public class TmbizApplicationTests {
                 result2.add(b);
             }
         }
-        System.out.println(result1);
+        System.out.println(Arrays.toString(result1.toArray()));
         System.out.println("******************************************");
-        System.out.println(result2);
+        System.out.println(result2.toArray());
         System.out.println("******************************************");
         System.out.println(result3);
 

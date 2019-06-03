@@ -58,4 +58,20 @@ public interface StatisticsMapper {
      * @return
      */
     List<String> queryChooser(String choose,String creatorId,String eventId);
+
+    /**
+     * 设置统计表为已过期
+     * @param creatorId
+     * @param eventId
+     * @return
+     */
+    int updStaIsOverdue(String creatorId,String eventId);
+
+    /**
+     * 查询一个统计表是否已过期
+     * @param creatorId
+     * @param eventId
+     * @return
+     */
+    String selectStaIsOverdue(String creatorId,String eventId);
 }
