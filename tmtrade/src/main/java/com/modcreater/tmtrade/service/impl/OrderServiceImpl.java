@@ -14,6 +14,7 @@ import com.modcreater.tmbeans.pojo.ServiceRemainingTime;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmdao.mapper.UserServiceMapper;
 import com.modcreater.tmtrade.config.WxPayConfig;
@@ -317,7 +318,7 @@ public class OrderServiceImpl implements OrderService {
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }
-        return DtoUtil.getFalseDto("支付宝订单创建异常", 70001);
+        return DtoUtil.getFalseDto("支付宝订单创建异常", 60001);
     }
 
     @Override
@@ -503,6 +504,20 @@ public class OrderServiceImpl implements OrderService {
     public Dto wxPayInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token) {
 
         return null;
+    }
+
+    @Override
+    public Dto isFriendServiceOpened(ReceivedId receivedId, String token) {
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+        }
+        if (ObjectUtils.isEmpty(userServiceMapper.getServiceRemainingTime(receivedId.getUserId(),"1"))){
+            return DtoUtil.getSuccessDto("该用户尚未开通好友服务",100000);
+        }
+        return DtoUtil.getSuccessDto("该用户已开通好友服务",200000);
     }
 
     /**

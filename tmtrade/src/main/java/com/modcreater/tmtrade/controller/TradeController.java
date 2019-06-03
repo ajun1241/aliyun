@@ -3,6 +3,7 @@ package com.modcreater.tmtrade.controller;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmtrade.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,6 +59,11 @@ public class TradeController {
     @PostMapping(value = "wxpayinfoverify")
     public Dto wxPayInfoVerify(@RequestBody ReceivedVerifyInfo receivedVerifyInfo, HttpServletRequest request){
         return orderService.wxPayInfoVerify(receivedVerifyInfo,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "isfriendserviceopened")
+    public Dto isFriendServiceOpened(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return orderService.isFriendServiceOpened(receivedId,request.getHeader("token"));
     }
 
 }

@@ -9,17 +9,21 @@
         <module name="tmauth" />
         <module name="tmbeans" />
         <module name="tmbiz" />
-        <module name="tmchat" />
         <module name="tmdao" />
         <module name="tmtrade" />
         <module name="tmutils" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="tmauth2" target="1.8" />
+      <module name="tmchat" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="timemanager" options="-parameters" />
       <module name="tmauth" options="-parameters" />
+      <module name="tmauth2" options="-parameters" />
       <module name="tmbeans" options="-parameters" />
       <module name="tmbiz" options="-parameters" />
       <module name="tmchat" options="-parameters" />

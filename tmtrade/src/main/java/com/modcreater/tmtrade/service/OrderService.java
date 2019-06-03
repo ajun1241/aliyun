@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedUserIdTradeId;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -93,4 +94,12 @@ public interface OrderService {
      * @return
      */
     Dto wxPayInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token);
+
+    /**
+     * 判断该用户是否开通了好友服务
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto isFriendServiceOpened(ReceivedId receivedId, String token);
 }
