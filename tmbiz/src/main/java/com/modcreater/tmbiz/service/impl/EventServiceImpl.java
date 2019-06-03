@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
+import com.modcreater.tmbiz.config.TimerConfig;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.*;
@@ -59,6 +60,9 @@ public class EventServiceImpl implements EventService {
 
     @Resource
     private BackerMapper backerMapper;
+
+    @Resource
+    private TimerConfig timerConfig;
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo,String token) {
@@ -781,9 +785,12 @@ public class EventServiceImpl implements EventService {
                 }
 
                 //设置定时给支持者发信息
-                String dateFormat=singleEvent.getYear()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay()+" "+Long.parseLong(singleEvent.getStarttime())/60+"-"+(Long.parseLong(singleEvent.getStarttime())%60+Long.parseLong(singleEvent.getRemindTime()))+"-00";
+                String dateFormat=singleEvent.getYear()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay()+" "+Long.parseLong(singleEvent.getStarttime())/60+"-"+(Long.parseLong(singleEvent.getStarttime())%60L+Long.parseLong(singleEvent.getRemindTime()))+"-00";
                 System.out.println("提醒时间："+dateFormat);
-                SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+                timerConfig.setDate(dateFormat);
+                timerConfig.setUserId(feedbackEventBackerVo.getUserId());
+                timerConfig.setFriendId(feedbackEventBackerVo.getUserId());
+                timerConfig.setContent("你支持的事件"+singleEvent.getEventname()+"将在"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+Long.parseLong(singleEvent.getStarttime())/60+"："+Long.parseLong(singleEvent.getStarttime())%60+"开始");
 //                TimerUtil timerUtil=new TimerUtil();
 //                timerUtil.setTimer(/*sdf.parse(dateFormat)*/);
 

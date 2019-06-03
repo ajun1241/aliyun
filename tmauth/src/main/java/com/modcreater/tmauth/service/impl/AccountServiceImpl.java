@@ -336,8 +336,8 @@ public class AccountServiceImpl implements AccountService {
         //判断这俩人是不是已经是好友
         Friendship friendship=accountMapper.queryFriendshipDetail(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId());
         Friendship friendship1=accountMapper.queryFriendshipDetail(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId());
-        System.out.println("xxxxxxxxxxxx   "+friendship);
-        System.out.println("ccccccccccc  "+friendship1);
+        System.out.println("是不是好友   "+friendship);
+        System.out.println("是不是好友  "+friendship1);
         //不是第一次添加
         if (!ObjectUtils.isEmpty(friendship)|| !ObjectUtils.isEmpty(friendship1)){
             //这时不能添加
@@ -722,7 +722,12 @@ public class AccountServiceImpl implements AccountService {
             msgVo.setUserName(account.getUserName());
             msgVo.setMsgContent(systemMsgRecord.getMsgContent());
             msgVo.setGender(account.getGender().toString());
-            msgVo.setStatus(friendship.getStatus().toString());
+            if (ObjectUtils.isEmpty(friendship)){
+                //如果一个好友都没有
+                msgVo.setStatus("0");
+            }else {
+                msgVo.setStatus(friendship.getStatus().toString());
+            }
             msgVo.setFriendId(systemMsgRecord.getFromId().toString());
             msgVo.setDayPlan(result.getDay());
             msgVo.setMonthPlan(result.getMonth());
