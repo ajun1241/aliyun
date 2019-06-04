@@ -50,7 +50,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     private EventMapper eventMapper;
 
     @Resource
-    private UserServiceMapper userServiceMapper;
+    private AccountMapper accountMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -76,6 +76,13 @@ public class UserInfoServiceImpl implements UserInfoService {
             showUserStatistics.setDrafts(userStatistics.getDrafts());
             List<String> imgUrlList = queryUserAchievementInBase(userId);
             Map<String, Object> result = new HashMap<>(3);
+            Account account = accountMapper.queryAccount(userId);
+            //用户部分信息
+            Map<String,Object> userInfo = new HashMap<>();
+            userInfo.put("userName",account.getUserName());
+            userInfo.put("userSign",account.getUserSign());
+            userInfo.put("headImgURL",account.getHeadImgUrl());
+            result.put("userInfo",userInfo);
             //用户事件状态
             result.put("userStatistics", showUserStatistics);
             //用户所有成就
