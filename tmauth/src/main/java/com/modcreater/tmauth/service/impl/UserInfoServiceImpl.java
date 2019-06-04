@@ -123,6 +123,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     if (achievementMapper.queryUserAchievement(userId, achievement.getId()) == 0) {
                         if (userStatistics.getLoggedDays() == (achievement.getLoggedDaysCondition()).longValue()) {
                             achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
+                            continue;
                         }
                         if (userStatistics.getCompleted() == achievement.getFinishedEventsCondition().longValue()) {
                             achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
@@ -149,11 +150,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
         System.out.println("查询草稿箱/已完成,未完成");
-        //此处判断用户是否开启了查询服务
-        Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
-        if (dto != null) {
-            return dto;
-        }
         QueryEventsCondition singleEventCondition = new QueryEventsCondition();
         if (receivedEventConditions.getUserId() == null || "".equals(receivedEventConditions.getUserId())) {
             return DtoUtil.getFalseDto("条件缺失", 40006);
@@ -197,6 +193,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         singleEventCondition.setPageNum((receivedEventConditions.getPageNum() - 1) * receivedEventConditions.getPageSize());
         singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
+        //此处判断用户是否开启了查询服务
+        Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
+        if (dto != null) {
+            singleEventCondition.setPageNum(0L);
+            singleEventCondition.setPageSize(7L);
+        }
         List<SingleEvent> singleEventList;
         List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
         if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("0")) {

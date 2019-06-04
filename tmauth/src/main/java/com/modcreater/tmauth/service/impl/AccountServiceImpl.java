@@ -812,6 +812,7 @@ public class AccountServiceImpl implements AccountService {
         }
         account.setUserPassword(null);
         ShowUserInfo showUserInfo = new ShowUserInfo();
+        showUserInfo.setDND(userSettingsMapper.getDND(queryUserVo.getId()));
         try {
             FatherToChild.change(account,showUserInfo);
         } catch (Exception e) {

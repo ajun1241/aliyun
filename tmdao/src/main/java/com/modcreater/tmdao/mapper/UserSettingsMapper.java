@@ -82,5 +82,5 @@ public interface UserSettingsMapper {
      * @param userId
      * @return
      */
-    int getDND(String userId);
+    Long getDND(String userId);
 }

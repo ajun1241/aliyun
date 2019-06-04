@@ -14,6 +14,6 @@ import lombok.Data;
 @Data
 public class ShowUserInfo extends Account {
 
-    private String DND;
+    private Long DND;
 
 }
