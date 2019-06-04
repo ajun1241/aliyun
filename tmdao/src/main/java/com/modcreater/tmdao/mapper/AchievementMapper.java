@@ -68,4 +68,12 @@ public interface AchievementMapper {
      * @return
      */
     int addNewUserStatistics(String userId);
+
+    /**
+     * 查询用户成就是否达成
+     * @param userId
+     * @param id
+     * @return
+     */
+    Long queryUserAchievement(@Param("userId") String userId,@Param("id") Long id);
 }

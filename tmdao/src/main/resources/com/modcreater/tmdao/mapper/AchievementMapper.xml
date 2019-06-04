@@ -54,5 +54,8 @@
     <select id="queryUserStatisticsDate" resultType="java.lang.Long">
         select lastOperatedTime from userstatistics where userId = #{userId}
     </select>
+    <select id="queryUserAchievement" resultType="java.lang.Long">
+        select count(id) from userachievement where userId = #{userId} and id = #{id}
+    </select>
 
 </mapper>

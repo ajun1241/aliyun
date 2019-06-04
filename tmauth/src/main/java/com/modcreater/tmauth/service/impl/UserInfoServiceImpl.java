@@ -113,11 +113,13 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!ObjectUtils.isEmpty(userStatistics) && !ObjectUtils.isEmpty(achievementList)) {
             for (Achievement achievement : achievementList) {
                 try {
-                    if (userStatistics.getLoggedDays() == (achievement.getLoggedDaysCondition()).longValue()) {
-                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                    }
-                    if (userStatistics.getCompleted() == achievement.getFinishedEventsCondition().longValue()) {
-                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
+                    if (achievementMapper.queryUserAchievement(userId, achievement.getId()) == 0) {
+                        if (userStatistics.getLoggedDays() == (achievement.getLoggedDaysCondition()).longValue()) {
+                            achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
+                        }
+                        if (userStatistics.getCompleted() == achievement.getFinishedEventsCondition().longValue()) {
+                            achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
+                        }
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
