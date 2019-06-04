@@ -36,4 +36,13 @@ public interface BackerMapper {
      * @return
      */
     List<String> queryBackers(String userId,String eventId);
+
+    /**
+     * 查询支持者详情
+     * @param userId
+     * @param eventId
+     * @param backerId
+     * @return
+     */
+    Backers queryBackerDetail(String userId,String eventId,String backerId);
 }

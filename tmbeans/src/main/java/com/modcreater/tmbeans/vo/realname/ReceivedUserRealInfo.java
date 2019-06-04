@@ -2,6 +2,8 @@ package com.modcreater.tmbeans.vo.realname;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -11,7 +13,7 @@ import lombok.Data;
  * Time: 13:53
  */
 @Data
-public class ReceivedUserRealInfo {
+public class ReceivedUserRealInfo implements Serializable {
 
     private String userId;
 

@@ -66,8 +66,11 @@ public class TmbizApplicationTests {
 
     @Test
     public void test1() {
-        StringBuilder stringBuilder = new StringBuilder("20190506");
-        System.out.println(stringBuilder.substring(6, 8));
+        List<String> list=new ArrayList<>();
+        System.out.println(list);
+        for (String s:list) {
+            System.out.println(s.split(","));
+        }
     }
 
     @Test

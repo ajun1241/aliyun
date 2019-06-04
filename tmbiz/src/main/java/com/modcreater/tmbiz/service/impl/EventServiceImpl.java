@@ -61,8 +61,8 @@ public class EventServiceImpl implements EventService {
     @Resource
     private BackerMapper backerMapper;
 
-/*    @Resource
-    private TimerConfig timerConfig;*/
+    @Resource
+    private TimedTaskMapper timedTaskMapper;
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo,String token) {
@@ -761,6 +761,11 @@ public class EventServiceImpl implements EventService {
             if (ObjectUtils.isEmpty(singleEventOld)){
                 return DtoUtil.getFalseDto("该事件已过期",29003);
             }
+            //不能重复回应
+            Backers backers1=backerMapper.queryBackerDetail(singleEvent.getUserid().toString(),singleEvent.getEventid().toString(),feedbackEventBackerVo.getUserId());
+            if (backers1.getStatus()!=0){
+                return DtoUtil.getFalseDto("你已经回复过了",29004);
+            }
             //同意
             if (Long.parseLong(feedbackEventBackerVo.getChoose())==1){
                 //更改backer表状态
@@ -788,14 +793,17 @@ public class EventServiceImpl implements EventService {
                 //设置定时给支持者发信息
                 String dateFormat=singleEvent.getYear()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay()+" "+Long.parseLong(singleEvent.getStarttime())/60+"-"+(Long.parseLong(singleEvent.getStarttime())%60L+Long.parseLong(singleEvent.getRemindTime()))+"-00";
                 System.out.println("提醒时间："+dateFormat);
-                /*timerConfig.setDate(dateFormat);
-                timerConfig.setUserId(feedbackEventBackerVo.getUserId());
-                timerConfig.setFriendId(feedbackEventBackerVo.getUserId());
-                timerConfig.setContent("你支持的事件"+singleEvent.getEventname()+"将在"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日"+Long.parseLong(singleEvent.getStarttime())/60+"："+Long.parseLong(singleEvent.getStarttime())%60+"开始");*/
-//                TimerUtil timerUtil=new TimerUtil();
-//                timerUtil.setTimer(/*sdf.parse(dateFormat)*/);
-
-
+                TimedTask timedTask=new TimedTask();
+                //userId, eventId, backerId, timer, content
+                timedTask.setUserId(singleEvent.getUserid());
+                timedTask.setEventId(singleEvent.getEventid());
+                timedTask.setBackerId(Long.parseLong(feedbackEventBackerVo.getUserId()));
+                timedTask.setTimer(dateFormat);
+                account=accountMapper.queryAccount(singleEvent.getUserid().toString());
+                timedTask.setContent(account.getUserName()+"的事件："+singleEvent.getEventname()+"将于"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日 "+Long.parseLong(singleEvent.getStarttime())/60+"："+Long.parseLong(singleEvent.getStarttime())%60+" 开始。");
+                if (timedTaskMapper.addTimedTask(timedTask)==0){
+                    return DtoUtil.getFalseDto("设置定时失败",29004);
+                }
             }else if (Long.parseLong(feedbackEventBackerVo.getChoose())==2){
                 //拒绝
                 //更改backer表状态
@@ -880,10 +888,19 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("发送消息失败",17002);
         }
         //定时器修改
-
-
-
-
+        String dateFormat=singleEvent.getYear()+"-"+singleEvent.getMonth()+"-"+singleEvent.getDay()+" "+Long.parseLong(singleEvent.getStarttime())/60+"-"+(Long.parseLong(singleEvent.getStarttime())%60L+Long.parseLong(singleEvent.getRemindTime()))+"-00";
+        System.out.println("提醒时间："+dateFormat);
+        TimedTask timedTask=new TimedTask();
+        //userId, eventId, backerId, timer, content
+        timedTask.setUserId(singleEvent.getUserid());
+        timedTask.setEventId(singleEvent.getEventid());
+        timedTask.setTimer(dateFormat);
+        timedTask.setTaskStatus(0L);
+        account=accountMapper.queryAccount(singleEvent.getUserid().toString());
+        timedTask.setContent(account.getUserName()+"的事件："+singleEvent.getEventname()+"将于"+singleEvent.getMonth()+"月"+singleEvent.getDay()+"日 "+Long.parseLong(singleEvent.getStarttime())/60+"："+Long.parseLong(singleEvent.getStarttime())%60+" 开始。");
+        if (timedTaskMapper.updateTimedTask(timedTask)==0){
+            return DtoUtil.getFalseDto("修改定时失败",29004);
+        }
         return DtoUtil.getSuccessDto("修改事件成功",100000);
     }
 

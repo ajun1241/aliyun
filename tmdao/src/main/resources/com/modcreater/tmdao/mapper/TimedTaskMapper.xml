@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmdao.mapper.TimedTaskMapper">
+    <sql id="Base_Column_List">
+        id,userId,eventId,backerId,timer,taskStatus,content
+    </sql>
+    <insert id="addTimedTask" parameterType="com.modcreater.tmbeans.pojo.TimedTask">
+        insert into timedtask (userId, eventId, backerId, timer, content)
+        VALUES (#{userId},#{eventId},#{backerId},#{timer},#{content})
+    </insert>
+
+    <update id="updateTimedTask" parameterType="com.modcreater.tmbeans.pojo.TimedTask">
+        update timedtask
+            <set>
+                <if test="backerId >0 ">
+                     backerId=#{backerId},
+                </if>
+                <if test="timer != null and timer != ''">
+                     timer=#{timer},
+                </if>
+                <if test="taskStatus != -1 ">
+                     taskStatus=#{taskStatus},
+                </if>
+                <if test="content != null and content != ''">
+                     content=#{content},
+                </if>
+            </set>
+        where userId=#{userId} and eventId=#{eventId}
+    </update>
+
+    <select id="queryTimedTask" resultType="com.modcreater.tmbeans.pojo.TimedTask">
+        select <include refid="Base_Column_List"/> from timedtask where userId=#{userId} and eventId=#{eventId}
+    </select>
+
+    <select id="queryWaitExecute" resultType="com.modcreater.tmbeans.pojo.TimedTask">
+        select <include refid="Base_Column_List"/> from timedtask where taskStatus=0
+    </select>
+
+</mapper>

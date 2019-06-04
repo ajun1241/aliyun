@@ -18,4 +18,8 @@
     <select id="queryBackers" resultType="java.lang.String">
         select backerId from backers where userId=#{userId} and eventId=#{eventId}
     </select>
+
+    <select id="queryBackerDetail" resultType="com.modcreater.tmbeans.pojo.Backers">
+        select * from backers where userId=#{userId} and eventId=#{eventId} and backerId=#{backerId}
+    </select>
 </mapper>

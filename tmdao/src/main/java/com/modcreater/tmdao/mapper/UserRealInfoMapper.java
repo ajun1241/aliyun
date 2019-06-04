@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.UserRealInfo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -20,4 +21,18 @@ public interface UserRealInfoMapper {
      * @return
      */
     int addNewRealInfo(ReceivedUserRealInfo receivedUserRealInfo);
+
+    /**
+     * 查询认证信息
+     * @param userId
+     * @return
+     */
+    UserRealInfo queryDetail(String userId);
+
+    /**
+     *更改认证信息
+     * @param userRealInfo
+     * @return
+     */
+    int updateRealInfo(UserRealInfo userRealInfo);
 }

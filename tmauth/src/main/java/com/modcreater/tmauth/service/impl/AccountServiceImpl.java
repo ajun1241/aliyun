@@ -203,22 +203,11 @@ public class AccountServiceImpl implements AccountService {
         account.setIsFirst(1);
         //把token保存在redis
         stringRedisTemplate.opsForValue().set(addPwdVo.getUserId(),token);
-        //没有实名认证
-        if (StringUtils.isEmpty(addPwdVo.getIDCard())&&StringUtils.isEmpty(addPwdVo.getRealName())&&StringUtils.isEmpty(addPwdVo.getUserAddress())){
-            if (accountMapper.updateAccount(account)<=0){
-                return DtoUtil.getFalseDto("添加密码失败",15003);
-            }
-        }else {
-            //有实名认证
-            account.setIDCard(addPwdVo.getIDCard());
-            account.setRealName(addPwdVo.getRealName());
-            account.setUserAddress(addPwdVo.getUserAddress());
-            if (accountMapper.updateAccount(account)<=0){
-                return DtoUtil.getFalseDto("添加密码失败",15003);
-            }
-            //更改实名认证状态(认证中)
-            accountMapper.updRealName(addPwdVo.getUserId(),"1");
+        //添加密码
+        if (accountMapper.updateAccount(account)<=0){
+            return DtoUtil.getFalseDto("添加密码失败",15003);
         }
+
         account=accountMapper.queryAccount(addPwdVo.getUserId());
         Map map=new HashMap();
         map.put("id",account.getId());

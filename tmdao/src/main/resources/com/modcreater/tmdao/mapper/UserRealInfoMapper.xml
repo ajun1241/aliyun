@@ -3,6 +3,37 @@
 <mapper namespace="com.modcreater.tmdao.mapper.UserRealInfoMapper">
 
     <insert id="addNewRealInfo">
-        insert into userrealinfo values (null,#{userId},#{userRealName},#{userIDNo},#{userIDCardFront},#{userIDCardVerso})
+        insert into userrealinfo
+        (userId, userRealName, userIDNo, userIDCardFront, userIDCardVerso)
+        values (#{userId},#{userRealName},#{userIDNo},#{userIDCardFront},#{userIDCardVerso})
     </insert>
+
+    <update id="updateRealInfo">
+        update userrealinfo
+            <set>
+                <if test="userRealName != null and userRealName != ''">
+                    userRealName=#{userRealName},
+                </if>
+                <if test="userIdNo != null and userIdNo != ''">
+                    userIDNo=#{userIdNo},
+                </if>
+                <if test="userIdCardFront != null and userIdCardFront != '' ">
+                    userIDCardFront=#{userIdCardFront},
+                </if>
+                <if test="userIdCardVerso != null and userIdCardVerso != ''">
+                    userIDCardVerso=#{userIdCardVerso},
+                </if>
+                <if test="realStatus >=0 ">
+                    realStatus=#{realStatus},
+                </if>
+                <if test="modifyDate != null ">
+                    modifyDate=#{modifyDate},
+                </if>
+            </set>
+        where userId=#{userId}
+    </update>
+
+    <select id="queryDetail" resultType="com.modcreater.tmbeans.pojo.UserRealInfo">
+        select * from userrealinfo where userId=#{userId}
+    </select>
 </mapper>

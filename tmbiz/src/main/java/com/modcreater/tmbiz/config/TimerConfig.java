@@ -1,93 +1,79 @@
 package com.modcreater.tmbiz.config;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import com.modcreater.tmbeans.pojo.TimedTask;
+import com.modcreater.tmdao.mapper.TimedTaskMapper;
+import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.RongCloudMethodUtil;
+import io.rong.messages.TxtMessage;
+import io.rong.models.response.ResponseResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.List;
 
 /**
  * Description:
- *
+ *  EnableScheduling   1.开启定时任务
+ *  EnableAsync        2.开启多线程
  * @Author: AJun
  * @Date: 2019/5/31 13:58
  */
-//@Component注解用于对那些比较中立的类进行注释；
-//相对与在持久层、业务层和控制层分别采用 @Repository、@Service 和 @Controller 对分层中的类进行注释
 @Component
-@EnableScheduling   // 1.开启定时任务
-@EnableAsync        // 2.开启多线程
+@EnableScheduling
+@EnableAsync
 public class TimerConfig {
 
-    private String content;
-    private String userId;
-    private String friendId;
-    private String date;
+    @Resource
+    private TimedTaskMapper timedTaskMapper;
 
-    public String getContent() {
-        return content;
-    }
+    private Logger logger= LoggerFactory.getLogger(TimerConfig.class);
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getFriendId() {
-        return friendId;
-    }
-
-    public void setFriendId(String friendId) {
-        this.friendId = friendId;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-/*    @Scheduled(fixedDelay = 1000)  //间隔1秒
-    public String setTimer() throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
-        Date date2;
-        if (StringUtils.isEmpty(getDate())){
-            date2 = simpleDateFormat.parse("1970-01-01 00-00-00");
-        }else {
-            date2 = simpleDateFormat.parse(getDate());
-        }
-        System.out.println("*********************");
-        System.out.println(simpleDateFormat.format(date2));
-        System.out.println("*********************");
-        Date date1 = new Date();
-        if (date2.getTime() / 1000 == date1.getTime() / 1000) {
-            System.out.println();
-            System.out.println("发消息"+getContent()+"给融云");
-            System.out.println();
-            return null;
+    @Scheduled(fixedDelay = 60000)
+    public void backerEventTimer(){
+        try {
+            List<TimedTask> taskList=timedTaskMapper.queryWaitExecute();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+            Date date1=new Date();
+            Date date2;
+            for (TimedTask task:taskList) {
+                date2=simpleDateFormat.parse(task.getTimer());
+                System.out.println(task.getTimer());
+                if (date1.getTime()/60000==date2.getTime()/60000){
+                    //发送消息给支持者
+                    RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+                    TxtMessage txtMessage=new TxtMessage(task.getContent(),"");
+                    String[] targetId={task.getBackerId().toString()};
+                    ResponseResult result = rongCloudMethodUtil.sendSystemMessage(task.getUserId().toString(),targetId,txtMessage,"","");
+                    if (result.getCode()!=200){
+                        logger.info("发送消息失败，任务编号："+task.getId());
+                    }else {
+                        logger.info("发送消息成功，任务编号："+task.getId());
+                    }
+                    //修改任务状态
+                    TimedTask timedTask=new TimedTask();
+                    timedTask.setTaskStatus(1L);
+                    timedTask.setUserId(task.getUserId());
+                    timedTask.setEventId(task.getEventId());
+                    if (timedTaskMapper.updateTimedTask(timedTask)==0){
+                        logger.info("修改状态失败，任务编号："+task.getId());
+                    }else {
+                        logger.info("修改状态成功，任务编号："+task.getId());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         System.out.println("第一个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
-        return null;
-    }*/
+    }
 
 }
