@@ -3,7 +3,7 @@
 <mapper namespace="com.modcreater.tmdao.mapper.UserServiceMapper">
 
     <sql id="serviceRemainingTime">
-        id,userId,serviceId,residueDegree,timeRemaining
+        id,userId,serviceId,residueDegree,timeRemaining,storageTime
     </sql>
     <insert id="addNewServiceRemainingTime">
         insert into serviceremainingtime (id,userId,serviceId,residueDegree,timeRemaining,storageTime)

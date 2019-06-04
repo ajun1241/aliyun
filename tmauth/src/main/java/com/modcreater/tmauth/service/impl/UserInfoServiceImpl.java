@@ -89,13 +89,68 @@ public class UserInfoServiceImpl implements UserInfoService {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
             if (timeList.size() != 0) {
                 for (ServiceRemainingTime serviceRemainingTime : timeList) {
-                    if (serviceRemainingTime.getResidueDegree() == 0) {
+                    if (serviceRemainingTime.getServiceId().equals("1")) {
+                        timeRemaining.put("friendService", "好友服务已开通永久");
+                    }
+                    if (serviceRemainingTime.getServiceId().equals("2")) {
+                        if (serviceRemainingTime.getResidueDegree() == 0) {
+                            String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
+                            if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
+                                timeRemaining.put("searchService", "您的查询服务将在" + time + "到期");
+                            } else if (serviceRemainingTime.getTimeRemaining() == 0) {
+                                timeRemaining.put("searchService", "您的查询服务尚未开通");
+                            } else {
+                                timeRemaining.put("searchService", "您的查询服务将在" + time + "到期");
+                            }
+                        } else {
+                            if (serviceRemainingTime.getStorageTime() == 0) {
+                                timeRemaining.put("searchService", "您的查询服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + ",月/年卡将在次卡消耗完后开始计算");
+                            } else {
+                                timeRemaining.put("searchService", "您的查询服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString());
+                            }
+                        }
+                    }
+                    if (serviceRemainingTime.getServiceId().equals("3")) {
                         String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
-                        timeRemaining.put(serviceRemainingTime.getServiceId(), time);
-                    } else {
-                        timeRemaining.put(serviceRemainingTime.getServiceId(), serviceRemainingTime.getResidueDegree().toString());
+                        if (serviceRemainingTime.getTimeRemaining() == 0) {
+                            timeRemaining.put("annualReportingService", "年报服务尚未开通");
+                        } else if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
+                            timeRemaining.put("annualReportingService", "年报服务将在" + time + "过期");
+                        } else {
+                            timeRemaining.put("annualReportingService", "年报服务已过期");
+                        }
+                    }
+                    if (serviceRemainingTime.getServiceId().equals("4")) {
+                        if (serviceRemainingTime.getResidueDegree() == 0) {
+                            String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
+                            if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
+                                timeRemaining.put("backupService", "您的备份服务将在" + time + "到期");
+                            } else if (serviceRemainingTime.getTimeRemaining() == 0) {
+                                timeRemaining.put("backupService", "您的备份服务尚未开通");
+                            } else {
+                                timeRemaining.put("backupService", "您的备份服务已过期");
+                            }
+                        } else {
+                            if (serviceRemainingTime.getStorageTime() == 0) {
+                                timeRemaining.put("backupService", "您的备份服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + ",月/年卡将在次卡消耗完后开始计算");
+                            } else {
+                                timeRemaining.put("backupService", "您的备份服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString());
+                            }
+                        }
                     }
                 }
+            }
+            if (ObjectUtils.isEmpty(timeRemaining.get("friendService"))) {
+                timeRemaining.put("friendService", "您的好友服务尚未开通");
+            }
+            if (ObjectUtils.isEmpty(timeRemaining.get("searchService"))) {
+                timeRemaining.put("searchService", "您的查询服务尚未开通");
+            }
+            if (ObjectUtils.isEmpty(timeRemaining.get("annualReportingService"))) {
+                timeRemaining.put("annualReportingService", "您的年报服务尚未开通");
+            }
+            if (ObjectUtils.isEmpty(timeRemaining.get("backupService"))) {
+                timeRemaining.put("backupService", "您的备份服务尚未开通");
             }
             result.put("serviceResidue", timeRemaining);
             return DtoUtil.getSuccesWithDataDto("查询用户详情成功", result, 100000);
