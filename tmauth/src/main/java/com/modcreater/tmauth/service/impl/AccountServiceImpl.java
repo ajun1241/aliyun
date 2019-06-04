@@ -7,14 +7,12 @@ import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.Friendship;
 import com.modcreater.tmbeans.pojo.SystemMsgRecord;
 import com.modcreater.tmbeans.pojo.UserStatistics;
+import com.modcreater.tmbeans.show.userinfo.ShowUserInfo;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
 import com.modcreater.tmdao.mapper.*;
-import com.modcreater.tmutils.DateUtil;
-import com.modcreater.tmutils.DtoUtil;
-import com.modcreater.tmutils.MD5Util;
-import com.modcreater.tmutils.RongCloudMethodUtil;
+import com.modcreater.tmutils.*;
 import io.rong.messages.ContactNtfMessage;
 import io.rong.messages.InfoNtfMessage;
 import io.rong.messages.TxtMessage;
@@ -813,10 +811,13 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("查询用户信息失败",200000);
         }
         account.setUserPassword(null);
-        Map<String,Object> result = new HashMap<>(2);
-        result.put("account",account);
-        result.put("DND", userSettingsMapper.getDND(queryUserVo.getId()));
-        return DtoUtil.getSuccesWithDataDto("查询用户信息成功",result,100000);
+        ShowUserInfo showUserInfo = new ShowUserInfo();
+        try {
+            FatherToChild.change(account,showUserInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DtoUtil.getSuccesWithDataDto("查询用户信息成功",showUserInfo,100000);
     }
 
     @Override
