@@ -157,6 +157,9 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("未获取到订单号", 60004);
         }
         UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
+        if (userOrders.getOrderStatus().equals("3")){
+            return DtoUtil.getFalseDto("订单已过期,请不要重复提交", 60021);
+        }
         if (userOrders.getOrderStatus().equals("2")) {
             return DtoUtil.getFalseDto("订单已完成,请不要重复提交", 60019);
         }

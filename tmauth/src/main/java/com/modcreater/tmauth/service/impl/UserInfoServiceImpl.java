@@ -78,11 +78,11 @@ public class UserInfoServiceImpl implements UserInfoService {
             Map<String, Object> result = new HashMap<>(3);
             Account account = accountMapper.queryAccount(userId);
             //用户部分信息
-            Map<String,Object> userInfo = new HashMap<>();
-            userInfo.put("userName",account.getUserName());
-            userInfo.put("userSign",account.getUserSign());
-            userInfo.put("headImgURL",account.getHeadImgUrl());
-            result.put("userInfo",userInfo);
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("userName", account.getUserName());
+            userInfo.put("userSign", account.getUserSign());
+            userInfo.put("headImgURL", account.getHeadImgUrl());
+            result.put("userInfo", userInfo);
             //用户事件状态
             result.put("userStatistics", showUserStatistics);
             //用户所有成就
@@ -202,7 +202,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             singleEventCondition.setPageNum(0L);
             singleEventCondition.setPageSize(7L);
         }
@@ -298,18 +298,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         SingleEvent condition = new SingleEvent();
         condition.setUserid(Long.valueOf(userId));
         List<ShowSingleEvent> weekLists = new ArrayList<>();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-        Calendar calendar = Calendar.getInstance();
-        try {
-            calendar.setTime((simpleDateFormat).parse(simpleDateFormat.format(new Date())));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         for (int i = 0; i <= 6; i++) {
+            StringBuffer startDate = new StringBuffer();
             if (i != 0) {
-                calendar.add(Calendar.DATE, -1);
+                startDate.append(DateUtil.getDay(-1));
             }
-            StringBuffer startDate = new StringBuffer(simpleDateFormat.format(calendar.getTime()));
+            startDate.append(DateUtil.getDay(0));
             condition.setYear(Long.valueOf(startDate.substring(0, 4)));
             condition.setMonth(Long.valueOf(startDate.substring(4, 6)));
             condition.setDay(Long.valueOf(startDate.substring(6, 8)));

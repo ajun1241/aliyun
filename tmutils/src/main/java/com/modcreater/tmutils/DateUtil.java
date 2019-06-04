@@ -47,17 +47,19 @@ public class DateUtil {
     }
 
     /**
-     * 获取今天的周
+     * 获取当前日期的前或后的某一天的日期
+     * @param fob 例:-1为返回当天
      * @return
      */
-    public static int getTodayWeek(){
+    public static String getDay(int fob){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar calendar = Calendar.getInstance();
-        Date date = new Date();
-        calendar.setTime(date);
-        int week = calendar.get(Calendar.DAY_OF_WEEK)-1;
-        if (week == 0){
-            week = 7;
+        try {
+            calendar.setTime((simpleDateFormat).parse(simpleDateFormat.format(new Date())));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        return week;
+        calendar.add(Calendar.DATE,fob);
+        return simpleDateFormat.format(calendar.getTime());
     }
 }
