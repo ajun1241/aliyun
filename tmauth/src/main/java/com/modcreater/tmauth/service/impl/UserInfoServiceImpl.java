@@ -185,17 +185,24 @@ public class UserInfoServiceImpl implements UserInfoService {
             singleEventCondition.setMonth(Long.valueOf(startDate.substring(4, 6)));
             singleEventCondition.setDay(Long.valueOf(startDate.substring(6, 8)));
         }
-        if (receivedEventConditions.getPageNum() == 0 || receivedEventConditions.getPageNum() == null) {
-            receivedEventConditions.setPageNum(1L);
-        }
-        if (receivedEventConditions.getPageSize() == 0 || receivedEventConditions.getPageSize() == null) {
-            singleEventCondition.setPageSize(7L);
-        }
-        singleEventCondition.setPageNum((receivedEventConditions.getPageNum() - 1) * receivedEventConditions.getPageSize());
-        singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
-        //此处判断用户是否开启了查询服务
-        Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
-        if (dto != null) {
+        try {
+            if (receivedEventConditions.getPageNum() == 0) {
+                receivedEventConditions.setPageNum(1L);
+            }
+            if (receivedEventConditions.getPageSize() == 0) {
+                singleEventCondition.setPageSize(7L);
+            }
+            singleEventCondition.setPageNum((receivedEventConditions.getPageNum() - 1) * receivedEventConditions.getPageSize());
+            singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
+            //此处判断用户是否开启了查询服务
+            Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
+            if (dto != null) {
+                singleEventCondition.setPageNum(0L);
+                singleEventCondition.setPageSize(7L);
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }finally {
             singleEventCondition.setPageNum(0L);
             singleEventCondition.setPageSize(7L);
         }
