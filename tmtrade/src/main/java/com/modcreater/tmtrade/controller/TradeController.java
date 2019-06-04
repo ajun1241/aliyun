@@ -2,6 +2,7 @@ package com.modcreater.tmtrade.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
+import com.modcreater.tmbeans.vo.trade.ReceivedServiceIdUserId;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmtrade.service.OrderService;
@@ -66,4 +67,8 @@ public class TradeController {
         return orderService.isFriendServiceOpened(receivedId,request.getHeader("token"));
     }
 
+    @PostMapping(value = "userservice")
+    public Dto searchUserService(@RequestBody ReceivedServiceIdUserId receivedServiceIdUserId, HttpServletRequest request){
+        return orderService.searchUserService(receivedServiceIdUserId,request.getHeader("token"));
+    }
 }

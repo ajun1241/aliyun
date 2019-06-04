@@ -3,6 +3,7 @@ package com.modcreater.tmtrade.service;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
+import com.modcreater.tmbeans.vo.trade.ReceivedServiceIdUserId;
 import com.modcreater.tmbeans.vo.trade.ReceivedUserIdTradeId;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
@@ -102,4 +103,12 @@ public interface OrderService {
      * @return
      */
     Dto isFriendServiceOpened(ReceivedId receivedId, String token);
+
+    /**
+     * 查询用户服务开通状态
+     * @param receivedServiceIdUserId
+     * @param token
+     * @return
+     */
+    Dto searchUserService(ReceivedServiceIdUserId receivedServiceIdUserId, String token);
 }
