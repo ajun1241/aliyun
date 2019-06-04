@@ -775,9 +775,9 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         if (accountMapper.uplHeadImg(headImgVo.getUserId(),headImgVo.getHeadImgUrl())<=0){
-            return DtoUtil.getSuccessDto("图片上传失败",21017);
+            return DtoUtil.getSuccessDto("头像上传失败",21017);
         }
-        return DtoUtil.getSuccessDto("图片上传成功",100000);
+        return DtoUtil.getSuccessDto("头像上传成功",100000);
     }
 
     @Override
@@ -811,34 +811,25 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Dto updateAccount(AccountVo accountVo,String token) {
-        if (ObjectUtils.isEmpty(accountVo)){
+    public Dto updateAccount(UpdAccountInfo updAccountInfo,String token) {
+        if (ObjectUtils.isEmpty(updAccountInfo)){
             return DtoUtil.getFalseDto("用户信息接收失败",13001);
         }
-        if (StringUtils.isEmpty(accountVo.getId())){
+        if (StringUtils.isEmpty(updAccountInfo.getUserId())){
             return DtoUtil.getFalseDto("请先登录",21011);
         }
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(accountVo.getId());
+        String redisToken=stringRedisTemplate.opsForValue().get(updAccountInfo.getUserId());
         if (!token.equals(redisToken)){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        //判断日期格式
-
-        Matcher isNum = pattern.matcher(accountVo.getBirthday());
-        if(!isNum.matches()){
-            return DtoUtil.getFalseDto("用户生日格式不正确",13004);
-        }
         Account account=new Account();
-        account.setId(accountVo.getId());
-        account.setUserName(accountVo.getUserName());
-        account.setGender(accountVo.getGender());
-        account.setUserType(accountVo.getUserType());
-        account.setBirthday(accountVo.getBirthday());
-        account.setModifyDate(new Date());
-        account.setUserSign(accountVo.getUserSign());
+        account.setId(Long.parseLong(updAccountInfo.getUserId()));
+        account.setUserName(updAccountInfo.getUserName());
+        account.setUserSign(updAccountInfo.getUserSign());
+        account.setGender(Long.parseLong(updAccountInfo.getGender()));
         int result=accountMapper.updateAccount(account);
         if (result<=0){
             return DtoUtil.getFalseDto("用户信息修改失败",13002);

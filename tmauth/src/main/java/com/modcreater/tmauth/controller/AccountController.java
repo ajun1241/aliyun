@@ -42,7 +42,7 @@ public class AccountController {
 
     @PostMapping("updateaccount")
     @ApiOperation("修改账户信息")
-    public Dto updateAccount(@RequestBody AccountVo accountVo, HttpServletRequest request){
+    public Dto updateAccount(@RequestBody UpdAccountInfo accountVo, HttpServletRequest request){
         return userService.updateAccount(accountVo,request.getHeader("token"));
     }
 
