@@ -1,6 +1,8 @@
 package com.modcreater.tmbiz.config;
 
+import com.modcreater.tmbeans.databaseparam.EventStatusScan;
 import com.modcreater.tmbeans.pojo.TimedTask;
+import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmdao.mapper.TimedTaskMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
@@ -13,14 +15,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Description:
@@ -32,10 +33,14 @@ import java.util.List;
 @Component
 @EnableScheduling
 @EnableAsync
+@Transactional(rollbackFor = Exception.class)
 public class TimerConfig {
 
     @Resource
     private TimedTaskMapper timedTaskMapper;
+
+    @Resource
+    private EventMapper eventMapper;
 
     private Logger logger= LoggerFactory.getLogger(TimerConfig.class);
 
@@ -78,11 +83,40 @@ public class TimerConfig {
         System.out.println("第一个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
     }
 
-
-    @Scheduled(cron = "0 0 4 * * ?")
+    /**
+     * 以下为每分钟的第30s进行过期事件过滤修改
+     */
+    @Scheduled(cron = "* * * * * ?")
     public void  eventStatusScan(){
-        StringBuilder stringBuilder = new StringBuilder(DateUtil.getDay(-1));
-
+        StringBuilder today = new StringBuilder(DateUtil.getDay(0));
+        EventStatusScan eventStatusScan = new EventStatusScan();
+        eventStatusScan.setThisYear(today.substring(0,4));
+        eventStatusScan.setThisMonth(today.substring(4,6));
+        eventStatusScan.setToday(today.substring(6));
+        Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date()))*60+Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
+        eventStatusScan.setTime(time.toString());
+        System.out.println(eventStatusScan.toString());
+        logger.info("有"+eventMapper.queryExpiredEvents(eventStatusScan)+"条事件待修改");
+        logger.info("修改了"+eventMapper.updateExpiredEvents(eventStatusScan)+"条事件");
     }
 
+    /**
+     * 以下为每日凌晨4点整进行过期事件过滤修改
+     */
+    /*@Scheduled(cron = "0 0 4 * * ?")
+    public void  eventStatusScan(){
+        StringBuilder date = new StringBuilder(DateUtil.getDay(-1));
+        StringBuilder today = new StringBuilder(DateUtil.getDay(0));
+        EventStatusScan eventStatusScan = new EventStatusScan();
+        eventStatusScan.setYear(date.substring(0,4));
+        eventStatusScan.setMonth(date.substring(4,6));
+        eventStatusScan.setDay(date.substring(6));
+        eventStatusScan.setThisYear(today.substring(0,4));
+        eventStatusScan.setThisMonth(today.substring(4,6));
+        eventStatusScan.setToday(today.substring(6));
+        Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date()))*60+Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
+        eventStatusScan.setTime(time.toString());
+        logger.info("有"+eventMapper.queryExpiredEvents(eventStatusScan)+"条事件待修改");
+        logger.info("修改了"+eventMapper.updateExpiredEvents(eventStatusScan)+"条事件");
+    }*/
 }

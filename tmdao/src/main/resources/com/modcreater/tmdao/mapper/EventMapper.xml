@@ -466,5 +466,27 @@
         from draft
         where userId=#{userId} and eventId=#{eventId} and isOverdue &lt;&gt; 2
     </select>
+    <select id="queryExpiredEvents" resultType="java.lang.Long">
+        select count(id) as id from singleevent
+        where isLoop = 0 and isOverdue = 0
+        and year = #{thisYear} and month = #{thisMonth} and day = #{today} and endTime &lt;= #{time}
+    </select>
+    <!--以下为每天凌晨4点查询一次
+    select count(id) from singleevent
+    where isLoop = 0 and isOverdue = 0
+    and (year &lt;= #{year} and month &lt;= #{month} and day &lt; #{day})
+    or (year = #{thisYear} and month = #{thisMonth} and day = #{today} and endTime &lt;= #{time})-->
+
+    <update id="updateExpiredEvents">
+        update singleevent set isOverdue = 1
+        where isLoop = 0 and isOverdue = 0
+        and year = #{thisYear} and month = #{thisMonth} and day = #{today} and endTime &lt;= #{time}
+
+    </update>
+    <!--以下为每天凌晨4点操作一次
+    update singleevent set isOverdue = 1
+    where isLoop = 0 and isOverdue = 0
+    and (year &lt;= #{year} and month &lt;= #{month} and day &lt; #{day})
+    or (year = #{thisYear} and month = #{thisMonth} and day = #{today} and endTime &lt;= #{time})-->
 
 </mapper>

@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.pojo.ServiceRemainingTime;
 import com.modcreater.tmdao.mapper.UserServiceMapper;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
  * Time: 14:08
  */
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
 
     @Resource

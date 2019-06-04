@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.databaseparam.EventStatusScan;
 import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.pojo.SingleEvent;
@@ -13,6 +14,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -235,4 +237,21 @@ public interface EventMapper {
      * @return
      */
     int deleteDraft(String userId,String eventId);
+
+
+    /**
+     * 查询已完成但没及时被修改的事件的数量
+     * @param eventStatusScan
+     * @return
+     */
+    Long queryExpiredEvents(EventStatusScan eventStatusScan);
+
+
+    /**
+     * 修改已完成但没及时被修改的事件的数量
+     * @param eventStatusScan
+     * @return
+     */
+    Long updateExpiredEvents(EventStatusScan eventStatusScan);
+
 }
