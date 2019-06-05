@@ -86,7 +86,7 @@ public class TimerConfig {
     /**
      * 以下为每分钟的第30s进行过期事件过滤修改
      */
-    @Scheduled(cron = "* * * * * ?")
+    @Scheduled(cron = "30 * * * * ?")
     public void  eventStatusScan(){
         StringBuilder today = new StringBuilder(DateUtil.getDay(0));
         EventStatusScan eventStatusScan = new EventStatusScan();
