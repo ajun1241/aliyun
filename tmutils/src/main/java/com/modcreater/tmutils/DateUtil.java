@@ -1,35 +1,47 @@
 package com.modcreater.tmutils;
 
+import com.modcreater.tmbeans.utils.NaturalWeek;
+
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class DateUtil {
     //日期转时间戳
-    public static String dateToStamp(Date date) throws ParseException {
+    public static String dateToStamp(Date date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String res=simpleDateFormat.format(date);
-        Date time = simpleDateFormat.parse(res);
-        long ts = (time.getTime())/1000;
+        String res = simpleDateFormat.format(date);
+        Date time = null;
+        try {
+            time = simpleDateFormat.parse(res);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        long ts = (time.getTime()) / 1000;
         res = String.valueOf(ts);
         return res;
     }
+
     //时间戳转日期
-    public static Date stampToDate(String s){
+    public static Date stampToDate(String s) {
         long lt = new Long(s);
         Date date = new Date(lt);
-        date.setTime(lt*1000);
+        date.setTime(lt * 1000);
         System.out.println(date);
         return date;
     }
 
     /**
      * 时间戳转周
+     *
      * @param s
      * @return
      */
-    public static int stringToWeek(String s){
+    public static int stringToWeek(String s) {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date date = new Date();
@@ -39,8 +51,8 @@ public class DateUtil {
             e.printStackTrace();
         }
         calendar.setTime(date);
-        int week = calendar.get(Calendar.DAY_OF_WEEK)-1;
-        if (week == 0){
+        int week = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+        if (week == 0) {
             week = 7;
         }
         return week;
@@ -48,10 +60,11 @@ public class DateUtil {
 
     /**
      * 获取当前日期的前或后的某一天的日期
-     * @param fob 例:-1为返回当天
+     *
+     * @param fob 例:-1为返回前一天
      * @return
      */
-    public static String getDay(int fob){
+    public static String getDay(int fob) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar calendar = Calendar.getInstance();
         try {
@@ -59,7 +72,38 @@ public class DateUtil {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        calendar.add(Calendar.DATE,fob);
+        calendar.add(Calendar.DATE, fob);
         return simpleDateFormat.format(calendar.getTime());
+    }
+
+    /**
+     * 获取自然周的开始及结束
+     *
+     * @param num 前几周(不能小于1)
+     * @return
+     */
+    public static List<NaturalWeek> getLastWeekOfNatural(int num) {
+        List<NaturalWeek> naturalWeeks = new ArrayList<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        int toWeek = stringToWeek(simpleDateFormat.format(new Date()));
+        int fobStart = -(toWeek - 1 + num * 7);
+        System.out.println(fobStart);
+        for (int i = 1; i <= 7; i++) {
+            NaturalWeek naturalWeek = new NaturalWeek();
+            StringBuilder whichNaturalWeekStartDay = new StringBuilder(getDay(fobStart));
+            System.out.println("前第" + num + "个自然周的周" + i + ":" + whichNaturalWeekStartDay.toString());
+            naturalWeek.setYear(whichNaturalWeekStartDay.substring(0, 4));
+            naturalWeek.setMonth(whichNaturalWeekStartDay.substring(4, 6));
+            naturalWeek.setDay(whichNaturalWeekStartDay.substring(6));
+            naturalWeeks.add(naturalWeek);
+            fobStart += 1;
+        }
+        return naturalWeeks;
+    }
+
+    public static void main(String[] args) {
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(2);
+        System.out.println();
     }
 }

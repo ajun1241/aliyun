@@ -135,11 +135,7 @@ public class AccountServiceImpl implements AccountService {
             account.setUserType(loginVo.getUserType());
             account.setUserName(loginVo.getUserCode());
             account.setGender(0L);
-            try {
-                account.setBirthday(DateUtil.dateToStamp(new Date()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            account.setBirthday(DateUtil.dateToStamp(new Date()));
             account.setIDCard("");
             account.setOfflineTime(null);
             account.setHeadImgUrl("");

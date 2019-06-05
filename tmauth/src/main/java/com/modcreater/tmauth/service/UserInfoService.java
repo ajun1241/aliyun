@@ -41,6 +41,7 @@ public interface UserInfoService {
      * @return
      */
     Dto statisticAnalysisOfData(String userId, String token);
+    Dto statisticAnalysisOfData2(String userId, String token);
 
     /**
      * 查询用户的成就

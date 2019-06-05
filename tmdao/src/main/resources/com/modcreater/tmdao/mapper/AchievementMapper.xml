@@ -36,6 +36,26 @@
         </set>
         where userId = #{userId}
     </update>
+    <update id="updateAllUserStatistics">
+        update userstatistics
+        <set>
+            <if test="userStatistics.loggedDays != null and userStatistics.loggedDays != 0">
+                loggedDays = loggedDays + #{userStatistics.loggedDays},
+            </if>
+            <if test="userStatistics.completed != null and userStatistics.completed != 0">
+                completed = completed + #{userStatistics.completed},
+            </if>
+            <if test="userStatistics.unfinished != null and userStatistics.unfinished != 0">
+                unfinished = unfinished + #{userStatistics.unfinished},
+            </if>
+            <if test="userStatistics.drafts != null and userStatistics.drafts != 0">
+                drafts = drafts + #{userStatistics.drafts},
+            </if>
+            <if test="userStatistics.lastOperatedTime != null and userStatistics.lastOperatedTime != 0">
+                lastOperatedTime = #{userStatistics.lastOperatedTime}
+            </if>
+        </set>
+    </update>
 
     <select id="searchAllAchievement" resultType="String">
         SELECT imgurl

@@ -2,6 +2,8 @@ package com.modcreater.tmbiz.config;
 
 import com.modcreater.tmbeans.databaseparam.EventStatusScan;
 import com.modcreater.tmbeans.pojo.TimedTask;
+import com.modcreater.tmbeans.pojo.UserStatistics;
+import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmdao.mapper.TimedTaskMapper;
@@ -46,6 +48,9 @@ public class TimerConfig {
 
     @Resource
     private OrderMapper orderMapper;
+
+    @Resource
+    private AchievementMapper achievementMapper;
 
     private Logger logger= LoggerFactory.getLogger(TimerConfig.class);
 
@@ -115,6 +120,17 @@ public class TimerConfig {
         if (orders != 0){
             logger.info("修改了"+orderMapper.updateExpiredOrders(timestamp)+"个订单");
         }
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void userLoginStatus(){
+        UserStatistics userStatistics = new UserStatistics();
+        try {
+            userStatistics.setLastOperatedTime(Long.valueOf(DateUtil.dateToStamp(new SimpleDateFormat("yyyyMMdd").parse(DateUtil.getDay(0)))));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        logger.info("修改了"+achievementMapper.updateAllUserStatistics(userStatistics)+"个用户");
     }
 
     /**

@@ -147,7 +147,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue in (1,0) and isLoop = 0
+            and isOverdue = 0 and isLoop = 0
         </where>
 
         order by day asc ,startTime asc
@@ -170,7 +170,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue in (1,0)
+            and isOverdue = 0
         </where>
         order by level asc
     </select>
@@ -192,7 +192,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue in (1,0)
+            and isOverdue = 0
         </where>
         order by level asc , startTime asc
     </select>
@@ -299,20 +299,20 @@
     </select>
     <select id="getUserEventsGroupByType" resultType="com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType">
         select type ,sum(endTime-startTime) totalMinutes ,count(type) num from singleevent
-        where userId = #{userId} and isOverdue in (1,0) group by type
+        where userId = #{userId} and isOverdue = 1 group by type
     </select>
     <select id="getMaxSingleEventType" resultType="java.lang.Long">
         select type from singleevent
-        where userId = #{userId} and isOverdue in (1,0) and
+        where userId = #{userId} and isOverdue = 1 and
         (select max(endTime-startTime) from singleevent
-        where userId = #{userId} and isOverdue in (1,0) limit 1)
+        where userId = #{userId} and isOverdue = 1 limit 1)
         limit 1
     </select>
     <select id="getMinSingleEventType" resultType="java.lang.Long">
         select type from singleevent
-        where userId = #{userId} and isOverdue in (1,0) and
+        where userId = #{userId} and isOverdue = 1 and
         (select min(endTime-startTime) from singleevent
-        where userId = #{userId} and isOverdue in (1,0) limit 1)
+        where userId = #{userId} and isOverdue = 1 limit 1)
         limit 1
     </select>
     <select id="countEvents" resultType="java.lang.Long">
@@ -470,6 +470,10 @@
         select count(id) as id from singleevent
         where isLoop = 0 and isOverdue = 0
         and year = #{thisYear} and month = #{thisMonth} and day = #{today} and endTime &lt;= #{time}
+    </select>
+    <select id="getEventsNum" resultType="java.lang.Long">
+        select count(id) from singleevent where userId = #{userId}
+        and year = #{year} and month = #{month} and day = #{day}
     </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent

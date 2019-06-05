@@ -10,6 +10,7 @@ import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.show.ShowUserAnalysis;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
+import com.modcreater.tmbeans.utils.NaturalWeek;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DateUtil;
@@ -22,10 +23,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -54,9 +52,14 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
+    /**
+     * 事件的类型,一次按0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他排列
+     */
     private static final String[] TYPE = {"a", "b", "c", "d", "e", "f", "g", "h"};
-    private static final String[] ONEWEEKINNUM = {"a", "b", "c", "d", "e", "f", "g"};
+    /**
+     * 线形图板块显示的周的数量
+     */
+    private static final Integer SEARCH_WEEK_NUM = 6;
 
     @Override
     public Dto showUserDetails(String userId, String token) {
@@ -119,18 +122,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<Achievement> achievementList = achievementMapper.queryAchievement();
         if (!ObjectUtils.isEmpty(userStatistics) && !ObjectUtils.isEmpty(achievementList)) {
             for (Achievement achievement : achievementList) {
-                try {
-                    if (achievementMapper.queryUserAchievement(userId, achievement.getId()) == 0) {
-                        if (userStatistics.getLoggedDays() == (achievement.getLoggedDaysCondition()).longValue()) {
-                            achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                            continue;
-                        }
-                        if (userStatistics.getCompleted() == achievement.getFinishedEventsCondition().longValue()) {
-                            achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                        }
+                if (achievementMapper.queryUserAchievement(userId, achievement.getId()) == 0) {
+                    if (userStatistics.getLoggedDays() == (achievement.getLoggedDaysCondition()).longValue()) {
+                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
+                        continue;
                     }
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                    if (userStatistics.getCompleted() == achievement.getFinishedEventsCondition().longValue()) {
+                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
+                    }
                 }
             }
         }
@@ -254,7 +253,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         ShowUserAnalysis showUserAnalysis = new ShowUserAnalysis();
         showUserAnalysis.setUserId(userId);
-        DecimalFormat format = new DecimalFormat("0.00");
         //记录的总和
         Long totalEvents = eventMapper.countEvents(userId);
         //记录事件的总用时分钟数
@@ -284,6 +282,107 @@ public class UserInfoServiceImpl implements UserInfoService {
         showUserAnalysis.setTotalMinutesResult(totalMinutesResult);
         showUserAnalysis.setSumMinutes(totalMinutes);
         return DtoUtil.getSuccesWithDataDto("用户数据统计成功", showUserAnalysis, 100000);
+    }
+
+    @Override
+    public Dto statisticAnalysisOfData2(String userId, String token) {
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
+        }
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+        }
+        //已完成的事件的总和
+        Long totalEvents = eventMapper.countEvents(userId);
+        //已完成事件的总分钟数
+        Long totalMinutes = 0L;
+        //返回数据
+        Map<String, Object> allStatistic = new HashMap<>();
+        //板块1:扇形图
+        //百分比
+        Map<String, String> sector = new HashMap<>();
+        //时长
+        Map<String, String> typeDuration = new HashMap<>();
+        //定义小数精度
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMaximumFractionDigits(2);
+        //添加所有类型到百分比,时长中
+        for (String s : TYPE) {
+            sector.put(s, null);
+            typeDuration.put(s, null);
+        }
+        //查询事件数量,用时(根据type分组)
+        List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
+        for (GetUserEventsGroupByType type : typeList) {
+            for (int i = 0; i < TYPE.length; i++) {
+                if (type.getType() == i) {
+                    sector.put(TYPE[i], Double.valueOf(nf.format((double) type.getNum() / totalEvents)) * 100 + "%");
+                    typeDuration.put(TYPE[i], type.getTotalMinutes() / 60 + "h" + type.getTotalMinutes() % 60 + "min");
+                }
+            }
+            //将每个类型的事件所占时长统计到总时长中
+            totalMinutes += type.getTotalMinutes();
+        }
+        if (totalMinutes % 60 >= 30) {
+            totalMinutes = totalMinutes / 60 + 1;
+        }
+        totalMinutes = totalMinutes / 60;
+        allStatistic.put("totalHours", totalMinutes);
+        allStatistic.put("sector", sector);
+        allStatistic.put("typeDuration", typeDuration);
+        //线形图板块
+        List<Map<String, Object>> showWeekEventsNumList = new ArrayList<>();
+        Long lastWeek = 0L;
+        Long lastLastWeek = 0L;
+        Long maxType = 0L;
+        Long minType = 0L;
+        for (int i = SEARCH_WEEK_NUM; i >= 1; i--) {
+            List<NaturalWeek> naturalWeeks = DateUtil.getLastWeekOfNatural(i);
+            Map<String, Object> showWeekEventsNum = new HashMap<>();
+            Long eventsNum = 0L;
+            for (NaturalWeek naturalWeek : naturalWeeks) {
+                naturalWeek.setUserId(userId);
+                eventsNum += eventMapper.getEventsNum(naturalWeek);
+            }
+            showWeekEventsNum.put("totalEvents", eventsNum);
+            showWeekEventsNum.put("startDateAndEndDate", Long.valueOf(naturalWeeks.get(0).getMonth())
+                    + "." + Long.valueOf(naturalWeeks.get(0).getDay())
+                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
+                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()));
+            showWeekEventsNumList.add(showWeekEventsNum);
+            if (i == 2) {
+                lastLastWeek = eventsNum;
+            }
+            if (i == 1) {
+                lastWeek = eventsNum;
+            }
+        }
+        allStatistic.put("showWeekEventsNumList", showWeekEventsNumList);
+        allStatistic.put("lastWeekContrastEarlier", nf.format((double) (lastWeek - lastLastWeek) / lastLastWeek * 100));
+        //周事件统计
+        Map<String, Long> frontSevenDays = new HashMap<>();
+        Long maxEventNum = 0L;
+        Long totalEventsNum = 0L;
+        for (int i = 0; i >= -6; i--) {
+            String day = DateUtil.getDay(i);
+            StringBuilder stringBuilder = new StringBuilder(day);
+            NaturalWeek naturalWeek = new NaturalWeek();
+            naturalWeek.setUserId(userId);
+            naturalWeek.setYear(stringBuilder.substring(0, 4));
+            naturalWeek.setMonth(stringBuilder.substring(4, 6));
+            naturalWeek.setDay(stringBuilder.substring(6));
+            Long num = eventMapper.getEventsNum(naturalWeek);
+            totalEventsNum += num;
+            frontSevenDays.put(Long.valueOf(stringBuilder.substring(4, 6)) + "." + Long.valueOf(stringBuilder.substring(6)), num);
+            if (num > maxEventNum) {
+                maxEventNum = num;
+            }
+        }
+        allStatistic.put("frontSevenDays", frontSevenDays);
+        allStatistic.put("maxEventsNum", maxEventNum);
+        allStatistic.put("avgEventsNum", totalEventsNum / 7);
+        return null;
     }
 
     @Override

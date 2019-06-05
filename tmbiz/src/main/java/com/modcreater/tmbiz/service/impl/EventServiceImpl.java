@@ -409,33 +409,25 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo,String token) {
+    public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo, String token) {
         if (StringUtils.hasText(searchEventVo.getUserId())) {
-            if (!StringUtils.hasText(token)){
-                return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
+            if (!StringUtils.hasText(token)) {
+                return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
             }
-            if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))){
-                return DtoUtil.getFalseDto("token过期请先登录",21014);
+            if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))) {
+                return DtoUtil.getFalseDto("token过期请先登录", 21014);
             }
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
                 System.out.println("按月查" + searchEventVo.toString());
                 //用户操作界面,记录时间
                 //查询上一次用户操作过的时间
                 Long lastUserStatisticsDate = achievementMapper.queryUserStatisticsDate(searchEventVo.getUserId());
-                //生成系统时间
-                Long now = System.currentTimeMillis();
-                UserStatistics userStatistics = new UserStatistics();
-                userStatistics.setLastOperatedTime(now);
-                System.out.println("()()()()()()("+now.toString());
-                //将本次操作的事件更新到用户统计表
-                achievementMapper.updateUserStatistics(userStatistics,searchEventVo.getUserId());
-                //如果当前操作时间与用户上一次操作的时间的差值大于一天则更改用户统计表中的登录天数
-                if ((now - lastUserStatisticsDate) >= 86400000){
+                if (lastUserStatisticsDate != 0) {
                     UserStatistics userStatisticsForLogin = new UserStatistics();
                     userStatisticsForLogin.setLoggedDays(1L);
-                    achievementMapper.updateUserStatistics(userStatisticsForLogin,searchEventVo.getUserId());
+                    userStatisticsForLogin.setLastOperatedTime(0L);
+                    achievementMapper.updateUserStatistics(userStatisticsForLogin, searchEventVo.getUserId());
                 }
-
                 SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
                 //查询在该月内存在事件的日的集合
                 List<Integer> days = eventMapper.queryDays(singleEvent);
@@ -451,13 +443,13 @@ public class EventServiceImpl implements EventService {
                             dayEvents.setTotalNum(singleEventList.size());
                             String month = singleEvent.getMonth().toString();
                             String day1 = singleEvent.getDay().toString();
-                            if (month.length() == 1){
+                            if (month.length() == 1) {
                                 month = "0" + month;
                             }
-                            if (day1.length() == 1){
+                            if (day1.length() == 1) {
                                 day1 = "0" + day1;
                             }
-                            dayEvents.setDayEventId(Integer.valueOf(singleEvent.getYear().toString() + month +day1));
+                            dayEvents.setDayEventId(Integer.valueOf(singleEvent.getYear().toString() + month + day1));
                             dayEvents.setMySingleEventList(showSingleEventList);
                             dayEventsList.add(dayEvents);
                         }

@@ -4,17 +4,14 @@ import com.modcreater.tmbeans.databaseparam.EventStatusScan;
 import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.pojo.SingleEvent;
-import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
+import com.modcreater.tmbeans.utils.NaturalWeek;
 import com.modcreater.tmbeans.vo.eventvo.DeleteEventVo;
-import com.modcreater.tmbeans.vo.eventvo.DraftVo;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -254,4 +251,10 @@ public interface EventMapper {
      */
     Long updateExpiredEvents(EventStatusScan eventStatusScan);
 
+    /**
+     * 根据开始日期和结束日期查询事件数量
+     * @param naturalWeek
+     * @return
+     */
+    Long getEventsNum(NaturalWeek naturalWeek);
 }
