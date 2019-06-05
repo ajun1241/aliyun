@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.pojo.UserRealInfo;
 import com.modcreater.tmbeans.vo.ComplaintVo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
 import com.modcreater.tmdao.mapper.AccountMapper;
+import com.modcreater.tmdao.mapper.ComplaintMapper;
 import com.modcreater.tmdao.mapper.UserRealInfoMapper;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -34,7 +35,7 @@ public class ManageServiceImpl implements ManageService {
     private UserRealInfoMapper userRealInfoMapper;
 
     @Resource
-    private AccountMapper accountMapper;
+    private ComplaintMapper complaintMapper;
 
     /**
      * 上传用户真实信息
@@ -88,6 +89,21 @@ public class ManageServiceImpl implements ManageService {
      */
     @Override
     public Dto complaint(ComplaintVo complaintVo, String token) {
-        return null;
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(complaintVo)){
+            return DtoUtil.getFalseDto("上传数据未获取到",21013);
+        }
+        if (StringUtils.isEmpty(complaintVo.getUserId())){
+            return DtoUtil.getFalseDto("userId未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(complaintVo.getUserId()))){
+            return DtoUtil.getFalseDto("token过期请先登录",21014);
+        }
+        if (complaintMapper.addComplaint(complaintVo)==0){
+            return DtoUtil.getFalseDto("投诉上传失败",50010);
+        }
+        return DtoUtil.getSuccessDto("上传成功",100000);
     }
 }

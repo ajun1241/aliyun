@@ -22,11 +22,11 @@ public interface AccountService {
 
     /**
      * 修改账号信息
-     * @param accountVo
+     * @param updAccountInfo
      * @param token
      * @return
      */
-    Dto updateAccount(AccountVo accountVo,String token);
+    Dto updateAccount(UpdAccountInfo updAccountInfo,String token);
 
     /**
      * 查看用户详情

@@ -2,6 +2,7 @@ package com.modcreater.tmauth.controller;
 
 import com.modcreater.tmauth.service.ManageService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.ComplaintVo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,11 @@ public class ManageController {
     @ApiOperation("实名认证")
     public Dto verify(@RequestBody ReceivedUserRealInfo receivedUserRealInfo, HttpServletRequest request){
         return manageService.uploadUserRealInfo(receivedUserRealInfo,request.getHeader("token"));
+    }
+    @PostMapping(value = "complaint")
+    @ApiOperation("投诉")
+    public Dto complaint(@RequestBody ComplaintVo complaintVo, HttpServletRequest request){
+        return manageService.complaint(complaintVo,request.getHeader("token"));
     }
 
 }
