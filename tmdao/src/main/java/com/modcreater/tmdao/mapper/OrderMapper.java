@@ -43,4 +43,18 @@ public interface OrderMapper {
      * @return
      */
     int updateUserOrder(UserOrders userOrders);
+
+    /**
+     * 查询已过期但未被及时修改的订单
+     * @param timestamp
+     * @return
+     */
+    Long queryExpiredOrders(Long timestamp);
+
+    /**
+     * 修改已过期但未被及时修改的订单
+     * @param timestamp
+     * @return
+     */
+    Long updateExpiredOrders(Long timestamp);
 }

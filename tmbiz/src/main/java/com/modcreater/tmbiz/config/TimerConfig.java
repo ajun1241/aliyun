@@ -3,6 +3,7 @@ package com.modcreater.tmbiz.config;
 import com.modcreater.tmbeans.databaseparam.EventStatusScan;
 import com.modcreater.tmbeans.pojo.TimedTask;
 import com.modcreater.tmdao.mapper.EventMapper;
+import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmdao.mapper.TimedTaskMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
@@ -11,6 +12,7 @@ import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -41,6 +43,9 @@ public class TimerConfig {
 
     @Resource
     private EventMapper eventMapper;
+
+    @Resource
+    private OrderMapper orderMapper;
 
     private Logger logger= LoggerFactory.getLogger(TimerConfig.class);
 
@@ -87,17 +92,29 @@ public class TimerConfig {
      * 以下为每分钟的第30s进行过期事件过滤修改
      */
     @Scheduled(cron = "30 * * * * ?")
-    public void  eventStatusScan(){
+    public void eventStatusScan() {
         StringBuilder today = new StringBuilder(DateUtil.getDay(0));
         EventStatusScan eventStatusScan = new EventStatusScan();
-        eventStatusScan.setThisYear(today.substring(0,4));
-        eventStatusScan.setThisMonth(today.substring(4,6));
+        eventStatusScan.setThisYear(today.substring(0, 4));
+        eventStatusScan.setThisMonth(today.substring(4, 6));
         eventStatusScan.setToday(today.substring(6));
-        Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date()))*60+Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
+        Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
         eventStatusScan.setTime(time.toString());
-        System.out.println(eventStatusScan.toString());
-        logger.info("有"+eventMapper.queryExpiredEvents(eventStatusScan)+"条事件待修改");
-        logger.info("修改了"+eventMapper.updateExpiredEvents(eventStatusScan)+"条事件");
+        Long events = eventMapper.queryExpiredEvents(eventStatusScan);
+        logger.info("有" + events + "条事件待修改");
+        if (events != 0) {
+            logger.info("修改了" + eventMapper.updateExpiredEvents(eventStatusScan) + "条事件");
+        }
+    }
+
+    @Scheduled(cron = "0 * * * * ?")
+    public void orderStatusScan(){
+        Long timestamp = System.currentTimeMillis()/1000;
+        Long orders = orderMapper.queryExpiredOrders(timestamp);
+        logger.info("有" + orders + "个订单待修改");
+        if (orders != 0){
+            logger.info("修改了"+orderMapper.updateExpiredOrders(timestamp)+"个订单");
+        }
     }
 
     /**

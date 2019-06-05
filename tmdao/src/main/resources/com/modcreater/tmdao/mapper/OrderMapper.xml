@@ -30,7 +30,6 @@
         orderStatus = #{orderStatus}
         where id = #{id}
     </update>
-
     <select id="getUnitPrice" resultType="java.lang.Double">
         select
         <if test="serviceType == 'month'">
@@ -50,4 +49,10 @@
     <select id="getUserOrder" resultType="com.modcreater.tmbeans.pojo.UserOrders">
         select <include refid="userOrders"/> from userorders where id = #{tradeId}
     </select>
+    <select id="queryExpiredOrders" resultType="java.lang.Long">
+        select count(id) from userorders where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800
+    </select>
+    <update id="updateExpiredOrders">
+        update userorders set orderStatus = 3 where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800
+    </update>
 </mapper>
