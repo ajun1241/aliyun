@@ -1,8 +1,11 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.UserOrders;
+import com.modcreater.tmbeans.show.order.ShowUserOrders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -57,4 +60,11 @@ public interface OrderMapper {
      * @return
      */
     Long updateExpiredOrders(Long timestamp);
+
+    /**
+     * 查询用户所有的订单
+     * @param userId
+     * @return
+     */
+    List<ShowUserOrders> getUserAllOrders(String userId);
 }

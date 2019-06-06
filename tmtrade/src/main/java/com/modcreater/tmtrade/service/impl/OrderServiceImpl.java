@@ -12,6 +12,7 @@ import com.github.wxpay.sdk.WXPayUtil;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.ServiceRemainingTime;
 import com.modcreater.tmbeans.pojo.UserOrders;
+import com.modcreater.tmbeans.show.order.ShowUserOrders;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedServiceIdUserId;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
@@ -587,6 +588,21 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return DtoUtil.getFalseDto("参数有误",60020);
+    }
+
+    @Override
+    public Dto searchUserOrders(ReceivedId receivedId, String token) {
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+        }
+        List<ShowUserOrders> userOrdersList = orderMapper.getUserAllOrders(receivedId.getUserId());
+        if (userOrdersList.size() == 0){
+            return DtoUtil.getSuccessDto("未查询到订单",200000);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",userOrdersList,100000);
     }
 
     /**

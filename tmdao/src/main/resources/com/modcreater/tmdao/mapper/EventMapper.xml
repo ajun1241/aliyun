@@ -316,7 +316,7 @@
         limit 1
     </select>
     <select id="countEvents" resultType="java.lang.Long">
-        select count(id) from singleevent where userId = #{userId} and isOverdue in (1,0)
+        select count(id) from singleevent where userId = #{userId} and isOverdue = 1
     </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.pojo.SingleEvent" >

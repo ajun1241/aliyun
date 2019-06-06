@@ -52,6 +52,18 @@
     <select id="queryExpiredOrders" resultType="java.lang.Long">
         select count(id) from userorders where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800
     </select>
+    <select id="getUserAllOrders" resultType="com.modcreater.tmbeans.show.order.ShowUserOrders">
+        select
+        serviceId ,
+        orderTitle ,
+        serviceType ,
+        paymentAmount ,
+        number ,
+        createDate ,
+        payTime ,
+        payChannel
+        from userorders where userId = #{userId} and orderStatus = 2
+    </select>
     <update id="updateExpiredOrders">
         update userorders set orderStatus = 3 where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800
     </update>

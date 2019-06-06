@@ -111,4 +111,12 @@ public interface OrderService {
      * @return
      */
     Dto searchUserService(ReceivedServiceIdUserId receivedServiceIdUserId, String token);
+
+    /**
+     * 查询用户订单
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto searchUserOrders(ReceivedId receivedId, String token);
 }

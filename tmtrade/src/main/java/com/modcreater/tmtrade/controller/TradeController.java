@@ -71,4 +71,9 @@ public class TradeController {
     public Dto searchUserService(@RequestBody ReceivedServiceIdUserId receivedServiceIdUserId, HttpServletRequest request){
         return orderService.searchUserService(receivedServiceIdUserId,request.getHeader("token"));
     }
+
+    @PostMapping(value = "searchorders")
+    public Dto searchOrders(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
+        return orderService.searchUserOrders(receivedId,request.getHeader("token"));
+    }
 }

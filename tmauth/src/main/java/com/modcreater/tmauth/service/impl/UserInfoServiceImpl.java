@@ -3,6 +3,7 @@ package com.modcreater.tmauth.service.impl;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmauth.service.UserServiceJudgeService;
 import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
+import com.modcreater.tmbeans.databaseparam.UserEventsGroupByInWeek;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
@@ -313,7 +314,47 @@ public class UserInfoServiceImpl implements UserInfoService {
             typeDuration.put(s, null);
         }
         //查询事件数量,用时(根据type分组)
-        List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
+        UserEventsGroupByInWeek userEventsGroupByInWeek = new UserEventsGroupByInWeek();
+        for (int i = 0 ;i <= 6 ;i--){
+            String date = DateUtil.getDay(i);
+            if (i == 0){
+                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
+                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
+                userEventsGroupByInWeek.setTodayDay(date.substring(6));
+            }
+            if (i == 1){
+                userEventsGroupByInWeek.setYesterdayYear(date.substring(0,4));
+                userEventsGroupByInWeek.setYesterdayMonth(date.substring(4,6));
+                userEventsGroupByInWeek.setYesterdayDay(date.substring(6));
+            }
+            if (i == 2){
+                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
+                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
+                userEventsGroupByInWeek.setTodayDay(date.substring(6));
+            }
+            if (i == 3){
+                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
+                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
+                userEventsGroupByInWeek.setTodayDay(date.substring(6));
+            }
+            if (i == 4){
+                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
+                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
+                userEventsGroupByInWeek.setTodayDay(date.substring(6));
+            }
+            if (i == 5){
+                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
+                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
+                userEventsGroupByInWeek.setTodayDay(date.substring(6));
+            }
+            if (i == 6){
+                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
+                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
+                userEventsGroupByInWeek.setTodayDay(date.substring(6));
+            }
+        }
+//        eventMapper.getUserEventsGroupByTypeInWeek(UserEventsGroupByInWeek);
+        /*List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i < TYPE.length; i++) {
                 if (type.getType() == i) {
@@ -328,15 +369,13 @@ public class UserInfoServiceImpl implements UserInfoService {
             totalMinutes = totalMinutes / 60 + 1;
         }
         totalMinutes = totalMinutes / 60;
-        allStatistic.put("totalHours", totalMinutes);
+        allStatistic.put("totalHours", totalMinutes);*/
         allStatistic.put("sector", sector);
         allStatistic.put("typeDuration", typeDuration);
         //线形图板块
         List<Map<String, Object>> showWeekEventsNumList = new ArrayList<>();
         Long lastWeek = 0L;
         Long lastLastWeek = 0L;
-        Long maxType = 0L;
-        Long minType = 0L;
         for (int i = SEARCH_WEEK_NUM; i >= 1; i--) {
             List<NaturalWeek> naturalWeeks = DateUtil.getLastWeekOfNatural(i);
             Map<String, Object> showWeekEventsNum = new HashMap<>();
