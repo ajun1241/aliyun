@@ -126,9 +126,9 @@ public class AccountServiceImpl implements AccountService {
             map.put("userAddress",result.getUserAddress());*/
             map.put("userSign",result.getUserSign());
             map.put("token",token);
-            result.setToken(token);
-            result.setUserPassword(null);
-            return DtoUtil.getSuccesWithDataDto("登录成功",result,100000);
+            //查询用户是否开启了勿扰模式
+            map.put("dnd",userSettingsMapper.getDND(result.getId().toString()));
+            return DtoUtil.getSuccesWithDataDto("登录成功",map,100000);
         }else {
             //未注册时
             account.setUserCode(loginVo.getUserCode());
@@ -321,6 +321,10 @@ public class AccountServiceImpl implements AccountService {
         Friendship friendship1=accountMapper.queryFriendshipDetail(sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getUserId());
         System.out.println("是不是好友   "+friendship);
         System.out.println("是不是好友  "+friendship1);
+        //判断你是不是自己加自己
+        if (sendFriendRequestVo.getUserId().equals(sendFriendRequestVo.getFriendId())){
+            return DtoUtil.getFalseDto("不能自己加自己",17007);
+        }
         //不是第一次添加
         if (!ObjectUtils.isEmpty(friendship)|| !ObjectUtils.isEmpty(friendship1)){
             //这时不能添加
