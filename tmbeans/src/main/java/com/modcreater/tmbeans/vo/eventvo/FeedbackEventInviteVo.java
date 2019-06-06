@@ -21,6 +21,7 @@ public class FeedbackEventInviteVo implements Serializable {
      * 选择（0；同意; 1：不同意; 2：未回应）
      */
     private String choose;
+
     private String userId;
     /**
      * 发送邀请时的扩展数据

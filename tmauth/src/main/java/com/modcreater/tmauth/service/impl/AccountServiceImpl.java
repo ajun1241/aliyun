@@ -474,12 +474,12 @@ public class AccountServiceImpl implements AccountService {
         ResponseResult result2;
         try {
             //小灰条通知
-            result1=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),new InfoNtfMessage("你已添加了"+ friend.getUserName() +"，现在可以开始聊天了。",""));
+            result1=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),new String[]{sendFriendResponseVo.getFriendId()},new InfoNtfMessage("你已添加了"+ friend.getUserName() +"，现在可以开始聊天了。",""));
             if (result1.getCode()!=200){
                 return DtoUtil.getFalseDto("发送小灰条通知失败",17003);
             }
             //发送文本消息
-            result2=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),new TxtMessage("我通过了你的朋友验证请求，现在我们可以开始聊天了",""));
+            result2=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),new String[]{sendFriendResponseVo.getFriendId()},new TxtMessage("我通过了你的朋友验证请求，现在我们可以开始聊天了",""));
             if (result2.getCode()!=200){
                 return DtoUtil.getFalseDto("发送文本result2消息失败",17004);
             }
@@ -574,9 +574,9 @@ public class AccountServiceImpl implements AccountService {
         }
         //成就
         List<String> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
-        if (achievement.size()==0){
+        /*if (achievement.size()==0){
             return DtoUtil.getFalseDto("查询成就失败",200000);
-        }
+        }*/
         map.put("userId",account.getId().toString());
         map.put("userCode",account.getUserCode());
         map.put("userName",account.getUserName());

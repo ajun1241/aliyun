@@ -106,10 +106,10 @@ public class RongCloudMethodUtil {
     /**
      * 通过融云发送单聊消息
      */
-    public ResponseResult sendPrivateMsg(String senderId, String targetId, BaseMessage baseMessage) throws Exception {
+    public ResponseResult sendPrivateMsg(String senderId, String[] targetId, BaseMessage baseMessage) throws Exception {
         PrivateMessage privateMessage = new PrivateMessage()
                 .setSenderId(senderId)
-                .setTargetId(new String[]{targetId})
+                .setTargetId(targetId)
                 .setObjectName(baseMessage.getType())
                 .setContent(baseMessage)
                 .setPushContent("")

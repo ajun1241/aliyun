@@ -1,4 +1,4 @@
-package com.modcreater.tmutils;
+package com.modcreater.tmutils.messageutil;
 
 import io.rong.messages.BaseMessage;
 import io.rong.util.GsonUtil;
@@ -12,34 +12,37 @@ import io.rong.util.GsonUtil;
 
 public class InviteMessage extends BaseMessage {
     private String content = "";
-    private String extra = "";
+    private String date = "";
     private String extraData = "";
-    private static final transient String TYPE = "InviteMsg";
+    private String extra = "";
+    private static final transient String TYPE = "ZX:InviteMsg";
 
-    public InviteMessage(String content, String extra, String extraData) {
+    public InviteMessage(String content, String date, String extraData, String extra) {
         this.content = content;
+        this.date = date;
+        this.extraData = extraData;
         this.extra = extra;
     }
 
     @Override
     public String getType() {
-        return "InviteMsg";
+        return "ZX:InviteMsg";
     }
 
     public String getContent() {
-        return this.content;
+        return content;
     }
 
     public void setContent(String content) {
         this.content = content;
     }
 
-    public String getExtra() {
-        return this.extra;
+    public String getDate() {
+        return date;
     }
 
-    public void setExtra(String extra) {
-        this.extra = extra;
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getExtraData() {
@@ -48,6 +51,14 @@ public class InviteMessage extends BaseMessage {
 
     public void setExtraData(String extraData) {
         this.extraData = extraData;
+    }
+
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
     }
 
     @Override
