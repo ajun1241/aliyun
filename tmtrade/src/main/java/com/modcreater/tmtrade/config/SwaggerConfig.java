@@ -42,7 +42,7 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("时间管理用户模块")
+                .title("时间管理支付模块")
                 .description("以下")
                 .termsOfServiceUrl("")
                 .version("1.0")

@@ -73,7 +73,7 @@ public class ManageServiceImpl implements ManageService {
             userRealInfo.setUserIdCardFront(receivedUserRealInfo.getUserIDCardFront());
             userRealInfo.setUserIdCardVerso(receivedUserRealInfo.getUserIDCardVerso());
             userRealInfo.setRealStatus(0L);
-            userRealInfo.setModifyDate(new Date());
+            userRealInfo.setCreateDate(new Date());
             if (userRealInfoMapper.updateRealInfo(userRealInfo)==0){
                 return DtoUtil.getFalseDto("上传数据失败",50001);
             }

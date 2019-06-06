@@ -2,6 +2,7 @@ package com.modcreater.tmbiz.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.eventvo.*;
@@ -657,6 +658,12 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("查询条件接收失败", 21004);
     }
 
+    /**
+     * 显示一个时间详情
+     * @param receivedSearchOnce
+     * @param token
+     * @return
+     */
     @Override
     public Dto searchOnce(ReceivedSearchOnce receivedSearchOnce, String token) {
         if (!StringUtils.hasText(token)){
@@ -666,7 +673,20 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         SingleEvent singleEvent = eventMapper.queryEventOne(receivedSearchOnce.getUserId(),receivedSearchOnce.getEventId());
+        String[] friendsId=singleEvent.getPerson().split(",");
+        List<Map> maps=new ArrayList<>();
+        for (String friendId:friendsId) {
+            Map map=new HashMap();
+            Account account=accountMapper.queryAccount(friendId);
+            map.put("friendId",account.getId());
+            map.put("userCode",account.getUserCode());
+            map.put("userName",account.getUserName());
+            map.put("headImgUrl",account.getHeadImgUrl());
+            map.put("gender",account.getGender());
+            maps.add(map);
+        }
         if (singleEvent != null){
+            singleEvent.setPerson(maps.toString());
             return DtoUtil.getSuccesWithDataDto("查询成功",SingleEventUtil.getShowSingleEvent(singleEvent),100000);
         }
         return DtoUtil.getSuccessDto("未查询到事件",200000);
@@ -974,7 +994,10 @@ public class EventServiceImpl implements EventService {
         if (y>0 || m){
             return DtoUtil.getFalseDto("该时间段内已有事件不能添加",21012);
         }
-        String[] persons=singleEvent.getPerson().split(",");
+        //好友列的数据
+        System.out.println("参与人员："+singleEvent.getPerson());
+        EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+        String[] persons=eventPersons.getFriendsId().split(",");
         String redisKey=addInviteEventVo.getUserId()+singleEvent.getEventid();
         stringRedisTemplate.opsForValue().set(redisKey,JSON.toJSONString(singleEvent));
         //生成统计表
