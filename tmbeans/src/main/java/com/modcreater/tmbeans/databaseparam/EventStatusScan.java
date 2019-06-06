@@ -13,18 +13,18 @@ import lombok.Data;
 @Data
 public class EventStatusScan {
 
-    private String year;
+    private Long year;
 
-    private String month;
+    private Long month;
 
-    private String day;
+    private Long day;
 
-    private String thisYear;
+    private Long thisYear;
 
-    private String thisMonth;
+    private Long thisMonth;
 
-    private String today;
+    private Long today;
 
-    private String time;
+    private Long time;
 
 }

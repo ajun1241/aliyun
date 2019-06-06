@@ -58,6 +58,10 @@ public class UserInfoController {
     public Dto statisticAnalysisOfData(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.statisticAnalysisOfData(receivedId.getUserId(),request.getHeader("token"));
     }
+    @RequestMapping(value = "statisticanalysisofdata2",method = RequestMethod.POST)
+    public Dto statisticAnalysisOfData2(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return userInfoService.statisticAnalysisOfData2(receivedId.getUserId(),request.getHeader("token"));
+    }
 
     /**
      * 查询用户成就

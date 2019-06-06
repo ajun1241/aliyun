@@ -1,11 +1,13 @@
 package com.modcreater.tmauth.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmauth.service.UserServiceJudgeService;
 import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
 import com.modcreater.tmbeans.databaseparam.UserEventsGroupByInWeek;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.show.ShowUserAnalysis;
@@ -315,46 +317,41 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         //查询事件数量,用时(根据type分组)
         UserEventsGroupByInWeek userEventsGroupByInWeek = new UserEventsGroupByInWeek();
-        for (int i = 0 ;i <= 6 ;i--){
+        userEventsGroupByInWeek.setUserId(userId);
+        for (int i = 0; i >= -6; i--) {
+            System.out.println("执行321");
             String date = DateUtil.getDay(i);
-            if (i == 0){
-                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
-                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
+            if (i == 0) {
+                userEventsGroupByInWeek.setTodayYear(date.substring(0, 4));
+                userEventsGroupByInWeek.setTodayMonth(date.substring(4, 6));
                 userEventsGroupByInWeek.setTodayDay(date.substring(6));
-            }
-            if (i == 1){
-                userEventsGroupByInWeek.setYesterdayYear(date.substring(0,4));
-                userEventsGroupByInWeek.setYesterdayMonth(date.substring(4,6));
+            } else if (i == 1) {
+                userEventsGroupByInWeek.setYesterdayYear(date.substring(0, 4));
+                userEventsGroupByInWeek.setYesterdayMonth(date.substring(4, 6));
                 userEventsGroupByInWeek.setYesterdayDay(date.substring(6));
-            }
-            if (i == 2){
-                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
-                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
-                userEventsGroupByInWeek.setTodayDay(date.substring(6));
-            }
-            if (i == 3){
-                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
-                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
-                userEventsGroupByInWeek.setTodayDay(date.substring(6));
-            }
-            if (i == 4){
-                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
-                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
-                userEventsGroupByInWeek.setTodayDay(date.substring(6));
-            }
-            if (i == 5){
-                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
-                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
-                userEventsGroupByInWeek.setTodayDay(date.substring(6));
-            }
-            if (i == 6){
-                userEventsGroupByInWeek.setTodayYear(date.substring(0,4));
-                userEventsGroupByInWeek.setTodayMonth(date.substring(4,6));
-                userEventsGroupByInWeek.setTodayDay(date.substring(6));
+            } else if (i == 2) {
+                userEventsGroupByInWeek.setThirdDayYear(date.substring(0, 4));
+                userEventsGroupByInWeek.setThirdDayMonth(date.substring(4, 6));
+                userEventsGroupByInWeek.setThirdDayDay(date.substring(6));
+            } else if (i == 3) {
+                userEventsGroupByInWeek.setFourthDayYear(date.substring(0, 4));
+                userEventsGroupByInWeek.setFourthDayMonth(date.substring(4, 6));
+                userEventsGroupByInWeek.setFourthDayDay(date.substring(6));
+            } else if (i == 4) {
+                userEventsGroupByInWeek.setFifthDayYear(date.substring(0, 4));
+                userEventsGroupByInWeek.setFifthDayMonth(date.substring(4, 6));
+                userEventsGroupByInWeek.setFifthDayDay(date.substring(6));
+            } else if (i == 5) {
+                userEventsGroupByInWeek.setSixthDayYear(date.substring(0, 4));
+                userEventsGroupByInWeek.setSixthDayMonth(date.substring(4, 6));
+                userEventsGroupByInWeek.setSixthDayDay(date.substring(6));
+            } else if (i == 6) {
+                userEventsGroupByInWeek.setSeventhDayYear(date.substring(0, 4));
+                userEventsGroupByInWeek.setSeventhDayMonth(date.substring(4, 6));
+                userEventsGroupByInWeek.setSeventhDayDay(date.substring(6));
             }
         }
-//        eventMapper.getUserEventsGroupByTypeInWeek(UserEventsGroupByInWeek);
-        /*List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
+        List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i < TYPE.length; i++) {
                 if (type.getType() == i) {
@@ -369,21 +366,80 @@ public class UserInfoServiceImpl implements UserInfoService {
             totalMinutes = totalMinutes / 60 + 1;
         }
         totalMinutes = totalMinutes / 60;
-        allStatistic.put("totalHours", totalMinutes);*/
+        allStatistic.put("totalHours", totalMinutes);
         allStatistic.put("sector", sector);
         allStatistic.put("typeDuration", typeDuration);
         //线形图板块
         List<Map<String, Object>> showWeekEventsNumList = new ArrayList<>();
         Long lastWeek = 0L;
         Long lastLastWeek = 0L;
+        Map<String, String> maxTypes = new HashMap<>();
+        Map<String, String> minTypes = new HashMap<>();
         for (int i = SEARCH_WEEK_NUM; i >= 1; i--) {
             List<NaturalWeek> naturalWeeks = DateUtil.getLastWeekOfNatural(i);
             Map<String, Object> showWeekEventsNum = new HashMap<>();
             Long eventsNum = 0L;
+            Long maxMinutes = 0L;
+            int maxType = 0;
+            Long minMinutes = 10100L;
+            int minType = 0;
             for (NaturalWeek naturalWeek : naturalWeeks) {
+                maxMinutes = 0L;
+                maxType = 0;
+                minMinutes = 10100L;
+                minType = 0;
                 naturalWeek.setUserId(userId);
                 eventsNum += eventMapper.getEventsNum(naturalWeek);
+                if (i == 1) {
+                    userEventsGroupByInWeek.setTodayYear(naturalWeek.getYear());
+                    userEventsGroupByInWeek.setTodayMonth(naturalWeek.getMonth());
+                    userEventsGroupByInWeek.setTodayDay(naturalWeek.getDay());
+                } else if (i == 2) {
+                    userEventsGroupByInWeek.setYesterdayYear(naturalWeek.getYear());
+                    userEventsGroupByInWeek.setYesterdayMonth(naturalWeek.getMonth());
+                    userEventsGroupByInWeek.setYesterdayDay(naturalWeek.getDay());
+                } else if (i == 3) {
+                    userEventsGroupByInWeek.setThirdDayYear(naturalWeek.getYear());
+                    userEventsGroupByInWeek.setThirdDayMonth(naturalWeek.getMonth());
+                    userEventsGroupByInWeek.setThirdDayDay(naturalWeek.getDay());
+                } else if (i == 4) {
+                    userEventsGroupByInWeek.setFourthDayYear(naturalWeek.getYear());
+                    userEventsGroupByInWeek.setFourthDayMonth(naturalWeek.getMonth());
+                    userEventsGroupByInWeek.setFourthDayDay(naturalWeek.getDay());
+                } else if (i == 5) {
+                    userEventsGroupByInWeek.setFifthDayYear(naturalWeek.getYear());
+                    userEventsGroupByInWeek.setFifthDayMonth(naturalWeek.getMonth());
+                    userEventsGroupByInWeek.setFifthDayDay(naturalWeek.getDay());
+                } else if (i == 6) {
+                    userEventsGroupByInWeek.setSixthDayYear(naturalWeek.getYear());
+                    userEventsGroupByInWeek.setSixthDayMonth(naturalWeek.getMonth());
+                    userEventsGroupByInWeek.setSixthDayDay(naturalWeek.getDay());
+                } else if (i == 7) {
+                    userEventsGroupByInWeek.setSeventhDayYear(naturalWeek.getYear());
+                    userEventsGroupByInWeek.setSeventhDayMonth(naturalWeek.getMonth());
+                    userEventsGroupByInWeek.setSeventhDayDay(naturalWeek.getDay());
+                }
+                List<GetUserEventsGroupByType> typeList1 = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
+                for (int ttt = 0; ttt < typeList1.size(); ttt++) {
+                    Long minutes = typeList1.get(ttt).getTotalMinutes();
+                    if (minutes > maxMinutes) {
+                        maxMinutes = minutes;
+                        maxType = ttt;
+                    }
+                    if (minutes < minMinutes) {
+                        minMinutes = minutes;
+                        minType = ttt;
+                    }
+                }
             }
+            maxTypes.put(Long.valueOf(naturalWeeks.get(0).getMonth())
+                    + "." + Long.valueOf(naturalWeeks.get(0).getDay())
+                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
+                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()), TYPE[maxType]);
+            minTypes.put(Long.valueOf(naturalWeeks.get(0).getMonth())
+                    + "." + Long.valueOf(naturalWeeks.get(0).getDay())
+                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
+                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()), TYPE[minType]);
             showWeekEventsNum.put("totalEvents", eventsNum);
             showWeekEventsNum.put("startDateAndEndDate", Long.valueOf(naturalWeeks.get(0).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(0).getDay())
@@ -421,7 +477,53 @@ public class UserInfoServiceImpl implements UserInfoService {
         allStatistic.put("frontSevenDays", frontSevenDays);
         allStatistic.put("maxEventsNum", maxEventNum);
         allStatistic.put("avgEventsNum", totalEventsNum / 7);
-        return null;
+        allStatistic.put("maxTypes", maxTypes);
+        allStatistic.put("minTypes", minTypes);
+        List<Map<String, String>> myBestFriends = new ArrayList<>();
+        List<String> persons = eventMapper.queryEventInBestFriends(userId);
+        Long maxEvents = 0L;
+        Long friendId = 100000L;
+
+        List<Long> friendIdsList = accountMapper.queryAllFriendList(userId);
+        Map<Long, Long> completeEventsTogether = new HashMap<>();
+        for (Long friend : friendIdsList) {
+            completeEventsTogether.put(friend, 0L);
+        }
+        for (String person : persons) {
+            EventPersons eventPersons = JSONObject.parseObject(person, EventPersons.class);
+            String[] friendIds = eventPersons.getFriendsId().split(",");
+            for (String s : friendIds) {
+                completeEventsTogether.put(Long.valueOf(s),completeEventsTogether.get(s) + 1);
+            }
+        }
+        Set<Long> sets = completeEventsTogether.keySet();
+        List<Long> friends = new ArrayList<>();
+        for (int i = 1;i<=3;i++){
+            for (Long set : sets){
+                Long num = completeEventsTogether.get(set);
+                if (num > maxEvents){
+                    maxEvents = num;
+                    friendId = set;
+
+                }
+
+            }
+            completeEventsTogether.remove(friendId);
+            friends.add(friendId);
+            maxEvents = 0L;
+            friendId = 100000L;
+        }
+        for (Long id : friends){
+            Map<String ,String> map = new HashMap<>();
+            if (id != 100000){
+                Account accounts = accountMapper.queryNameAndHead(id);
+                map.put("userName",accounts.getUserName());
+                map.put("headImgUrl",accounts.getHeadImgUrl());
+            }
+            myBestFriends.add(map);
+        }
+        allStatistic.put("myBestFriends",myBestFriends);
+        return DtoUtil.getSuccesWithDataDto("查询成功",allStatistic,100000);
     }
 
     @Override

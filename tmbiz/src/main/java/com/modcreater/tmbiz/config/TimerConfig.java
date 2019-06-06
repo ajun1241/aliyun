@@ -100,11 +100,12 @@ public class TimerConfig {
     public void eventStatusScan() {
         StringBuilder today = new StringBuilder(DateUtil.getDay(0));
         EventStatusScan eventStatusScan = new EventStatusScan();
-        eventStatusScan.setThisYear(today.substring(0, 4));
-        eventStatusScan.setThisMonth(today.substring(4, 6));
-        eventStatusScan.setToday(today.substring(6));
+        eventStatusScan.setThisYear(Long.valueOf(today.substring(0, 4)));
+        eventStatusScan.setThisMonth(Long.valueOf(today.substring(4, 6)));
+        eventStatusScan.setToday(Long.valueOf(today.substring(6)));
         Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
-        eventStatusScan.setTime(time.toString());
+        System.out.println(time);
+        eventStatusScan.setTime((long)time);
         Long events = eventMapper.queryExpiredEvents(eventStatusScan);
         logger.info("有" + events + "条事件待修改");
         if (events != 0) {

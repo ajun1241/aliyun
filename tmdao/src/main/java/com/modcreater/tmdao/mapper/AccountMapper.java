@@ -180,4 +180,18 @@ public interface AccountMapper {
      * @return
      */
     int uplHeadImg(String userId, String headImgUrl);
+
+    /**
+     * 查询我的所有好友
+     * @param userId
+     * @return
+     */
+    List<Long> queryAllFriendList(String userId);
+
+    /**
+     * 根据ID查询用户
+     * @param id
+     * @return
+     */
+    Account queryNameAndHead(Long id);
 }

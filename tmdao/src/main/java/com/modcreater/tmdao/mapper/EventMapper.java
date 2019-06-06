@@ -2,6 +2,7 @@ package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.databaseparam.EventStatusScan;
 import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
+import com.modcreater.tmbeans.databaseparam.UserEventsGroupByInWeek;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.utils.NaturalWeek;
@@ -257,4 +258,18 @@ public interface EventMapper {
      * @return
      */
     Long getEventsNum(NaturalWeek naturalWeek);
+
+    /**
+     * 查询前一周的事件类型统计
+     * @param userEventsGroupByInWeek
+     * @return
+     */
+    List<GetUserEventsGroupByType> getUserEventsGroupByTypeInWeek(UserEventsGroupByInWeek userEventsGroupByInWeek);
+
+    /**
+     * 查询和用户一起已完成的事件的好友
+     * @param userId
+     * @return
+     */
+    List<String> queryEventInBestFriends(String userId);
 }
