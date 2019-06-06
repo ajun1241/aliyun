@@ -490,6 +490,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             completeEventsTogether.put(friend, 0L);
         }
         for (String person : persons) {
+            System.out.println(person);
             EventPersons eventPersons = JSONObject.parseObject(person, EventPersons.class);
             String[] friendIds = eventPersons.getFriendsId().split(",");
             for (String s : friendIds) {
