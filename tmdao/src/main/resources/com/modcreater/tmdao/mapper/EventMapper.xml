@@ -473,7 +473,7 @@
     </select>
     <select id="getEventsNum" resultType="java.lang.Long">
         select count(id) from singleevent where userId = #{userId}
-        and year = #{year} and month = #{month} and day = #{day}
+        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1
     </select>
     <select id="getUserEventsGroupByTypeInWeek"
             resultType="com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType">

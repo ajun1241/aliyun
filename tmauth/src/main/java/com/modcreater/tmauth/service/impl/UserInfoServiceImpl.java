@@ -319,33 +319,33 @@ public class UserInfoServiceImpl implements UserInfoService {
         UserEventsGroupByInWeek userEventsGroupByInWeek = new UserEventsGroupByInWeek();
         userEventsGroupByInWeek.setUserId(userId);
         for (int i = 0; i >= -6; i--) {
-            System.out.println("执行321");
             String date = DateUtil.getDay(i);
+            System.out.println("时间时间!!"+date);
             if (i == 0) {
                 userEventsGroupByInWeek.setTodayYear(date.substring(0, 4));
                 userEventsGroupByInWeek.setTodayMonth(date.substring(4, 6));
                 userEventsGroupByInWeek.setTodayDay(date.substring(6));
-            } else if (i == 1) {
+            } else if (i == -1) {
                 userEventsGroupByInWeek.setYesterdayYear(date.substring(0, 4));
                 userEventsGroupByInWeek.setYesterdayMonth(date.substring(4, 6));
                 userEventsGroupByInWeek.setYesterdayDay(date.substring(6));
-            } else if (i == 2) {
+            } else if (i == -2) {
                 userEventsGroupByInWeek.setThirdDayYear(date.substring(0, 4));
                 userEventsGroupByInWeek.setThirdDayMonth(date.substring(4, 6));
                 userEventsGroupByInWeek.setThirdDayDay(date.substring(6));
-            } else if (i == 3) {
+            } else if (i == -3) {
                 userEventsGroupByInWeek.setFourthDayYear(date.substring(0, 4));
                 userEventsGroupByInWeek.setFourthDayMonth(date.substring(4, 6));
                 userEventsGroupByInWeek.setFourthDayDay(date.substring(6));
-            } else if (i == 4) {
+            } else if (i == -4) {
                 userEventsGroupByInWeek.setFifthDayYear(date.substring(0, 4));
                 userEventsGroupByInWeek.setFifthDayMonth(date.substring(4, 6));
                 userEventsGroupByInWeek.setFifthDayDay(date.substring(6));
-            } else if (i == 5) {
+            } else if (i == -5) {
                 userEventsGroupByInWeek.setSixthDayYear(date.substring(0, 4));
                 userEventsGroupByInWeek.setSixthDayMonth(date.substring(4, 6));
                 userEventsGroupByInWeek.setSixthDayDay(date.substring(6));
-            } else if (i == 6) {
+            } else if (i == -6) {
                 userEventsGroupByInWeek.setSeventhDayYear(date.substring(0, 4));
                 userEventsGroupByInWeek.setSeventhDayMonth(date.substring(4, 6));
                 userEventsGroupByInWeek.setSeventhDayDay(date.substring(6));
@@ -387,7 +387,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 maxMinutes = 0L;
                 maxType = 0;
                 minMinutes = 10100L;
-                minType = 0;
+                minType = 0;//此处bug为for循环每执行一次以上四条数据将被清空
                 naturalWeek.setUserId(userId);
                 eventsNum += eventMapper.getEventsNum(naturalWeek);
                 if (i == 1) {
@@ -434,17 +434,17 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             maxTypes.put(Long.valueOf(naturalWeeks.get(0).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(0).getDay())
-                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
-                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()), TYPE[maxType]);
+                    + "~" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
+                    + "." + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()), TYPE[maxType]);
             minTypes.put(Long.valueOf(naturalWeeks.get(0).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(0).getDay())
-                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
-                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()), TYPE[minType]);
+                    + "~" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
+                    + "." + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()), TYPE[minType]);
             showWeekEventsNum.put("totalEvents", eventsNum);
             showWeekEventsNum.put("startDateAndEndDate", Long.valueOf(naturalWeeks.get(0).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(0).getDay())
-                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
-                    + "" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()));
+                    + "~" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
+                    + "." + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()));
             showWeekEventsNumList.add(showWeekEventsNum);
             if (i == 2) {
                 lastLastWeek = eventsNum;
@@ -453,8 +453,13 @@ public class UserInfoServiceImpl implements UserInfoService {
                 lastWeek = eventsNum;
             }
         }
+        System.out.println(lastLastWeek);
+        System.out.println(lastWeek);
+        if (lastLastWeek == 0){
+            lastLastWeek = 1L;
+        }
         allStatistic.put("showWeekEventsNumList", showWeekEventsNumList);
-        allStatistic.put("lastWeekContrastEarlier", nf.format((double) (lastWeek - lastLastWeek) / lastLastWeek * 100));
+        allStatistic.put("lastWeekContrastEarlier", nf.format((double) (lastWeek - lastLastWeek) / lastLastWeek * 100) + "%");
         //周事件统计
         Map<String, Long> frontSevenDays = new HashMap<>();
         Long maxEventNum = 0L;
@@ -490,10 +495,12 @@ public class UserInfoServiceImpl implements UserInfoService {
             completeEventsTogether.put(friend, 0L);
         }
         for (String person : persons) {
-            System.out.println(person);
             EventPersons eventPersons = JSONObject.parseObject(person, EventPersons.class);
             String[] friendIds = eventPersons.getFriendsId().split(",");
             for (String s : friendIds) {
+                if(ObjectUtils.isEmpty(completeEventsTogether.get(s))){
+                    continue;
+                }
                 completeEventsTogether.put(Long.valueOf(s),completeEventsTogether.get(s) + 1);
             }
         }
