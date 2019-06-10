@@ -83,4 +83,14 @@ public interface UserSettingsMapper {
      * @return
      */
     Long getDND(String userId);
+
+    /**
+     * 修改对好友的邀请/支持/不被看权限
+     * @param type
+     * @param friendId
+     * @param status
+     * @param userId
+     * @return
+     */
+    int updateUserSettingsToFriends(@Param("type") String type,@Param("friendId") String friendId,@Param("status") int status ,@Param("userId")String userId);
 }

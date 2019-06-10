@@ -31,6 +31,9 @@
     <update id="updateUserSettings" statementType="STATEMENT">
         update usersettings set ${type} = ${status} where userId = ${userId}
     </update>
+    <update id="updateUserSettingsToFriends" statementType="STATEMENT">
+        update friendship set ${type} = ${status} where userId = ${userId} and friendId = ${friendId}
+    </update>
     <select id="queryAllSettings" resultType="com.modcreater.tmbeans.pojo.UserSettings">
         select * from usersettings where userId = #{userId}
     </select>

@@ -189,23 +189,23 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         try {
             if (receivedEventConditions.getPageNum() == 0) {
-                receivedEventConditions.setPageNum(1L);
+                singleEventCondition.setPageNum(1L);
             }
             if (receivedEventConditions.getPageSize() == 0) {
-                singleEventCondition.setPageSize(7L);
-            }
-            singleEventCondition.setPageNum((receivedEventConditions.getPageNum() - 1) * receivedEventConditions.getPageSize());
-            singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
-            //此处判断用户是否开启了查询服务
-            Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
-            if (dto != null) {
-                singleEventCondition.setPageNum(0L);
                 singleEventCondition.setPageSize(7L);
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
         } finally {
-            singleEventCondition.setPageNum(0L);
+            receivedEventConditions.setPageNum(1L);
+            receivedEventConditions.setPageSize(7L);
+        }
+        singleEventCondition.setPageNum((receivedEventConditions.getPageNum() - 1) * receivedEventConditions.getPageSize());
+        singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
+        //此处判断用户是否开启了查询服务
+        Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
+        if (dto != null) {
+            singleEventCondition.setPageNum(1L);
             singleEventCondition.setPageSize(7L);
         }
         List<SingleEvent> singleEventList;
@@ -456,7 +456,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         allStatistic.put("showWeekEventsNumList", showWeekEventsNumList);
         allStatistic.put("lastWeekContrastEarlier", nf.format((double) (lastWeek - lastLastWeek) / lastLastWeek * 100) + "%");
         //周事件统计
-        Map<String, Long> frontSevenDays = new HashMap<>();
+        List<Map<String,Object>> frontSevenDays = new ArrayList<>();
         Long maxEventNum = 0L;
         Long totalEventsNum = 0L;
         for (int i = 0; i >= -6; i--) {
@@ -469,7 +469,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             naturalWeek.setDay(stringBuilder.substring(6));
             Long num = eventMapper.getEventsNum(naturalWeek);
             totalEventsNum += num;
-            frontSevenDays.put(Long.valueOf(stringBuilder.substring(4, 6)) + "." + Long.valueOf(stringBuilder.substring(6)), num);
+            Map<String,Object> map = new HashMap<>();
+            map.put("date",Long.valueOf(stringBuilder.substring(4, 6)) + "." + Long.valueOf(stringBuilder.substring(6)));
+            map.put("num",num);
+            frontSevenDays.add(map);
             if (num > maxEventNum) {
                 maxEventNum = num;
             }
