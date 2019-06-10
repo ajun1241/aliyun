@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="timemanagerdb" uuid="81366492-6a83-49e3-81a6-5e803ad328fa">
+    <data-source source="LOCAL" name="timemanagerdb@192.168.1.7" uuid="4d08f202-6216-472b-9c49-09fcabe429c4">
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://192.168.1.5:3306/timemanagerdb</jdbc-url>
+      <jdbc-url>jdbc:mysql://192.168.1.7:3306/timemanagerdb</jdbc-url>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />

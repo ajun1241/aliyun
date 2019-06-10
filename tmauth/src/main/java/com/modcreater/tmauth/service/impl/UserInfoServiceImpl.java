@@ -14,6 +14,7 @@ import com.modcreater.tmbeans.show.ShowUserAnalysis;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
 import com.modcreater.tmbeans.utils.NaturalWeek;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedAlterUserInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DateUtil;
@@ -562,8 +563,22 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         if (weekLists.size() == 0) {
             return DtoUtil.getSuccessDto("未查询到数据", 200000);
-
         }
         return DtoUtil.getSuccesWithDataDto("查询我的一周成功", weekLists, 100000);
+    }
+
+    @Override
+    public Dto alterUserSign(ReceivedAlterUserInfo receivedAlterUserInfo, String token) {
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedAlterUserInfo.getUserId()))) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+        }
+        int i = accountMapper.alterUserInfo(receivedAlterUserInfo.getUserId(),receivedAlterUserInfo.getUserSign(),receivedAlterUserInfo.getUserName(),receivedAlterUserInfo.getHeadImgUrl());
+        if (i != 0){
+            return DtoUtil.getSuccessDto("修改成功",100000);
+        }
+        return DtoUtil.getFalseDto("修改失败",200000);
     }
 }

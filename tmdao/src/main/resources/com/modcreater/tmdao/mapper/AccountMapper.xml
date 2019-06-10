@@ -144,6 +144,21 @@
         update account set headImgUrl=#{headImgUrl}
         where id=#{userId}
     </update>
+    <update id="alterUserInfo">
+        update account
+        <set>
+            <if test="userSign != null and userSign != ''">
+                userSign = #{userSign}
+            </if>
+            <if test="userName != null and userName != ''">
+                userName = #{userName}
+            </if>
+            <if test="headImgUrl != null and headImgUrl != ''">
+                headImgUrl = #{headImgUrl}
+            </if>
+        </set>
+        where id = #{userId}
+    </update>
 
     <select id="queryUserDetails" resultType="com.modcreater.tmbeans.show.userinfo.ShowUserDetails">
         select userName,userSign,headImgUrl "userHeadPortrait" from account where id = #{userId}

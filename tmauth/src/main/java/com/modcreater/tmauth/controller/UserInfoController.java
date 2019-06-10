@@ -2,10 +2,7 @@ package com.modcreater.tmauth.controller;
 
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
+import com.modcreater.tmbeans.vo.userinfovo.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -90,5 +87,16 @@ public class UserInfoController {
     @RequestMapping(value = "myweek",method = RequestMethod.POST)
     public Dto myWeek(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.myWeek(receivedId.getUserId(),request.getHeader("token"));
+    }
+
+    /**
+     * 修改用户信息
+     * @param receivedAlterUserInfo
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "alterusersign")
+    public Dto alterUserSign(@RequestBody ReceivedAlterUserInfo receivedAlterUserInfo,HttpServletRequest request){
+        return userInfoService.alterUserSign(receivedAlterUserInfo,request.getHeader("token"));
     }
 }

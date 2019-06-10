@@ -194,4 +194,14 @@ public interface AccountMapper {
      * @return
      */
     Account queryNameAndHead(Long id);
+
+    /**
+     * 修改用户头像签名昵称
+     * @param userId
+     * @param userSign
+     * @param userName
+     * @param headImgUrl
+     * @return
+     */
+    int alterUserInfo(@Param("userId") String userId,@Param("userSign") String userSign,@Param("userName") String userName,@Param("headImgUrl") String headImgUrl);
 }

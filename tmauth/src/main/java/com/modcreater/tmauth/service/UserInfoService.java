@@ -2,6 +2,7 @@ package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserAchievement;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedAlterUserInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
@@ -72,4 +73,12 @@ public interface UserInfoService {
      * @return
      */
     Dto myWeek(String userId, String token);
+
+    /**
+     * 修改用户信息
+     * @param receivedAlterUserInfo
+     * @param token
+     * @return
+     */
+    Dto alterUserSign(ReceivedAlterUserInfo receivedAlterUserInfo, String token);
 }
