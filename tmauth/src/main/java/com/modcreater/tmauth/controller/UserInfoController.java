@@ -58,9 +58,16 @@ public class UserInfoController {
     public Dto statisticAnalysisOfData(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.statisticAnalysisOfData(receivedId.getUserId(),request.getHeader("token"));
     }
-    @RequestMapping(value = "statisticanalysisofdata2",method = RequestMethod.POST)
-    public Dto statisticAnalysisOfData2(@RequestBody ReceivedId receivedId,HttpServletRequest request){
-        return userInfoService.statisticAnalysisOfData2(receivedId.getUserId(),request.getHeader("token"));
+
+    /**
+     * 周报
+     * @param receivedId
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "weeklyreport",method = RequestMethod.POST)
+    public Dto weeklyReport(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return userInfoService.weeklyReport(receivedId.getUserId(),request.getHeader("token"));
     }
 
     /**

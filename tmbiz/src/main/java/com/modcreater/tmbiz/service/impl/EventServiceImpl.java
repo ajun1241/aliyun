@@ -574,9 +574,9 @@ public class EventServiceImpl implements EventService {
             System.out.println("按周查" + searchEventVo.toString());
             Map<String,Object> result = new HashMap<>(3);
             if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 || userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(),searchEventVo.getFriendId()) == 1){
-                result.put("userPrivatePermission",1);
+                result.put("userPrivatePermission","1");
             }else {
-                result.put("userPrivatePermission",0);
+                result.put("userPrivatePermission","0");
                 return DtoUtil.getSuccesWithDataDto("该用户设置了查看权限",result,100000);
             }
             SingleEvent singleEvent;

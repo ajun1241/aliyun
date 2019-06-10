@@ -288,7 +288,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public Dto statisticAnalysisOfData2(String userId, String token) {
+    public Dto weeklyReport(String userId, String token) {
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
@@ -320,7 +320,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userEventsGroupByInWeek.setUserId(userId);
         for (int i = 0; i >= -6; i--) {
             String date = DateUtil.getDay(i);
-            System.out.println("时间时间!!"+date);
+            System.out.println("时间时间!!" + date);
             if (i == 0) {
                 userEventsGroupByInWeek.setTodayYear(date.substring(0, 4));
                 userEventsGroupByInWeek.setTodayMonth(date.substring(4, 6));
@@ -384,10 +384,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             Long minMinutes = 10100L;
             int minType = 0;
             for (NaturalWeek naturalWeek : naturalWeeks) {
-                maxMinutes = 0L;
-                maxType = 0;
-                minMinutes = 10100L;
-                minType = 0;//此处bug为for循环每执行一次以上四条数据将被清空
                 naturalWeek.setUserId(userId);
                 eventsNum += eventMapper.getEventsNum(naturalWeek);
                 if (i == 1) {
@@ -419,17 +415,18 @@ public class UserInfoServiceImpl implements UserInfoService {
                     userEventsGroupByInWeek.setSeventhDayMonth(naturalWeek.getMonth());
                     userEventsGroupByInWeek.setSeventhDayDay(naturalWeek.getDay());
                 }
-                List<GetUserEventsGroupByType> typeList1 = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
-                for (int ttt = 0; ttt < typeList1.size(); ttt++) {
-                    Long minutes = typeList1.get(ttt).getTotalMinutes();
-                    if (minutes > maxMinutes) {
-                        maxMinutes = minutes;
-                        maxType = ttt;
-                    }
-                    if (minutes < minMinutes) {
-                        minMinutes = minutes;
-                        minType = ttt;
-                    }
+            }
+            List<GetUserEventsGroupByType> typeList1 = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
+            for (int ttt = 0; ttt < typeList1.size(); ttt++) {
+                Long minutes = typeList1.get(ttt).getTotalMinutes();
+                System.out.println("minutes:"+minutes);
+                if (minutes > maxMinutes) {
+                    maxMinutes = minutes;
+                    maxType = ttt;
+                }
+                if (minutes < minMinutes) {
+                    minMinutes = minutes;
+                    minType = ttt;
                 }
             }
             maxTypes.put(Long.valueOf(naturalWeeks.get(0).getMonth())
@@ -453,9 +450,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 lastWeek = eventsNum;
             }
         }
-        System.out.println(lastLastWeek);
-        System.out.println(lastWeek);
-        if (lastLastWeek == 0){
+        if (lastLastWeek == 0) {
             lastLastWeek = 1L;
         }
         allStatistic.put("showWeekEventsNumList", showWeekEventsNumList);
@@ -498,40 +493,40 @@ public class UserInfoServiceImpl implements UserInfoService {
             EventPersons eventPersons = JSONObject.parseObject(person, EventPersons.class);
             String[] friendIds = eventPersons.getFriendsId().split(",");
             for (String s : friendIds) {
-                if(ObjectUtils.isEmpty(completeEventsTogether.get(s))){
+                Long key = Long.valueOf(s);
+                if (ObjectUtils.isEmpty(completeEventsTogether.get(key))) {
                     continue;
                 }
-                completeEventsTogether.put(Long.valueOf(s),completeEventsTogether.get(s) + 1);
+                completeEventsTogether.put(key, completeEventsTogether.get(key) + 1);
             }
         }
         Set<Long> sets = completeEventsTogether.keySet();
         List<Long> friends = new ArrayList<>();
-        for (int i = 1;i<=3;i++){
-            for (Long set : sets){
+        for (int i = 1; i <= 3; i++) {
+            for (Long set : sets) {
                 Long num = completeEventsTogether.get(set);
-                if (num > maxEvents){
+                if (num > maxEvents) {
                     maxEvents = num;
                     friendId = set;
 
                 }
-
             }
             completeEventsTogether.remove(friendId);
             friends.add(friendId);
             maxEvents = 0L;
             friendId = 100000L;
         }
-        for (Long id : friends){
-            Map<String ,String> map = new HashMap<>();
-            if (id != 100000){
+        for (Long id : friends) {
+            Map<String, String> map = new HashMap<>();
+            if (id != 100000) {
                 Account accounts = accountMapper.queryNameAndHead(id);
-                map.put("userName",accounts.getUserName());
-                map.put("headImgUrl",accounts.getHeadImgUrl());
+                map.put("userName", accounts.getUserName());
+                map.put("headImgUrl", accounts.getHeadImgUrl());
             }
             myBestFriends.add(map);
         }
-        allStatistic.put("myBestFriends",myBestFriends);
-        return DtoUtil.getSuccesWithDataDto("查询成功",allStatistic,100000);
+        allStatistic.put("myBestFriends", myBestFriends);
+        return DtoUtil.getSuccesWithDataDto("查询成功", allStatistic, 100000);
     }
 
     @Override
