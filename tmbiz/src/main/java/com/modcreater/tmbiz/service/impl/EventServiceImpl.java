@@ -723,8 +723,8 @@ public class EventServiceImpl implements EventService {
         SingleEvent singleEvent=JSONObject.parseObject(addbackerVo.getSingleEvent(),SingleEvent.class);
         singleEvent.setUserid(Long.parseLong(addbackerVo.getUserId()));
         //事件时间冲突判断
-        if (eventMapper.countIdByDate(singleEvent) != 0){
-            return DtoUtil.getFalseDto("时间段冲突,无法添加",21012);
+        if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent),Long.valueOf(singleEvent.getStarttime()),Long.valueOf(singleEvent.getEndtime()))){
+            return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
         }
         if (eventMapper.uploadingEvents(singleEvent)==0){
             return DtoUtil.getFalseDto("事件添加失败",25001);
@@ -991,9 +991,9 @@ public class EventServiceImpl implements EventService {
         SingleEvent singleEvent=JSONObject.parseObject(addInviteEventVo.getSingleEvent(),SingleEvent.class);
         singleEvent.setUserid(Long.parseLong(addInviteEventVo.getUserId()));
         //判断是否有冲突事件
-        int y=eventMapper.countIdByDate(singleEvent);
+        boolean y=SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent),Long.valueOf(singleEvent.getStarttime()),Long.valueOf(singleEvent.getEndtime()));
         boolean m=stringRedisTemplate.hasKey(addInviteEventVo.getUserId()+singleEvent.getEventid().toString());
-        if (y>0 || m){
+        if (!y || m){
             return DtoUtil.getFalseDto("该时间段内已有事件不能添加",21012);
         }
         //好友列的数据
@@ -1020,7 +1020,7 @@ public class EventServiceImpl implements EventService {
             RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
             String date=singleEvent.getYear()+"/"+singleEvent.getMonth()+"/"+singleEvent.getDay();
             System.out.println(JSON.toJSONString(singleEvent));
-            InviteMessage inviteMessage=new InviteMessage(singleEvent.getEventname(),date,JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)),"1");
+            InviteMessage inviteMessage=new InviteMessage(singleEvent.getEventname(),date,JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)),"2");
             ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),persons,inviteMessage);
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送消息失败",17002);
@@ -1355,8 +1355,8 @@ public class EventServiceImpl implements EventService {
             singleEvent.setPerson(finalPerson);
 
             //事件时间冲突判断
-            if (eventMapper.countIdByDate(singleEvent) != 0){
-                return DtoUtil.getFalseDto("时间段冲突,无法添加",21012);
+            if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent),Long.valueOf(singleEvent.getStarttime()),Long.valueOf(singleEvent.getEndtime()))){
+                return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
             }
             //把该事件添加进发起者事件列表(修改这件事)
             SingleEvent sEvent=eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
@@ -1523,8 +1523,8 @@ public class EventServiceImpl implements EventService {
             System.out.println("最终参与者"+finalPerson);
             singleEvent.setPerson(finalPerson);
             //事件时间冲突判断
-            if (eventMapper.countIdByDate(singleEvent) != 0){
-                return DtoUtil.getFalseDto("时间段冲突,无法添加",21012);
+            if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent),Long.valueOf(singleEvent.getStarttime()),Long.valueOf(singleEvent.getEndtime()))){
+                return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
             }
             //修改
             eventMapper.alterEventsByUserId(singleEvent);

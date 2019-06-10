@@ -33,6 +33,7 @@ public class ManageController {
     public Dto verify(@RequestBody ReceivedUserRealInfo receivedUserRealInfo, HttpServletRequest request){
         return manageService.uploadUserRealInfo(receivedUserRealInfo,request.getHeader("token"));
     }
+
     @PostMapping(value = "complaint")
     @ApiOperation("投诉")
     public Dto complaint(@RequestBody ComplaintVo complaintVo, HttpServletRequest request){
