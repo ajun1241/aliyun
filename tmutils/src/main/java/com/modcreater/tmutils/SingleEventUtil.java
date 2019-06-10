@@ -287,8 +287,8 @@ public class SingleEventUtil {
                     || (Long.valueOf(singleEvent1.getStarttime()) > startTime && Long.valueOf(singleEvent1.getStarttime()) < endTime)
                     || (Long.valueOf(singleEvent1.getEndtime()) > startTime && Long.valueOf(singleEvent1.getEndtime()) < endTime)
                     || (Long.valueOf(singleEvent1.getStarttime()) <= startTime && Long.valueOf(singleEvent1.getEndtime()) >= endTime));
-            if (!res){
-                return res;
+            if (res){
+                return false;
             }
         }
         return true;
