@@ -57,11 +57,11 @@ public class ReceivedEventConditions implements Serializable {
     /**
      * 当前页
      */
-    private Long pageNum;
+    private String pageNum;
     /**
      * 每页显示的条数
      */
-    private Long pageSize;
+    private String pageSize;
 
     private String appType;
 }

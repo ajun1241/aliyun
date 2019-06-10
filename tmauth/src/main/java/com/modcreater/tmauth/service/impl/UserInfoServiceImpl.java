@@ -188,27 +188,20 @@ public class UserInfoServiceImpl implements UserInfoService {
             singleEventCondition.setMonth(Long.valueOf(startDate.substring(4, 6)));
             singleEventCondition.setDay(Long.valueOf(startDate.substring(6, 8)));
         }
-        try {
-            if (receivedEventConditions.getPageNum() == 0) {
-                singleEventCondition.setPageNum(1L);
-            }
-            if (receivedEventConditions.getPageSize() == 0) {
-                singleEventCondition.setPageSize(7L);
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        } finally {
-            receivedEventConditions.setPageNum(1L);
-            receivedEventConditions.setPageSize(7L);
+        if (!StringUtils.hasText(receivedEventConditions.getPageNum())) {
+            singleEventCondition.setPageNum(1L);
         }
-        singleEventCondition.setPageNum((receivedEventConditions.getPageNum() - 1) * receivedEventConditions.getPageSize());
-        singleEventCondition.setPageSize(receivedEventConditions.getPageSize());
+        if (!StringUtils.hasText(receivedEventConditions.getPageSize())) {
+            singleEventCondition.setPageSize(7L);
+        }
         //此处判断用户是否开启了查询服务
         Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
         if (dto != null) {
-            singleEventCondition.setPageNum(1L);
-            singleEventCondition.setPageSize(7L);
+            receivedEventConditions.setPageNum("1");
+            receivedEventConditions.setPageSize("7");
         }
+        singleEventCondition.setPageNum((Long.valueOf(receivedEventConditions.getPageNum()) - 1) * Long.valueOf(receivedEventConditions.getPageSize()));
+        singleEventCondition.setPageSize(Long.valueOf(receivedEventConditions.getPageSize()));
         List<SingleEvent> singleEventList;
         List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
         if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("0")) {
@@ -221,8 +214,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (singleEventList.size() != 0) {
             for (SingleEvent singleEvent : singleEventList) {
                 if (receivedEventConditions.getPerson() != null && !"".equals(receivedEventConditions.getPerson())) {
-                    String[] persons = receivedEventConditions.getPerson().split(",");
-                    String[] personsInResult = singleEvent.getPerson().split(",");
+                    EventPersons eventPersons1 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
+                    String[] persons = eventPersons1.getFriendsId().split(",");
+                    EventPersons eventPersons2 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
+                    String[] personsInResult = eventPersons2.getFriendsId().split(",");
                     int i = 0;
                     if (persons.length > personsInResult.length) {
                         continue;
@@ -420,7 +415,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             List<GetUserEventsGroupByType> typeList1 = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
             for (int ttt = 0; ttt < typeList1.size(); ttt++) {
                 Long minutes = typeList1.get(ttt).getTotalMinutes();
-                System.out.println("minutes:"+minutes);
+                System.out.println("minutes:" + minutes);
                 if (minutes > maxMinutes) {
                     maxMinutes = minutes;
                     maxType = ttt;
@@ -457,7 +452,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         allStatistic.put("showWeekEventsNumList", showWeekEventsNumList);
         allStatistic.put("lastWeekContrastEarlier", nf.format((double) (lastWeek - lastLastWeek) / lastLastWeek * 100) + "%");
         //周事件统计
-        List<Map<String,Object>> frontSevenDays = new ArrayList<>();
+        List<Map<String, Object>> frontSevenDays = new ArrayList<>();
         Long maxEventNum = 0L;
         Long totalEventsNum = 0L;
         for (int i = 0; i >= -6; i--) {
@@ -470,9 +465,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             naturalWeek.setDay(stringBuilder.substring(6));
             Long num = eventMapper.getEventsNum(naturalWeek);
             totalEventsNum += num;
-            Map<String,Object> map = new HashMap<>();
-            map.put("date",Long.valueOf(stringBuilder.substring(4, 6)) + "." + Long.valueOf(stringBuilder.substring(6)));
-            map.put("num",num);
+            Map<String, Object> map = new HashMap<>();
+            map.put("date", Long.valueOf(stringBuilder.substring(4, 6)) + "." + Long.valueOf(stringBuilder.substring(6)));
+            map.put("num", num);
             frontSevenDays.add(map);
             if (num > maxEventNum) {
                 maxEventNum = num;
@@ -575,10 +570,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedAlterUserInfo.getUserId()))) {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
-        int i = accountMapper.alterUserInfo(receivedAlterUserInfo.getUserId(),receivedAlterUserInfo.getUserSign(),receivedAlterUserInfo.getUserName(),receivedAlterUserInfo.getHeadImgUrl());
-        if (i != 0){
-            return DtoUtil.getSuccessDto("修改成功",100000);
+        int i = accountMapper.alterUserInfo(receivedAlterUserInfo.getUserId(), receivedAlterUserInfo.getUserSign(), receivedAlterUserInfo.getUserName(), receivedAlterUserInfo.getHeadImgUrl());
+        if (i != 0) {
+            return DtoUtil.getSuccessDto("修改成功", 100000);
         }
-        return DtoUtil.getFalseDto("修改失败",200000);
+        return DtoUtil.getFalseDto("修改失败", 200000);
     }
 }

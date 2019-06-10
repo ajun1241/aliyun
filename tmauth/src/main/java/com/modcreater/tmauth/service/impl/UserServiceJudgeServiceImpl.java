@@ -49,6 +49,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
                 time.setTimeRemaining(System.currentTimeMillis()/1000 + time.getStorageTime());
             }
         }
+        userServiceMapper.updateServiceRemainingTime(time);
         return null;
     }
 
