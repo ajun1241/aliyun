@@ -270,4 +270,27 @@ public class SingleEventUtil {
         }
         return different;
     }
+
+    /**
+     * 判断时间冲突
+     * @param singleEventList
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static boolean eventTime(List<SingleEvent> singleEventList, Long startTime, Long endTime) {
+        if (singleEventList.size() == 0){
+            return true;
+        }
+        for (SingleEvent singleEvent1 : singleEventList) {
+            boolean res =  ((Long.valueOf(singleEvent1.getStarttime()) > startTime && Long.valueOf(singleEvent1.getEndtime()) < endTime)
+                    || (Long.valueOf(singleEvent1.getStarttime()) > startTime && Long.valueOf(singleEvent1.getStarttime()) < endTime)
+                    || (Long.valueOf(singleEvent1.getEndtime()) > startTime && Long.valueOf(singleEvent1.getEndtime()) < endTime)
+                    || (Long.valueOf(singleEvent1.getStarttime()) <= startTime && Long.valueOf(singleEvent1.getEndtime()) >= endTime));
+            if (!res){
+                return res;
+            }
+        }
+        return true;
+    }
 }

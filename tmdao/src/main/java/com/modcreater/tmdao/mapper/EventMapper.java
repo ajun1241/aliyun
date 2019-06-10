@@ -272,4 +272,11 @@ public interface EventMapper {
      * @return
      */
     List<String> queryEventInBestFriends(String userId);
+
+    /**
+     *
+     * @param singleEvent
+     * @return
+     */
+    List<SingleEvent> queryAllEventsByForDate(SingleEvent singleEvent);
 }

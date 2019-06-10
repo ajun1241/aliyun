@@ -93,9 +93,8 @@ public class EventServiceImpl implements EventService {
                 } else {
                     singleEvent.setIsLoop(0);
                 }
-                //如果查询Id的数量为0才能继续添加的操作(单一事件)
-                if (eventMapper.countIdByDate(singleEvent) != 0){
-                    return DtoUtil.getFalseDto("时间段冲突,无法添加",21012);
+                if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent),Long.valueOf(singleEvent.getStarttime()),Long.valueOf(singleEvent.getEndtime()))){
+                    return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
                 }
                 if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
                     return DtoUtil.getSuccessDto("事件上传成功", 100000);
@@ -147,9 +146,9 @@ public class EventServiceImpl implements EventService {
                 }
                 singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
                 SingleEvent result = eventMapper.querySingleEventTime(singleEvent);
-                if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))){
-                    if (eventMapper.countIdByDate(singleEvent) != 0){
-                        return DtoUtil.getFalseDto("时间段冲突,无法修改",21012);
+                if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
+                    if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent),Long.valueOf(singleEvent.getStarttime()),Long.valueOf(singleEvent.getEndtime()))){
+                        return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
                     }
                 }
                 //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
