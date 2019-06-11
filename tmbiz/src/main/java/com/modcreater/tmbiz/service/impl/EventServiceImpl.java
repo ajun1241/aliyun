@@ -531,19 +531,9 @@ public class EventServiceImpl implements EventService {
                 SingleEvent singleEvent;
                 //按周查询单一事件
                 List<DayEvents> dayEventsList = new ArrayList<>();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-                Calendar calendar = Calendar.getInstance();
-                try {
-                    calendar.setTime(simpleDateFormat.parse(searchEventVo.getDayEventId()));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
                 for (int i = 0; i <= 6; i++) {
                     DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
-                    if (i != 0) {
-                        calendar.add(Calendar.DATE, 1);
-                    }
-                    String dayEventId = simpleDateFormat.format(calendar.getTime());
+                    String dayEventId = DateUtil.getDay(i);
                     singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
                     List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
                     ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
@@ -636,19 +626,9 @@ public class EventServiceImpl implements EventService {
             SingleEvent singleEvent;
             //按周查询单一事件
             List<DayEvents> dayEventsList = new ArrayList<>();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-            Calendar calendar = Calendar.getInstance();
-            try {
-                calendar.setTime(simpleDateFormat.parse(searchEventVo.getDayEventId()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
             for (int i = 0; i <= 6; i++) {
                 DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
-                if (i != 0) {
-                    calendar.add(Calendar.DATE, 1);
-                }
-                String dayEventId = simpleDateFormat.format(calendar.getTime());
+                String dayEventId = DateUtil.getDay(i);
                 singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
                 singleEvent.setUserid(Long.parseLong(searchEventVo.getFriendId()));
                 List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
@@ -1002,7 +982,7 @@ public class EventServiceImpl implements EventService {
         }
         SingleEvent singleEvent=eventMapper.queryEventOne(deleteEventVo.getUserId(),deleteEventVo.getEventId());
         //删除事件表
-        if (eventMapper.deleteByDeleteType(Long.parseLong(deleteEventVo.getEventId()),"singleevent",deleteEventVo.getUserId())<=0){
+        if (eventMapper.withdrawEventsByUserId(deleteEventVo)<=0){
             return DtoUtil.getFalseDto("删除事件失败",22222);
         }
         if (deleteEventVo.getEventStatus().equals("1")) {
@@ -1215,7 +1195,7 @@ public class EventServiceImpl implements EventService {
             //其他参与者的该事件变为私有
             //参与者清空
             //最高权限表清空
-
+            //完成时记得找孔庆一(整个方法)
 
         }else {
             //如果不是创建者删除
