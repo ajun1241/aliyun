@@ -100,10 +100,4 @@ public class DateUtil {
         }
         return naturalWeeks;
     }
-
-    public static void main(String[] args) {
-        NumberFormat nf = NumberFormat.getNumberInstance();
-        nf.setMaximumFractionDigits(2);
-        System.out.println();
-    }
 }
