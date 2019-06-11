@@ -83,4 +83,26 @@ public interface AchievementMapper {
      * @return
      */
     Long queryUserAchievement(@Param("userId") String userId,@Param("id") Long id);
+
+    /**
+     * 修改用户上一次操作的时间
+     * @param userId
+     * @param time
+     * @return
+     */
+    int updateUserLastOperatedTime(@Param("userId") String userId,@Param("time") Long time);
+
+    /**
+     * 获取用户是否添加过登录天数
+     * @param result
+     * @return
+     */
+    int getLoggedDaysUpdated(String result);
+
+    /**
+     * 获取上一次操作的时间
+     * @param userId
+     * @return
+     */
+    Long getLastOperatedTime(String userId);
 }

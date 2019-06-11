@@ -122,35 +122,4 @@ public class TimerConfig {
             logger.info("修改了"+orderMapper.updateExpiredOrders(timestamp)+"个订单");
         }
     }
-
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void userLoginStatus(){
-        UserStatistics userStatistics = new UserStatistics();
-        try {
-            userStatistics.setLastOperatedTime(Long.valueOf(DateUtil.dateToStamp(new SimpleDateFormat("yyyyMMdd").parse(DateUtil.getDay(0)))));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        logger.info("修改了"+achievementMapper.updateAllUserStatistics(userStatistics)+"个用户");
-    }
-
-    /**
-     * 以下为每日凌晨4点整进行过期事件过滤修改
-     */
-    /*@Scheduled(cron = "0 0 4 * * ?")
-    public void  eventStatusScan(){
-        StringBuilder date = new StringBuilder(DateUtil.getDay(-1));
-        StringBuilder today = new StringBuilder(DateUtil.getDay(0));
-        EventStatusScan eventStatusScan = new EventStatusScan();
-        eventStatusScan.setYear(date.substring(0,4));
-        eventStatusScan.setMonth(date.substring(4,6));
-        eventStatusScan.setDay(date.substring(6));
-        eventStatusScan.setThisYear(today.substring(0,4));
-        eventStatusScan.setThisMonth(today.substring(4,6));
-        eventStatusScan.setToday(today.substring(6));
-        Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date()))*60+Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
-        eventStatusScan.setTime(time.toString());
-        logger.info("有"+eventMapper.queryExpiredEvents(eventStatusScan)+"条事件待修改");
-        logger.info("修改了"+eventMapper.updateExpiredEvents(eventStatusScan)+"条事件");
-    }*/
 }

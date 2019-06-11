@@ -473,15 +473,6 @@ public class EventServiceImpl implements EventService {
             }
             if (StringUtils.hasText(searchEventVo.getDayEventId())) {
                 System.out.println("按月查" + searchEventVo.toString());
-                //用户操作界面,记录时间
-                //查询上一次用户操作过的时间
-                Long lastUserStatisticsDate = achievementMapper.queryUserStatisticsDate(searchEventVo.getUserId());
-                if (lastUserStatisticsDate != 0) {
-                    UserStatistics userStatisticsForLogin = new UserStatistics();
-                    userStatisticsForLogin.setLoggedDays(1L);
-                    userStatisticsForLogin.setLastOperatedTime(0L);
-                    achievementMapper.updateUserStatistics(userStatisticsForLogin, searchEventVo.getUserId());
-                }
                 SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
                 //查询在该月内存在事件的日的集合
                 List<Integer> days = eventMapper.queryDays(singleEvent);
@@ -599,7 +590,6 @@ public class EventServiceImpl implements EventService {
             }
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }
-
         return DtoUtil.getFalseDto("请先登录", 21011);
     }
 

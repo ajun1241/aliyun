@@ -3,7 +3,7 @@
 <mapper namespace="com.modcreater.tmdao.mapper.AchievementMapper">
 
     <sql id="Base_Column_List_UserStatistics">
-        id,userId,loggedDays,completed,unfinished,drafts
+        id,userId,loggedDays,completed,unfinished,drafts,loggedDaysUpdated
     </sql>
 
     <sql id="Base_Column_List_Achievement">
@@ -33,28 +33,37 @@
             <if test="userStatistics.lastOperatedTime != null and userStatistics.lastOperatedTime != 0">
                 lastOperatedTime = #{userStatistics.lastOperatedTime}
             </if>
+            <if test="userStatistics.loggedDaysUpdated != null and userStatistics.loggedDaysUpdated != 0">
+                loggedDaysUpdated = #{userStatistics.loggedDaysUpdated}
+            </if>
         </set>
         where userId = #{userId}
     </update>
     <update id="updateAllUserStatistics">
         update userstatistics
         <set>
-            <if test="userStatistics.loggedDays != null and userStatistics.loggedDays != 0">
-                loggedDays = loggedDays + #{userStatistics.loggedDays},
+            <if test="loggedDays != null and loggedDays != 0">
+                loggedDays = loggedDays + #{loggedDays},
             </if>
-            <if test="userStatistics.completed != null and userStatistics.completed != 0">
-                completed = completed + #{userStatistics.completed},
+            <if test="completed != null and completed != 0">
+                completed = completed + #{completed},
             </if>
-            <if test="userStatistics.unfinished != null and userStatistics.unfinished != 0">
-                unfinished = unfinished + #{userStatistics.unfinished},
+            <if test="unfinished != null and unfinished != 0">
+                unfinished = unfinished + #{unfinished},
             </if>
-            <if test="userStatistics.drafts != null and userStatistics.drafts != 0">
-                drafts = drafts + #{userStatistics.drafts},
+            <if test="drafts != null and drafts != 0">
+                drafts = drafts + #{drafts},
             </if>
-            <if test="userStatistics.lastOperatedTime != null and userStatistics.lastOperatedTime != 0">
-                lastOperatedTime = #{userStatistics.lastOperatedTime}
+            <if test="lastOperatedTime != null and lastOperatedTime != 0">
+                lastOperatedTime = #{lastOperatedTime}
+            </if>
+            <if test="loggedDaysUpdated != null">
+                loggedDaysUpdated = #{loggedDaysUpdated}
             </if>
         </set>
+    </update>
+    <update id="updateUserLastOperatedTime">
+        update userstatistics set lastOperatedTime = #{time} where userId = #{userId}
     </update>
 
     <select id="searchAllAchievement" resultType="String">
@@ -76,6 +85,12 @@
     </select>
     <select id="queryUserAchievement" resultType="java.lang.Long">
         select count(id) from userachievement where userId = #{userId} and id = #{id}
+    </select>
+    <select id="getLoggedDaysUpdated" resultType="java.lang.Integer">
+        select loggedDaysUpdated from userstatistics where userId = #{userId}
+    </select>
+    <select id="getLastOperatedTime" resultType="java.lang.Long">
+        select lastOperatedTime from userstatistics where userId = #{userId}
     </select>
 
 </mapper>

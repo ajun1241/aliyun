@@ -42,5 +42,9 @@ public class UserStatistics {
      * 最后操作(按天查询)的时间
      */
     private Long lastOperatedTime;
+    /**
+     * 记录用户今天是否添加过登录天数(0:未添加,1:添加过了)
+     */
+    private Long loggedDaysUpdated;
 
 }

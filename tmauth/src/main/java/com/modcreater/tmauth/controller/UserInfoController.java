@@ -1,5 +1,6 @@
 package com.modcreater.tmauth.controller;
 
+import com.modcreater.tmauth.config.annotation.GLOT;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.userinfovo.*;
@@ -29,6 +30,7 @@ public class UserInfoController {
      * @param request
      * @return
      */
+    @GLOT
     @RequestMapping(value = "showuserdetails",method = RequestMethod.POST)
     public Dto showUserDetails(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return userInfoService.showUserDetails(receivedId.getUserId(),request.getHeader("token"));

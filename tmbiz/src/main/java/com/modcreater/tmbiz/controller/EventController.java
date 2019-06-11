@@ -3,6 +3,7 @@ package com.modcreater.tmbiz.controller;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
+import com.modcreater.tmbiz.config.annotation.GLOT;
 import com.modcreater.tmbiz.service.EventService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -95,6 +96,7 @@ public class EventController {
      * @param searchEventVo
      * @return
      */
+    @GLOT
     @RequestMapping(value = "seabyday",method = RequestMethod.POST)
     public Dto searchByDay(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
         return eventService.searchByDayEventIds(searchEventVo,request.getHeader("token"));
@@ -105,6 +107,7 @@ public class EventController {
      * @param searchEventVo
      * @return
      */
+    @GLOT
     @RequestMapping(value = "seabymon",method = RequestMethod.POST)
     public Dto searchByMonth(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
         return eventService.searchByDayEventIdsInMonth(searchEventVo,request.getHeader("token"));
@@ -115,6 +118,7 @@ public class EventController {
      * @param searchEventVo
      * @return
      */
+    @GLOT
     @RequestMapping(value = "seabyweek",method = RequestMethod.POST)
     public Dto searchByWeek(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
         return eventService.searchByDayEventIdsInWeek(searchEventVo,request.getHeader("token"));
@@ -124,6 +128,7 @@ public class EventController {
      * 根据"周"查询事件排序并带有用户是否给予他人查看权限
      * @return
      */
+    @GLOT
     @PostMapping(value = "seabyweekwithprivatepermission")
     public Dto seaByWeekWithPrivatePermission(@RequestBody SearchEventVo searchEventVo,HttpServletRequest request){
         return eventService.seaByWeekWithPrivatePermission(searchEventVo,request.getHeader("token"));
@@ -188,6 +193,7 @@ public class EventController {
      * @param request
      * @return
      */
+    @GLOT
     @RequestMapping(value = "seabydayforios",method = RequestMethod.POST)
     public Dto searchByDayForIOS(@RequestBody SearchConditionsForIOS searchConditionsForIOS,HttpServletRequest request){
         return eventService.searchByDayForIOS(searchConditionsForIOS,request.getHeader("token"));
@@ -271,11 +277,13 @@ public class EventController {
      * @param request
      * @return
      */
+    @GLOT
     @PostMapping(value = "searchonce")
     public Dto searchOnce(@RequestBody ReceivedSearchOnce receivedSearchOnce,HttpServletRequest request){
         return eventService.searchOnce(receivedSearchOnce,request.getHeader("token"));
     }
 
+    @GLOT
     @PostMapping(value = "searchdraftonce")
     public Dto searchDraftOnce(@RequestBody ReceivedSearchOnce receivedSearchOnce,HttpServletRequest request){
         return eventService.searchDraftOnce(receivedSearchOnce,request.getHeader("token"));
