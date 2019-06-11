@@ -33,9 +33,27 @@ public class JudgeController {
         return judgeService.realInfoJudge(receivedId.getUserId(),token);
     }
 
-    @PostMapping("searchjudge")
+    @PostMapping("searchservicejudge")
     @ApiOperation("搜索服务判断")
     public Dto searchJudge(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return judgeService.searchServiceJudge(receivedId.getUserId(),request.getHeader("token"));
+    }
+
+    @PostMapping("friendservicejudge")
+    @ApiOperation("好友服务判断")
+    public Dto friendServiceJudge(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return judgeService.friendServiceJudge(receivedId.getUserId(),request.getHeader("token"));
+    }
+
+    @PostMapping("annualreportingservicejudge")
+    @ApiOperation("年报服务判断")
+    public Dto reportServiceJudge(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return judgeService.annualReportingServiceJudge(receivedId.getUserId(),request.getHeader("token"));
+    }
+
+    @PostMapping("backupservicejudge")
+    @ApiOperation("备份服务判断")
+    public Dto backupServiceJudge(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return judgeService.backupServiceJudge(receivedId.getUserId(),request.getHeader("token"));
     }
 }
