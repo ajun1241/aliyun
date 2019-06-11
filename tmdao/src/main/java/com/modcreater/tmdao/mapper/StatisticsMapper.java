@@ -48,7 +48,7 @@ public interface StatisticsMapper {
      * @param eventId
      * @return
      */
-    Map<String,String> queryFeedbackStatistics(String creatorId,String eventId);
+    Map<String,Long> queryFeedbackStatistics(String creatorId,String eventId);
 
     /**
      * 查询选择的人都有谁

@@ -21,6 +21,9 @@
         <if test="msgStatus >=0 ">
             and  msgStatus=#{msgStatus}
         </if>
+        <if test="msgType !=null and  msgType != '' ">
+            and  msgType=#{msgType}
+        </if>
         order by createDate desc
     </select>
 

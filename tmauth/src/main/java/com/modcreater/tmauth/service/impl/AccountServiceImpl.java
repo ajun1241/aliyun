@@ -68,6 +68,9 @@ public class AccountServiceImpl implements AccountService {
         if (ObjectUtils.isEmpty(loginVo)){
             return DtoUtil.getFalseDto("注册信息接收失败",14001);
         }
+        if (StringUtils.isEmpty(loginVo.getUserCode())){
+            return DtoUtil.getFalseDto("账号不能为空",14009);
+        }
         System.out.println("登录"+loginVo.toString());
         String token=null;
         Map map=new HashMap();
@@ -346,7 +349,7 @@ public class AccountServiceImpl implements AccountService {
                 sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
                 String[] friendId={sendFriendRequestVo.getFriendId()};
                 //发送消息未读条数
-                List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0");
+                List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0","");
                 Integer count;
                 if (ObjectUtils.isEmpty(systemMsgRecordList)){
                     count=1;
@@ -394,7 +397,7 @@ public class AccountServiceImpl implements AccountService {
                 sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
                 String[] friendId={sendFriendRequestVo.getFriendId()};
                 //发送消息未读条数
-                List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0");
+                List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0","");
                 Integer count;
                 if (ObjectUtils.isEmpty(systemMsgRecordList)){
                     count=1;
@@ -660,7 +663,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
-     * 查询所有系统消息
+     * 查询所有好友消息
      * @param receivedId
      * @param token
      * @return
@@ -686,7 +689,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         //查询所有消息
-        List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"-1");
+        List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"-1","newFriend");
         if (systemMsgRecordList.size()==0){
             return DtoUtil.getFalseDto("没有好友请求消息",200000);
         }
@@ -746,7 +749,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
         Map<String,Object> map=new HashMap<>();
-        List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"0");
+        List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"0","");
         if (systemMsgRecordList.size()==0){
             return DtoUtil.getFalseDto("没有未读消息",200000);
         }

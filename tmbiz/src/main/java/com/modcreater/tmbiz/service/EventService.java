@@ -1,6 +1,7 @@
 package com.modcreater.tmbiz.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.QueryMsgStatusVo;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 
@@ -241,4 +242,12 @@ public interface EventService {
      * @return
      */
     Dto updateBackers(UpdatePersonsVo updatePersonsVo, String token);
+
+    /**
+     * 查询一条消息的状态（暂用邀请事件）
+     * @param queryMsgStatusVo
+     * @param token
+     * @return
+     */
+    Dto queryMsgStatus(QueryMsgStatusVo queryMsgStatusVo, String token);
 }

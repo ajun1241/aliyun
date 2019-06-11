@@ -1,6 +1,7 @@
 package com.modcreater.tmbiz.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.QueryMsgStatusVo;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbiz.config.annotation.GLOT;
@@ -300,5 +301,16 @@ public class EventController {
         return eventService.deleteInBatches(receivedDeleteEventIds,request.getHeader("token"));
     }
 
+    /**
+     * 查询一条消息状态
+     * @param queryMsgStatusVo
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "querymsgstatus")
+    @ApiOperation("查询一条消息状态")
+    public Dto queryMsgStatus(@RequestBody QueryMsgStatusVo queryMsgStatusVo, HttpServletRequest request){
+        return eventService.queryMsgStatus(queryMsgStatusVo,request.getHeader("token"));
+    }
 
 }

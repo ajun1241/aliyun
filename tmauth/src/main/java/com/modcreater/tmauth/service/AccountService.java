@@ -109,7 +109,7 @@ public interface AccountService {
     Dto deleteFriendship(FriendshipVo deleteFriendshipVo, String token);
 
     /**
-     * 查询所有未读消息
+     * 查询所有好友消息
      * @param receivedId
      * @param token
      * @return

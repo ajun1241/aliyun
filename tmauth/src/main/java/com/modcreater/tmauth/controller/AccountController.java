@@ -89,7 +89,7 @@ public class AccountController {
     }
 
     @PostMapping("queryallunreadmsg")
-    @ApiOperation("拉取所有未读消息")
+    @ApiOperation("拉取所有好友消息")
     public Dto queryAllUnreadMsg(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return userService.queryAllUnreadMsg(receivedId,request.getHeader("token"));
     }

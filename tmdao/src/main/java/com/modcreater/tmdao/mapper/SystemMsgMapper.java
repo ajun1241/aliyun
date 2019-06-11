@@ -22,12 +22,12 @@ public interface SystemMsgMapper {
     int addNewMsg(Map<String,String> map);
 
     /**
-     * 查询所有未读消息
+     * 查询所有好友消息
      * @param userId
      * @param msgStatus
      * @return
      */
-    List<SystemMsgRecord> queryAllUnreadMsg(String userId,String msgStatus);
+    List<SystemMsgRecord> queryAllUnreadMsg(String userId,String msgStatus,String msgType);
 
     /**
      *修改未读消息为已读

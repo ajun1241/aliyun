@@ -137,7 +137,7 @@ public class TmbizApplicationTests {
     public void test() throws Exception {
         RongCloud rongCloud = RongCloud.getInstance("0vnjpoad03rzz", "BbTOtrRIF5MOA");
         String[] targetIds = {"100033"};
-        InviteMessage inviteMessage = new InviteMessage("这是一条测试消息","2019/6/6","","");
+        InviteMessage inviteMessage = new InviteMessage("这是一条测试消息","2019/6/6","","","");
         Private Private = rongCloud.message.msgPrivate;
         /*MsgSystem system = rongCloud.message.system;
         Group group = rongCloud.message.group;

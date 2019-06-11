@@ -15,13 +15,18 @@ public class InviteMessage extends BaseMessage {
     private String date = "";
     private String extraData = "";
     private String extra = "";
+    /**
+     *   消息id
+     */
+    private String msgId = "";
     private static final transient String TYPE = "ZX:InviteMsg";
 
-    public InviteMessage(String content, String date, String extraData, String extra) {
+    public InviteMessage(String content, String date, String extraData, String extra, String msgId) {
         this.content = content;
         this.date = date;
         this.extraData = extraData;
         this.extra = extra;
+        this.msgId = msgId;
     }
 
     @Override
@@ -59,6 +64,14 @@ public class InviteMessage extends BaseMessage {
 
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+
+    public String getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(String msgId) {
+        this.msgId = msgId;
     }
 
     @Override

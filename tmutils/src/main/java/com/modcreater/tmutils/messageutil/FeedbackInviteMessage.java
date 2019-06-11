@@ -94,6 +94,6 @@ public class FeedbackInviteMessage extends BaseMessage {
 
     @Override
     public String toString() {
-        return GsonUtil.toJson(this, InviteMessage.class);
+        return GsonUtil.toJson(this, FeedbackInviteMessage.class);
     }
 }
