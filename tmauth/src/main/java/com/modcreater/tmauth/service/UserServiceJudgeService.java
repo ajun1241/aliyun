@@ -18,6 +18,7 @@ public interface UserServiceJudgeService {
      * @return
      */
     Dto searchServiceJudge(String userId);
+    Dto searchServiceJudge(String userId,String token);
 
     /**
      * 好友功能判断

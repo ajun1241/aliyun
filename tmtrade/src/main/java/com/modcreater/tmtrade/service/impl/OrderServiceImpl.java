@@ -148,6 +148,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto payInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token) {
+        if (StringUtils.isEmpty(receivedVerifyInfo.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
@@ -294,6 +297,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto alipay(ReceivedOrderInfo receivedOrderInfo, String token) {
+        if (StringUtils.isEmpty(receivedOrderInfo.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
@@ -331,6 +337,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto wxPayOrderSubmitted(ReceivedOrderInfo receivedOrderInfo, String token) throws Exception {
+        if (StringUtils.isEmpty(receivedOrderInfo.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
@@ -509,13 +518,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Dto wxPayInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token) {
-
-        return null;
-    }
-
-    @Override
     public Dto isFriendServiceOpened(ReceivedId receivedId, String token) {
+        if (StringUtils.isEmpty(receivedId.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
@@ -530,6 +536,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto searchUserService(ReceivedServiceIdUserId receivedServiceIdUserId, String token) {
+        if (StringUtils.isEmpty(receivedServiceIdUserId.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
@@ -592,6 +601,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto searchUserOrders(ReceivedId receivedId, String token) {
+        if (StringUtils.isEmpty(receivedId.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }

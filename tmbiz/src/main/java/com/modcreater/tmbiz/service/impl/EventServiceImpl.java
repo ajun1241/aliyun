@@ -116,6 +116,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto deleteEvents(DeleteEventVo deleteEventVo, String token) {
+        if (StringUtils.isEmpty(deleteEventVo.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
@@ -612,6 +615,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto seaByWeekWithPrivatePermission(SearchEventVo searchEventVo,String token) {
+        if (StringUtils.isEmpty(searchEventVo.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
         }
@@ -717,6 +723,9 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public Dto searchOnce(ReceivedSearchOnce receivedSearchOnce, String token) {
+        if (StringUtils.isEmpty(receivedSearchOnce.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
         }
@@ -1679,6 +1688,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto searchByDayForIOS(SearchConditionsForIOS searchConditionsForIOS, String token) {
+        if (StringUtils.isEmpty(searchConditionsForIOS.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("操作失败,token未获取到",21013);
         }
@@ -1703,6 +1715,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public Dto deleteInBatches(ReceivedDeleteEventIds receivedDeleteEventIds, String token) {
         try {
+            if (StringUtils.isEmpty(receivedDeleteEventIds.getUserId())){
+                return DtoUtil.getFalseDto("请先登录",21011);
+            }
             if (!StringUtils.hasText(token)) {
                 return DtoUtil.getFalseDto("token未获取到", 21013);
             }
@@ -1735,6 +1750,9 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public Dto searchDraftOnce(ReceivedSearchOnce receivedSearchOnce, String token) {
+        if (StringUtils.isEmpty(receivedSearchOnce.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }

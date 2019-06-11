@@ -68,6 +68,9 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public Dto showUserDetails(String userId, String token) {
         System.out.println("查询用户成就==>" + userId);
+        if (StringUtils.isEmpty(userId)){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
@@ -101,6 +104,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto queryUserAchievement(String userId, String token) {
+        if (StringUtils.isEmpty(userId)){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
@@ -142,6 +148,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto filtrateUserEvents(ReceivedEventConditions receivedEventConditions, String token) {
+        if (StringUtils.isEmpty(receivedEventConditions.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
@@ -196,7 +205,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         //此处判断用户是否开启了查询服务
         Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
-        if (dto != null) {
+        if (dto.getResCode() == 200000) {
             receivedEventConditions.setPageNum("1");
             receivedEventConditions.setPageSize("7");
         }
@@ -243,6 +252,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto statisticAnalysisOfData(String userId, String token) {
+        if (StringUtils.isEmpty(userId)){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
@@ -285,6 +297,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto weeklyReport(String userId, String token) {
+        if (StringUtils.isEmpty(userId)){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
@@ -530,6 +545,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto myWeek(String userId, String token) {
+        if (StringUtils.isEmpty(userId)){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
@@ -564,6 +582,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto alterUserSign(ReceivedAlterUserInfo receivedAlterUserInfo, String token) {
+        if (StringUtils.isEmpty(receivedAlterUserInfo.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }

@@ -32,4 +32,10 @@ public class JudgeController {
         String token=request.getHeader("token");
         return judgeService.realInfoJudge(receivedId.getUserId(),token);
     }
+
+    @PostMapping("searchjudge")
+    @ApiOperation("搜索服务判断")
+    public Dto searchJudge(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return judgeService.searchServiceJudge(receivedId.getUserId(),request.getHeader("token"));
+    }
 }

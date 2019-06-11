@@ -31,47 +31,89 @@ public class TradeController {
     @Resource
     private OrderService orderService;
 
+    /**
+     * 支付宝支付
+     * @param receivedOrderInfo
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
     @PostMapping(value = "appalipay")
     public Dto aliPayOrderSubmitted(@RequestBody ReceivedOrderInfo receivedOrderInfo, HttpServletRequest httpServletRequest) throws Exception{
         return orderService.alipay(receivedOrderInfo ,httpServletRequest.getHeader("token"));
     }
 
+    /**
+     * 支付宝异步回调
+     * @param request
+     * @return
+     */
     @PostMapping(value = "alipay/notify_url")
     public String aliPayNotify(HttpServletRequest request){
-        System.out.println("调用了异步接口");
         return orderService.alipayNotify(request);
     }
 
+    /**
+     * 微信支付
+     * @param receivedOrderInfo
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
     @PostMapping(value = "appwxpay")
     public Dto wxPayOrderSubmitted(@RequestBody ReceivedOrderInfo receivedOrderInfo , HttpServletRequest httpServletRequest) throws Exception{
         return orderService.wxPayOrderSubmitted(receivedOrderInfo,httpServletRequest.getHeader("token"));
     }
 
+    /**
+     * 微信支付回调
+     * @param request
+     * @return
+     */
     @PostMapping(value = "wxpay/notify_url")
     public String wxPayNotify(HttpServletRequest request){
         return orderService.wxPayNotify(request);
     }
 
+    /**
+     * 订单最后验证
+     * @param receivedVerifyInfo
+     * @param request
+     * @return
+     */
     @PostMapping(value = "payinfoverify")
     public Dto payInfoVerify(@RequestBody ReceivedVerifyInfo receivedVerifyInfo, HttpServletRequest request){
         return orderService.payInfoVerify(receivedVerifyInfo,request.getHeader("token"));
     }
 
-    @PostMapping(value = "wxpayinfoverify")
-    public Dto wxPayInfoVerify(@RequestBody ReceivedVerifyInfo receivedVerifyInfo, HttpServletRequest request){
-        return orderService.wxPayInfoVerify(receivedVerifyInfo,request.getHeader("token"));
-    }
-
+    /**
+     * 判断用户是否开通了好友服务
+     * @param receivedId
+     * @param request
+     * @return
+     */
     @PostMapping(value = "isfriendserviceopened")
     public Dto isFriendServiceOpened(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return orderService.isFriendServiceOpened(receivedId,request.getHeader("token"));
     }
 
+    /**
+     * 查询用户服务开通状态
+     * @param receivedServiceIdUserId
+     * @param request
+     * @return
+     */
     @PostMapping(value = "userservice")
     public Dto searchUserService(@RequestBody ReceivedServiceIdUserId receivedServiceIdUserId, HttpServletRequest request){
         return orderService.searchUserService(receivedServiceIdUserId,request.getHeader("token"));
     }
 
+    /**
+     * 查询订单
+     * @param receivedId
+     * @param request
+     * @return
+     */
     @PostMapping(value = "searchorders")
     public Dto searchOrders(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
         return orderService.searchUserOrders(receivedId,request.getHeader("token"));

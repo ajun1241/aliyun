@@ -45,14 +45,14 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId,"2");
         //用户未开通
         if (ObjectUtils.isEmpty(time)){
-            return DtoUtil.getSuccessDto("该用户尚未开通查询功能",20000);
+            return DtoUtil.getSuccessDto("该用户尚未开通查询功能",200000);
         }
         //开通了,查询次卡是否有剩余
         if (time.getResidueDegree() == 0){
             //无剩余,判断剩余年/月卡时间
             Long timeRemaining = time.getTimeRemaining();
             if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis()/1000){
-                return DtoUtil.getSuccessDto("该用户尚未开通查询功能",20000);
+                return DtoUtil.getSuccessDto("该用户尚未开通查询功能",200000);
             }
         }else {
             //有剩余,判断此次查询完毕后是否剩余为0次
@@ -65,8 +65,24 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
             }
         }
         userServiceMapper.updateServiceRemainingTime(time);
-        return null;
+        return DtoUtil.getSuccessDto("查询服务已开通",100000);
     }
+
+    @Override
+    public Dto searchServiceJudge(String userId, String token) {
+        if (StringUtils.isEmpty(userId)){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        String redisToken=stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)){
+            return DtoUtil.getFalseDto("token过期请重新登录",21014);
+        }
+        return searchServiceJudge(userId);
+    }
+
     /**
      * 好友功能判断
      * @param userId

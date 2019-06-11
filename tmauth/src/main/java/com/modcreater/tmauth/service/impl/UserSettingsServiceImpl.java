@@ -45,6 +45,9 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Override
     public Dto updateUserSettings(int status, String userId, String type, String token) {
+        if (StringUtils.isEmpty(userId)){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -60,6 +63,9 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Override
     public Dto updateNotAllowed(ReceivedShowFriendList receivedShowFriendList, String token) {
+        if (StringUtils.isEmpty(receivedShowFriendList.getId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -110,6 +116,9 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Override
     public Dto getUserSettings(String userId, String token) {
+        if (StringUtils.isEmpty(userId)){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -126,6 +135,9 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Override
     public Dto getFriendList(GetFriendListInSettings getFriendListInSettings, String token) {
+        if (StringUtils.isEmpty(getFriendListInSettings.getUserId())){
+            return DtoUtil.getFalseDto("请先登录",21011);
+        }
         if (!StringUtils.hasText(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }

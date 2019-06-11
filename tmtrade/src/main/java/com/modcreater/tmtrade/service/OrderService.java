@@ -89,14 +89,6 @@ public interface OrderService {
     String payBack(String wxNotifyData);
 
     /**
-     * 微信支付数据校验
-     * @param receivedVerifyInfo
-     * @param token
-     * @return
-     */
-    Dto wxPayInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token);
-
-    /**
      * 判断该用户是否开通了好友服务
      * @param receivedId
      * @param token
