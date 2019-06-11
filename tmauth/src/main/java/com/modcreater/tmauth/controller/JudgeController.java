@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
  * @Date: 2019/6/10 15:06
  */
 @RestController
-@RequestMapping("judge")
+@RequestMapping("/judge/")
 public class JudgeController {
 
     @Resource

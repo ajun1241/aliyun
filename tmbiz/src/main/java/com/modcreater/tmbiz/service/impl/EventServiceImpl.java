@@ -68,6 +68,9 @@ public class EventServiceImpl implements EventService {
     @Resource
     private TimedTaskMapper timedTaskMapper;
 
+    @Resource
+    private UserServiceMapper userServiceMapper;
+
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo,String token) {
         if (StringUtils.hasText(uploadingEventVo.getUserId())) {
@@ -263,6 +266,12 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    /**
+     * 上传草稿
+     * @param draftVo
+     * @param token
+     * @return
+     */
     @Override
     public Dto uplDraft(DraftVo draftVo, String token) {
         if (ObjectUtils.isEmpty(draftVo)) {
@@ -276,6 +285,29 @@ public class EventServiceImpl implements EventService {
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(draftVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21013);
+        }
+        //判断是否已开通或者服务时间未消耗完
+        ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(draftVo.getUserId(),"4");
+        //用户未开通
+        if (ObjectUtils.isEmpty(time)){
+            return DtoUtil.getSuccessDto("该用户尚未开通备份功能",20000);
+        }
+        //开通了,查询次卡是否有剩余
+        if (time.getResidueDegree() == 0){
+            //无剩余,判断剩余年/月卡时间
+            Long timeRemaining = time.getTimeRemaining();
+            if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis()/1000){
+                return DtoUtil.getSuccessDto("该用户尚未开通备份功能",20000);
+            }
+        }else {
+            //有剩余,判断此次查询完毕后是否剩余为0次
+            time.setResidueDegree(time.getResidueDegree()-1);
+            //如果剩余次数为0,判断库存时间是否为0
+            if (time.getResidueDegree() == 0 && time.getStorageTime()!= 0){
+                //如果有库存时间,将这个时间加入用户有效的剩余时间中
+                time.setTimeRemaining(System.currentTimeMillis()/1000 + time.getStorageTime());
+                time.setStorageTime(0L);
+            }
         }
         ArrayList<Object> drafts=JSONObject.parseObject(draftVo.getSingleEvents(),ArrayList.class);
         for (Object draft:drafts) {
@@ -312,6 +344,12 @@ public class EventServiceImpl implements EventService {
         userStatistics.setDrafts(times);
         if (achievementMapper.updateUserStatistics(userStatistics,userStatistics.getUserId().toString()) == 0){
             return DtoUtil.getFalseDto("草稿箱数据计数失败",27004);
+        }
+        //修改用户服务剩余时间
+        if (userServiceMapper.updateServiceRemainingTime(time)==0){
+            //回滚
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("修改用户服务剩余时间失败",27004);
         }
         return DtoUtil.getSuccessDto("上传草稿成功", 100000);
     }
@@ -1046,7 +1084,7 @@ public class EventServiceImpl implements EventService {
             String date=singleEvent.getYear()+"/"+singleEvent.getMonth()+"/"+singleEvent.getDay();
             System.out.println(JSON.toJSONString(singleEvent));
             InviteMessage inviteMessage=new InviteMessage(singleEvent.getEventname(),date,JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)),"2");
-            ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),persons,inviteMessage);
+            ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),persons,1,inviteMessage);
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送消息失败",17002);
             }
@@ -1272,7 +1310,7 @@ public class EventServiceImpl implements EventService {
                 String[] targetId={singleEvent.getUserid().toString()};
                 try {
                     //发送者为系统
-                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,targetId,feedbackInviteMessage);
+                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,targetId,0,feedbackInviteMessage);
                     if (result.getCode()!=200){
                         return DtoUtil.getFalseDto("发送消息失败",17002);
                     }
@@ -1306,7 +1344,7 @@ public class EventServiceImpl implements EventService {
                 FeedbackInviteMessage feedbackInviteMessage=new FeedbackInviteMessage(map.get("agree"),map.get("refuse"),map.get("noReply"),map.get("total"),feedbackEventInviteVo.getExtraData(),"2");
                 String[] targetId={singleEvent.getUserid().toString()};
                 try {
-                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,targetId,feedbackInviteMessage);
+                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,targetId,0,feedbackInviteMessage);
                     if (result.getCode()!=200){
                         return DtoUtil.getFalseDto("发送消息失败",17002);
                     }
@@ -1328,7 +1366,7 @@ public class EventServiceImpl implements EventService {
             FeedbackInviteMessage feedbackInviteMessage=new FeedbackInviteMessage(map.get("agree"),map.get("refuse"),map.get("noReply"),map.get("total"),feedbackEventInviteVo.getExtraData(),"2");
             String[] targetId={singleEvent.getUserid().toString()};
             try {
-                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,targetId,feedbackInviteMessage);
+                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,targetId,0,feedbackInviteMessage);
                 if (result.getCode()!=200){
                     return DtoUtil.getFalseDto("发送消息失败",17002);
                 }

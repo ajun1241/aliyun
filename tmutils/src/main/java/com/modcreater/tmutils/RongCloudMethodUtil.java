@@ -106,7 +106,7 @@ public class RongCloudMethodUtil {
     /**
      * 通过融云发送单聊消息
      */
-    public ResponseResult sendPrivateMsg(String senderId, String[] targetId, BaseMessage baseMessage) throws Exception {
+    public ResponseResult sendPrivateMsg(String senderId, String[] targetId, Integer isIncludeSender,BaseMessage baseMessage) throws Exception {
         PrivateMessage privateMessage = new PrivateMessage()
                 .setSenderId(senderId)
                 .setTargetId(targetId)
@@ -116,9 +116,9 @@ public class RongCloudMethodUtil {
                 .setPushData("")
                 .setCount("")
                 .setVerifyBlacklist(0)
-                .setIsPersisted(0)
+                .setIsPersisted(1)
                 .setIsCounted(0)
-                .setIsIncludeSender(0);
+                .setIsIncludeSender(isIncludeSender);
         //发送单聊方法
         ResponseResult privateResult = Private.send(privateMessage);
         System.out.println("send private message:  " + privateResult.toString());

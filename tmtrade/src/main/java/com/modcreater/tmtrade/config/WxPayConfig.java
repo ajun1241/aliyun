@@ -24,7 +24,7 @@ public class WxPayConfig {
     /**
      * 通知地址
      */
-    public static String NOTIFY_URL = "http://6asa57.natappfree.cc/pay/wxpay/notify_url";
+    public static String NOTIFY_URL = "http://84q5i6.natappfree.cc/pay/wxpay/notify_url";
     /**
      * 交易类型
      */
