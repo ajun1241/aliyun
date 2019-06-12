@@ -94,7 +94,7 @@ public class EventServiceImpl implements EventService {
         singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
-        if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+        if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
             return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
         }
         if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
@@ -148,7 +148,7 @@ public class EventServiceImpl implements EventService {
         singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
         SingleEvent result = eventMapper.querySingleEventTime(singleEvent);
         if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
-            if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+            if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
                 return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
             }
         }
@@ -712,7 +712,7 @@ public class EventServiceImpl implements EventService {
             SingleEvent singleEvent = JSONObject.parseObject(addbackerVo.getSingleEvent(), SingleEvent.class);
             singleEvent.setUserid(Long.parseLong(addbackerVo.getUserId()));
             //事件时间冲突判断
-            if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+            if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
                 return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
             }
             if (eventMapper.uploadingEvents(singleEvent) == 0) {
@@ -1411,7 +1411,7 @@ public class EventServiceImpl implements EventService {
                 singleEvent.setPerson(finalPerson);
 
                 //事件时间冲突判断
-                if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+                if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
                     return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
                 }
                 //把该事件添加进发起者事件列表(修改这件事)
@@ -1589,7 +1589,7 @@ public class EventServiceImpl implements EventService {
             System.out.println("最终参与者" + finalPerson);
             singleEvent.setPerson(finalPerson);
             //事件时间冲突判断
-            if (!SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+            if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
                 return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
             }
             //修改

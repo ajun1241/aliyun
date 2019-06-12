@@ -353,6 +353,7 @@
         and month = #{month}
         and day = #{day}
         and year = #{year}
+        and isOverdue=0
     </select>
 
     <select id="queryEventsByDayForIOS" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
