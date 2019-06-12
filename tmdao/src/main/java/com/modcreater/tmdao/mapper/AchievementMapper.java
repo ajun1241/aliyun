@@ -105,4 +105,11 @@ public interface AchievementMapper {
      * @return
      */
     Long getLastOperatedTime(String userId);
+
+    /**
+     * 查询用户是否已经添加过成就数据
+     * @param userId
+     * @return
+     */
+    int isUserAchievementExists(String userId);
 }

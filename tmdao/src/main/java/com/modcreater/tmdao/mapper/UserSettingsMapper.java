@@ -93,4 +93,11 @@ public interface UserSettingsMapper {
      * @return
      */
     int updateUserSettingsToFriends(@Param("type") String type,@Param("friendId") String friendId,@Param("status") int status ,@Param("userId")String userId);
+
+    /**
+     * 判断用户是否已经添加过设置
+     * @param userId
+     * @return
+     */
+    int isUserSettingsExists(String userId);
 }

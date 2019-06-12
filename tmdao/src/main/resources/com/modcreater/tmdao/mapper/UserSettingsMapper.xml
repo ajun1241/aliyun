@@ -55,4 +55,7 @@
     <select id="getDND" resultType="java.lang.Long">
         select DND from usersettings where userId = #{userId}
     </select>
+    <select id="isUserSettingsExists" resultType="java.lang.Integer">
+        select count(id) from usersettings where userId = #{userId}
+    </select>
 </mapper>
