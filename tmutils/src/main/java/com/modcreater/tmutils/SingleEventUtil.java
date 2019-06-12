@@ -191,6 +191,11 @@ public class SingleEventUtil {
         return flag;
     }
 
+    /**
+     *为ShowCompletedEvents对象赋值
+     * @param singleEvent
+     * @return
+     */
     public static ShowCompletedEvents getShowCompleted(SingleEvent singleEvent) {
         ShowCompletedEvents showCompletedEvents = new ShowCompletedEvents();
         showCompletedEvents.setEventId(singleEvent.getEventid().toString());

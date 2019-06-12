@@ -83,28 +83,6 @@
         (startTime &lt;= #{starttime} and endTime &gt;= #{endtime}))
     </select>
 
-    <insert id="uploadingLoopEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
-            insert into loopevent values
-            (null ,
-            #{eventid} ,
-            #{userid},
-            #{eventname},
-            #{starttime},
-            #{endtime},
-            #{address},
-            #{level},
-            #{flag},
-            #{person},
-            #{remarks},
-            #{repeaTtime},
-            #{isOverdue},
-            #{remindTime},
-            #{day},
-            #{month},
-            #{year},
-            #{type})
-    </insert>
-
     <update id="withdrawEventsByUserId">
         update singleevent set isOverdue = #{eventStatus} where eventId = #{eventId} and userId = #{userId}
     </update>
@@ -170,7 +148,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue = 0
+            and isOverdue = 0 and isLoop = 0
         </where>
         order by level asc
     </select>
@@ -192,7 +170,7 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue = 0
+            and isOverdue = 0 and isLoop = 0
         </where>
         order by level asc , startTime asc
     </select>
@@ -232,7 +210,7 @@
         select
         <include refid="Base_Column_List"/>
         from singleevent
-        where userid = #{userId} and isLoop = 1 and isOverdue in (1,0) order by startTime asc
+        where userid = #{userId} and isLoop = 1 and isOverdue = 0 order by startTime asc
     </select>
     <select id="queryDays" resultType="java.lang.Integer">
         select day from singleevent where
@@ -471,10 +449,7 @@
         where isLoop = 0 and isOverdue = 0
         and year = #{thisYear} and month = #{thisMonth} and day = #{today} and endTime &lt;= #{time}
     </select>
-    <select id="getEventsNum" resultType="java.lang.Long">
-        select count(id) from singleevent where userId = #{userId}
-        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1
-    </select>
+
     <select id="getUserEventsGroupByTypeInWeek"
             resultType="com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType">
         select type ,sum(endTime-startTime) totalMinutes ,count(type) num from singleevent
@@ -491,6 +466,33 @@
     </select>
     <select id="queryEventInBestFriends" resultType="java.lang.String">
         select person from singleevent where userId = #{userId} and isOverdue = 1 and (person != null or person != '')
+    </select>
+    <select id="queryCompletedEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select
+        <include refid="Base_Column_List"/>
+        from singleevent
+        <where>
+            <if test="userid != null">
+                userid = #{userid}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            and isOverdue = 1
+        </where>
+        order by level asc , startTime asc
+    </select>
+
+
+    <select id="getEventsNum" resultType="java.lang.Long">
+        select count(id) from singleevent where userId = #{userId}
+        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1
     </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent

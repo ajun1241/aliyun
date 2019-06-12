@@ -55,7 +55,7 @@ public interface EventMapper {
     int alterEventsByUserId(SingleEvent singleEvent);
 
     /**
-     * 查询事件
+     * 查询事件(未完成的,单一事件)
      *
      * @param singleEvent
      * @return
@@ -63,7 +63,7 @@ public interface EventMapper {
     ArrayList<SingleEvent> queryEvents(SingleEvent singleEvent);
 
     /**
-     * 按天查询事件forIOS
+     * 按天查询事件forIOS(事件状态可选,单一事件)
      * @param singleEvent
      * @return
      */
@@ -98,28 +98,21 @@ public interface EventMapper {
      */
     int updateDraft(SingleEvent draftVo);
     /**
-     * 根据"日"查找事件并根据事件等级(level)排序
+     * 根据"日"查找事件并根据事件等级(level)排序(未完成,单一事件)
      * @param singleEvent
      * @return
      */
     List<SingleEvent> queryByDayOrderByLevel(SingleEvent singleEvent);
 
     /**
-     * 根据"日"查找事件并根据事件等级(level)和事件开始时间(startTime)排序
+     * 根据"日"查找事件并根据事件等级(level)和事件开始时间(startTime)排序(未完成,单一事件)
      * @param singleEvent
      * @return
      */
     List<SingleEvent> queryByDayOrderByLevelAndDate(SingleEvent singleEvent);
 
     /**
-     * 添加一个重复事件
-     * @param singleEvent
-     * @return
-     */
-    int uploadingLoopEvents(SingleEvent singleEvent);
-
-    /**
-     * 查询重复事件
+     * 查询重复事件(未完成)
      *
      * @param userId
      * @return
@@ -176,7 +169,7 @@ public interface EventMapper {
     Long getMinSingleEventType(String userId);
 
     /**
-     * 根据userId查询事件表中共有多少条有效(未完成和已完成1/2)事件
+     * 根据userId查询事件表中共有多少条有效(已完成)事件
      * @param userId
      * @return
      */
@@ -274,9 +267,9 @@ public interface EventMapper {
     List<String> queryEventInBestFriends(String userId);
 
     /**
-     *
+     * 根据日期查询已完成的事件
      * @param singleEvent
      * @return
      */
-    List<SingleEvent> queryAllEventsByForDate(SingleEvent singleEvent);
+    List<SingleEvent> queryCompletedEvents(SingleEvent singleEvent);
 }

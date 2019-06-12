@@ -68,8 +68,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public Dto showUserDetails(String userId, String token) {
         System.out.println("查询用户成就==>" + userId);
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
@@ -78,34 +78,34 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(redisToken)) {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
-        if (StringUtils.hasText(userId)) {
-            UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
-            ShowUserStatistics showUserStatistics = new ShowUserStatistics();
-            showUserStatistics.setCompleted(userStatistics.getCompleted());
-            showUserStatistics.setUnfinished(userStatistics.getUnfinished());
-            showUserStatistics.setDrafts(userStatistics.getDrafts());
-            List<String> imgUrlList = queryUserAchievementInBase(userId);
-            Map<String, Object> result = new HashMap<>(3);
-            Account account = accountMapper.queryAccount(userId);
-            //用户部分信息
-            Map<String, Object> userInfo = new HashMap<>();
-            userInfo.put("userName", account.getUserName());
-            userInfo.put("userSign", account.getUserSign());
-            userInfo.put("headImgURL", account.getHeadImgUrl());
-            result.put("userInfo", userInfo);
-            //用户事件状态
-            result.put("userStatistics", showUserStatistics);
-            //用户所有成就
-            result.put("imgUrlList", imgUrlList);
-            return DtoUtil.getSuccesWithDataDto("查询用户详情成功", result, 100000);
+        if (!StringUtils.hasText(userId)) {
+            return DtoUtil.getSuccessDto("没有查询到用户信息", 200000);
         }
-        return DtoUtil.getSuccessDto("没有查询到用户信息", 200000);
+        UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
+        ShowUserStatistics showUserStatistics = new ShowUserStatistics();
+        showUserStatistics.setCompleted(userStatistics.getCompleted());
+        showUserStatistics.setUnfinished(userStatistics.getUnfinished());
+        showUserStatistics.setDrafts(userStatistics.getDrafts());
+        List<String> imgUrlList = queryUserAchievementInBase(userId);
+        Map<String, Object> result = new HashMap<>(3);
+        Account account = accountMapper.queryAccount(userId);
+        //用户部分信息
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("userName", account.getUserName());
+        userInfo.put("userSign", account.getUserSign());
+        userInfo.put("headImgURL", account.getHeadImgUrl());
+        result.put("userInfo", userInfo);
+        //用户事件状态
+        result.put("userStatistics", showUserStatistics);
+        //用户所有成就
+        result.put("imgUrlList", imgUrlList);
+        return DtoUtil.getSuccesWithDataDto("查询用户详情成功", result, 100000);
     }
 
     @Override
     public Dto queryUserAchievement(String userId, String token) {
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
@@ -115,19 +115,17 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
         List<String> result = queryUserAchievementInBase(userId);
-        if (result.size() != 0) {
-            Map<String, List<String>> imgUrlList = new HashMap<>();
-            imgUrlList.put("imgUrlList", result);
-            return DtoUtil.getSuccesWithDataDto("查询用户成就成功", imgUrlList, 100000);
+        if (result.size() == 0) {
+            return DtoUtil.getSuccessDto("该用户还没有任何成就", 100000);
         }
-        return DtoUtil.getSuccessDto("该用户还没有任何成就", 100000);
+        Map<String, List<String>> imgUrlList = new HashMap<>();
+        imgUrlList.put("imgUrlList", result);
+        return DtoUtil.getSuccesWithDataDto("查询用户成就成功", imgUrlList, 100000);
     }
 
     @Override
     public List<String> queryUserAchievementInBase(String userId) {
-        /**
-         * 在此查询用户统计表,并判断该用户是否完成某个成就
-         */
+        //在此查询用户统计表,并判断该用户是否完成某个成就
         UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
         List<Achievement> achievementList = achievementMapper.queryAchievement();
         if (!ObjectUtils.isEmpty(userStatistics) && !ObjectUtils.isEmpty(achievementList)) {
@@ -148,8 +146,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto filtrateUserEvents(ReceivedEventConditions receivedEventConditions, String token) {
-        if (StringUtils.isEmpty(receivedEventConditions.getUserId())){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(receivedEventConditions.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
@@ -157,8 +155,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (ObjectUtils.isEmpty(receivedEventConditions)) {
             return DtoUtil.getFalseDto("筛选条件接收失败", 40002);
         }
-        String redisToken = stringRedisTemplate.opsForValue().get(receivedEventConditions.getUserId());
-        if (!token.equals(redisToken)) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedEventConditions.getUserId()))) {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
         System.out.println("查询草稿箱/已完成,未完成");
@@ -197,10 +194,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             singleEventCondition.setMonth(Long.valueOf(startDate.substring(4, 6)));
             singleEventCondition.setDay(Long.valueOf(startDate.substring(6, 8)));
         }
-        if (!StringUtils.hasText(receivedEventConditions.getPageNum())) {
+        if (!StringUtils.hasText(receivedEventConditions.getPageNum()) || receivedEventConditions.getPageNum().equals("0")) {
             singleEventCondition.setPageNum(1L);
         }
-        if (!StringUtils.hasText(receivedEventConditions.getPageSize())) {
+        if (!StringUtils.hasText(receivedEventConditions.getPageSize()) || receivedEventConditions.getPageSize().equals("0")) {
             singleEventCondition.setPageSize(7L);
         }
         //此处判断用户是否开启了查询服务
@@ -220,40 +217,40 @@ public class UserInfoServiceImpl implements UserInfoService {
         } else {
             return DtoUtil.getFalseDto("searchType未接收到", 40005);
         }
-        if (singleEventList.size() != 0) {
-            for (SingleEvent singleEvent : singleEventList) {
-                if (receivedEventConditions.getPerson() != null && !"".equals(receivedEventConditions.getPerson())) {
-                    EventPersons eventPersons1 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
-                    String[] persons = eventPersons1.getFriendsId().split(",");
-                    EventPersons eventPersons2 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
-                    String[] personsInResult = eventPersons2.getFriendsId().split(",");
-                    int i = 0;
-                    if (persons.length > personsInResult.length) {
-                        continue;
-                    }
-                    for (String sOut : persons) {
-                        for (String sInside : personsInResult) {
-                            if (sOut.equals(sInside)) {
-                                i += 1;
-                            }
+        if (singleEventList.size() == 0) {
+            return DtoUtil.getSuccessDto("没有查询到事件", 200000);
+        }
+        for (SingleEvent singleEvent : singleEventList) {
+            if (receivedEventConditions.getPerson() != null && !"".equals(receivedEventConditions.getPerson())) {
+                EventPersons eventPersons1 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
+                String[] persons = eventPersons1.getFriendsId().split(",");
+                EventPersons eventPersons2 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
+                String[] personsInResult = eventPersons2.getFriendsId().split(",");
+                int i = 0;
+                if (persons.length > personsInResult.length) {
+                    continue;
+                }
+                for (String sOut : persons) {
+                    for (String sInside : personsInResult) {
+                        if (sOut.equals(sInside)) {
+                            i += 1;
                         }
                     }
-                    if (i == persons.length) {
-                        showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
-                    }
-                } else {
+                }
+                if (i == persons.length) {
                     showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
                 }
+            } else {
+                showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
             }
-            return DtoUtil.getSuccesWithDataDto("筛选事件成功", showCompletedEventsList, 100000);
         }
-        return DtoUtil.getSuccessDto("没有查询到事件", 200000);
+        return DtoUtil.getSuccesWithDataDto("筛选事件成功", showCompletedEventsList, 100000);
     }
 
     @Override
     public Dto statisticAnalysisOfData(String userId, String token) {
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
@@ -297,8 +294,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto weeklyReport(String userId, String token) {
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
@@ -331,7 +328,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         userEventsGroupByInWeek.setUserId(userId);
         for (int i = 0; i >= -6; i--) {
             String date = DateUtil.getDay(i);
-            System.out.println("时间时间!!" + date);
             if (i == 0) {
                 userEventsGroupByInWeek.setTodayYear(date.substring(0, 4));
                 userEventsGroupByInWeek.setTodayMonth(date.substring(4, 6));
@@ -545,34 +541,19 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto myWeek(String userId, String token) {
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
-        String redisToken = stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userId))) {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
-        SingleEvent condition = new SingleEvent();
-        condition.setUserid(Long.valueOf(userId));
-        List<ShowSingleEvent> weekLists = new ArrayList<>();
-        for (int i = 0; i <= 6; i++) {
-            StringBuffer startDate = new StringBuffer();
-            if (i != 0) {
-                startDate.append(DateUtil.getDay(-1));
-            }
-            startDate.append(DateUtil.getDay(0));
-            condition.setYear(Long.valueOf(startDate.substring(0, 4)));
-            condition.setMonth(Long.valueOf(startDate.substring(4, 6)));
-            condition.setDay(Long.valueOf(startDate.substring(6, 8)));
-            List<SingleEvent> singleEventList = eventMapper.queryEvents(condition);
-            if (singleEventList.size() > 0) {
-                for (SingleEvent singleEvent : singleEventList) {
-                    weekLists.add(SingleEventUtil.getShowSingleEvent(singleEvent));
-                }
-            }
+        List<List<ShowSingleEvent>> weekLists = new ArrayList<>();
+        for (int i = 0; i >= -6; i--) {
+            List<SingleEvent> singleEventList = eventMapper.queryCompletedEvents(SingleEventUtil.getSingleEvent(userId, DateUtil.getDay(i)));
+            weekLists.add(SingleEventUtil.getShowSingleEventList(singleEventList));
         }
         if (weekLists.size() == 0) {
             return DtoUtil.getSuccessDto("未查询到数据", 200000);
@@ -582,8 +563,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public Dto alterUserSign(ReceivedAlterUserInfo receivedAlterUserInfo, String token) {
-        if (StringUtils.isEmpty(receivedAlterUserInfo.getUserId())){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(receivedAlterUserInfo.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("token未获取到", 21013);
