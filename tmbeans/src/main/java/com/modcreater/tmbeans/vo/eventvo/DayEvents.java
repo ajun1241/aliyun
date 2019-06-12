@@ -9,9 +9,9 @@ import java.util.ArrayList;
 @Data
 public class DayEvents<T> implements Serializable {
 
-    private int userId;
-    private int totalNum;
+    private Long userId;
+    private Long totalNum;
     private ArrayList<T> mySingleEventList ;
-    private int DayEventId;
+    private Long DayEventId;
 
 }
