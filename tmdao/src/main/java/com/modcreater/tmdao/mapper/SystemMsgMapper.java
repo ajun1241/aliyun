@@ -52,4 +52,12 @@ public interface SystemMsgMapper {
      * @return
      */
     SystemMsgRecord queryMsgByUserIdFriendIdMsgTypeDetial(SystemMsgRecord systemMsgRecord);
+
+    /**
+     * 删除消息记录
+     * @param userId
+     * @param fromId
+     * @return
+     */
+    int deleteSystemMsg(String userId,String fromId);
 }

@@ -23,16 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -474,19 +468,8 @@ public class AccountServiceImpl implements AccountService {
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送请求失败",17002);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        ResponseResult result1;
-        ResponseResult result2;
-        try {
-            //小灰条通知
-            result1=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),new String[]{sendFriendResponseVo.getFriendId()},0,new InfoNtfMessage("你已添加了"+ friend.getUserName() +"，现在可以开始聊天了。",""));
-            if (result1.getCode()!=200){
-                return DtoUtil.getFalseDto("发送小灰条通知失败",17003);
-            }
             //发送文本消息
-            result2=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),new String[]{sendFriendResponseVo.getFriendId()},0,new TxtMessage("我通过了你的朋友验证请求，现在我们可以开始聊天了",""));
+            ResponseResult result2=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),new String[]{sendFriendResponseVo.getFriendId()},0,new TxtMessage("我通过了你的朋友验证请求，现在我们可以开始聊天了",""));
             if (result2.getCode()!=200){
                 return DtoUtil.getFalseDto("发送文本result2消息失败",17004);
             }
@@ -525,6 +508,7 @@ public class AccountServiceImpl implements AccountService {
         }
         int pageIndex=(Integer.parseInt(userIdVo.getPageNumber())-1)*pageSize;
         List<Account> accountList=accountMapper.queryFriendList(userIdVo.getUserId(),pageIndex,pageSize);
+        System.out.println("查询好友列表时输出的为什么会失败==》"+accountList.toString());
         List<Map> maps=new ArrayList<>();
         for (Account account:accountList) {
             Map map=new HashMap();
@@ -533,6 +517,7 @@ public class AccountServiceImpl implements AccountService {
             map.put("userName",account.getUserName());
             map.put("headImgUrl",account.getHeadImgUrl());
             map.put("gender",account.getGender());
+            map.put("userSign",account.getUserSign());
             maps.add(map);
         }
         if (ObjectUtils.isEmpty(accountList)){
@@ -637,6 +622,7 @@ public class AccountServiceImpl implements AccountService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(deleteFriendshipVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
+        try {
         //判断这俩人是不是好友
         int i=accountMapper.queryFriendRel(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId());
         int j=accountMapper.queryFriendRel(deleteFriendshipVo.getFriendId(),deleteFriendshipVo.getUserId());
@@ -654,10 +640,19 @@ public class AccountServiceImpl implements AccountService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DtoUtil.getFalseDto("删除好友失败",16008);
         }
+        //把添加好友消息删除
+        boolean flag=false;
+        if (systemMsgMapper.deleteSystemMsg(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId())>0){
+            flag=true;
+        }else if (systemMsgMapper.deleteSystemMsg(deleteFriendshipVo.getFriendId(),deleteFriendshipVo.getUserId())>0){
+            flag=true;
+        }
+        if (!flag){
+            return DtoUtil.getFalseDto("添加好友消息记录删除失败",16010);
+        }
         //加入到融云的黑名单
-        try {
-            rongCloudMethodUtil.addBlackList(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId());
-            rongCloudMethodUtil.addBlackList(deleteFriendshipVo.getFriendId(),deleteFriendshipVo.getUserId());
+        rongCloudMethodUtil.addBlackList(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId());
+        rongCloudMethodUtil.addBlackList(deleteFriendshipVo.getFriendId(),deleteFriendshipVo.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
             return DtoUtil.getFalseDto("拉黑操作出错",233);

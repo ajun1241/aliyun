@@ -35,4 +35,8 @@
             resultType="com.modcreater.tmbeans.pojo.SystemMsgRecord">
         select * from systemmsgrecord where userId=#{userId} and fromId=#{fromId} and msgType=#{msgType}
     </select>
+
+    <delete id="deleteSystemMsg">
+        delete from systemmsgrecord where userId=#{userId} and fromId=#{fromId} and msgType="newFriend"
+    </delete>
 </mapper>
