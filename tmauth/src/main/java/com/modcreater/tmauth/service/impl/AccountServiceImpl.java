@@ -506,7 +506,6 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Dto queryFriendList(UserIdVo userIdVo, String token) {
-        System.out.println("{}{}{{{}++"+userIdVo.toString());
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }

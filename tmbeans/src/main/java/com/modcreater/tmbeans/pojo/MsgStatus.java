@@ -10,6 +10,7 @@ public class MsgStatus {
 
   private Long id;
   private Long userId;
+  // 0: 同意; 1：不同意; 2：未回应;
   private Long status;
   private Long type;
 
