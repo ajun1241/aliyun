@@ -312,7 +312,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         Map<String, Object> allStatistic = new HashMap<>();
         //板块1:扇形图
         //百分比
-        Map<String, String> sector = new HashMap<>();
+        Map<String, Double> sector = new HashMap<>();
         //时长
         Map<String, String> typeDuration = new HashMap<>();
         //定义小数精度
@@ -362,7 +362,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i < TYPE.length; i++) {
                 if (type.getType() == i) {
-                    sector.put(TYPE[i], Double.valueOf(nf.format((double) type.getNum() / totalEvents)) * 100 + "%");
+                    sector.put(TYPE[i], Double.valueOf(nf.format((double) type.getNum() / totalEvents)));
                     typeDuration.put(TYPE[i], type.getTotalMinutes() / 60 + "h" + type.getTotalMinutes() % 60 + "min");
                 }
             }
@@ -380,8 +380,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<Map<String, Object>> showWeekEventsNumList = new ArrayList<>();
         Long lastWeek = 0L;
         Long lastLastWeek = 0L;
-        Map<String, String> maxTypes = new HashMap<>();
-        Map<String, String> minTypes = new HashMap<>();
+        List<Map<String,String>> maxTypes = new ArrayList<>();
+        List<Map<String,String>> minTypes = new ArrayList<>();
         for (int i = SEARCH_WEEK_NUM; i >= 1; i--) {
             List<NaturalWeek> naturalWeeks = DateUtil.getLastWeekOfNatural(i);
             Map<String, Object> showWeekEventsNum = new HashMap<>();
@@ -436,14 +436,20 @@ public class UserInfoServiceImpl implements UserInfoService {
                     minType = ttt;
                 }
             }
-            maxTypes.put(Long.valueOf(naturalWeeks.get(0).getMonth())
+            Map<String, String> xTypes = new HashMap<>();
+            xTypes.put("date", Long.valueOf(naturalWeeks.get(0).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(0).getDay())
                     + "~" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
-                    + "." + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()), TYPE[maxType]);
-            minTypes.put(Long.valueOf(naturalWeeks.get(0).getMonth())
+                    + "." + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()));
+            xTypes.put("type", TYPE[maxType]);
+            maxTypes.add(xTypes);
+            Map<String, String> nTypes = new HashMap<>();
+            nTypes.put("date", Long.valueOf(naturalWeeks.get(0).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(0).getDay())
                     + "~" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
-                    + "." + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()), TYPE[minType]);
+                    + "." + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()));
+            nTypes.put("type", TYPE[minType]);
+            minTypes.add(nTypes);
             showWeekEventsNum.put("totalEvents", eventsNum);
             showWeekEventsNum.put("startDateAndEndDate", Long.valueOf(naturalWeeks.get(0).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(0).getDay())
@@ -461,7 +467,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             lastLastWeek = 1L;
         }
         allStatistic.put("showWeekEventsNumList", showWeekEventsNumList);
-        allStatistic.put("lastWeekContrastEarlier", nf.format((double) (lastWeek - lastLastWeek) / lastLastWeek * 100) + "%");
+        allStatistic.put("lastWeekContrastEarlier", nf.format((double) (lastWeek - lastLastWeek) / lastLastWeek));
         //周事件统计
         List<Map<String, Object>> frontSevenDays = new ArrayList<>();
         Long maxEventNum = 0L;
@@ -553,7 +559,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<List<ShowSingleEvent>> weekLists = new ArrayList<>();
         for (int i = 0; i >= -6; i--) {
             List<SingleEvent> singleEventList = eventMapper.queryCompletedEvents(SingleEventUtil.getSingleEvent(userId, DateUtil.getDay(i)));
-            weekLists.add(SingleEventUtil.getShowSingleEventList(singleEventList));
+            if (singleEventList.size() != 0) {
+                weekLists.add(SingleEventUtil.getShowSingleEventList(singleEventList));
+            }
         }
         if (weekLists.size() == 0) {
             return DtoUtil.getSuccessDto("未查询到数据", 200000);
