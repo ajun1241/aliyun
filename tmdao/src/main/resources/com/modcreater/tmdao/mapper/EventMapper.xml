@@ -295,6 +295,15 @@
     </select>
     <select id="countEvents" resultType="java.lang.Long">
         select count(id) from singleevent where userId = #{userId} and isOverdue = 1
+        <if test="todayYear != null">
+            and ((year = #{todayYear} and month = #{todayMonth} and day = #{todayDay})
+            or (year = #{yesterdayYear} and month = #{yesterdayMonth} and day = #{yesterdayDay})
+            or (year = #{thirdDayYear} and month = #{thirdDayMonth} and day = #{thirdDayDay})
+            or (year = #{fourthDayYear} and month = #{fourthDayMonth} and day = #{fourthDayDay})
+            or (year = #{fifthDayYear} and month = #{fifthDayMonth} and day = #{fifthDayDay})
+            or (year = #{sixthDayYear} and month = #{sixthDayMonth} and day = #{sixthDayDay})
+            or (year = #{seventhDayYear} and month = #{seventhDayMonth} and day = #{seventhDayDay}))
+        </if>
     </select>
 
     <update id="updateDraft" parameterType="com.modcreater.tmbeans.pojo.SingleEvent" >

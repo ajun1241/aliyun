@@ -27,6 +27,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -262,13 +263,16 @@ public class UserInfoServiceImpl implements UserInfoService {
         ShowUserAnalysis showUserAnalysis = new ShowUserAnalysis();
         showUserAnalysis.setUserId(userId);
         //记录的总和
-        Long totalEvents = eventMapper.countEvents(userId);
+        UserEventsGroupByInWeek userEventsGroupByInWeek = new UserEventsGroupByInWeek();
+        userEventsGroupByInWeek.setUserId(userId);
+        Long totalEvents = eventMapper.countEvents(userEventsGroupByInWeek);
         //记录事件的总用时分钟数
         Long totalMinutes = 0L;
         Map<String, Double> percentResult = new HashMap<>();
         Map<String, Long> totalMinutesResult = new HashMap<>();
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
         NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setRoundingMode(RoundingMode.HALF_UP);
         nf.setMaximumFractionDigits(2);
         for (int i = 0; i <= 7; i++) {
             percentResult.put(TYPE[i], null);
@@ -304,8 +308,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(redisToken)) {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
-        //已完成的事件的总和
-        Long totalEvents = eventMapper.countEvents(userId);
         //已完成事件的总分钟数
         Long totalMinutes = 0L;
         //返回数据
@@ -317,7 +319,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         Map<String, String> typeDuration = new HashMap<>();
         //定义小数精度
         NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setRoundingMode(RoundingMode.HALF_UP);
         nf.setMaximumFractionDigits(2);
+
         //添加所有类型到百分比,时长中
         for (String s : TYPE) {
             sector.put(s, "0");
@@ -358,6 +362,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userEventsGroupByInWeek.setSeventhDayDay(date.substring(6));
             }
         }
+        //已完成的事件的总和
+        Long totalEvents = eventMapper.countEvents(userEventsGroupByInWeek);
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i < TYPE.length; i++) {

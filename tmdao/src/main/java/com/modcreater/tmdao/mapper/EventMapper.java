@@ -170,10 +170,10 @@ public interface EventMapper {
 
     /**
      * 根据userId查询事件表中共有多少条有效(已完成)事件
-     * @param userId
+     * @param userEventsGroupByInWeek
      * @return
      */
-    Long countEvents(String userId);
+    Long countEvents(UserEventsGroupByInWeek userEventsGroupByInWeek);
 
     /**
      * 查询冲突事件
