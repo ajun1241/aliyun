@@ -312,7 +312,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         Map<String, Object> allStatistic = new HashMap<>();
         //板块1:扇形图
         //百分比
-        Map<String, Double> sector = new HashMap<>();
+        Map<String, String> sector = new HashMap<>();
         //时长
         Map<String, String> typeDuration = new HashMap<>();
         //定义小数精度
@@ -320,8 +320,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         nf.setMaximumFractionDigits(2);
         //添加所有类型到百分比,时长中
         for (String s : TYPE) {
-            sector.put(s, null);
-            typeDuration.put(s, null);
+            sector.put(s, "0");
+            typeDuration.put(s, "0");
         }
         //查询事件数量,用时(根据type分组)
         UserEventsGroupByInWeek userEventsGroupByInWeek = new UserEventsGroupByInWeek();
@@ -362,7 +362,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i < TYPE.length; i++) {
                 if (type.getType() == i) {
-                    sector.put(TYPE[i], Double.valueOf(nf.format((double) type.getNum() / totalEvents)));
+                    sector.put(TYPE[i], nf.format((double) type.getNum() / totalEvents));
                     typeDuration.put(TYPE[i], type.getTotalMinutes() / 60 + "h" + type.getTotalMinutes() % 60 + "min");
                 }
             }
