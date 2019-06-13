@@ -88,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
             }
             if (receivedOrderInfo.getNumber() == null || receivedOrderInfo.getNumber() == 0) {
                 receivedOrderInfo.setNumber(1L);
-            } else {
+            } else if (receivedOrderInfo.getNumber() != 1){
                 return DtoUtil.getFalseDto("数量错误", 60018);
             }
         }

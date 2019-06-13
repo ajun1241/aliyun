@@ -505,7 +505,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }
         Map<String, Object> result = new HashMap<>(3);
-        //总权限 + 单一权限
+        //总权限 + 单一权限(这里的逻辑为在mybatis中userId和friendId值相反)
         try {
             if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 && userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(), searchEventVo.getFriendId()) == 1) {
                 result.put("userPrivatePermission", "1");
