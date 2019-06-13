@@ -562,11 +562,13 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(userId))) {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
-        List<List<ShowSingleEvent>> weekLists = new ArrayList<>();
+        List<ShowSingleEvent> weekLists = new ArrayList<>();
         for (int i = 0; i >= -6; i--) {
-            List<SingleEvent> singleEventList = eventMapper.queryCompletedEvents(SingleEventUtil.getSingleEvent(userId, DateUtil.getDay(i)));
+            List<ShowSingleEvent> singleEventList = SingleEventUtil.getShowSingleEventList(eventMapper.queryCompletedEvents(SingleEventUtil.getSingleEvent(userId, DateUtil.getDay(i))));
             if (singleEventList.size() != 0) {
-                weekLists.add(SingleEventUtil.getShowSingleEventList(singleEventList));
+                for (ShowSingleEvent singleEvent : singleEventList){
+                    weekLists.add(singleEvent);
+                }
             }
         }
         if (weekLists.size() == 0) {
