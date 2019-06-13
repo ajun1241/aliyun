@@ -47,7 +47,7 @@
         select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.hide 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId}
     </select>
     <select id="getIsHideFromFriend" resultType="java.lang.Integer">
-        select hide from friendship where userId = #{userId} and friendId = #{friendId}
+        select hide from friendship where userId = #{friendId} and friendId = #{userId}
     </select>
     <select id="getFriendHide" resultType="java.lang.Integer">
         select friendHide from usersettings where userId = #{friendId}
