@@ -272,4 +272,11 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> queryCompletedEvents(SingleEvent singleEvent);
+
+    /**
+     * 查询将要修改状态的事件的状态
+     * @param deleteEventVo
+     * @return
+     */
+    SingleEvent getChangingEventStatus(DeleteEventVo deleteEventVo);
 }

@@ -117,6 +117,9 @@ public class EventServiceImpl implements EventService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(deleteEventVo.getUserId()))) {
             return DtoUtil.getFalseDto("token过期请先登录", 21014);
         }
+        if (!ObjectUtils.isEmpty(eventMapper.getChangingEventStatus(deleteEventVo))){
+            return DtoUtil.getFalseDto("重复操作:已经操作过了",21003);
+        }
         if (eventMapper.withdrawEventsByUserId(deleteEventVo) > 0) {
             if (deleteEventVo.getEventStatus().equals("1")) {
                 //已完成+1,未完成-1

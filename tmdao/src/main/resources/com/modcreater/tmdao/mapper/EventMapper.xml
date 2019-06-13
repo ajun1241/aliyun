@@ -497,6 +497,9 @@
         select count(id) from singleevent where userId = #{userId}
         and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1
     </select>
+    <select id="getChangingEventStatus" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select isOverdue from singleevent where userId = #{userId} and eventId = #{eventId} and isOverdue = #{eventStatus}
+    </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent
     where isLoop = 0 and isOverdue = 0
