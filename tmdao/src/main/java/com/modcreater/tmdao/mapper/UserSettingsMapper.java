@@ -99,5 +99,5 @@ public interface UserSettingsMapper {
      * @param userId
      * @return
      */
-    int isUserSettingsExists(String userId);
+    UserSettings isUserSettingsExists(String userId);
 }

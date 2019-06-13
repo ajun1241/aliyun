@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.Achievement;
+import com.modcreater.tmbeans.pojo.UserAchievement;
 import com.modcreater.tmbeans.pojo.UserStatistics;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -111,5 +112,5 @@ public interface AchievementMapper {
      * @param userId
      * @return
      */
-    int isUserAchievementExists(String userId);
+    UserAchievement isUserAchievementExists(String userId);
 }

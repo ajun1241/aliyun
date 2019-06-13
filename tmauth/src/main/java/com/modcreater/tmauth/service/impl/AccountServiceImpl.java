@@ -211,15 +211,20 @@ public class AccountServiceImpl implements AccountService {
         map.put("birthday",account.getBirthday());
         map.put("headImgUrl",account.getHeadImgUrl());
         map.put("token",account.getToken());
-        if (achievementMapper.isUserAchievementExists(addPwdVo.getUserId()) == 0){
-            if (achievementMapper.addNewUserStatistics(addPwdVo.getUserId()) == 0){
-                return DtoUtil.getFalseDto("为用户添加计数表失败",15005);
+        try {
+            if (ObjectUtils.isEmpty(achievementMapper.isUserAchievementExists(addPwdVo.getUserId()))){
+                if (achievementMapper.addNewUserStatistics(addPwdVo.getUserId()) == 0){
+                    return DtoUtil.getFalseDto("为用户添加计数表失败",15005);
+                }
             }
-        }
-        if (userSettingsMapper.isUserSettingsExists(addPwdVo.getUserId()) == 0){
-            if (userSettingsMapper.addNewUserSettings(addPwdVo.getUserId()) == 0){
-                return DtoUtil.getFalseDto("为用户添加设置失败",15006);
+            if (ObjectUtils.isEmpty(userSettingsMapper.isUserSettingsExists(addPwdVo.getUserId()))){
+                if (userSettingsMapper.addNewUserSettings(addPwdVo.getUserId()) == 0){
+                    return DtoUtil.getFalseDto("为用户添加设置失败",15006);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("请勿重复操作",15007);
         }
         return DtoUtil.getSuccesWithDataDto("添加密码成功",map,100000);
     }
