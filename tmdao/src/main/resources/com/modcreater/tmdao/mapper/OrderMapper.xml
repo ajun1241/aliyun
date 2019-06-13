@@ -33,13 +33,13 @@
     <select id="getUnitPrice" resultType="java.lang.Double">
         select
         <if test="serviceType == 'month'">
-            monthCardPrice
+            monthCardPrice,
         </if>
         <if test="serviceType == 'time'">
-            timeCardPrice
+            timeCardPrice,
         </if>
         <if test="serviceType == 'year'">
-            yearCardPrice
+            yearCardPrice,
         </if>
         <if test="serviceType == 'perpetual'">
             yearCardPrice

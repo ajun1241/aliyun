@@ -374,7 +374,7 @@
                 userid = #{userid}
             </if>
             <if test="eventid != null">
-                eventId &lt; #{eventid}
+                and eventId &lt; #{eventid}
             </if>
             <if test="day != null">
                 and day = #{day}

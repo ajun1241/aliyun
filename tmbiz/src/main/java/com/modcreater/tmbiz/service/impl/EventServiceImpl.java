@@ -9,6 +9,7 @@ import com.modcreater.tmbeans.vo.QueryMsgStatusVo;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbiz.service.EventService;
+import com.modcreater.tmbiz.config.EventUtil;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.*;
 import com.modcreater.tmutils.messageutil.FeedbackInviteMessage;
@@ -17,7 +18,6 @@ import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.NoTransactionException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
@@ -25,8 +25,6 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -75,6 +73,9 @@ public class EventServiceImpl implements EventService {
 
     @Resource
     private MsgStatusMapper msgStatusMapper;
+
+    @Resource
+    private EventUtil eventUtil;
 
     @Override
     public Dto addNewEvents(UploadingEventVo uploadingEventVo, String token) {
@@ -1009,7 +1010,7 @@ public class EventServiceImpl implements EventService {
             SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
             singleEvent.setUserid(Long.parseLong(addInviteEventVo.getUserId()));
             //判断是否有冲突事件
-            boolean y = SingleEventUtil.eventTime(eventMapper.queryEvents(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()));
+            boolean y = SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()));
             boolean m = stringRedisTemplate.hasKey(addInviteEventVo.getUserId() + singleEvent.getEventid().toString());
             if (!y || m) {
                 return DtoUtil.getFalseDto("该时间段内已有事件不能添加", 21012);
@@ -1018,6 +1019,8 @@ public class EventServiceImpl implements EventService {
             System.out.println("参与人员：" + singleEvent.getPerson());
             EventPersons eventPersons = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
             String[] persons = eventPersons.getFriendsId().split(",");
+            //判断好友是否开启了邀请权限
+
             String redisKey = addInviteEventVo.getUserId() + singleEvent.getEventid();
             stringRedisTemplate.opsForValue().set(redisKey, JSON.toJSONString(singleEvent));
             //生成统计表
@@ -1247,7 +1250,8 @@ public class EventServiceImpl implements EventService {
             if (Integer.parseInt(feedbackEventInviteVo.getChoose()) == 0) {
                 //判断接受者的事件列表是否有冲突
                 //查到冲突的事件集合
-                List<SingleEvent> singleEvents = eventMapper.queryClashEventList(singleEvent);
+                List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleEvent);
+                System.out.println("回应事件邀请时的冲突事件集合"+singleEvents.toString());
                 //判断是否忽略冲突任然添加
                 if (Integer.parseInt(feedbackEventInviteVo.getIsHold()) == 0) {
                     //如果有冲突反馈给该用户
@@ -1441,7 +1445,7 @@ public class EventServiceImpl implements EventService {
                 //判断同意该事件的人，他们的事件表是否有冲突事件
                 for (String userId : agrees) {
                     singleEvent.setUserid(Long.parseLong(userId));
-                    List<SingleEvent> singleEvents = eventMapper.queryClashEventList(singleEvent);
+                    List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleEvent);
                     if (singleEvents.size() > 0) {
                         for (SingleEvent se : singleEvents) {
                             //把冲突事件移入草稿箱
@@ -1597,7 +1601,7 @@ public class EventServiceImpl implements EventService {
             //判断同意该事件的人，他们的事件表是否有冲突事件
             for (String userId : agrees) {
                 singleEvent.setUserid(Long.parseLong(userId));
-                List<SingleEvent> singleEvents = eventMapper.queryClashEventList(singleEvent);
+                List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleEvent);
                 if (singleEvents.size() > 0) {
                     for (SingleEvent se : singleEvents) {
                         //把冲突事件移入草稿箱

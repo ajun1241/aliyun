@@ -153,6 +153,23 @@ public class RongCloudMethodUtil {
         return user;
     }
 
+    public String refreshHeadImg(String userId,String userName,String headImgUrl) throws Exception {
+        User User = rongCloud.user;
+        UserModel user = new UserModel()
+                .setId(userId)
+                .setName(userName)
+                .setPortrait(headImgUrl);
+
+        /**
+         *
+         * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/user/user.html#refresh
+         *
+         * 刷新用户信息方法
+         */
+        Result refreshResult = User.update(user);
+        System.out.println("refresh:  " + refreshResult.toString());
+        return refreshResult.toString();
+    }
 }
 
 

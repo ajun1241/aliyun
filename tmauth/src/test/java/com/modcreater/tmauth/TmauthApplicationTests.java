@@ -1,6 +1,8 @@
 package com.modcreater.tmauth;
 
 import com.modcreater.tmbeans.pojo.MsgStatus;
+import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmdao.mapper.MsgStatusMapper;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
@@ -28,20 +30,12 @@ import java.util.List;
 public class TmauthApplicationTests {
     @Resource
     MsgStatusMapper msgStatusMapper;
+    @Resource
+    private EventMapper eventMapper;
     @Test
     public void contextLoads() {
-        List<String> list=new ArrayList<>();
-        list.add("a");
-        list.add("b");
-        list.add("c");
-        list.add("d");
-        list.add("e");
-//        list.toArray();
-        String[] l={"a","b","c","d","e"};
-        System.out.println(list.toString());
-        System.out.println("***************************");
-        String s=String.join(",",list);
-        System.out.println("ssdasdasdas===="+s);
+        SingleEvent singleEvent=new SingleEvent();
+        System.out.println(eventMapper.queryClashEventList(singleEvent).toString());
     }
     @Test
     public void test(){

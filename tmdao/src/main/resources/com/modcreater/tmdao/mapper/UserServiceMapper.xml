@@ -13,13 +13,13 @@
         update serviceremainingtime
         <set>
             <if test="residueDegree != null and residueDegree != 0">
-                residueDegree = #{residueDegree}
+                residueDegree = #{residueDegree},
             </if>
             <if test="timeRemaining != null and timeRemaining != 0">
-                timeRemaining = #{timeRemaining}
+                timeRemaining = #{timeRemaining},
             </if>
             <if test="storageTime != null and storageTime != 0">
-                storageTime = #{storageTime}
+                storageTime = #{storageTime},
             </if>
         </set>
         where userId = #{userId} and serviceId = #{serviceId}

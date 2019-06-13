@@ -60,6 +60,9 @@
             <if test="userPassword != null">
                 userPassword = #{userPassword},
             </if>
+            <if test="headImgUrl != null and headImgUrl != ''">
+                headImgUrl=#{headImgUrl},
+            </if>
             <if test="isFirst != 0">
                 isFirst = #{isFirst},
             </if>

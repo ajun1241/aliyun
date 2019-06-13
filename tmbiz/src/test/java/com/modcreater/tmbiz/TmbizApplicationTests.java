@@ -3,6 +3,8 @@ package com.modcreater.tmbiz;
 //import com.modcreater.tmbeans.pojo.TestSingEvent;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.EventPersons;
+import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbiz.config.EventUtil;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.messageutil.InviteMessage;
 import io.rong.RongCloud;
@@ -29,6 +31,9 @@ public class TmbizApplicationTests {
     private EventMapper eventMapper;
 
     @Resource
+    private EventUtil eventUtil;
+
+    @Resource
     private StringRedisTemplate stringRedisTemplate;
 
     @Test
@@ -51,11 +56,8 @@ public class TmbizApplicationTests {
 
     @Test
     public void test1() {
-        List<String> list=new ArrayList<>();
-        System.out.println(list);
-        for (String s:list) {
-            System.out.println(s.split(","));
-        }
+        EventUtil eventUtil=new EventUtil();
+        System.out.println(eventUtil.eventClashUtil(new SingleEvent()));
     }
 
     @Test

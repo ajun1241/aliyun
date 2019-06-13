@@ -775,8 +775,26 @@ public class AccountServiceImpl implements AccountService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(headImgVo.getUserId()))){
             return DtoUtil.getFalseDto("token过期请先登录",21014);
         }
-        if (accountMapper.uplHeadImg(headImgVo.getUserId(),headImgVo.getHeadImgUrl())<=0){
-            return DtoUtil.getSuccessDto("头像上传失败",21017);
+        try {
+            //生成token
+            Account account=accountMapper.queryAccount(headImgVo.getUserId());
+            token= rongCloudMethodUtil.createToken(headImgVo.getUserId(),account.getUserName(),account.getHeadImgUrl());
+            if (StringUtils.isEmpty(token)){
+                return DtoUtil.getFalseDto("生成token失败",14005);
+            }
+            System.out.println("这是我要的token*****************************>"+token);
+            //把token保存在数据库
+            account.setId(account.getId());
+            account.setToken(token);
+            account.setHeadImgUrl(headImgVo.getHeadImgUrl());
+            //把token保存在redis
+            stringRedisTemplate.opsForValue().set(account.getId().toString(),token);
+            if (accountMapper.updateAccount(account)<=0){
+                return DtoUtil.getFalseDto("上传头像失败",14006);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("生成token失败",14005);
         }
         return DtoUtil.getSuccessDto("头像上传成功",100000);
     }

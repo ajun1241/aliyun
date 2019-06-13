@@ -31,10 +31,10 @@
                 drafts = drafts + #{userStatistics.drafts},
             </if>
             <if test="userStatistics.lastOperatedTime != null and userStatistics.lastOperatedTime != 0">
-                lastOperatedTime = #{userStatistics.lastOperatedTime}
+                lastOperatedTime = #{userStatistics.lastOperatedTime},
             </if>
             <if test="userStatistics.loggedDaysUpdated != null and userStatistics.loggedDaysUpdated != 0">
-                loggedDaysUpdated = #{userStatistics.loggedDaysUpdated}
+                loggedDaysUpdated = #{userStatistics.loggedDaysUpdated},
             </if>
         </set>
         where userId = #{userId}
@@ -55,10 +55,10 @@
                 drafts = drafts + #{drafts},
             </if>
             <if test="lastOperatedTime != null and lastOperatedTime != 0">
-                lastOperatedTime = #{lastOperatedTime}
+                lastOperatedTime = #{lastOperatedTime},
             </if>
             <if test="loggedDaysUpdated != null">
-                loggedDaysUpdated = #{loggedDaysUpdated}
+                loggedDaysUpdated = #{loggedDaysUpdated},
             </if>
         </set>
     </update>
