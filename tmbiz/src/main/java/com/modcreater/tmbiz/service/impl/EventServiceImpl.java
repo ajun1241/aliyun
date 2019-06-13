@@ -477,65 +477,10 @@ public class EventServiceImpl implements EventService {
         System.out.println("按周查" + searchEventVo.toString());
         SingleEvent singleEvent;
         //按周查询单一事件
-        List<DayEvents> dayEventsList = new ArrayList<>();
-        for (int i = 0; i <= 6; i++) {
-            DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
-            String dayEventId = DateUtil.getDay(i);
-            singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
-            List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
-            ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
-            dayEvents.setMySingleEventList(showSingleEventList);
-            dayEvents.setTotalNum((long) dayEvents.getMySingleEventList().size());
-            dayEvents.setUserId(Long.valueOf(searchEventVo.getUserId()));
-            dayEvents.setDayEventId(Long.valueOf(dayEventId));
-            dayEventsList.add(dayEvents);
-        }
+        List<DayEvents> dayEventsList = getDayEventsList(searchEventVo.getUserId());
         //按周查询重复事件
         List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
-        List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
-        //创建七个几个代表一周七天
-        List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> monShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> tueShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> wedShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
-        for (SingleEvent singleEvent1 : loopEventListInDataBase) {
-            ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
-            Boolean[] booleans = showSingleEvent.getRepeaTtime();
-            //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
-            for (int i = 0; i <= 6; i++) {
-                if (i == 0 && booleans[i]) {
-                    sunShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 1 && booleans[i]) {
-                    monShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 2 && booleans[i]) {
-                    tueShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 3 && booleans[i]) {
-                    wedShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 4 && booleans[i]) {
-                    thuShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 5 && booleans[i]) {
-                    friShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 6 && booleans[i]) {
-                    satShowLoopEventList.add(showSingleEvent);
-                }
-            }
-        }
-        loopEventList.add(sunShowLoopEventList);
-        loopEventList.add(monShowLoopEventList);
-        loopEventList.add(tueShowLoopEventList);
-        loopEventList.add(wedShowLoopEventList);
-        loopEventList.add(thuShowLoopEventList);
-        loopEventList.add(friShowLoopEventList);
-        loopEventList.add(satShowLoopEventList);
+        List<List<ShowSingleEvent>> loopEventList = getShowSingleEventListList(loopEventListInDataBase);
         if ((dayEventsList.size() + loopEventList.size()) == 0) {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
@@ -560,74 +505,23 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
         }
         Map<String, Object> result = new HashMap<>(3);
-        if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 || userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(), searchEventVo.getFriendId()) == 1) {
-            result.put("userPrivatePermission", "1");
-        } else {
-            result.put("userPrivatePermission", "0");
-            return DtoUtil.getSuccesWithDataDto("该用户设置了查看权限", result, 100000);
+        //总权限 + 单一权限
+        try {
+            if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 && userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(), searchEventVo.getFriendId()) == 1) {
+                result.put("userPrivatePermission", "1");
+            } else {
+                result.put("userPrivatePermission", "0");
+                return DtoUtil.getSuccesWithDataDto("该用户设置了查看权限", result, 100000);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("查询权限报错",23335);
         }
-        SingleEvent singleEvent;
         //按周查询单一事件
-        List<DayEvents> dayEventsList = new ArrayList<>();
-        for (int i = 0; i <= 6; i++) {
-            DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
-            String dayEventId = DateUtil.getDay(i);
-            singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), dayEventId);
-            singleEvent.setUserid(Long.parseLong(searchEventVo.getFriendId()));
-            List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
-            ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
-            dayEvents.setMySingleEventList(showSingleEventList);
-            dayEvents.setTotalNum((long) dayEvents.getMySingleEventList().size());
-            dayEvents.setUserId(Long.valueOf(searchEventVo.getUserId()));
-            dayEvents.setDayEventId(Long.valueOf(dayEventId));
-            dayEventsList.add(dayEvents);
-        }
+        List<DayEvents> dayEventsList = getDayEventsList(searchEventVo.getUserId());
         //按周查询重复事件
         List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getFriendId());
-        List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
-        //创建七个几个代表一周七天
-        List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> monShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> tueShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> wedShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
-        for (SingleEvent singleEvent1 : loopEventListInDataBase) {
-            ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
-            Boolean[] booleans = showSingleEvent.getRepeaTtime();
-            //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
-            for (int i = 0; i <= 6; i++) {
-                if (i == 0 && booleans[i]) {
-                    sunShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 1 && booleans[i]) {
-                    monShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 2 && booleans[i]) {
-                    tueShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 3 && booleans[i]) {
-                    wedShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 4 && booleans[i]) {
-                    thuShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 5 && booleans[i]) {
-                    friShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 6 && booleans[i]) {
-                    satShowLoopEventList.add(showSingleEvent);
-                }
-            }
-        }
-        loopEventList.add(sunShowLoopEventList);
-        loopEventList.add(monShowLoopEventList);
-        loopEventList.add(tueShowLoopEventList);
-        loopEventList.add(wedShowLoopEventList);
-        loopEventList.add(thuShowLoopEventList);
-        loopEventList.add(friShowLoopEventList);
-        loopEventList.add(satShowLoopEventList);
+        List<List<ShowSingleEvent>> loopEventList = getShowSingleEventListList(loopEventListInDataBase);
         if ((dayEventsList.size() + loopEventList.size()) == 0) {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
@@ -1929,5 +1823,70 @@ public class EventServiceImpl implements EventService {
     private static UserStatistics changeCompleted(UserStatistics userStatistics, Long num) {
         userStatistics.setCompleted(num);
         return userStatistics;
+    }
+
+    private List<List<ShowSingleEvent>> getShowSingleEventListList(List<SingleEvent> list){
+        List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
+        List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();
+        List<ShowSingleEvent> monShowLoopEventList = new ArrayList<>();
+        List<ShowSingleEvent> tueShowLoopEventList = new ArrayList<>();
+        List<ShowSingleEvent> wedShowLoopEventList = new ArrayList<>();
+        List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
+        List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
+        List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
+        for (SingleEvent singleEvent1 : list) {
+            ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+            Boolean[] booleans = showSingleEvent.getRepeaTtime();
+            //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
+            for (int i = 0; i <= 6; i++) {
+                if (i == 0 && booleans[i]) {
+                    sunShowLoopEventList.add(showSingleEvent);
+                }
+                if (i == 1 && booleans[i]) {
+                    monShowLoopEventList.add(showSingleEvent);
+                }
+                if (i == 2 && booleans[i]) {
+                    tueShowLoopEventList.add(showSingleEvent);
+                }
+                if (i == 3 && booleans[i]) {
+                    wedShowLoopEventList.add(showSingleEvent);
+                }
+                if (i == 4 && booleans[i]) {
+                    thuShowLoopEventList.add(showSingleEvent);
+                }
+                if (i == 5 && booleans[i]) {
+                    friShowLoopEventList.add(showSingleEvent);
+                }
+                if (i == 6 && booleans[i]) {
+                    satShowLoopEventList.add(showSingleEvent);
+                }
+            }
+        }
+        loopEventList.add(sunShowLoopEventList);
+        loopEventList.add(monShowLoopEventList);
+        loopEventList.add(tueShowLoopEventList);
+        loopEventList.add(wedShowLoopEventList);
+        loopEventList.add(thuShowLoopEventList);
+        loopEventList.add(friShowLoopEventList);
+        loopEventList.add(satShowLoopEventList);
+        return loopEventList;
+    }
+
+    private List<DayEvents> getDayEventsList(String userId){
+        List<DayEvents> dayEventsList = new ArrayList<>();
+        SingleEvent singleEvent;
+        for (int i = 0; i <= 6; i++) {
+            DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
+            String dayEventId = DateUtil.getDay(i);
+            singleEvent = SingleEventUtil.getSingleEvent(userId, dayEventId);
+            List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+            ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
+            dayEvents.setMySingleEventList(showSingleEventList);
+            dayEvents.setTotalNum((long) dayEvents.getMySingleEventList().size());
+            dayEvents.setUserId(Long.valueOf(userId));
+            dayEvents.setDayEventId(Long.valueOf(dayEventId));
+            dayEventsList.add(dayEvents);
+        }
+        return dayEventsList;
     }
 }
