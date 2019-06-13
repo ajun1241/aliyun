@@ -1835,6 +1835,33 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccesWithDataDto("查询消息状态成功", map, 100000);
     }
 
+    @Override
+    public Dto searchFriendEventOnce(ReceivedFriendEventOnce receivedFriendEventOnce, String token) {
+        if (!StringUtils.hasText(receivedFriendEventOnce.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedFriendEventOnce.getUserId()))) {
+            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+        }
+        Map<String, Object> result = new HashMap<>();
+        if (userSettingsMapper.getIsHideFromFriend(receivedFriendEventOnce.getUserId(),receivedFriendEventOnce.getFriendId()) != 2){
+            result.put("userPrivatePermission",0);
+            return DtoUtil.getSuccesWithDataDto("该用户设置了查看权限",result,200000);
+        }else {
+            result.put("userPrivatePermission",1);
+        }
+        SingleEvent singleEvent = eventMapper.queryEventOne(receivedFriendEventOnce.getFriendId(),receivedFriendEventOnce.getEventId());
+        if (ObjectUtils.isEmpty(singleEvent)){
+            return DtoUtil.getSuccessDto("没有数据",200000);
+        }
+
+        result.put("event",SingleEventUtil.getShowSingleEvent(singleEvent));
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
     /**
      * 未完成
      *

@@ -250,4 +250,12 @@ public interface EventService {
      * @return
      */
     Dto queryMsgStatus(QueryMsgStatusVo queryMsgStatusVo, String token);
+
+    /**
+     * 查询好友的事件详情
+     * @param receivedFriendEventOnce
+     * @param token
+     * @return
+     */
+    Dto searchFriendEventOnce(ReceivedFriendEventOnce receivedFriendEventOnce, String token);
 }

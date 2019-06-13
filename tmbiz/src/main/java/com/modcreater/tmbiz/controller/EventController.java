@@ -126,13 +126,18 @@ public class EventController {
     }
 
     /**
-     * 根据"周"查询事件排序并带有用户是否给予他人查看权限
+     * 根据"周"查询事件排序并带有用户是否给予他人查看权限(查看好友的周)
      * @return
      */
     @GLOT
     @PostMapping(value = "seabyweekwithprivatepermission")
     public Dto seaByWeekWithPrivatePermission(@RequestBody SearchEventVo searchEventVo,HttpServletRequest request){
         return eventService.seaByWeekWithPrivatePermission(searchEventVo,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "searchfriendeventonce")
+    public Dto searchFriendEventOnce(@RequestBody ReceivedFriendEventOnce receivedFriendEventOnce,HttpServletRequest request){
+        return eventService.searchFriendEventOnce(receivedFriendEventOnce,request.getHeader("token"));
     }
 
     /**
