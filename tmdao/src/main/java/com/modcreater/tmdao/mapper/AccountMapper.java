@@ -204,4 +204,5 @@ public interface AccountMapper {
      * @return
      */
     int alterUserInfo(@Param("userId") String userId,@Param("userSign") String userSign,@Param("userName") String userName,@Param("headImgUrl") String headImgUrl);
+
 }

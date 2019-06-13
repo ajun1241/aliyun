@@ -551,23 +551,32 @@ public class EventServiceImpl implements EventService {
             }
             System.out.println(receivedSearchOnce.toString());
             SingleEvent singleEvent = eventMapper.queryEventOne(receivedSearchOnce.getUserId(), receivedSearchOnce.getEventId());
-            List<Map> maps = new ArrayList<>();
+            if (ObjectUtils.isEmpty(singleEvent)){
+                return DtoUtil.getFalseDto("事件已过期或者不存在",200000);
+            }
+            Map<String,Object> maps = new HashMap<>();
+            ArrayList<Map> list = new ArrayList<>();
             if (!StringUtils.isEmpty(singleEvent.getPerson())) {
                 EventPersons eventPersons = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
-                String[] friendsId = singleEvent.getPerson().split(",");
-                for (String friendId : friendsId) {
-                    Map map = new HashMap();
-                    Account account = accountMapper.queryAccount(friendId);
-                    map.put("friendId", account.getId());
-                    map.put("userCode", account.getUserCode());
-                    map.put("userName", account.getUserName());
-                    map.put("headImgUrl", account.getHeadImgUrl());
-                    map.put("gender", account.getGender());
-                    maps.add(map);
+                if (!StringUtils.isEmpty(eventPersons.getFriendsId())){
+                        String[] friendsId = eventPersons.getFriendsId().split(",");
+                        for (String friendId : friendsId) {
+                            Map map = new HashMap();
+                            Account account = accountMapper.queryAccount(friendId);
+                            map.put("friendId", account.getId());
+                            map.put("userCode", account.getUserCode());
+                            map.put("userName", account.getUserName());
+                            map.put("headImgUrl", account.getHeadImgUrl());
+                            map.put("gender", account.getGender());
+                            list.add(map);
+                    }
                 }
+                maps.put("friendsId",list);
+                maps.put("others",eventPersons.getOthers());
             }
             if (singleEvent != null) {
-                singleEvent.setPerson(maps.toString());
+                singleEvent.setPerson(JSON.toJSONString(maps));
+                System.out.println("显示一个事件详情时输出的"+singleEvent.getPerson());
                 return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEvent), 100000);
             }
             return DtoUtil.getSuccessDto("未查询到事件", 200000);
@@ -603,6 +612,15 @@ public class EventServiceImpl implements EventService {
         }
         try {
             String[] backers = addbackerVo.getFriendIds().split(",");
+            //判断好友是否开启了权限
+            List<String> personList=new ArrayList<>();
+            for (int i = 0; i < backers.length; i++) {
+                Friendship friendship=accountMapper.queryFriendshipDetail(backers[i],addbackerVo.getUserId());
+                if (friendship.getInvite()==1){
+                    //只添加满足条件的人
+                    personList.add(backers[i]);
+                }
+            }
             //添加事件进数据库
             SingleEvent singleEvent = JSONObject.parseObject(addbackerVo.getSingleEvent(), SingleEvent.class);
             singleEvent.setUserid(Long.parseLong(addbackerVo.getUserId()));
@@ -619,13 +637,13 @@ public class EventServiceImpl implements EventService {
             statistics.setUnfinished(1L);
             achievementMapper.updateUserStatistics(statistics, addbackerVo.getUserId());
             //添加支持者状态
-            backerMapper.addBackers(addbackerVo.getUserId(), backers, singleEvent.getEventid().toString());
+            backerMapper.addBackers(addbackerVo.getUserId(), (String[]) personList.toArray((new String[]{})), singleEvent.getEventid().toString());
             //发送信息给被邀请者
 //            Account account=accountMapper.queryAccount(addbackerVo.getUserId());
             RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
             String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
             InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, singleEvent.toString(), "", "");
-            ResponseResult result = rongCloudMethodUtil.sendSystemMessage(addbackerVo.getUserId(), backers, inviteMessage, "", "");
+            ResponseResult result = rongCloudMethodUtil.sendSystemMessage(addbackerVo.getUserId(), (String[]) personList.toArray((new String[]{})), inviteMessage, "", "");
             if (result.getCode() != 200) {
                 return DtoUtil.getFalseDto("发送消息失败", 17002);
             }
@@ -913,13 +931,20 @@ public class EventServiceImpl implements EventService {
             System.out.println("参与人员：" + singleEvent.getPerson());
             EventPersons eventPersons = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
             String[] persons = eventPersons.getFriendsId().split(",");
+            ArrayList<String> personList=new ArrayList<>();
             //判断好友是否开启了邀请权限
-
+            for (int i = 0; i < persons.length; i++) {
+                Friendship friendship=accountMapper.queryFriendshipDetail(persons[i],addInviteEventVo.getUserId());
+                if (friendship.getInvite()==1){
+                    //只添加满足条件的人
+                    personList.add(persons[i]);
+                }
+            }
             String redisKey = addInviteEventVo.getUserId() + singleEvent.getEventid();
             stringRedisTemplate.opsForValue().set(redisKey, JSON.toJSONString(singleEvent));
             //生成统计表
             List<StatisticsTable> tables = new ArrayList<>();
-            for (String userId : persons) {
+            for (String userId : personList) {
                 StatisticsTable statisticsTable = new StatisticsTable();
                 statisticsTable.setCreatorId(Long.parseLong(addInviteEventVo.getUserId()));
                 statisticsTable.setEventId(singleEvent.getEventid());
@@ -933,6 +958,7 @@ public class EventServiceImpl implements EventService {
             //消息状态保存在数据库
             MsgStatus msgStatus = new MsgStatus();
             msgStatus.setType(1L);
+            System.out.println("这是啥啊"+addInviteEventVo.getUserId());
             msgStatus.setUserId(Long.parseLong(addInviteEventVo.getUserId()));
             if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
                 return DtoUtil.getFalseDto("消息状态保存失败", 26010);
@@ -942,7 +968,7 @@ public class EventServiceImpl implements EventService {
             RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
             String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
             InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2", msgStatus.getId().toString());
-            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), persons, 0, inviteMessage);
+            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), personList.toArray(new String[]{}), 0, inviteMessage);
             if (result.getCode() != 200) {
                 return DtoUtil.getFalseDto("发送消息失败", 17002);
             }
@@ -1340,6 +1366,7 @@ public class EventServiceImpl implements EventService {
                 for (String userId : agrees) {
                     singleEvent.setUserid(Long.parseLong(userId));
                     List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleEvent);
+                    System.out.println("创建事件时创建者选择时的冲突事件集合"+singleEvents.toString());
                     if (singleEvents.size() > 0) {
                         for (SingleEvent se : singleEvents) {
                             //把冲突事件移入草稿箱

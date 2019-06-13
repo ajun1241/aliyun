@@ -183,7 +183,7 @@ public interface EventMapper {
     List<SingleEvent> queryClashEventList(SingleEvent singleEvent);
 
     /**
-     * 根据userId和eventId查询一条事件
+     * 根据userId和eventId查询一条(未过期的)事件
      * @param userId
      * @param eventId
      * @return

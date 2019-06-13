@@ -55,9 +55,9 @@ public class TmbizApplicationTests {
     }
 
     @Test
-    public void test1() {
-        EventUtil eventUtil=new EventUtil();
-        System.out.println(eventUtil.eventClashUtil(new SingleEvent()));
+    public void test1() {/*
+        SingleEvent singleEvent
+        System.out.println(eventUtil.eventClashUtil());*/
     }
 
     @Test
