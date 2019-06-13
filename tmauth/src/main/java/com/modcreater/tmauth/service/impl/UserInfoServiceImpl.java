@@ -481,7 +481,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<Map<String, Object>> frontSevenDays = new ArrayList<>();
         Long maxEventNum = 0L;
         Long totalEventsNum = 0L;
-        for (int i = 0; i >= -6; i--) {
+        for (int i = -6; i <= 0; i++) {
             String day = DateUtil.getDay(i);
             StringBuilder stringBuilder = new StringBuilder(day);
             NaturalWeek naturalWeek = new NaturalWeek();
