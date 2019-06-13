@@ -204,7 +204,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         //此处判断用户是否开启了查询服务
         Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
         if (dto.getResCode() == 200000) {
-            if (!receivedEventConditions.getPageNum().equals("1")){
+            if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")){
                 return DtoUtil.getSuccesWithDataDto("未开通查询服务,不能查看更多",null,200000);
             }
             receivedEventConditions.setPageNum("1");
