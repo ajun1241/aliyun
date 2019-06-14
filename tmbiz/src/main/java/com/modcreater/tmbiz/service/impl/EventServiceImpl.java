@@ -1473,8 +1473,9 @@ public class EventServiceImpl implements EventService {
                 }
                 //判断同意该事件的人，他们的事件表是否有冲突事件
                 for (String userId : agrees) {
-                    singleEvent.setUserid(Long.parseLong(userId));
-                    List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleEvent);
+                    SingleEvent singleXEvent = JSONObject.parseObject(eventCreatorChooseVo.getExtraData(), SingleEvent.class);
+                    singleXEvent.setUserid(Long.parseLong(userId));
+                    List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleXEvent);
                     System.out.println("创建事件时创建者选择时的冲突事件集合"+singleEvents.toString());
                     if (singleEvents.size() > 0) {
                         for (SingleEvent se : singleEvents) {
@@ -1491,27 +1492,27 @@ public class EventServiceImpl implements EventService {
                         //参与者变更(把参与者里的自己替换成创建者)
                         System.out.println("为什么出错1"+eventPersons.toString());
                         eventPersons.setFriendsId(eventPersons.getFriendsId().replace(userId, eventCreatorChooseVo.getUserId()));
-                        singleEvent.setPerson(JSON.toJSONString(eventPersons));
+                        singleXEvent.setPerson(JSON.toJSONString(eventPersons));
                         if (flag) {
                             //修改
-                            eventMapper.alterEventsByUserId(singleEvent);
+                            eventMapper.alterEventsByUserId(singleXEvent);
                         }else {
                             //上传
-                            eventMapper.uploadingEvents(singleEvent);
+                            eventMapper.uploadingEvents(singleXEvent);
                             UserStatistics statistics = new UserStatistics();
-                            statistics.setUserId(Long.valueOf(singleEvent.getUserid()));
+                            statistics.setUserId(Long.valueOf(userId));
                             //用户新增一条事件,未完成+1
                             statistics.setUnfinished(1L);
                             achievementMapper.updateUserStatistics(statistics, userId);
                             //在事件副表插入创建者
                             SingleEventVice singleEventVice1 = new SingleEventVice();
                             singleEventVice1.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
-                            singleEventVice1.setUserId(singleEvent.getUserid());
-                            singleEventVice1.setEventId(singleEvent.getEventid());
+                            singleEventVice1.setUserId(singleXEvent.getUserid());
+                            singleEventVice1.setEventId(singleXEvent.getEventid());
                             eventViceMapper.createEventVice(singleEventVice1);
                         }
                         //通知该好友事件已添加
-                        String content=account.getUserName() + "发起的事件“" + singleEvent.getEventname() + "”已添至你的事件表";
+                        String content=account.getUserName() + "发起的事件“" + singleXEvent.getEventname() + "”已添至你的事件表";
                         TxtMessage txtMessage = new TxtMessage(content, "");
                         System.out.println("创建事件时创建者选择输出的消息内容：" + txtMessage.getContent());
                         try {
@@ -1529,27 +1530,27 @@ public class EventServiceImpl implements EventService {
                         //参与者变更(把参与者里的自己替换成创建者)
                         System.out.println("为什么出错2"+eventPersons.toString());
                         eventPersons.setFriendsId(eventPersons.getFriendsId().replace(userId, eventCreatorChooseVo.getUserId()));
-                        singleEvent.setPerson(JSON.toJSONString(eventPersons));
+                        singleXEvent.setPerson(JSON.toJSONString(eventPersons));
                         if (flag) {
                             //修改
-                            eventMapper.alterEventsByUserId(singleEvent);
+                            eventMapper.alterEventsByUserId(singleXEvent);
                         }else {
                             //上传
-                            eventMapper.uploadingEvents(singleEvent);
+                            eventMapper.uploadingEvents(singleXEvent);
                             UserStatistics statistics = new UserStatistics();
-                            statistics.setUserId(Long.valueOf(singleEvent.getUserid()));
+                            statistics.setUserId(Long.valueOf(singleXEvent.getUserid()));
                             //用户新增一条事件,未完成+1
                             statistics.setUnfinished(1L);
                             achievementMapper.updateUserStatistics(statistics, eventCreatorChooseVo.getUserId());
                             //在事件副表插入创建者
                             SingleEventVice singleEventVice1 = new SingleEventVice();
                             singleEventVice1.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
-                            singleEventVice1.setUserId(singleEvent.getUserid());
-                            singleEventVice1.setEventId(singleEvent.getEventid());
+                            singleEventVice1.setUserId(singleXEvent.getUserid());
+                            singleEventVice1.setEventId(singleXEvent.getEventid());
                             eventViceMapper.createEventVice(singleEventVice1);
                         }
                         //通知该好友事件已修改
-                        TxtMessage txtMessage = new TxtMessage(account.getUserName() + "发起的事件“" + singleEvent.getEventname() + "”已添至你的事件表", "");
+                        TxtMessage txtMessage = new TxtMessage(account.getUserName() + "发起的事件“" + singleXEvent.getEventname() + "”已添至你的事件表", "");
                         System.out.println("创建事件时创建者选择输出的消息内容：" + txtMessage.getContent());
                         try {
                             String[] targetId = {userId};
