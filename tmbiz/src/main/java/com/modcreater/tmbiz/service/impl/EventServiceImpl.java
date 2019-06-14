@@ -102,7 +102,9 @@ public class EventServiceImpl implements EventService {
         }
         if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
             //未完成+1
-            achievementMapper.updateUserStatistics(changeUnfinished(new UserStatistics(), 1L), uploadingEventVo.getUserId());
+            UserStatistics userStatistics = new UserStatistics();
+            userStatistics.setUserId(Long.valueOf(uploadingEventVo.getUserId()));
+            achievementMapper.updateUserStatistics(changeUnfinished(userStatistics, 1L));
             return DtoUtil.getSuccessDto("事件上传成功", 100000);
         }
         return DtoUtil.getFalseDto("事件上传失败", 21001);
@@ -123,13 +125,15 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("重复操作:已经操作过了",21003);
         }
         System.out.println(deleteEventVo.getUserId()+"操作删除");
+        UserStatistics userStatistics = new UserStatistics();
+        userStatistics.setUserId(Long.valueOf(deleteEventVo.getUserId()));
         if (eventMapper.withdrawEventsByUserId(deleteEventVo) > 0) {
             if (deleteEventVo.getEventStatus().equals("1")) {
                 //已完成+1,未完成-1
-                achievementMapper.updateUserStatistics(changeUnfinished(changeCompleted(new UserStatistics(), 1L), -1L), deleteEventVo.getUserId());
+                achievementMapper.updateUserStatistics(changeUnfinished(changeCompleted(userStatistics, 1L), -1L));
             } else if (deleteEventVo.getEventStatus().equals("2")) {
                 //未完成-1
-                achievementMapper.updateUserStatistics(changeUnfinished(new UserStatistics(), -1L), deleteEventVo.getUserId());
+                achievementMapper.updateUserStatistics(changeUnfinished(userStatistics, -1L));
             }
             return DtoUtil.getSuccessDto("修改事件状态成功", 100000);
         }
@@ -318,7 +322,7 @@ public class EventServiceImpl implements EventService {
         }
         userStatistics.setUserId(Long.valueOf(draftVo.getUserId()));
         userStatistics.setDrafts(times);
-        if (achievementMapper.updateUserStatistics(userStatistics, userStatistics.getUserId().toString()) == 0) {
+        if (achievementMapper.updateUserStatistics(userStatistics) == 0) {
             return DtoUtil.getFalseDto("草稿箱数据计数失败", 27004);
         }
         //修改用户服务剩余时间
@@ -661,7 +665,8 @@ public class EventServiceImpl implements EventService {
             statistics.setUserId(Long.valueOf(addbackerVo.getUserId()));
             //用户新增一条事件,未完成+1
             statistics.setUnfinished(1L);
-            achievementMapper.updateUserStatistics(statistics, addbackerVo.getUserId());
+            statistics.setUserId(Long.valueOf(addbackerVo.getUserId()));
+            achievementMapper.updateUserStatistics(statistics);
             //添加支持者状态
             backerMapper.addBackers(addbackerVo.getUserId(), (String[]) personList.toArray((new String[]{})), singleEvent.getEventid().toString());
             //发送信息给被邀请者
@@ -888,11 +893,13 @@ public class EventServiceImpl implements EventService {
                 UserStatistics userStatistics = new UserStatistics();
                 userStatistics.setCompleted(1L);
                 userStatistics.setUnfinished(-1L);
-                achievementMapper.updateUserStatistics(userStatistics, deleteEventVo.getUserId());
+                userStatistics.setUserId(Long.valueOf(deleteEventVo.getUserId()));
+                achievementMapper.updateUserStatistics(userStatistics);
             } else if (deleteEventVo.getEventStatus().equals("2")) {
                 UserStatistics userStatistics = new UserStatistics();
                 userStatistics.setUnfinished(-1L);
-                achievementMapper.updateUserStatistics(userStatistics, deleteEventVo.getUserId());
+                userStatistics.setUserId(Long.valueOf(deleteEventVo.getUserId()));
+                achievementMapper.updateUserStatistics(userStatistics);
             }
             //告知支持者
             String[] backers = backerMapper.queryBackers(deleteEventVo.getUserId(), deleteEventVo.getEventId()).toString().replace("[", "").replace("]", "").split(",");
@@ -1178,13 +1185,17 @@ public class EventServiceImpl implements EventService {
                     return DtoUtil.getFalseDto("删除事件失败", 29002);
                 }
                 //删除计数
-                achievementMapper.updateUserStatistics(changeUnfinished(new UserStatistics(), -1L), receivedSearchOnce.getUserId());
+                UserStatistics userStatistics = new UserStatistics();
+                userStatistics.setUserId(Long.valueOf(receivedSearchOnce.getUserId()));
+                achievementMapper.updateUserStatistics(changeUnfinished(userStatistics, -1L));
             } else {
                 //如果不是创建者删除
                 //从自己的事件表里移除
                 eventMapper.deleteByDeleteType(singleEvent.getEventid(), "singleevent", receivedSearchOnce.getUserId());
                 //删除计数
-                achievementMapper.updateUserStatistics(changeUnfinished(new UserStatistics(), -1L), receivedSearchOnce.getUserId());
+                UserStatistics userStatistics = new UserStatistics();
+                userStatistics.setUserId(Long.valueOf(receivedSearchOnce.getUserId()));
+                achievementMapper.updateUserStatistics(changeUnfinished(userStatistics, -1L));
                 //其他参与者的事件里删除本参与者
                 EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
                 String[] persons = eventPersons.getFriendsId().split(",");
@@ -1463,7 +1474,8 @@ public class EventServiceImpl implements EventService {
                     statistics.setUserId(Long.valueOf(eventCreatorChooseVo.getUserId()));
                     //用户新增一条事件,未完成+1
                     statistics.setUnfinished(1L);
-                    achievementMapper.updateUserStatistics(statistics, eventCreatorChooseVo.getUserId());
+                    statistics.setUserId(Long.valueOf(eventCreatorChooseVo.getUserId()));
+                    achievementMapper.updateUserStatistics(statistics);
                     //在事件副表插入创建者
                     SingleEventVice singleEventVice = new SingleEventVice();
                     singleEventVice.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
@@ -1500,10 +1512,10 @@ public class EventServiceImpl implements EventService {
                             //上传
                             eventMapper.uploadingEvents(singleXEvent);
                             UserStatistics statistics = new UserStatistics();
-                            statistics.setUserId(Long.valueOf(userId));
                             //用户新增一条事件,未完成+1
                             statistics.setUnfinished(1L);
-                            achievementMapper.updateUserStatistics(statistics, userId);
+                            statistics.setUserId(Long.valueOf(userId));
+                            achievementMapper.updateUserStatistics(statistics);
                             //在事件副表插入创建者
                             SingleEventVice singleEventVice1 = new SingleEventVice();
                             singleEventVice1.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
@@ -1541,7 +1553,7 @@ public class EventServiceImpl implements EventService {
                             statistics.setUserId(Long.valueOf(singleXEvent.getUserid()));
                             //用户新增一条事件,未完成+1
                             statistics.setUnfinished(1L);
-                            achievementMapper.updateUserStatistics(statistics, eventCreatorChooseVo.getUserId());
+                            achievementMapper.updateUserStatistics(statistics);
                             //在事件副表插入创建者
                             SingleEventVice singleEventVice1 = new SingleEventVice();
                             singleEventVice1.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));

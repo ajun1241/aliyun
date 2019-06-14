@@ -60,7 +60,7 @@ public class GetLastOperatedTime {
                     userStatistics.setUserId(Long.valueOf(result));
                     userStatistics.setLoggedDays(1L);
                     userStatistics.setLoggedDaysUpdated(1L);
-                    achievementMapper.updateUserStatistics(userStatistics,result);
+                    achievementMapper.updateUserStatistics(userStatistics);
                     Long thisTime = System.currentTimeMillis()/1000;
                     achievementMapper.updateUserLastOperatedTime(result,thisTime);
                 }

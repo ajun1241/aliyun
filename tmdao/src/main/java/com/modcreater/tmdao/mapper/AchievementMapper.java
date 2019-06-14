@@ -58,10 +58,9 @@ public interface AchievementMapper {
     /**
      * 修改用户统计表
      * @param userStatistics
-     * @param userId
      * @return
      */
-    int updateUserStatistics(@Param("userStatistics") UserStatistics userStatistics ,@Param("userId") String userId);
+    int updateUserStatistics(@Param("userStatistics") UserStatistics userStatistics);
 
     /**
      * 修改所有用户统计表
