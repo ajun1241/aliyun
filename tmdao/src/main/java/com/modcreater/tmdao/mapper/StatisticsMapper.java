@@ -74,4 +74,12 @@ public interface StatisticsMapper {
      * @return
      */
     String selectStaIsOverdue(String creatorId,String eventId);
+
+    /**
+     * 删除统计表
+     * @param creatorId
+     * @param eventId
+     * @return
+     */
+    int deleteStatistics(String creatorId,String eventId);
 }

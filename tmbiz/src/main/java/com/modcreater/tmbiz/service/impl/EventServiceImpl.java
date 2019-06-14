@@ -1041,23 +1041,18 @@ public class EventServiceImpl implements EventService {
             stringRedisTemplate.opsForValue().set(redisKey, JSON.toJSONString(singleEvent));
             EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
             String[] persons = eventPersons.getFriendsId().split(",");
-            //查看该事件最高权限
-            SingleEventVice singleEventVice = new SingleEventVice();
-            singleEventVice.setUserId(singleEvent.getUserid());
-            singleEventVice.setEventId(singleEvent.getEventid());
-            singleEventVice = eventViceMapper.queryEventVice(singleEventVice);
-            for (String person : persons) {
+            //生成投票
+            List<StatisticsTable> tables = new ArrayList<>();
+            for (String userId : persons) {
                 StatisticsTable statisticsTable = new StatisticsTable();
-                statisticsTable.setCreatorId(singleEventVice.getCreateBy());
+                statisticsTable.setCreatorId(Long.parseLong(addInviteEventVo.getUserId()));
                 statisticsTable.setEventId(singleEvent.getEventid());
-                statisticsTable.setUserId(Long.parseLong(person));
-                //生成投票
-                System.out.println(statisticsTable.toString());
-                if (statisticsMapper.rollbackStatistics(statisticsTable) == 0) {
-                    //回滚
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return DtoUtil.getFalseDto("生成投票失败", 29101);
-                }
+                statisticsTable.setUserId(Long.parseLong(userId));
+                tables.add(statisticsTable);
+            }
+            int a = statisticsMapper.createStatistics(tables);
+            if (a <= 0) {
+                return DtoUtil.getFalseDto("生成统计表失败", 26003);
             }
             //发送信息
             Account account = accountMapper.queryAccount(addInviteEventVo.getUserId());
@@ -1116,6 +1111,7 @@ public class EventServiceImpl implements EventService {
         try {
             //找到该事件
             SingleEvent singleEvent = eventMapper.queryEventOne(receivedSearchOnce.getUserId(), receivedSearchOnce.getEventId());
+            System.out.println("删除邀请事件接口"+singleEvent.toString());
             //查看该事件最高权限
             SingleEventVice singleEventVice = new SingleEventVice();
             singleEventVice.setUserId(Long.parseLong(receivedSearchOnce.getUserId()));
@@ -1131,6 +1127,7 @@ public class EventServiceImpl implements EventService {
                 int a=eventMapper.deleteByDeleteType(singleEvent.getEventid(), "singleevent", receivedSearchOnce.getUserId());
                 //其他参与者的事件里删除本参与者
                 EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+                System.out.println("删除邀请事件接口输出的person"+eventPersons.toString());
                 String[] persons = eventPersons.getFriendsId().split(",");
                 for (int j = 0; j < persons.length; j++) {
                     //其他参与者的事件
@@ -1403,9 +1400,6 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("该事件已经添加成功不能重复选择",2333);
             }
 
-
-
-
             System.out.println("创建事件时创建者选择输出的事件内容：" + eventCreatorChooseVo.getExtraData());
             RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
             EventPersons eventPersons = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
@@ -1538,6 +1532,11 @@ public class EventServiceImpl implements EventService {
                         }
                     }
                 }
+                //删除统计表
+                int a=statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(),singleEvent.getEventid().toString());
+                if (a<=0){
+                    return DtoUtil.getFalseDto("删除统计表失败",2333);
+                }
                 return DtoUtil.getSuccessDto("消息发送成功", 100000);
             } else {
                 //不保留
@@ -1558,6 +1557,12 @@ public class EventServiceImpl implements EventService {
                     e.printStackTrace();
                     return DtoUtil.getFalseDto("消息发送失败", 26002);
                 }
+            }
+            //删除统计表
+            //删除统计表
+            int a=statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(),singleEvent.getEventid().toString());
+            if (a<=0){
+                return DtoUtil.getFalseDto("删除统计表失败",2333);
             }
             return DtoUtil.getSuccessDto("消息发送成功", 100000);
         } catch (Exception e) {

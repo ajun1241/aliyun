@@ -36,8 +36,6 @@
         creatorId=#{creatorId}
         and
         eventId=#{eventId}
-        and
-        userId=#{userId}
     </update>
 
     <update id="updStaIsOverdue">
@@ -49,7 +47,9 @@
         and
         eventId=#{eventId}
     </update>
-
+    <delete id="deleteStatistics">
+        delete from statisticstable where creatorId=#{creatorId} and eventId=#{eventId}
+    </delete>
     <select id="queryStatisticsCount" parameterType="com.modcreater.tmbeans.pojo.StatisticsTable" resultType="int">
         select count(1) from statisticstable
         where
