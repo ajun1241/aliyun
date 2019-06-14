@@ -17,7 +17,7 @@ public class ServiceFunction {
      */
     private String friendService;
     /**
-     * 查询服务(0:未开通;1:已开通)
+         * 查询服务(0:未开通;1:已开通)
      */
     private String searchService;
     /**

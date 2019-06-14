@@ -102,9 +102,9 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         }
         ServiceRemainingTime service=userServiceMapper.getServiceRemainingTime(userId,"1");
         if (ObjectUtils.isEmpty(service)){
-            return DtoUtil.getFalseDto("好友功能尚未开通",37001);
+            return DtoUtil.getFalseDto("好友功能尚未开通",200000);
         }
-        return DtoUtil.getSuccessDto("好友功能已开通",37002);
+        return DtoUtil.getSuccessDto("好友功能已开通",100000);
     }
 
     /**
@@ -225,15 +225,23 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         result.put("backupService", "0");
         for (ServiceRemainingTime serviceRemainingTime : serviceRemainingTimes) {
             if (serviceRemainingTime.getServiceId().equals("1")) {
-                result.put("friendService", "0");
+                if (friendServiceJudge(receivedId.getUserId(), token).getResCode() == 100000) {
+                    result.put("friendService", "1");
+                }
             } else if (serviceRemainingTime.getServiceId().equals("2")) {
-                result.put("searchService", "0");
+                if (searchServiceJudge(receivedId.getUserId()).getResCode() == 100000) {
+                    result.put("searchService", "1");
+                }
             } else if (serviceRemainingTime.getServiceId().equals("3")) {
-                result.put("annualReportingService", "0");
+                if (annualReportingServiceJudge(receivedId.getUserId(), token).getResCode() == 100000) {
+                    result.put("annualReportingService", "1");
+                }
             } else if (serviceRemainingTime.getServiceId().equals("4")) {
-                result.put("backupService", "0");
+                if (backupServiceJudge(receivedId.getUserId(), token).getResCode() == 100000) {
+                    result.put("backupService", "1");
+                }
             }
         }
-        return null;
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 }
