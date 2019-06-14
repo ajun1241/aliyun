@@ -480,7 +480,7 @@ public class EventServiceImpl implements EventService {
         System.out.println("按周查" + searchEventVo.toString());
         SingleEvent singleEvent;
         //按周查询单一事件
-        List<DayEvents> dayEventsList = getDayEventsList(searchEventVo.getUserId());
+        List<DayEvents> dayEventsList = getDayEventsList(searchEventVo.getUserId(),"all");
         //按周查询重复事件
         List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
         List<List<ShowSingleEvent>> loopEventList = getShowSingleEventListList(loopEventListInDataBase);
@@ -512,24 +512,40 @@ public class EventServiceImpl implements EventService {
         try {
             if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 && userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(), searchEventVo.getFriendId()) == 1) {
                 result.put("userPrivatePermission", "1");
+            } else if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 || userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(), searchEventVo.getFriendId()) == 2) {
+                result.put("userPrivatePermission", "2");
             } else {
                 result.put("userPrivatePermission", "0");
                 return DtoUtil.getSuccesWithDataDto("该用户设置了查看权限", result, 100000);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return DtoUtil.getFalseDto("查询权限报错",23335);
+            return DtoUtil.getFalseDto("查询权限报错", 23335);
         }
-        //按周查询单一事件
-        List<DayEvents> dayEventsList = getDayEventsList(searchEventVo.getUserId());
-        //按周查询重复事件
-        List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getFriendId());
-        List<List<ShowSingleEvent>> loopEventList = getShowSingleEventListList(loopEventListInDataBase);
+        List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
+        List<DayEvents> dayEventsList = new ArrayList<>();
+        if (result.get("userPrivatePermission").equals("1")) {
+            //按周查询单一事件
+            dayEventsList = getDayEventsList(searchEventVo.getUserId(),"all");
+            //按周查询重复事件
+            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getFriendId());
+            if (loopEventListInDataBase.size() != 0) {
+                loopEventList = getShowSingleEventListList(loopEventListInDataBase);
+            }
+        } else if (result.get("userPrivatePermission").equals("2")) {
+            //按周查询单一事件
+            dayEventsList = getDayEventsList(searchEventVo.getUserId(),"few");
+            //按周查询重复事件
+            List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEventsWithFewInfo(searchEventVo.getFriendId());
+            if (loopEventListInDataBase.size() != 0) {
+                loopEventList = getShowSingleEventListList(loopEventListInDataBase);
+            }
+        }
         if ((dayEventsList.size() + loopEventList.size()) == 0) {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
-        result.put("dayEventsList", dayEventsList);
         result.put("loopEventList", loopEventList);
+        result.put("dayEventsList", dayEventsList);
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 
@@ -1929,14 +1945,19 @@ public class EventServiceImpl implements EventService {
         return loopEventList;
     }
 
-    private List<DayEvents> getDayEventsList(String userId){
+    private List<DayEvents> getDayEventsList(String userId,String condition){
         List<DayEvents> dayEventsList = new ArrayList<>();
         SingleEvent singleEvent;
         for (int i = 0; i <= 6; i++) {
             DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
             String dayEventId = DateUtil.getDay(i);
             singleEvent = SingleEventUtil.getSingleEvent(userId, dayEventId);
-            List<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+            List<SingleEvent> singleEventList;
+            if ("all".equals(condition)){
+                singleEventList = eventMapper.queryEvents(singleEvent);
+            }else {
+                singleEventList = eventMapper.queryEventsWithFewInfo(singleEvent);
+            }
             ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
             dayEvents.setMySingleEventList(showSingleEventList);
             dayEvents.setTotalNum((long) dayEvents.getMySingleEventList().size());

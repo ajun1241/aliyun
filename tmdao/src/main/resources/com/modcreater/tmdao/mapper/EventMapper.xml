@@ -500,6 +500,31 @@
     <select id="getChangingEventStatus" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select isOverdue from singleevent where userId = #{userId} and eventId = #{eventId} and isOverdue = #{eventStatus}
     </select>
+    <select id="queryEventsWithFewInfo" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select eventId,userId,eventName,startTime,endTime from singleevent
+        <where>
+            <if test="userid != null">
+                userid = #{userid}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            and isOverdue = 0 and isLoop = 0
+        </where>
+        order by day asc ,startTime asc
+    </select>
+    <select id="queryLoopEventsWithFewInfo" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select
+        eventId,userId,eventName,startTime,endTime,repeatTime
+        from singleevent
+        where userid = #{userId} and isLoop = 1 and isOverdue = 0 order by startTime asc
+    </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent
     where isLoop = 0 and isOverdue = 0

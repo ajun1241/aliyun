@@ -279,4 +279,18 @@ public interface EventMapper {
      * @return
      */
     SingleEvent getChangingEventStatus(DeleteEventVo deleteEventVo);
+
+    /**
+     * 查询事件(只查询eventId,userId,eventName,startTime,endTime)
+     * @param singleEvent
+     * @return
+     */
+    List<SingleEvent> queryEventsWithFewInfo(SingleEvent singleEvent);
+
+    /**
+     * 查询重复事件(只查询eventId,userId,eventName,startTime,endTime)
+     * @param friendId
+     * @return
+     */
+    List<SingleEvent> queryLoopEventsWithFewInfo(String friendId);
 }
