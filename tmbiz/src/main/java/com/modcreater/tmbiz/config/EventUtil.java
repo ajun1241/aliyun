@@ -27,9 +27,13 @@ public class EventUtil {
            if (((Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) < Long.parseLong(singleEvent.getEndtime()))
                    || (Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getStarttime()) < Long.parseLong(singleEvent.getEndtime()))
                    || (Long.valueOf(singleEvent1.getEndtime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) < Long.parseLong(singleEvent.getEndtime()))
-                   || (Long.valueOf(singleEvent1.getStarttime()) <= Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) >= Long.parseLong(singleEvent.getEndtime())))){
-               //冲突事件添加进集合
-               clashList.add(singleEvent1);
+                   || (Long.valueOf(singleEvent1.getStarttime()) <= Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) >= Long.parseLong(singleEvent.getEndtime()))) ){
+               if (singleEvent1.getEventid().equals(singleEvent.getEventid()) && singleEvent1.getUserid().equals(singleEvent.getUserid())){
+
+               }else {
+                   //冲突事件添加进集合
+                   clashList.add(singleEvent1);
+               }
            }
         }
         return clashList;

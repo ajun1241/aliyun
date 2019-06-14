@@ -1032,7 +1032,6 @@ public class EventServiceImpl implements EventService {
             Map<String, Object> m2 = SingleEvent.toMap(singleEventOld);
             //比较差异
             StringBuffer different = SingleEventUtil.eventDifferent(m1, m2);
-
             if (StringUtils.isEmpty(different)) {
                 return DtoUtil.getFalseDto("没有任何更改", 29102);
             }
@@ -1161,12 +1160,14 @@ public class EventServiceImpl implements EventService {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return DtoUtil.getFalseDto("删除事件失败", 29002);
                 }
-                //完成时记得找孔庆一(整个方法)
-
+                //删除计数
+                achievementMapper.updateUserStatistics(changeUnfinished(new UserStatistics(), -1L), receivedSearchOnce.getUserId());
             } else {
                 //如果不是创建者删除
                 //从自己的事件表里移除
                 int i = eventMapper.deleteByDeleteType(singleEvent.getEventid(), "singleevent", receivedSearchOnce.getUserId());
+                //删除计数
+                achievementMapper.updateUserStatistics(changeUnfinished(new UserStatistics(), -1L), receivedSearchOnce.getUserId());
                 //其他参与者的事件里删除本参与者
                 EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
                 String[] persons = eventPersons.getFriendsId().split(",");

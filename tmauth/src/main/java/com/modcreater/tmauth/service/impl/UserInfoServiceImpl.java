@@ -63,8 +63,6 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-    @Resource
-    private Logger logger = LoggerFactory.getLogger(UserInfoServiceImpl.class);
     /**
      * 事件的类型,一次按0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他排列
      */
