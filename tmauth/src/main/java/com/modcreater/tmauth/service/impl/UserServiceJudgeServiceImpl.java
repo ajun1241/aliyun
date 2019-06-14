@@ -51,8 +51,6 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         if (time.getResidueDegree() == 0){
             //无剩余,判断剩余年/月卡时间
             Long timeRemaining = time.getTimeRemaining();
-            System.out.println(timeRemaining);
-            System.out.println(System.currentTimeMillis()/1000);
             if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis()/1000){
                 return DtoUtil.getSuccessDto("该用户尚未开通查询功能",200000);
             }

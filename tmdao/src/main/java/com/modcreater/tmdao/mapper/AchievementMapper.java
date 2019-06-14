@@ -83,7 +83,7 @@ public interface AchievementMapper {
      * @param id
      * @return
      */
-    Long queryUserAchievement(@Param("userId") String userId,@Param("id") Long id);
+    UserAchievement queryUserAchievement(@Param("userId") String userId,@Param("achievementId") Long id);
 
     /**
      * 修改用户上一次操作的时间

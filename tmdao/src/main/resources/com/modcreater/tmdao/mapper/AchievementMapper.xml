@@ -83,8 +83,8 @@
     <select id="queryUserStatisticsDate" resultType="java.lang.Long">
         select lastOperatedTime from userstatistics where userId = #{userId}
     </select>
-    <select id="queryUserAchievement" resultType="java.lang.Long">
-        select count(id) from userachievement where userId = #{userId} and id = #{id}
+    <select id="queryUserAchievement" resultType="com.modcreater.tmbeans.pojo.UserAchievement">
+        select * from userachievement where userId = #{userId} and achievementId = #{achievementId}
     </select>
     <select id="getLoggedDaysUpdated" resultType="java.lang.Integer">
         select loggedDaysUpdated from userstatistics where userId = #{userId}
