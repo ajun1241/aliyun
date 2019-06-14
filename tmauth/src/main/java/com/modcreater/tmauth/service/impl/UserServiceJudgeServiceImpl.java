@@ -2,8 +2,10 @@ package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.UserServiceJudgeService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.ServiceFunction;
 import com.modcreater.tmbeans.pojo.ServiceRemainingTime;
 import com.modcreater.tmbeans.pojo.UserRealInfo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.UserRealInfoMapper;
 import com.modcreater.tmdao.mapper.UserServiceMapper;
 import com.modcreater.tmutils.DtoUtil;
@@ -14,6 +16,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,23 +53,18 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
             return DtoUtil.getSuccessDto("该用户尚未开通查询功能",200000);
         }
         //开通了,查询次卡是否有剩余
-        if (time.getResidueDegree() == 0){
+        if (time.getResidueDegree() == 0) {
             //无剩余,判断剩余年/月卡时间
             Long timeRemaining = time.getTimeRemaining();
-            if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis()/1000){
-                return DtoUtil.getSuccessDto("该用户尚未开通查询功能",200000);
+            if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis() / 1000) {
+                return DtoUtil.getSuccessDto("该用户尚未开通查询功能", 200000);
             }
-        }else {
-            //有剩余,判断此次查询完毕后是否剩余为0次
-            time.setResidueDegree(time.getResidueDegree()-1);
-            //如果剩余次数为0,判断库存时间是否为0
-            if (time.getResidueDegree() == 0 && time.getStorageTime()!= 0){
-                //如果有库存时间,将这个时间加入用户有效的剩余时间中
-                time.setTimeRemaining(System.currentTimeMillis()/1000 + time.getStorageTime());
-                time.setStorageTime(0L);
+        } else {
+            //判断剩余次数-1后是否为0,如果为0...
+            if (time.getResidueDegree() - 1 == 0) {
+                return DtoUtil.getSuccessDto("该用户尚未开通查询功能", 200000);
             }
         }
-        userServiceMapper.updateServiceRemainingTime(time);
         return DtoUtil.getSuccessDto("查询服务已开通",100000);
     }
 
@@ -204,5 +204,36 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
             return DtoUtil.getFalseDto("实名认证已驳回，请重新上传认证",36002);
         }
         return DtoUtil.getSuccessDto("实名认证已完成",100000);
+    }
+
+    @Override
+    public Dto queryUserAllServiceFunction(ReceivedId receivedId, String token) {
+        if (StringUtils.isEmpty(receivedId.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        if (StringUtils.isEmpty(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("token过期请重新登录", 21014);
+        }
+        List<ServiceRemainingTime> serviceRemainingTimes = userServiceMapper.getAllServiceRemainingTime(receivedId.getUserId());
+        Map<String, String> result = new HashMap<>(4);
+        result.put("friendService", "0");
+        result.put("searchService", "0");
+        result.put("annualReportingService", "0");
+        result.put("backupService", "0");
+        for (ServiceRemainingTime serviceRemainingTime : serviceRemainingTimes) {
+            if (serviceRemainingTime.getServiceId().equals("1")) {
+                result.put("friendService", "0");
+            } else if (serviceRemainingTime.getServiceId().equals("2")) {
+                result.put("searchService", "0");
+            } else if (serviceRemainingTime.getServiceId().equals("3")) {
+                result.put("annualReportingService", "0");
+            } else if (serviceRemainingTime.getServiceId().equals("4")) {
+                result.put("backupService", "0");
+            }
+        }
+        return null;
     }
 }

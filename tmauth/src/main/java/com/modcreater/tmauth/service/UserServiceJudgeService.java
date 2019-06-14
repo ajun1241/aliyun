@@ -1,6 +1,7 @@
 package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,4 +49,11 @@ public interface UserServiceJudgeService {
      */
     Dto realInfoJudge(String userId,String token);
 
+    /**
+     * 查看用户所有服务是否开通
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto queryUserAllServiceFunction(ReceivedId receivedId, String token);
 }

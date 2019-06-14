@@ -56,4 +56,10 @@ public class JudgeController {
     public Dto backupServiceJudge(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return judgeService.backupServiceJudge(receivedId.getUserId(),request.getHeader("token"));
     }
+
+    @PostMapping(value = "queryuserallservicefunction")
+    @ApiOperation("查看用户所有服务是否开通")
+    public Dto queryUserAllServiceFunction(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return judgeService.queryUserAllServiceFunction(receivedId,request.getHeader("token"));
+    }
 }

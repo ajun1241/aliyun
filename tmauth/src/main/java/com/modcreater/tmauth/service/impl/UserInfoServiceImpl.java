@@ -56,6 +56,9 @@ public class UserInfoServiceImpl implements UserInfoService {
     private AccountMapper accountMapper;
 
     @Resource
+    private UserServiceMapper userServiceMapper;
+
+    @Resource
     private StringRedisTemplate stringRedisTemplate;
     /**
      * 事件的类型,一次按0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他排列
@@ -210,6 +213,18 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             receivedEventConditions.setPageNum("1");
             receivedEventConditions.setPageSize("7");
+        }else if (dto.getResCode() == 100000){
+            if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")) {
+                ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(receivedEventConditions.getUserId(), "2");
+                time.setResidueDegree(time.getResidueDegree() - 1);
+                //如果剩余次数为0,判断库存时间是否为0
+                if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
+                    //如果有库存时间,将这个时间加入用户有效的剩余时间中
+                    time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
+                    time.setStorageTime(0L);
+                }
+                userServiceMapper.updateServiceRemainingTime(time);
+            }
         }
         singleEventCondition.setPageNum((Long.valueOf(receivedEventConditions.getPageNum()) - 1) * Long.valueOf(receivedEventConditions.getPageSize()));
         singleEventCondition.setPageSize(Long.valueOf(receivedEventConditions.getPageSize()));
