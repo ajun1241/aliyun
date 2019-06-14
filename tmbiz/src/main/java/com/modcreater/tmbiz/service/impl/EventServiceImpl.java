@@ -982,21 +982,23 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("生成统计表失败", 26003);
             }
             //消息状态保存在数据库
-            MsgStatus msgStatus = new MsgStatus();
-            msgStatus.setType(1L);
-            System.out.println("这是啥啊"+addInviteEventVo.getUserId());
-            msgStatus.setUserId(Long.parseLong(addInviteEventVo.getUserId()));
-            if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
-                return DtoUtil.getFalseDto("消息状态保存失败", 26010);
-            }
-            System.out.println("添加事件邀请输出的消息Id==>  " + msgStatus.getId());
-            //向被邀请者发送信息
-            RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
-            String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
-            InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2", msgStatus.getId().toString());
-            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), personList.toArray(new String[]{}), 0, inviteMessage);
-            if (result.getCode() != 200) {
-                return DtoUtil.getFalseDto("发送消息失败", 17002);
+            for (int j = 0; j <persons.length ; j++) {
+                MsgStatus msgStatus = new MsgStatus();
+                msgStatus.setType(1L);
+                System.out.println("这是啥啊"+addInviteEventVo.getUserId());
+                msgStatus.setUserId(Long.parseLong(persons[j]));
+                if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
+                    return DtoUtil.getFalseDto("消息状态保存失败", 26010);
+                }
+                System.out.println("添加事件邀请输出的消息Id==>  " + msgStatus.getId());
+                //向被邀请者发送信息
+                RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
+                String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
+                InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2", msgStatus.getId().toString());
+                ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),new String[]{persons[j]}, 0, inviteMessage);
+                if (result.getCode() != 200) {
+                    return DtoUtil.getFalseDto("发送消息失败", 17002);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1058,30 +1060,32 @@ public class EventServiceImpl implements EventService {
             if (a <= 0) {
                 return DtoUtil.getFalseDto("生成统计表失败", 26003);
             }
-            //发送信息
-            Account account = accountMapper.queryAccount(addInviteEventVo.getUserId());
-            RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
-            //内容修改
-            String content = account.getUserName() + "请求修改事件" + singleEventOld.getEventname() + "：" + different.replace(different.length() - 1, different.length(), "。");
-            System.out.println("消息内容==>" + content);
-            //消息状态保存在数据库
-            MsgStatus msgStatus = new MsgStatus();
-            msgStatus.setType(1L);
-            msgStatus.setUserId(Long.parseLong(addInviteEventVo.getUserId()));
-            if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
-                return DtoUtil.getFalseDto("消息状态保存失败", 26010);
-            }
-            System.out.println("修改事件邀请输出的消息Id==>  " + msgStatus.getId());
-            UpdateInviteMessage updateInviteMessage=new UpdateInviteMessage(content,"", JSON.toJSONString(singleEvent),"2",msgStatus.getId().toString());
-            //接收人员变动
-            for (int i = 0; i < persons.length; i++) {
-                if (persons[i].equals(addInviteEventVo.getUserId())){
-                    persons[i]=singleEvent.getUserid().toString();
+            for (String userId : persons) {
+                //发送信息
+                Account account = accountMapper.queryAccount(addInviteEventVo.getUserId());
+                RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
+                //内容修改
+                System.out.println("区别点"+different);
+                String content = account.getUserName() + "请求修改事件“" + singleEventOld.getEventname() + "”：" + different.replace(different.length() - 1, different.length(), "。");
+                System.out.println("消息内容==>" + content);
+                //消息状态保存在数据库
+                MsgStatus msgStatus = new MsgStatus();
+                msgStatus.setType(1L);
+                msgStatus.setUserId(Long.parseLong(userId));
+                if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
+                    return DtoUtil.getFalseDto("消息状态保存失败", 26010);
                 }
-            }
-            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), persons, 0, updateInviteMessage);
-            if (result.getCode()!=200){
-                return DtoUtil.getFalseDto("发送消息失败",17002);
+                System.out.println("修改事件邀请输出的消息Id==>  " + msgStatus.getId());
+                UpdateInviteMessage updateInviteMessage=new UpdateInviteMessage(content,"", JSON.toJSONString(singleEvent),"2",msgStatus.getId().toString());
+                //接收人员变动
+                if (userId.equals(addInviteEventVo.getUserId())){
+                    System.out.println("都有谁￥￥￥￥￥￥￥￥￥￥￥￥￥￥￥￥"+userId);
+                    userId=singleEvent.getUserid().toString();
+                }
+                ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), new String[]{userId}, 0, updateInviteMessage);
+                if (result.getCode()!=200){
+                    return DtoUtil.getFalseDto("发送消息失败",17002);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1138,7 +1142,15 @@ public class EventServiceImpl implements EventService {
                     SingleEvent singleEvent1 = eventMapper.queryEventOne(persons[j], singleEvent.getEventid().toString());
                     //变更参与者
                     eventPersons=JSONObject.parseObject(singleEvent1.getPerson(),EventPersons.class);
-                    eventPersons.setFriendsId(eventPersons.getFriendsId().indexOf(receivedSearchOnce.getUserId()) != -1 ? eventPersons.getFriendsId().replace(receivedSearchOnce.getUserId(), "") : eventPersons.getFriendsId());
+                    String[] person=eventPersons.getFriendsId().split(",");
+                    List<String> list=new ArrayList<>();
+                    for (int i = 0; i < person.length; i++) {
+                        if (!person[i].equals(receivedSearchOnce.getUserId())){
+                            list.add(person[i]);
+                        }
+                    }
+                    String finalPerson=String.join(",",list);
+                    eventPersons.setFriendsId(finalPerson);
                     singleEvent1.setPerson(JSON.toJSONString(eventPersons));
                     b= eventMapper.alterEventsByUserId(singleEvent1);
                 }
@@ -1170,7 +1182,7 @@ public class EventServiceImpl implements EventService {
             } else {
                 //如果不是创建者删除
                 //从自己的事件表里移除
-                int i = eventMapper.deleteByDeleteType(singleEvent.getEventid(), "singleevent", receivedSearchOnce.getUserId());
+                eventMapper.deleteByDeleteType(singleEvent.getEventid(), "singleevent", receivedSearchOnce.getUserId());
                 //删除计数
                 achievementMapper.updateUserStatistics(changeUnfinished(new UserStatistics(), -1L), receivedSearchOnce.getUserId());
                 //其他参与者的事件里删除本参与者
@@ -1181,7 +1193,15 @@ public class EventServiceImpl implements EventService {
                     SingleEvent singleEvent1 = eventMapper.queryEventOne(persons[j], singleEvent.getEventid().toString());
                     //变更参与者
                     eventPersons=JSONObject.parseObject(singleEvent1.getPerson(),EventPersons.class);
-                    eventPersons.setFriendsId(eventPersons.getFriendsId().indexOf(receivedSearchOnce.getUserId()) != -1 ? eventPersons.getFriendsId().replace(receivedSearchOnce.getUserId(), "") : eventPersons.getFriendsId());
+                    String[] person=eventPersons.getFriendsId().split(",");
+                    List<String> list=new ArrayList<>();
+                    for (int i = 0; i < person.length; i++) {
+                        if (!person[i].equals(receivedSearchOnce.getUserId())){
+                            list.add(person[i]);
+                        }
+                    }
+                    String finalPerson=String.join(",",list);
+                    eventPersons.setFriendsId(finalPerson);
                     singleEvent1.setPerson(JSON.toJSONString(eventPersons));
                     int delResult = eventMapper.alterEventsByUserId(singleEvent1);
                     if (delResult <= 0) {
@@ -1425,16 +1445,19 @@ public class EventServiceImpl implements EventService {
                 System.out.println("创建事件时创建者选择输出的最终参与者" + finalPerson);
                 eventPersons.setFriendsId(finalPerson);
                 singleEvent.setPerson(JSON.toJSONString(eventPersons));
+                List<SingleEvent> singleEventList=eventUtil.eventClashUtil(singleEvent);
                 //事件时间冲突判断
-                if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+                if (singleEventList.size()>0) {
                     return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
                 }
                 //把该事件添加进发起者事件列表(修改这件事)
                 if (flag) {
                     //修改
+                    System.out.println("最终修改"+singleEvent.toString());
                     eventMapper.alterEventsByUserId(singleEvent);
                 }else {
                     //上传
+                    System.out.println("最终修改"+singleEvent.toString());
                     eventMapper.uploadingEvents(singleEvent);
                     UserStatistics statistics = new UserStatistics();
                     statistics.setUserId(Long.valueOf(eventCreatorChooseVo.getUserId()));
@@ -1466,6 +1489,7 @@ public class EventServiceImpl implements EventService {
                         }
                         //把该事件添加到该好友的事件表
                         //参与者变更(把参与者里的自己替换成创建者)
+                        System.out.println("为什么出错1"+eventPersons.toString());
                         eventPersons.setFriendsId(eventPersons.getFriendsId().replace(userId, eventCreatorChooseVo.getUserId()));
                         singleEvent.setPerson(JSON.toJSONString(eventPersons));
                         if (flag) {
@@ -1478,7 +1502,7 @@ public class EventServiceImpl implements EventService {
                             statistics.setUserId(Long.valueOf(singleEvent.getUserid()));
                             //用户新增一条事件,未完成+1
                             statistics.setUnfinished(1L);
-                            achievementMapper.updateUserStatistics(statistics, eventCreatorChooseVo.getUserId());
+                            achievementMapper.updateUserStatistics(statistics, userId);
                             //在事件副表插入创建者
                             SingleEventVice singleEventVice1 = new SingleEventVice();
                             singleEventVice1.setCreateBy(Long.parseLong(eventCreatorChooseVo.getUserId()));
@@ -1487,7 +1511,7 @@ public class EventServiceImpl implements EventService {
                             eventViceMapper.createEventVice(singleEventVice1);
                         }
                         //通知该好友事件已添加
-                        String content=account.getUserName() + "发起的事件" + singleEvent.getEventname() + "已添至你的事件表";
+                        String content=account.getUserName() + "发起的事件“" + singleEvent.getEventname() + "”已添至你的事件表";
                         TxtMessage txtMessage = new TxtMessage(content, "");
                         System.out.println("创建事件时创建者选择输出的消息内容：" + txtMessage.getContent());
                         try {
@@ -1503,6 +1527,7 @@ public class EventServiceImpl implements EventService {
                     }else {
                         //不冲突直接添加
                         //参与者变更(把参与者里的自己替换成创建者)
+                        System.out.println("为什么出错2"+eventPersons.toString());
                         eventPersons.setFriendsId(eventPersons.getFriendsId().replace(userId, eventCreatorChooseVo.getUserId()));
                         singleEvent.setPerson(JSON.toJSONString(eventPersons));
                         if (flag) {
@@ -1524,7 +1549,7 @@ public class EventServiceImpl implements EventService {
                             eventViceMapper.createEventVice(singleEventVice1);
                         }
                         //通知该好友事件已修改
-                        TxtMessage txtMessage = new TxtMessage(account.getUserName() + "发起的事件" + singleEvent.getEventname() + "已添至你的事件表", "");
+                        TxtMessage txtMessage = new TxtMessage(account.getUserName() + "发起的事件“" + singleEvent.getEventname() + "”已添至你的事件表", "");
                         System.out.println("创建事件时创建者选择输出的消息内容：" + txtMessage.getContent());
                         try {
                             String[] targetId = {userId};
@@ -1552,7 +1577,7 @@ public class EventServiceImpl implements EventService {
                     return DtoUtil.getFalseDto("删除失败", 21014);
                 }
                 //通知被邀请者
-                TxtMessage txtMessage = new TxtMessage("由" + account.getUserName() + "发起的事件" + singleEvent.getEventname() + "已被取消", "");
+                TxtMessage txtMessage = new TxtMessage("由" + account.getUserName() + "发起的事件“" + singleEvent.getEventname() + "”已被取消", "");
                 System.out.println("创建事件时创建者选择输出的消息内容：" + txtMessage.getContent());
                 try {
                     ResponseResult result1 = rongCloudMethodUtil.sendSystemMessage(eventCreatorChooseVo.getUserId(), persons, txtMessage, "", "");

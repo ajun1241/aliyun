@@ -39,5 +39,16 @@ public class TmauthApplicationTests {
     }
     @Test
     public void test(){
+        List names=new ArrayList<String>();
+
+        names.add("1");
+
+        System.out.println(String.join("-", names));
+
+
+
+        String[] arrStr=new String[]{"a","b","c"};
+
+        System.out.println(String.join("-", arrStr));
     }
 }

@@ -167,9 +167,12 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
                 return DtoUtil.getSuccessDto("该用户尚未开通备份功能",20000);
             }
         }else {
-            //判断剩余次数-1后是否为0,如果为0...
-            if (time.getResidueDegree() - 1 == 0) {
-                return DtoUtil.getSuccessDto("该用户尚未开通查询功能", 200000);
+            //有剩余,判断此次查询完毕后是否剩余为0次
+            time.setResidueDegree(time.getResidueDegree()-1);
+            //如果剩余次数为0,判断库存时间是否为0
+            if (time.getResidueDegree() == 0 && time.getStorageTime()!= 0){
+                //如果有库存时间,将这个时间加入用户有效的剩余时间中
+                time.setTimeRemaining(System.currentTimeMillis()/1000 + time.getStorageTime());
             }
         }
         return DtoUtil.getSuccessDto("备份功能已开通",100000);
