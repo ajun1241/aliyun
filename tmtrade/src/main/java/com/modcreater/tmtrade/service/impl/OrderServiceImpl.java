@@ -171,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
             ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId());
             if (userOrders.getServiceType().equals("time")) {
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), userOrders.getNumber(), 0L, 0L)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), userOrders.getNumber(), 0L, 0L,0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
@@ -183,7 +183,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else if (userOrders.getServiceType().equals("month")) {
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * MONTH + System.currentTimeMillis() / 1000, 0L)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * MONTH + System.currentTimeMillis() / 1000, 0L,0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
@@ -200,7 +200,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else if (userOrders.getServiceType().equals("year")) {
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * YEAR + System.currentTimeMillis() / 1000, 0L)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * YEAR + System.currentTimeMillis() / 1000, 0L,0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
@@ -216,7 +216,7 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             } else if (userOrders.getServiceType().equals("perpetual")) {
-                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L, 0L)) == 0) {
+                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L, 0L,0L)) == 0) {
                     return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                 }
             }
@@ -626,13 +626,14 @@ public class OrderServiceImpl implements OrderService {
      * @param timeRemaining 剩余时间
      * @return ServiceRemainingTime对象
      */
-    private ServiceRemainingTime setServiceRemainingTime(String userId, String serviceId, Long residueDegree, Long timeRemaining, Long storageTime) {
+    private ServiceRemainingTime setServiceRemainingTime(String userId, String serviceId, Long residueDegree, Long timeRemaining, Long storageTime,Long timeCardDuration) {
         ServiceRemainingTime serviceRemainingTime = new ServiceRemainingTime();
         serviceRemainingTime.setUserId(userId);
         serviceRemainingTime.setServiceId(serviceId);
         serviceRemainingTime.setResidueDegree(residueDegree);
         serviceRemainingTime.setTimeRemaining(timeRemaining);
         serviceRemainingTime.setStorageTime(storageTime);
+        serviceRemainingTime.setTimeCardDuration(timeCardDuration);
         return serviceRemainingTime;
     }
 }

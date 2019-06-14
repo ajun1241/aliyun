@@ -14,6 +14,7 @@ import com.modcreater.tmbeans.show.ShowUserAnalysis;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
 import com.modcreater.tmbeans.utils.NaturalWeek;
+import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedAlterUserInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmdao.mapper.*;
@@ -62,15 +63,6 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
-    /**
-     * 事件的类型,一次按0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他排列
-     */
-    private static final String[] TYPE = {"a", "b", "c", "d", "e", "f", "g", "h"};
-    /**
-     * 线形图板块显示的周的数量
-     */
-    private static final Integer SEARCH_WEEK_NUM = 6;
 
     @Override
     public Dto showUserDetails(String userId, String token) {
@@ -209,31 +201,14 @@ public class UserInfoServiceImpl implements UserInfoService {
             singleEventCondition.setPageSize(7L);
         }
 
-
-
         //此处判断用户是否开启了查询服务
-        Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
-        if (dto.getResCode() == 200000) {
+        if (!isSearchServiceNice(receivedEventConditions)){
             if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")) {
                 return DtoUtil.getSuccesWithDataDto("未开通查询服务,不能查看更多", null, 200000);
             }
             receivedEventConditions.setPageNum("1");
             receivedEventConditions.setPageSize("7");
-        } else if (dto.getResCode() == 100000) {
-            if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")) {
-                ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(receivedEventConditions.getUserId(), "2");
-                time.setResidueDegree(time.getResidueDegree() - 1);
-                //如果剩余次数为0,判断库存时间是否为0
-                if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
-                    //如果有库存时间,将这个时间加入用户有效的剩余时间中
-                    time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
-                    time.setStorageTime(0L);
-                }
-                userServiceMapper.updateServiceRemainingTime(time);
-            }
         }
-
-
 
         singleEventCondition.setPageNum((Long.valueOf(receivedEventConditions.getPageNum()) - 1) * Long.valueOf(receivedEventConditions.getPageSize()));
         singleEventCondition.setPageSize(Long.valueOf(receivedEventConditions.getPageSize()));
@@ -309,14 +284,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         nf.setRoundingMode(RoundingMode.HALF_UP);
         nf.setMaximumFractionDigits(2);
         for (int i = 0; i <= 7; i++) {
-            percentResult.put(TYPE[i], null);
-            totalMinutesResult.put(TYPE[i], null);
+            percentResult.put(FinalValues.TYPE[i], null);
+            totalMinutesResult.put(FinalValues.TYPE[i], null);
         }
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i <= 7; i++) {
                 if (type.getType() == i) {
-                    percentResult.put(TYPE[i], Double.valueOf(nf.format((double) type.getNum() / totalEvents)));
-                    totalMinutesResult.put(TYPE[i], type.getTotalMinutes());
+                    percentResult.put(FinalValues.TYPE[i], Double.valueOf(nf.format((double) type.getNum() / totalEvents)));
+                    totalMinutesResult.put(FinalValues.TYPE[i], type.getTotalMinutes());
                 }
             }
             totalMinutes += type.getTotalMinutes();
@@ -357,7 +332,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         nf.setMaximumFractionDigits(2);
 
         //添加所有类型到百分比,时长中
-        for (String s : TYPE) {
+        for (String s : FinalValues.TYPE) {
             sector.put(s, "0");
             typeDuration.put(s, "0");
         }
@@ -400,10 +375,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         Long totalEvents = eventMapper.countEvents(userEventsGroupByInWeek);
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
         for (GetUserEventsGroupByType type : typeList) {
-            for (int i = 0; i < TYPE.length; i++) {
+            for (int i = 0; i < FinalValues.TYPE.length; i++) {
                 if (type.getType() == i) {
-                    sector.put(TYPE[i], nf.format((double) type.getNum() / totalEvents));
-                    typeDuration.put(TYPE[i], type.getTotalMinutes() / 60 + "h" + type.getTotalMinutes() % 60 + "min");
+                    sector.put(FinalValues.TYPE[i], nf.format((double) type.getNum() / totalEvents));
+                    typeDuration.put(FinalValues.TYPE[i], type.getTotalMinutes() / 60 + "h" + type.getTotalMinutes() % 60 + "min");
                 }
             }
             //将每个类型的事件所占时长统计到总时长中
@@ -422,7 +397,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         Long lastLastWeek = 0L;
         List<Map<String, String>> maxTypes = new ArrayList<>();
         List<Map<String, String>> minTypes = new ArrayList<>();
-        for (int i = SEARCH_WEEK_NUM; i >= 1; i--) {
+        for (int i = FinalValues.SEARCH_WEEK_NUM; i >= 1; i--) {
             List<NaturalWeek> naturalWeeks = DateUtil.getLastWeekOfNatural(i);
             Map<String, Object> showWeekEventsNum = new HashMap<>();
             Long eventsNum = 0L;
@@ -481,14 +456,14 @@ public class UserInfoServiceImpl implements UserInfoService {
                     + "." + Long.valueOf(naturalWeeks.get(0).getDay())
                     + "~" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()));
-            xTypes.put("type", TYPE[maxType]);
+            xTypes.put("type", FinalValues.TYPE[maxType]);
             maxTypes.add(xTypes);
             Map<String, String> nTypes = new HashMap<>();
             nTypes.put("date", Long.valueOf(naturalWeeks.get(0).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(0).getDay())
                     + "~" + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getMonth())
                     + "." + Long.valueOf(naturalWeeks.get(naturalWeeks.size() - 1).getDay()));
-            nTypes.put("type", TYPE[minType]);
+            nTypes.put("type", FinalValues.TYPE[minType]);
             minTypes.add(nTypes);
             showWeekEventsNum.put("totalEvents", eventsNum);
             showWeekEventsNum.put("startDateAndEndDate", Long.valueOf(naturalWeeks.get(0).getMonth())
@@ -554,7 +529,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 continue;
             }
             for (String s : friendIds) {
-                if (s == null || s == ""){
+                if (s == null || s == "") {
                     continue;
                 }
                 Long key = Long.valueOf(s);
@@ -635,5 +610,37 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getSuccessDto("修改成功", 100000);
         }
         return DtoUtil.getFalseDto("修改失败", 200000);
+    }
+
+    public boolean isSearchServiceNice(ReceivedEventConditions receivedEventConditions){
+        //此处判断用户是否开启了查询服务
+        ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(receivedEventConditions.getUserId(), "2");
+        //用户未开通
+        if (ObjectUtils.isEmpty(time)) {
+            return false;
+        }
+        //开通了,查询次卡是否有剩余
+        if (time.getResidueDegree() == 0) {
+            //无剩余,判断剩余年/月卡时间
+            Long timeRemaining = time.getTimeRemaining();
+            if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis() / 1000) {
+                return false;
+            }
+        } else {
+            if (time.getTimeCardDuration() < System.currentTimeMillis()/1000){
+                time.setResidueDegree(time.getResidueDegree() - 1);
+                //增加次卡时长
+                time.setTimeCardDuration(System.currentTimeMillis()/1000 + FinalValues.TIME_CARD_DURATION);
+                //判断剩余次数-1后是否为0,如果为0...
+                if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
+                    //如果有库存时间,将这个时间加入用户有效的剩余时间中
+                    time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
+                    long l = 0L;
+                    time.setStorageTime(l);
+                }
+            }
+        }
+        userServiceMapper.updateServiceRemainingTime(time);
+        return true;
     }
 }

@@ -25,4 +25,6 @@ public class ServiceRemainingTime {
 
     private Long storageTime;
 
+    private Long timeCardDuration;
+
 }

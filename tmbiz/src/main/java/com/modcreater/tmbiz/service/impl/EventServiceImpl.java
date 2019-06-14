@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
+import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.QueryMsgStatusVo;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
@@ -272,12 +273,16 @@ public class EventServiceImpl implements EventService {
             }
         } else {
             //有剩余,判断此次查询完毕后是否剩余为0次
-            time.setResidueDegree(time.getResidueDegree() - 1);
-            //如果剩余次数为0,判断库存时间是否为0
-            if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
-                //如果有库存时间,将这个时间加入用户有效的剩余时间中
-                time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
-                time.setStorageTime(0L);
+            if (time.getTimeCardDuration() < System.currentTimeMillis()/1000){
+                time.setResidueDegree(time.getResidueDegree() - 1);
+                //增加次卡时长
+                time.setTimeCardDuration(System.currentTimeMillis()/1000 + FinalValues.TIME_CARD_DURATION);
+                //判断剩余次数-1后是否为0,如果为0...
+                if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
+                    //如果有库存时间,将这个时间加入用户有效的剩余时间中
+                    time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
+                    time.setStorageTime(0L);
+                }
             }
         }
         ArrayList<Object> drafts = JSONObject.parseObject(draftVo.getSingleEvents(), ArrayList.class);
