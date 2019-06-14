@@ -208,6 +208,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!StringUtils.hasText(receivedEventConditions.getPageSize()) || receivedEventConditions.getPageSize().equals("0")) {
             singleEventCondition.setPageSize(7L);
         }
+
+
+
         //此处判断用户是否开启了查询服务
         Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
         if (dto.getResCode() == 200000) {
@@ -229,6 +232,9 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userServiceMapper.updateServiceRemainingTime(time);
             }
         }
+
+
+
         singleEventCondition.setPageNum((Long.valueOf(receivedEventConditions.getPageNum()) - 1) * Long.valueOf(receivedEventConditions.getPageSize()));
         singleEventCondition.setPageSize(Long.valueOf(receivedEventConditions.getPageSize()));
         List<SingleEvent> singleEventList;
@@ -548,6 +554,9 @@ public class UserInfoServiceImpl implements UserInfoService {
                 continue;
             }
             for (String s : friendIds) {
+                if (s == null || s == ""){
+                    continue;
+                }
                 Long key = Long.valueOf(s);
                 if (ObjectUtils.isEmpty(completeEventsTogether.get(key))) {
                     continue;
