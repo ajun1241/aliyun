@@ -20,6 +20,8 @@ import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.SingleEventUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +62,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private Logger logger = LoggerFactory.getLogger(UserInfoServiceImpl.class);
     /**
      * 事件的类型,一次按0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他排列
      */
@@ -208,12 +213,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         //此处判断用户是否开启了查询服务
         Dto dto = userServiceJudgeService.searchServiceJudge(receivedEventConditions.getUserId());
         if (dto.getResCode() == 200000) {
-            if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")){
-                return DtoUtil.getSuccesWithDataDto("未开通查询服务,不能查看更多",null,200000);
+            if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")) {
+                return DtoUtil.getSuccesWithDataDto("未开通查询服务,不能查看更多", null, 200000);
             }
             receivedEventConditions.setPageNum("1");
             receivedEventConditions.setPageSize("7");
-        }else if (dto.getResCode() == 100000){
+        } else if (dto.getResCode() == 100000) {
             if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")) {
                 ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(receivedEventConditions.getUserId(), "2");
                 time.setResidueDegree(time.getResidueDegree() - 1);
@@ -242,10 +247,16 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         for (SingleEvent singleEvent : singleEventList) {
             if (receivedEventConditions.getPerson() != null && !"".equals(receivedEventConditions.getPerson())) {
-                EventPersons eventPersons1 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
-                String[] persons = eventPersons1.getFriendsId().split(",");
-                EventPersons eventPersons2 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
-                String[] personsInResult = eventPersons2.getFriendsId().split(",");
+                String[] persons;
+                String[] personsInResult;
+                try {
+                    EventPersons eventPersons1 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
+                    persons = eventPersons1.getFriendsId().split(",");
+                    EventPersons eventPersons2 = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
+                    personsInResult = eventPersons2.getFriendsId().split(",");
+                } catch (NullPointerException e) {
+                    continue;
+                }
                 int i = 0;
                 if (persons.length > personsInResult.length) {
                     continue;
@@ -405,8 +416,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<Map<String, Object>> showWeekEventsNumList = new ArrayList<>();
         Long lastWeek = 0L;
         Long lastLastWeek = 0L;
-        List<Map<String,String>> maxTypes = new ArrayList<>();
-        List<Map<String,String>> minTypes = new ArrayList<>();
+        List<Map<String, String>> maxTypes = new ArrayList<>();
+        List<Map<String, String>> minTypes = new ArrayList<>();
         for (int i = SEARCH_WEEK_NUM; i >= 1; i--) {
             List<NaturalWeek> naturalWeeks = DateUtil.getLastWeekOfNatural(i);
             Map<String, Object> showWeekEventsNum = new HashMap<>();
@@ -532,7 +543,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         for (String person : persons) {
             EventPersons eventPersons = JSONObject.parseObject(person, EventPersons.class);
-            String[] friendIds = eventPersons.getFriendsId().split(",");
+            String[] friendIds;
+            try {
+                friendIds = eventPersons.getFriendsId().split(",");
+            } catch (NullPointerException e) {
+                continue;
+            }
             for (String s : friendIds) {
                 Long key = Long.valueOf(s);
                 if (ObjectUtils.isEmpty(completeEventsTogether.get(key))) {
@@ -585,7 +601,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         for (int i = 0; i >= -6; i--) {
             List<ShowSingleEvent> singleEventList = SingleEventUtil.getShowSingleEventList(eventMapper.queryCompletedEvents(SingleEventUtil.getSingleEvent(userId, DateUtil.getDay(i))));
             if (singleEventList.size() != 0) {
-                for (ShowSingleEvent singleEvent : singleEventList){
+                for (ShowSingleEvent singleEvent : singleEventList) {
                     weekLists.add(singleEvent);
                 }
             }
