@@ -212,7 +212,7 @@ public class AccountServiceImpl implements AccountService {
         map.put("headImgUrl",account.getHeadImgUrl());
         map.put("token",account.getToken());
         try {
-            if (ObjectUtils.isEmpty(achievementMapper.isUserAchievementExists(addPwdVo.getUserId()))){
+            if (ObjectUtils.isEmpty(achievementMapper.queryUserStatistics(addPwdVo.getUserId()))){
                 if (achievementMapper.addNewUserStatistics(addPwdVo.getUserId()) == 0){
                     return DtoUtil.getFalseDto("为用户添加计数表失败",15005);
                 }
