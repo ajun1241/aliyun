@@ -55,9 +55,8 @@ public class TmbizApplicationTests {
     }
 
     @Test
-    public void test1() {/*
-        SingleEvent singleEvent
-        System.out.println(eventUtil.eventClashUtil());*/
+    public void test1() {
+        stringRedisTemplate.opsForValue().set("2","3");
     }
 
     @Test

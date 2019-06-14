@@ -12,13 +12,13 @@
     <update id="updateServiceRemainingTime">
         update serviceremainingtime
         <set>
-            <if test="residueDegree != null and residueDegree != 0">
+            <if test="residueDegree != null">
                 residueDegree = #{residueDegree},
             </if>
-            <if test="timeRemaining != null and timeRemaining != 0">
+            <if test="timeRemaining != null">
                 timeRemaining = #{timeRemaining},
             </if>
-            <if test="storageTime != null and storageTime != 0">
+            <if test="storageTime != null">
                 storageTime = #{storageTime},
             </if>
         </set>

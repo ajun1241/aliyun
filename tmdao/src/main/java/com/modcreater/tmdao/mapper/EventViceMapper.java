@@ -21,10 +21,10 @@ public interface EventViceMapper {
 
     /**
      * 修改事件附属表
-     * @param singleEventVice
+     * @param
      * @return
      */
-    int updateEventVice(SingleEventVice singleEventVice);
+    int updateEventVice(String eventId,String createBy,String newCreateBy);
 
     /**
      * 查询事件附属表

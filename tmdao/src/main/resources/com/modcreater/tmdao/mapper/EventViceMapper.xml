@@ -9,9 +9,15 @@
           (#{eventId},#{userId},#{createBy})
     </insert>
 
-    <update id="updateEventVice" parameterType="com.modcreater.tmbeans.pojo.SingleEventVice">
-        update singleeventvice set modifyBy=#{modifyBy}
-        where eventId=#{eventId} and userId=#{userId}
+    <update id="updateEventVice">
+        update singleeventvice
+        <set>
+            <if test="createBy > 0">
+                createBy=#{createBy},
+            </if>
+        </set>
+        where eventId=#{eventId}
+        and createBy=#{createBy}
     </update>
 
     <delete id="deleteEventVice" parameterType="com.modcreater.tmbeans.pojo.SingleEventVice">

@@ -196,14 +196,20 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
             return DtoUtil.getFalseDto("token过期请重新登录",21014);
         }
         UserRealInfo userRealInfo=realInfoMapper.queryDetail(userId);
+        Map<String,String> map=new HashMap<>();
         if (ObjectUtils.isEmpty(userRealInfo)){
-            return DtoUtil.getFalseDto("实名认证尚未开通",200000);
+            map.put("status","3");
+            return DtoUtil.getSuccesWithDataDto("实名认证尚未开通",map,100000);
         }else if (userRealInfo.getRealStatus() == 0 ){
-            return DtoUtil.getFalseDto("实名认证正在认证中，请稍等",36001);
+            map.put("status",userRealInfo.getRealStatus().toString());
+            return DtoUtil.getSuccesWithDataDto("实名认证正在认证中，请稍等",map,100000);
         }else if (userRealInfo.getRealStatus() == 2 ){
-            return DtoUtil.getFalseDto("实名认证已驳回，请重新上传认证",36002);
+            map.put("status",userRealInfo.getRealStatus().toString());
+            return DtoUtil.getSuccesWithDataDto("实名认证已驳回，请重新上传认证",map,100000);
+        }else {
+            map.put("status",userRealInfo.getRealStatus().toString());
+            return DtoUtil.getSuccesWithDataDto("实名认证已完成",map,100000);
         }
-        return DtoUtil.getSuccessDto("实名认证已完成",100000);
     }
 
     @Override
