@@ -77,6 +77,28 @@ public class DateUtil {
     }
 
     /**
+     * 获取当前日期的前或后的某一天的日期
+     *
+     * @param fob 例:-1为返回前一天
+     * @param date 开始日期
+     * @return
+     */
+    public static String getDay(int fob,String date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        Calendar calendar = Calendar.getInstance();
+        try {
+            if (date.length() != 8){
+                date = simpleDateFormat.format(new Date());
+            }
+            calendar.setTime((simpleDateFormat).parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        calendar.add(Calendar.DATE, fob);
+        return simpleDateFormat.format(calendar.getTime());
+    }
+
+    /**
      * 获取自然周的开始及结束
      *
      * @param num 前几周(不能小于1)

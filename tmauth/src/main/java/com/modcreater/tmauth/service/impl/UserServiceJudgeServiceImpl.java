@@ -78,7 +78,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请重新登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         return searchServiceJudge(userId);
     }
@@ -98,7 +98,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请重新登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         ServiceRemainingTime service=userServiceMapper.getServiceRemainingTime(userId,"1");
         if (ObjectUtils.isEmpty(service)){
@@ -122,7 +122,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请重新登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId,"4");
         //用户未开通
@@ -152,7 +152,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请重新登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId,"4");
         //用户未开通
@@ -193,7 +193,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请重新登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         UserRealInfo userRealInfo=realInfoMapper.queryDetail(userId);
         Map<String,String> map=new HashMap<>();
@@ -221,7 +221,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请重新登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         List<ServiceRemainingTime> serviceRemainingTimes = userServiceMapper.getAllServiceRemainingTime(receivedId.getUserId());
         Map<String, String> result = new HashMap<>(4);

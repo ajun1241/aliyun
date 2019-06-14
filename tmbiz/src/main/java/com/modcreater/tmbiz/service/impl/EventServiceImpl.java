@@ -87,7 +87,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(uploadingEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (!StringUtils.hasText(uploadingEventVo.getSingleEvent())) {
             return DtoUtil.getFalseDto("没有可上传的事件", 21002);
@@ -116,7 +116,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(deleteEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (!ObjectUtils.isEmpty(eventMapper.getChangingEventStatus(deleteEventVo))){
             return DtoUtil.getFalseDto("重复操作:已经操作过了",21003);
@@ -145,7 +145,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(updateEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (ObjectUtils.isEmpty(updateEventVo)) {
             return DtoUtil.getFalseDto("修改条件接收失败", 21008);
@@ -179,7 +179,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(synchronousUpdateVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //判断上传有没有数据
         //判断是否第一次上传
@@ -255,7 +255,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(draftVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         //判断是否已开通或者服务时间未消耗完
         ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(draftVo.getUserId(), "4");
@@ -344,7 +344,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
         System.out.println("修改草稿:" + singleEvent.toString());
@@ -367,7 +367,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (!StringUtils.hasText(searchEventVo.getDayEventId())) {
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
@@ -428,7 +428,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (!StringUtils.hasText(searchEventVo.getDayEventId())) {
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
@@ -474,7 +474,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (ObjectUtils.isEmpty(searchEventVo)) {
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
@@ -482,7 +482,7 @@ public class EventServiceImpl implements EventService {
         System.out.println("按周查" + searchEventVo.toString());
         SingleEvent singleEvent;
         //按周查询单一事件
-        List<DayEvents> dayEventsList = getDayEventsList(searchEventVo.getUserId(),"all");
+        List<DayEvents> dayEventsList = getDayEventsList(searchEventVo.getUserId(),"all",searchEventVo.getDayEventId());
         //按周查询重复事件
         List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
         List<List<ShowSingleEvent>> loopEventList = getShowSingleEventListList(loopEventListInDataBase);
@@ -504,7 +504,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (ObjectUtils.isEmpty(searchEventVo)) {
             return DtoUtil.getFalseDto("查询条件接收失败", 21004);
@@ -528,7 +528,7 @@ public class EventServiceImpl implements EventService {
         List<DayEvents> dayEventsList = new ArrayList<>();
         if (result.get("userPrivatePermission").equals("1")) {
             //按周查询单一事件
-            dayEventsList = getDayEventsList(searchEventVo.getUserId(),"all");
+            dayEventsList = getDayEventsList(searchEventVo.getUserId(),"all",searchEventVo.getDayEventId());
             //按周查询重复事件
             List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getFriendId());
             if (loopEventListInDataBase.size() != 0) {
@@ -536,7 +536,7 @@ public class EventServiceImpl implements EventService {
             }
         } else if (result.get("userPrivatePermission").equals("2")) {
             //按周查询单一事件
-            dayEventsList = getDayEventsList(searchEventVo.getUserId(),"few");
+            dayEventsList = getDayEventsList(searchEventVo.getUserId(),"few",searchEventVo.getDayEventId());
             //按周查询重复事件
             List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEventsWithFewInfo(searchEventVo.getFriendId());
             if (loopEventListInDataBase.size() != 0) {
@@ -568,7 +568,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
             }
             if (!token.equals(stringRedisTemplate.opsForValue().get(receivedSearchOnce.getUserId()))) {
-                return DtoUtil.getFalseDto("token过期请先登录", 21014);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             System.out.println(receivedSearchOnce.toString());
             SingleEvent singleEvent = eventMapper.queryEventOne(receivedSearchOnce.getUserId(), receivedSearchOnce.getEventId());
@@ -626,7 +626,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(addbackerVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         if (StringUtils.isEmpty(addbackerVo.getFriendIds())) {
             return DtoUtil.getFalseDto("支持者不能空", 25002);
@@ -693,7 +693,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("userId不能为空", 21011);
             }
             if (!token.equals(stringRedisTemplate.opsForValue().get(feedbackEventBackerVo.getUserId()))) {
-                return DtoUtil.getFalseDto("token过期请先登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21013);
             }
             //拿到发起者的事件
             SingleEvent singleEvent = JSONObject.parseObject(feedbackEventBackerVo.getExtraData(), SingleEvent.class);
@@ -799,7 +799,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("userId不能为空", 21011);
             }
             if (!token.equals(stringRedisTemplate.opsForValue().get(addbackerVo.getUserId()))) {
-                return DtoUtil.getFalseDto("token过期请先登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21013);
             }
             //拿到新事件和支持者列表
             SingleEvent singleEvent = JSONObject.parseObject(addbackerVo.getSingleEvent(), SingleEvent.class);
@@ -872,7 +872,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("userId不能为空", 21011);
             }
             if (!token.equals(stringRedisTemplate.opsForValue().get(deleteEventVo.getUserId()))) {
-                return DtoUtil.getFalseDto("token过期请先登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21013);
             }
             SingleEvent singleEvent = eventMapper.queryEventOne(deleteEventVo.getUserId(), deleteEventVo.getEventId());
             //删除事件表
@@ -936,7 +936,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         try {
             //保存这条事件
@@ -1019,7 +1019,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         try {
             System.out.println("修改一条邀请事件时输出的接收数据"+addInviteEventVo.toString());
@@ -1111,7 +1111,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedSearchOnce.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         try {
             //找到该事件
@@ -1225,7 +1225,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("userId不能为空", 21011);
             }
             if (!token.equals(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getUserId()))) {
-                return DtoUtil.getFalseDto("token过期请先登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21013);
             }
             //拿到发起者的事件
             System.out.println("回应事件邀请时输出的事件内容：" + feedbackEventInviteVo.getExtraData());
@@ -1391,7 +1391,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("userId不能为空", 21011);
             }
             if (!token.equals(stringRedisTemplate.opsForValue().get(eventCreatorChooseVo.getUserId()))) {
-                return DtoUtil.getFalseDto("token过期请先登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21013);
             }
             //先拿到事件
             SingleEvent singleEvent = JSONObject.parseObject(eventCreatorChooseVo.getExtraData(), SingleEvent.class);
@@ -1585,7 +1585,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(eventCreatorChooseVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         //先拿到事件
         SingleEvent singleEvent = JSONObject.parseObject(eventCreatorChooseVo.getExtraData(), SingleEvent.class);
@@ -1721,7 +1721,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(searchConditionsForIOS.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SingleEvent singleEvent = new SingleEvent();
         StringBuffer stringBuffer = new StringBuffer(searchConditionsForIOS.getDate());
@@ -1748,7 +1748,7 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("token未获取到", 21013);
             }
             if (!token.equals(stringRedisTemplate.opsForValue().get(receivedDeleteEventIds.getUserId()))) {
-                return DtoUtil.getFalseDto("token过期请先登录", 21014);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             if (receivedDeleteEventIds.getDeleteType().equals("0")) {
                 receivedDeleteEventIds.setDeleteType("singleevent");
@@ -1784,7 +1784,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedSearchOnce.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SingleEvent singleEvent = eventMapper.queryDraftOne(receivedSearchOnce.getUserId(), receivedSearchOnce.getEventId());
         if (singleEvent != null) {
@@ -1812,7 +1812,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
         if (ObjectUtils.isEmpty(singleEvent)) {
@@ -1849,7 +1849,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(updatePersonsVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         SingleEvent singleEvent = eventMapper.queryEventOne(updatePersonsVo.getUserId(), updatePersonsVo.getEventId());
         if (ObjectUtils.isEmpty(singleEvent)) {
@@ -1910,7 +1910,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(updatePersonsVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         //给新添加的成员发送邀请消息
 
@@ -1930,7 +1930,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(queryMsgStatusVo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         MsgStatus msgStatus = msgStatusMapper.queryMsg(queryMsgStatusVo.getMsgId());
         Map<String,String> map=new HashMap<>();
@@ -1953,7 +1953,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedFriendEventOnce.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         Map<String, Object> result = new HashMap<>();
         if (userSettingsMapper.getIsHideFromFriend(receivedFriendEventOnce.getUserId(),receivedFriendEventOnce.getFriendId()) != 2){
@@ -2038,12 +2038,12 @@ public class EventServiceImpl implements EventService {
         return loopEventList;
     }
 
-    private List<DayEvents> getDayEventsList(String userId,String condition){
+    private List<DayEvents> getDayEventsList(String userId,String condition,String date){
         List<DayEvents> dayEventsList = new ArrayList<>();
         SingleEvent singleEvent;
         for (int i = 0; i <= 6; i++) {
             DayEvents<ShowSingleEvent> dayEvents = new DayEvents();
-            String dayEventId = DateUtil.getDay(i);
+            String dayEventId = DateUtil.getDay(i,date);
             singleEvent = SingleEventUtil.getSingleEvent(userId, dayEventId);
             List<SingleEvent> singleEventList;
             if ("all".equals(condition)){

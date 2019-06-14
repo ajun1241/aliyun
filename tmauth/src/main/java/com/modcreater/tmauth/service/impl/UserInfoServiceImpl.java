@@ -80,7 +80,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         String redisToken = stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (!StringUtils.hasText(userId)) {
             return DtoUtil.getSuccessDto("没有查询到用户信息", 200000);
@@ -116,7 +116,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         String redisToken = stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         List<String> result = queryUserAchievementInBase(userId);
         if (result.size() == 0) {
@@ -161,7 +161,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("筛选条件接收失败", 40002);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedEventConditions.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         System.out.println("查询草稿箱/已完成,未完成");
         QueryEventsCondition singleEventCondition = new QueryEventsCondition();
@@ -277,7 +277,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         String redisToken = stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         ShowUserAnalysis showUserAnalysis = new ShowUserAnalysis();
         showUserAnalysis.setUserId(userId);
@@ -325,7 +325,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         String redisToken = stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //已完成事件的总分钟数
         Long totalMinutes = 0L;
@@ -579,7 +579,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(userId))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         List<ShowSingleEvent> weekLists = new ArrayList<>();
         for (int i = 0; i >= -6; i--) {
@@ -605,7 +605,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedAlterUserInfo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         int i = accountMapper.alterUserInfo(receivedAlterUserInfo.getUserId(), receivedAlterUserInfo.getUserSign(), receivedAlterUserInfo.getUserName(), receivedAlterUserInfo.getHeadImgUrl());
         if (i != 0) {

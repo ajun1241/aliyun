@@ -245,7 +245,7 @@ public class AccountServiceImpl implements AccountService {
         }
         System.out.println("搜索好友："+queFridenVo.toString());
         if (!token.equals(stringRedisTemplate.opsForValue().get(queFridenVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         Map<String,Object> map=new HashMap();
         Date date=new Date();
@@ -320,7 +320,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("userId和friendId不能为空",17001);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(sendFriendRequestVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         //判断这俩人是不是已经是好友
         Friendship friendship=accountMapper.queryFriendshipDetail(sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId());
@@ -452,7 +452,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("userId和friendId不能为空",17001);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(sendFriendResponseVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         //修改好友关系
         int i=accountMapper.updateFriendship(sendFriendResponseVo.getUserId(),sendFriendResponseVo.getFriendId(),"20");
@@ -505,7 +505,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("查询好友数据未获取到",16004);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(userIdVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         int pageSize=Integer.parseInt(userIdVo.getPageSize());
         if (StringUtils.isEmpty(userIdVo.getPageNumber())){
@@ -547,7 +547,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("查询好友数据未获取到",16004);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(queFridenVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         Map<String,Object> map=new HashMap();
         Date date=new Date();
@@ -602,7 +602,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("修改好友数据未获取到",16005);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(jurisdictionVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         if (accountMapper.updateFriendJurisdiction(jurisdictionVo)<=0){
             return DtoUtil.getFalseDto("修改好友权限失败",16006);
@@ -625,7 +625,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("删除好友数据未获取到",16007);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(deleteFriendshipVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         try {
         //判断这俩人是不是好友
@@ -680,7 +680,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("查询所有未读消息数据未获取到",16007);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         Map<String,Object> map=new HashMap<>();
 
@@ -749,7 +749,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("查询所有未读消息数据未获取到",16007);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         Map<String,Object> map=new HashMap<>();
         List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"0","");
@@ -778,7 +778,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("userId未获取到",21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(headImgVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         try {
             //生成token
@@ -817,7 +817,7 @@ public class AccountServiceImpl implements AccountService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(queryUserVo.getId());
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         Account account= accountMapper.queryAccount(queryUserVo.getId());
         if (ObjectUtils.isEmpty(account)){
@@ -847,7 +847,7 @@ public class AccountServiceImpl implements AccountService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(updAccountInfo.getUserId());
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         Account account=new Account();
         account.setId(Long.parseLong(updAccountInfo.getUserId()));

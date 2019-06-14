@@ -53,7 +53,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         if (userSettingsMapper.updateUserSettings(type,userId,status) != 0){
             return DtoUtil.getSuccessDto("修改成功",100000);
@@ -71,7 +71,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(receivedShowFriendList.getId());
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         boolean result = false;
         if (receivedShowFriendList.getShowFriendList().contains("invite")){
@@ -124,7 +124,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(userId);
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         UserSettings userSettings = userSettingsMapper.queryAllSettings(userId);
         if (ObjectUtils.isEmpty(userSettings)){
@@ -143,7 +143,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         }
         String redisToken=stringRedisTemplate.opsForValue().get(getFriendListInSettings.getUserId());
         if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         Map<String,Object> result = new HashMap<>(1);
         if ("invite".equals(getFriendListInSettings.getUpdateType())){

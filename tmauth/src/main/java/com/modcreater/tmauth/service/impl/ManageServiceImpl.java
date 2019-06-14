@@ -55,7 +55,7 @@ public class ManageServiceImpl implements ManageService {
             return DtoUtil.getFalseDto("userId未获取到",21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedUserRealInfo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         //第一次上传认证
         if (ObjectUtils.isEmpty(userRealInfoMapper.queryDetail(receivedUserRealInfo.getUserId()))){
@@ -99,7 +99,7 @@ public class ManageServiceImpl implements ManageService {
             return DtoUtil.getFalseDto("userId未获取到",21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(complaintVo.getUserId()))){
-            return DtoUtil.getFalseDto("token过期请先登录",21014);
+            return DtoUtil.getFalseDto("请重新登录",21014);
         }
         if (complaintMapper.addComplaint(complaintVo)==0){
             return DtoUtil.getFalseDto("投诉上传失败",50010);

@@ -155,7 +155,7 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedVerifyInfo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (!StringUtils.hasText(receivedVerifyInfo.getId())) {
             return DtoUtil.getFalseDto("未获取到订单号", 60004);
@@ -304,7 +304,7 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY, sign_type);
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
@@ -344,7 +344,7 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         Dto dto = createNewOrder(receivedOrderInfo);
         if (dto.getResCode() != 100000) {
@@ -526,7 +526,7 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (ObjectUtils.isEmpty(userServiceMapper.getServiceRemainingTime(receivedId.getUserId(), "1"))) {
             return DtoUtil.getSuccessDto("该用户尚未开通好友服务", 100000);
@@ -543,7 +543,7 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedServiceIdUserId.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         ServiceRemainingTime serviceRemainingTime = userServiceMapper.getServiceRemainingTime(receivedServiceIdUserId.getUserId(), receivedServiceIdUserId.getServiceId());
         if (ObjectUtils.isEmpty(serviceRemainingTime)){
@@ -608,7 +608,7 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
-            return DtoUtil.getFalseDto("token过期请先登录", 21014);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         List<ShowUserOrders> userOrdersList = orderMapper.getUserAllOrders(receivedId.getUserId());
         if (userOrdersList.size() == 0){
