@@ -179,7 +179,7 @@
         select * from friendship where userId=#{userId} and friendId=#{friendId}
     </select>
     <select id="queryAllFriendList" resultType="java.lang.Long">
-        select friendId from friendship where userId = #{userId}
+        select friendId from friendship where userId = #{userId} and status = 20
     </select>
     <select id="queryNameAndHead" resultType="com.modcreater.tmbeans.pojo.Account">
         select userName, headImgUrl from account where id = #{id}

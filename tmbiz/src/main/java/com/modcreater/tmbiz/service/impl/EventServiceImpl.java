@@ -531,26 +531,22 @@ public class EventServiceImpl implements EventService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return DtoUtil.getFalseDto("查询权限报错", 23335);
+            return DtoUtil.getFalseDto("你们可能还不是好友", 23335);
         }
         List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
         List<DayEvents> dayEventsList = new ArrayList<>();
         if (result.get("userPrivatePermission").equals("1")) {
             //按周查询单一事件
-            dayEventsList = getDayEventsList(searchEventVo.getUserId(),"all",searchEventVo.getDayEventId());
+            dayEventsList = getDayEventsList(searchEventVo.getUserId(), "all", searchEventVo.getDayEventId());
             //按周查询重复事件
             List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getFriendId());
-            if (loopEventListInDataBase.size() != 0) {
-                loopEventList = getShowSingleEventListList(loopEventListInDataBase);
-            }
+            loopEventList = getShowSingleEventListList(loopEventListInDataBase);
         } else if (result.get("userPrivatePermission").equals("2")) {
             //按周查询单一事件
-            dayEventsList = getDayEventsList(searchEventVo.getUserId(),"few",searchEventVo.getDayEventId());
+            dayEventsList = getDayEventsList(searchEventVo.getUserId(), "few", searchEventVo.getDayEventId());
             //按周查询重复事件
             List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEventsWithFewInfo(searchEventVo.getFriendId());
-            if (loopEventListInDataBase.size() != 0) {
-                loopEventList = getShowSingleEventListList(loopEventListInDataBase);
-            }
+            loopEventList = getShowSingleEventListList(loopEventListInDataBase);
         }
         if ((dayEventsList.size() + loopEventList.size()) == 0) {
             return DtoUtil.getSuccessDto("没有数据", 200000);

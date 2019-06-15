@@ -529,7 +529,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 continue;
             }
             for (String s : friendIds) {
-                if (s == null || s == "") {
+                if (s == null || s.equals("")) {
                     continue;
                 }
                 Long key = Long.valueOf(s);
