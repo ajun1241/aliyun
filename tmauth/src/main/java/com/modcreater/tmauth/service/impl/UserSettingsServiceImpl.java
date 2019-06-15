@@ -135,7 +135,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Override
     public Dto getFriendList(GetFriendListInSettings getFriendListInSettings, String token) {
-        if (StringUtils.isEmpty(getFriendListInSettings.getUserId())){
+        if (!StringUtils.hasText(getFriendListInSettings.getUserId())){
             return DtoUtil.getFalseDto("请先登录",21011);
         }
         if (!StringUtils.hasText(token)){
