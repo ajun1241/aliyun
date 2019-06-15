@@ -18,5 +18,5 @@ public class AliPayConfig {
     public static String sign_type="RSA2";
     public static String CHARSET="utf-8";
     public static String url = "https://openapi.alipay.com/gateway.do";
-    public static String NOTIFY_URL = "http://8fw5sz.natappfree.cc/pay/alipay/notify_url";
+    public static String NOTIFY_URL = "http://mub8ju.natappfree.cc/pay/alipay/notify_url";
 }

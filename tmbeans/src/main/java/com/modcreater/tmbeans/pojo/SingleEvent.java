@@ -116,20 +116,20 @@ public class SingleEvent implements Serializable {
     }
 
     //将对象中的属性存入集合作比较
-    public static Map<String,Object> toMap(SingleEvent singleEvent){
-        Map<String,Object> map=new HashMap<>();
+    public static Map<String,String> toMap(SingleEvent singleEvent){
+        Map<String,String> map=new HashMap<>();
         map.put("事件名称",singleEvent.getEventname());
         map.put("开始时间",singleEvent.getStarttime());
         map.put("结束时间",singleEvent.getEndtime());
         map.put("地址",singleEvent.getAddress());
-        map.put("优先级",singleEvent.getLevel());
+        map.put("优先级",singleEvent.getLevel().toString());
         map.put("备注",singleEvent.getRemarks());
         map.put("重复次数",singleEvent.getRepeaTtime());
         map.put("提醒时间",singleEvent.getRemindTime());
-        map.put("年",singleEvent.getYear());
-        map.put("月",singleEvent.getMonth());
-        map.put("日",singleEvent.getDay());
-        map.put("事件类型",singleEvent.getType());
+        map.put("年",singleEvent.getYear().toString());
+        map.put("月",singleEvent.getMonth().toString());
+        map.put("日",singleEvent.getDay().toString());
+        map.put("事件类型",singleEvent.getType().toString());
         return map;
     }
 }

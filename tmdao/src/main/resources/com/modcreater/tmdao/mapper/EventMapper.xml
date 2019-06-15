@@ -399,7 +399,7 @@
         select
         <include refid="Base_Column_List"/>
         from singleevent
-        where userId=#{userId} and eventId=#{eventId} and isOverdue &lt;&gt; 2
+        where userId=#{userId} and eventId=#{eventId} and isOverdue &lt;&gt; 2 limit 1
     </select>
 
     <select id="queryDraft" resultType="com.modcreater.tmbeans.pojo.SingleEvent">

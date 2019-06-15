@@ -219,7 +219,7 @@ public class SingleEventUtil {
      *
      * @return
      */
-    public static StringBuffer eventDifferent(Map<String, Object> m1, Map<String, Object> m2) {
+    public static StringBuffer eventDifferent(Map<String, String> m1, Map<String, String> m2) {
         //比较差异
         StringBuffer different = new StringBuffer();
         for (String key : m1.keySet()) {
@@ -266,17 +266,17 @@ public class SingleEventUtil {
                         different.append(key + "更改为：学习；");
                     } else if (m1.get(key).equals("1")) {
                         different.append(key + "更改为：工作；");
-                    } else if ("2".equals(m1.get(key))) {
+                    } else if (m1.get(key).equals("2")) {
                         different.append(key + "更改为：商务；");
-                    } else if ("3".equals(m1.get(key))) {
+                    } else if (m1.get(key).equals("3")) {
                         different.append(key + "更改为：休闲；");
-                    } else if ("4".equals(m1.get(key))) {
+                    } else if (m1.get(key).equals("4")) {
                         different.append(key + "更改为：家庭；");
-                    } else if ("5".equals(m1.get(key))) {
+                    } else if (m1.get(key).equals("5")) {
                         different.append(key + "更改为：节日；");
-                    } else if ("6".equals(m1.get(key))) {
+                    } else if (m1.get(key).equals("6")) {
                         different.append(key + "更改为：假期；");
-                    } else if ("7".equals(m1.get(key))) {
+                    } else if (m1.get(key).equals("7")) {
                         different.append(key + "更改为：其他；");
                     }
                 } else {

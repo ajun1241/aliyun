@@ -60,7 +60,7 @@ public interface AchievementMapper {
      * @param userStatistics
      * @return
      */
-    int updateUserStatistics(@Param("userStatistics") UserStatistics userStatistics);
+    int updateUserStatistics(UserStatistics userStatistics);
 
     /**
      * 修改所有用户统计表
