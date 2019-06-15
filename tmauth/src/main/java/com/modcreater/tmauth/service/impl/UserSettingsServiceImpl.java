@@ -74,10 +74,14 @@ public class UserSettingsServiceImpl implements UserSettingsService {
             return DtoUtil.getFalseDto("请重新登录",21014);
         }
         boolean result = false;
+        if (!StringUtils.hasText(receivedShowFriendList.getShowFriendList())){
+            return DtoUtil.getFalseDto("未获取到列表",200000);
+        }
         if (receivedShowFriendList.getShowFriendList().contains("invite")){
+            System.out.println("invite修改");
             ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
             for (Object o : list){
-                ShowFriendList showFriendList = JSONObject.parseObject((String) o, ShowFriendList.class);
+                ShowFriendList showFriendList = JSONObject.parseObject(o.toString(), ShowFriendList.class);
                 if (showFriendList.getStatus().equals("0")){
                     showFriendList.setStatus("1");
                 }else {
@@ -86,9 +90,10 @@ public class UserSettingsServiceImpl implements UserSettingsService {
                 result = (userSettingsMapper.updateUserSettingsToFriends("invite", showFriendList.getUserId(),Integer.valueOf(showFriendList.getStatus()),receivedShowFriendList.getId())) > 0;
             }
         }else if (receivedShowFriendList.getShowFriendList().contains("sustain")){
+            System.out.println("sustain修改");
             ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
             for (Object o : list){
-                ShowFriendList showFriendListForSupport = JSONObject.parseObject((String) o,ShowFriendList.class);
+                ShowFriendList showFriendListForSupport = JSONObject.parseObject(o.toString(),ShowFriendList.class);
                 if (showFriendListForSupport.getStatus().equals("0")){
                     showFriendListForSupport.setStatus("1");
                 }else {
@@ -97,9 +102,10 @@ public class UserSettingsServiceImpl implements UserSettingsService {
                 result = (userSettingsMapper.updateUserSettingsToFriends("sustain",showFriendListForSupport.getUserId(),Integer.valueOf(showFriendListForSupport.getStatus()),receivedShowFriendList.getId())) > 0;
             }
         }else if (receivedShowFriendList.getShowFriendList().contains("hide")){
+            System.out.println("hide修改");
             ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
             for (Object o : list){
-                ShowFriendList showFriendListForHide = JSONObject.parseObject((String) o,ShowFriendList.class);
+                ShowFriendList showFriendListForHide = JSONObject.parseObject(o.toString(),ShowFriendList.class);
                 if (showFriendListForHide.getStatus().equals("0")){
                     showFriendListForHide.setStatus("1");
                 }else {

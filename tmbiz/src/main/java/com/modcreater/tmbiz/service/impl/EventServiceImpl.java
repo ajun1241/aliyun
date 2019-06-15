@@ -211,6 +211,10 @@ public class EventServiceImpl implements EventService {
                     if (eventMapper.uploadingEvents(singleEvent1) <= 0) {
                         return DtoUtil.getFalseDto("上传事件" + singleEvent1.getEventid() + "失败", 25005);
                     }
+                    UserStatistics userStatistics = new UserStatistics();
+                    userStatistics.setUserId(Long.valueOf(synchronousUpdateVo.getUserId()));
+                    userStatistics.setUnfinished(1L);
+                    achievementMapper.updateUserStatistics(userStatistics);
                 }
             }
             flag = true;
@@ -220,15 +224,21 @@ public class EventServiceImpl implements EventService {
             List<ArrayList> loopEvents = JSONObject.parseObject(synchronousUpdateVo.getLoopEventList(), ArrayList.class);
             //上传重复事件
             for (List<SingleEvent> singleEvents : loopEvents) {
-                //第二层转换
-                List<SingleEvent> singleEventList = JSONObject.parseObject(singleEvents.toString(), ArrayList.class);
-                for (Object loopEvent : singleEventList) {
-                    //第三层转换
-                    SingleEvent singleEvent = JSONObject.parseObject(loopEvent.toString(), SingleEvent.class);
-                    singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
-                    singleEvent.setIsLoop(1);
-                    if (eventMapper.uploadingEvents(singleEvent) <= 0) {
-                        return DtoUtil.getFalseDto("上传重复事件" + singleEvent.getEventid() + "失败", 25006);
+                if (!ObjectUtils.isEmpty(singleEvents)){
+                    //第二层转换
+                    List<SingleEvent> singleEventList = JSONObject.parseObject(singleEvents.toString(), ArrayList.class);
+                    for (Object loopEvent : singleEventList) {
+                        //第三层转换
+                        SingleEvent singleEvent = JSONObject.parseObject(loopEvent.toString(), SingleEvent.class);
+                        singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
+                        singleEvent.setIsLoop(1);
+                        if (eventMapper.uploadingEvents(singleEvent) <= 0) {
+                            return DtoUtil.getFalseDto("上传重复事件" + singleEvent.getEventid() + "失败", 25006);
+                        }
+                        UserStatistics userStatistics = new UserStatistics();
+                        userStatistics.setUserId(Long.valueOf(synchronousUpdateVo.getUserId()));
+                        userStatistics.setUnfinished(1L);
+                        achievementMapper.updateUserStatistics(userStatistics);
                     }
                 }
             }
@@ -1079,7 +1089,7 @@ public class EventServiceImpl implements EventService {
                     return DtoUtil.getFalseDto("消息状态保存失败", 26010);
                 }
                 System.out.println("修改事件邀请输出的消息Id==>  " + msgStatus.getId());
-                UpdateInviteMessage updateInviteMessage=new UpdateInviteMessage(content,"", JSON.toJSONString(singleEvent),"2",msgStatus.getId().toString());
+                UpdateInviteMessage updateInviteMessage=new UpdateInviteMessage(content,"", JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)),"2",msgStatus.getId().toString());
                 //接收人员变动
                 if (userId.equals(addInviteEventVo.getUserId())){
                     System.out.println("都有谁￥￥￥￥￥￥￥￥￥￥￥￥￥￥￥￥"+userId);
@@ -1157,6 +1167,8 @@ public class EventServiceImpl implements EventService {
                     singleEvent1.setPerson(JSON.toJSONString(eventPersons));
                     b= eventMapper.alterEventsByUserId(singleEvent1);
                 }
+                //删除最高权限表的自己
+                eventViceMapper.deleteEventVice(singleEvent.getEventid().toString(),receivedSearchOnce.getUserId());
                 //最高权限表更改
                 Random random=new Random();
                 int i=random.nextInt(persons.length);
@@ -1180,6 +1192,21 @@ public class EventServiceImpl implements EventService {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return DtoUtil.getFalseDto("删除事件失败", 29002);
                 }
+                //发送消息给其他人
+                Account account = accountMapper.queryAccount(receivedSearchOnce.getUserId());
+                String content = account.getUserName() + "退出了事件：" + singleEvent.getEventname() + "。";
+                TxtMessage txtMessage1 = new TxtMessage(content, "");
+                System.out.println("创建事件时创建者选择输出的消息内容：" + txtMessage1.getContent());
+                try {
+                    RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+                    ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(SYSTEMID, persons,0, txtMessage1);
+                    if (result.getCode() != 200) {
+                        return DtoUtil.getFalseDto("发送消息失败", 17002);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return DtoUtil.getFalseDto("消息发送失败", 26002);
+                }
                 //删除计数
                 UserStatistics userStatistics = new UserStatistics();
                 userStatistics.setUserId(Long.valueOf(receivedSearchOnce.getUserId()));
@@ -1187,6 +1214,8 @@ public class EventServiceImpl implements EventService {
             } else {
                 //如果不是创建者删除
                 //从自己的事件表里移除
+                //删除最高权限表的自己
+                eventViceMapper.deleteEventVice(singleEvent.getEventid().toString(),receivedSearchOnce.getUserId());
                 eventMapper.deleteByDeleteType(singleEvent.getEventid(), "singleevent", receivedSearchOnce.getUserId());
                 //删除计数
                 UserStatistics userStatistics = new UserStatistics();
@@ -1223,7 +1252,7 @@ public class EventServiceImpl implements EventService {
                 String content = account.getUserName() + "退出了事件：" + singleEvent.getEventname() + "。";
                 System.out.println("消息内容" + content);
                 TxtMessage txtMessage = new TxtMessage(content, "");
-                ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(receivedSearchOnce.getUserId(),persons, 0, txtMessage);
+                ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,persons, 0, txtMessage);
                 if (result.getCode()!=200){
                     return DtoUtil.getFalseDto("发送消息失败",17002);
                 }
@@ -1549,7 +1578,7 @@ public class EventServiceImpl implements EventService {
                             //上传
                             eventMapper.uploadingEvents(singleEvent1);
                             UserStatistics statistics = new UserStatistics();
-                            statistics.setUserId(Long.valueOf(singleEvent.getUserid()));
+                            statistics.setUserId(Long.valueOf(singleEvent1.getUserid()));
                             //用户新增一条事件,未完成+1
                             statistics.setUnfinished(1L);
                             achievementMapper.updateUserStatistics(statistics);

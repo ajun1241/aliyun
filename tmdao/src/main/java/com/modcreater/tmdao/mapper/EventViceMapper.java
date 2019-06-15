@@ -35,8 +35,9 @@ public interface EventViceMapper {
 
     /**
      * 删除事件附属表
-     * @param singleEventVice
+     * @param eventId
+     * @param userId
      * @return
      */
-    int deleteEventVice(SingleEventVice singleEventVice);
+    int deleteEventVice(String eventId,String userId);
 }

@@ -24,8 +24,8 @@ import com.modcreater.tmtrade.service.OrderService;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.RandomNumber;
-import com.modcreater.tmutils.wxconfig.WxConfig;
-import com.modcreater.tmutils.wxconfig.WxMD5Util;
+import com.modcreater.tmtrade.config.wxconfig.WxConfig;
+import com.modcreater.tmtrade.config.wxconfig.WxMD5Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.modcreater.tmtrade.config.AliPayConfig.*;
-import static com.modcreater.tmtrade.config.WxPayConfig.MCH_ID;
 
 /**
  * Created with IntelliJ IDEA.

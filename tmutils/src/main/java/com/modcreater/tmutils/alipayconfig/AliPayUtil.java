@@ -1,6 +1,6 @@
 package com.modcreater.tmutils.alipayconfig;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -28,7 +28,7 @@ public class AliPayUtil {
     public static String signatureConversion(String content, String privateKey) {
         try {
             PKCS8EncodedKeySpec priPKCS8 = new PKCS8EncodedKeySpec(
-                    Base64.decode(privateKey));
+                    Base64.decodeBase64(privateKey));
             KeyFactory keyf = KeyFactory.getInstance(ALGORITHM);
             PrivateKey priKey = keyf.generatePrivate(priPKCS8);
 
@@ -40,7 +40,7 @@ public class AliPayUtil {
 
             byte[] signed = signature.sign();
 
-            return Base64.encode(signed);
+            return Base64.encodeBase64String(signed);
         } catch (Exception e) {
             e.printStackTrace();
         }

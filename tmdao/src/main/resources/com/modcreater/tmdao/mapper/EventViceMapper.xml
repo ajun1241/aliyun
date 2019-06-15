@@ -20,7 +20,7 @@
         and createBy=#{createBy}
     </update>
 
-    <delete id="deleteEventVice" parameterType="com.modcreater.tmbeans.pojo.SingleEventVice">
+    <delete id="deleteEventVice" >
         delete from  singleeventvice where eventId=#{eventId} and userId=#{userId}
     </delete>
 

@@ -93,9 +93,9 @@ public class TimerConfig {
         System.out.println("第一个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
     }
 
-  /*  *//**
+    /**
      * 以下为每分钟的第30s进行过期事件过滤修改
-     *//*
+     */
     @Scheduled(cron = "30 * * * * ?")
     public void eventStatusScan() {
         StringBuilder today = new StringBuilder(DateUtil.getDay(0));
@@ -111,7 +111,7 @@ public class TimerConfig {
         if (events != 0) {
             logger.info("修改了" + eventMapper.updateExpiredEvents(eventStatusScan) + "条事件");
         }
-    }*/
+    }
 
     @Scheduled(cron = "0 * * * * ?")
     public void orderStatusScan(){

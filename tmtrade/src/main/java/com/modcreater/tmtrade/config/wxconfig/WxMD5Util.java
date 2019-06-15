@@ -1,4 +1,4 @@
-package com.modcreater.tmutils.wxconfig;
+package com.modcreater.tmtrade.config.wxconfig;
 
 import com.github.wxpay.sdk.WXPayConstants;
 

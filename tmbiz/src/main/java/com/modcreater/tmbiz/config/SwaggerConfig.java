@@ -23,7 +23,7 @@ import java.util.List;
 @ComponentScan("com.modcreater.tmbiz.*")
 @Component
 public class SwaggerConfig {
-    @Bean
+    /*@Bean
     public Docket createRestApi() {
         //添加head参数配置start
         ParameterBuilder tokenPar = new ParameterBuilder();
@@ -47,5 +47,5 @@ public class SwaggerConfig {
                 .termsOfServiceUrl("")
                 .version("1.0")
                 .build();
-    }
+    }*/
 }

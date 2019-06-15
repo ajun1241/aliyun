@@ -15,7 +15,6 @@
         <module>tmauth</module>
         <module>tmutils</module>
         <module>tmbiz</module>
-        <module>tmchat</module>
     </modules>
 
     <parent>
