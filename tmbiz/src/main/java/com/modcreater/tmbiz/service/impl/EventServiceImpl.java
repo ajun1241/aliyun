@@ -111,7 +111,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto deleteEvents(DeleteEventVo deleteEventVo, String token) {
+    public synchronized Dto deleteEvents(DeleteEventVo deleteEventVo, String token) {
         if (!StringUtils.hasText(deleteEventVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
