@@ -293,4 +293,13 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> queryLoopEventsWithFewInfo(String friendId);
+
+    /**
+     * 获取一条事件(未完成,已完成,普通事件,草稿箱)
+     * @param userId
+     * @param eventId
+     * @param type
+     * @return
+     */
+    SingleEvent getAEvent(@Param("userId") String userId,@Param("eventId") Long eventId,@Param("type") String type);
 }

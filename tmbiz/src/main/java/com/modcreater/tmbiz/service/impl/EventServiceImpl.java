@@ -1828,14 +1828,26 @@ public class EventServiceImpl implements EventService {
             }
             if (receivedDeleteEventIds.getDeleteType().equals("0")) {
                 receivedDeleteEventIds.setDeleteType("singleevent");
-            }
-            if (receivedDeleteEventIds.getDeleteType().equals("1")) {
+            } else if (receivedDeleteEventIds.getDeleteType().equals("1")) {
                 receivedDeleteEventIds.setDeleteType("draft");
             }
-            for (Long l : receivedDeleteEventIds.getEventIds()) {
-                if (eventMapper.deleteByDeleteType(l, receivedDeleteEventIds.getDeleteType(), receivedDeleteEventIds.getUserId()) == 0) {
+            for (Long eventId : receivedDeleteEventIds.getEventIds()) {
+                UserStatistics userStatistics = new UserStatistics();
+                userStatistics.setUserId(Long.valueOf(receivedDeleteEventIds.getUserId()));
+                SingleEvent singleEvent = eventMapper.getAEvent(receivedDeleteEventIds.getUserId(),eventId,receivedDeleteEventIds.getDeleteType());
+                if (receivedDeleteEventIds.getDeleteType().equals("singleevent")){
+                    if (singleEvent.getIsOverdue() == 0){
+                        userStatistics.setUnfinished(-1L);
+                    }else if (singleEvent.getIsOverdue() == 1){
+                        userStatistics.setCompleted(-1L);
+                    }
+                }else if (receivedDeleteEventIds.getDeleteType().equals("draft")){
+                    userStatistics.setDrafts(-1L);
+                }
+                if (eventMapper.deleteByDeleteType(eventId, receivedDeleteEventIds.getDeleteType(), receivedDeleteEventIds.getUserId()) == 0) {
                     return DtoUtil.getFalseDto("删除失败", 21016);
                 }
+                achievementMapper.updateUserStatistics(userStatistics);
             }
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

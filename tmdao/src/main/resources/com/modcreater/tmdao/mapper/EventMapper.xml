@@ -537,6 +537,16 @@
         from singleevent
         where userid = #{userId} and isLoop = 1 and isOverdue = 0 order by startTime asc
     </select>
+    <select id="getAEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from
+        <if test="'singleevent' == type">
+            singleevent
+        </if>
+        <if test="'draft' == type">
+            draft
+        </if>
+        where userId = #{userId} and eventId = #{eventId} and isOverdue in (0,1)
+    </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent
     where isLoop = 0 and isOverdue = 0
