@@ -188,7 +188,7 @@ public class EventController {
      * @return
      */
     @PostMapping(value = "eventupdchoose")
-    @ApiOperation("修改事件时创建者选择")
+    /*@ApiOperation("修改事件时创建者选择")*/
     public Dto eventUpdChoose(@RequestBody EventCreatorChooseVo eventCreatorChooseVo, HttpServletRequest request){
         return eventService.eventUpdChoose(eventCreatorChooseVo,request.getHeader("token"));
     }

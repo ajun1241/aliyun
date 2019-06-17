@@ -135,7 +135,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                         continue;
                     }
-                    if (userStatistics.getCompleted() >= achievement.getFinishedEventsCondition().longValue()) {
+                    if (achievement.getFinishedEventsCondition().longValue() != 0 && userStatistics.getCompleted() >= achievement.getFinishedEventsCondition().longValue()) {
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                     }
                 }

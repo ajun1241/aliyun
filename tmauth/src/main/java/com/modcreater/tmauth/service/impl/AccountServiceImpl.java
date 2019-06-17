@@ -85,6 +85,7 @@ public class AccountServiceImpl implements AccountService {
                 map.put("userType",result.getUserType());
                 map.put("realName",result.getRealName());
                 map.put("userAddress",result.getUserAddress());*/
+                map.put("dnd","1");
                 map.put("userSign",result.getUserSign());
                 return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
             }
@@ -124,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
             map.put("userSign",result.getUserSign());
             map.put("token",token);
             //查询用户是否开启了勿扰模式
-            map.put("dnd",userSettingsMapper.getDND(result.getId().toString()));
+            map.put("dnd",userSettingsMapper.getDND(result.getId().toString()).toString());
             return DtoUtil.getSuccesWithDataDto("登录成功",map,100000);
         }else {
             //未注册时
@@ -157,6 +158,7 @@ public class AccountServiceImpl implements AccountService {
             map.put("userType",result.getUserType());
             map.put("realName",result.getRealName());
             map.put("userAddress",result.getUserAddress());*/
+            map.put("dnd","1");
             map.put("userSign",result.getUserSign());
             return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
         }
@@ -200,17 +202,6 @@ public class AccountServiceImpl implements AccountService {
         if (accountMapper.updateAccount(account)<=0){
             return DtoUtil.getFalseDto("添加密码失败",15003);
         }
-
-        account=accountMapper.queryAccount(addPwdVo.getUserId());
-        Map map=new HashMap();
-        map.put("id",account.getId());
-        map.put("userCode",account.getUserCode());
-        map.put("isFirst",account.getIsFirst());
-        map.put("userName",account.getUserName());
-        map.put("gender",account.getGender());
-        map.put("birthday",account.getBirthday());
-        map.put("headImgUrl",account.getHeadImgUrl());
-        map.put("token",account.getToken());
         try {
             if (ObjectUtils.isEmpty(achievementMapper.queryUserStatistics(addPwdVo.getUserId()))){
                 if (achievementMapper.addNewUserStatistics(addPwdVo.getUserId()) == 0){
@@ -226,6 +217,18 @@ public class AccountServiceImpl implements AccountService {
             e.printStackTrace();
             return DtoUtil.getFalseDto("请勿重复操作",15007);
         }
+        account=accountMapper.queryAccount(addPwdVo.getUserId());
+        Map map=new HashMap();
+        map.put("id",account.getId());
+        map.put("userCode",account.getUserCode());
+        map.put("isFirst",account.getIsFirst());
+        map.put("userName",account.getUserName());
+        map.put("gender",account.getGender());
+        map.put("birthday",account.getBirthday());
+        map.put("headImgUrl",account.getHeadImgUrl());
+        map.put("dnd",userSettingsMapper.getDND(account.getId().toString()).toString());
+        map.put("userSign",account.getUserSign());
+        map.put("token",account.getToken());
         return DtoUtil.getSuccesWithDataDto("添加密码成功",map,100000);
     }
 

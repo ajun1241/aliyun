@@ -357,12 +357,24 @@
 
     <select id="queryClashEventList" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select * from singleevent
-        where
-        userId = #{userid}
-        and month = #{month}
-        and day = #{day}
-        and year = #{year}
-        and isOverdue=0
+        <where>
+            <if test="userid != null">
+                userId = #{userid}
+            </if>
+            <if test="month != null">
+                and month = #{month}
+            </if>
+            <if test="day != null">
+                and day = #{day}
+            </if>
+            <if test="year != null">
+                and year = #{year}
+            </if>
+            <if test="eventid != null">
+                and eventId != #{eventid}
+            </if>
+            and isOverdue=0
+        </where>
     </select>
 
     <select id="queryEventsByDayForIOS" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
