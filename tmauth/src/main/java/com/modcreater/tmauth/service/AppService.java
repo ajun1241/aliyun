@@ -2,6 +2,7 @@ package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.app.ReceivedAppInfo;
+import com.modcreater.tmbeans.vo.app.ReceivedNotice;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,4 +23,12 @@ public interface AppService {
      * @return
      */
     Dto updateApp(ReceivedAppInfo appInfo, HttpServletRequest request);
+
+    /**
+     * 获取实名认证活动公告
+     * @param receivedNotice
+     * @param token
+     * @return
+     */
+    Dto getAuthenticationActivityNotice(ReceivedNotice receivedNotice, String token);
 }

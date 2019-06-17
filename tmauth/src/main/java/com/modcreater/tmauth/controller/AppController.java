@@ -3,6 +3,7 @@ package com.modcreater.tmauth.controller;
 import com.modcreater.tmauth.service.AppService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.app.ReceivedAppInfo;
+import com.modcreater.tmbeans.vo.app.ReceivedNotice;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,11 @@ public class AppController {
     @PostMapping(value = "update")
     public Dto updateApp(@RequestBody ReceivedAppInfo appInfo, HttpServletRequest request){
         return appService.updateApp(appInfo,request);
+    }
+
+    @PostMapping(value = "authenticationactivitynotice")
+    public Dto authenticationActivityNotice(@RequestBody ReceivedNotice receivedNotice , HttpServletRequest request){
+        return appService.getAuthenticationActivityNotice(receivedNotice,request.getHeader("token"));
     }
 
 }

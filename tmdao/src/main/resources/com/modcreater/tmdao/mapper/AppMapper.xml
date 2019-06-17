@@ -5,11 +5,23 @@
     <sql id="appVersion">
         id,appName,appVersion,apkUrl,uploadTime,updatedInstructions,functionIntroduction,updateTimes
     </sql>
+    <insert id="addUserNotice">
+        insert into usernotice values (null,#{userId},#{noticeName},0)
+    </insert>
     <update id="updateUpdateTimes">
         update appversion set updateTimes = #{updateTimes} where uploadTime = #{uploadTime}
+    </update>
+    <update id="updateUserNotice">
+        update usernotice set todayNotifications = todayNotifications + #{todayNotifications} where userId = #{userId} and noticeName = #{noticeName}
     </update>
 
     <select id="getAppVersion" resultType="com.modcreater.tmbeans.pojo.AppVersion">
         select <include refid="appVersion"/> from appversion where uploadTime &lt;= date(#{now}) order by uploadTime desc limit 0,1
+    </select>
+    <select id="getUserNotice" resultType="com.modcreater.tmbeans.pojo.UserNotice">
+        select * from usernotice where userId = #{userId}
+    </select>
+    <select id="getNoticeContent" resultType="java.lang.String">
+        select noticeContent from notice where noticeTypeId = #{noticeTypeId} and noticeName = #{noticeName} and startDate = #{date}
     </select>
 </mapper>
