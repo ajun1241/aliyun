@@ -27,11 +27,23 @@ public class AppController {
     @Resource
     private AppService appService;
 
+    /**
+     * 更新APP
+     * @param appInfo
+     * @param request
+     * @return
+     */
     @PostMapping(value = "update")
     public Dto updateApp(@RequestBody ReceivedAppInfo appInfo, HttpServletRequest request){
         return appService.updateApp(appInfo,request);
     }
 
+    /**
+     * 获取实名认证活动公告
+     * @param receivedNotice
+     * @param request
+     * @return
+     */
     @PostMapping(value = "authenticationactivitynotice")
     public Dto authenticationActivityNotice(@RequestBody ReceivedNotice receivedNotice , HttpServletRequest request){
         return appService.getAuthenticationActivityNotice(receivedNotice,request.getHeader("token"));

@@ -67,7 +67,7 @@ public class AppServiceImpl implements AppService {
         }
         userNotice = appMapper.getUserNotice(receivedNotice.getUserId());
         if (userNotice.getTodayNotifications() == 1) {
-            return DtoUtil.getSuccesWithDataDto("已经通知过了", 1, 200000);
+            return DtoUtil.getSuccessDto("已经通知过了", 200000);
         }
         String content = appMapper.getNoticeContent(receivedNotice.getNoticeTypeId(), receivedNotice.getNoticeName(),receivedNotice.getDate());
         if (StringUtils.hasText(content)) {
