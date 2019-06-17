@@ -235,7 +235,7 @@ public interface EventMapper {
      * @param eventStatusScan
      * @return
      */
-    Long queryExpiredEvents(EventStatusScan eventStatusScan);
+    List<Long> queryExpiredEvents(EventStatusScan eventStatusScan);
 
 
     /**

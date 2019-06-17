@@ -104,12 +104,19 @@ public class TimerConfig {
         eventStatusScan.setThisMonth(Long.valueOf(today.substring(4, 6)));
         eventStatusScan.setToday(Long.valueOf(today.substring(6)));
         Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
-        System.out.println(time);
         eventStatusScan.setTime((long)time);
-        Long events = eventMapper.queryExpiredEvents(eventStatusScan);
-        logger.info("有" + events + "条事件待修改");
-        if (events != 0) {
-            logger.info("修改了" + eventMapper.updateExpiredEvents(eventStatusScan) + "条事件");
+        List<Long> userIds = eventMapper.queryExpiredEvents(eventStatusScan);
+        logger.info("有" + userIds.size() + "条事件待修改");
+        if (userIds.size() != 0) {
+            Long result = eventMapper.updateExpiredEvents(eventStatusScan);
+            for (Long userId : userIds){
+                UserStatistics userStatistics = new UserStatistics();
+                userStatistics.setUserId(userId);
+                userStatistics.setUnfinished(-1L);
+                userStatistics.setCompleted(1L);
+                achievementMapper.updateUserStatistics(userStatistics);
+            }
+            logger.info("修改了" + result + "条事件");
         }
     }
 

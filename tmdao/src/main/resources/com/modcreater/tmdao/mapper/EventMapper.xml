@@ -460,7 +460,7 @@
         where userId=#{userId} and eventId=#{eventId} and isOverdue &lt;&gt; 2
     </select>
     <select id="queryExpiredEvents" resultType="java.lang.Long">
-        select count(id) as id from singleevent
+        select userId from singleevent
         where isLoop = 0 and isOverdue = 0
         and year = #{thisYear} and month = #{thisMonth} and day = #{today} and endTime &lt;= #{time}
     </select>
