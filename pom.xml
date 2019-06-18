@@ -15,6 +15,7 @@
         <module>tmauth</module>
         <module>tmutils</module>
         <module>tmbiz</module>
+        <module>tmtrade</module>
     </modules>
 
     <parent>

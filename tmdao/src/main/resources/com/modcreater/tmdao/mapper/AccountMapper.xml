@@ -151,13 +151,13 @@
         update account
         <set>
             <if test="userSign != null and userSign != ''">
-                userSign = #{userSign}
+                userSign = #{userSign},
             </if>
             <if test="userName != null and userName != ''">
-                userName = #{userName}
+                userName = #{userName},
             </if>
             <if test="headImgUrl != null and headImgUrl != ''">
-                headImgUrl = #{headImgUrl}
+                headImgUrl = #{headImgUrl},
             </if>
         </set>
         where id = #{userId}

@@ -352,7 +352,9 @@ public class AccountServiceImpl implements AccountService {
             ResponseResult result;
             Map<String,String> map=new HashMap<>();
             try {
-                sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
+                Account account=accountMapper.queryAccount(sendFriendRequestVo.getUserId());
+                sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+account.getUserName():sendFriendRequestVo.getContent());
+                System.out.println(sendFriendRequestVo.getContent());
                 String[] friendId={sendFriendRequestVo.getFriendId()};
                 //发送消息未读条数
                 List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0","");
@@ -400,7 +402,8 @@ public class AccountServiceImpl implements AccountService {
             ResponseResult result;
             Map<String,String> map=new HashMap<>();
             try {
-                sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+sendFriendRequestVo.getUserId():sendFriendRequestVo.getContent());
+                Account account=accountMapper.queryAccount(sendFriendRequestVo.getUserId());
+                sendFriendRequestVo.setContent(StringUtils.isEmpty(sendFriendRequestVo.getContent())?"我是"+account.getUserName():sendFriendRequestVo.getContent());
                 String[] friendId={sendFriendRequestVo.getFriendId()};
                 //发送消息未读条数
                 List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(sendFriendRequestVo.getFriendId(),"0","");

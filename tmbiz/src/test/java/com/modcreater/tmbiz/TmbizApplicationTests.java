@@ -56,7 +56,7 @@ public class TmbizApplicationTests {
 
     @Test
     public void test1() {
-        stringRedisTemplate.opsForValue().set("2","3");
+        /*stringRedisTemplate.opsForValue().set("2","3");*/
     }
 
     @Test
