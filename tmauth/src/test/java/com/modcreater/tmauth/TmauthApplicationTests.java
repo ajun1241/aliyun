@@ -22,6 +22,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -34,8 +35,10 @@ public class TmauthApplicationTests {
     private EventMapper eventMapper;
     @Test
     public void contextLoads() {
-        SingleEvent singleEvent=new SingleEvent();
-        System.out.println(eventMapper.queryClashEventList(singleEvent).toString());
+        String code="100000adv00";
+        String pattern = "^1[\\d]{10}";
+        System.out.println(Pattern.matches(pattern,code));
+
     }
     @Test
     public void test(){

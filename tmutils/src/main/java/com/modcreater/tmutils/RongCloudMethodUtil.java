@@ -31,8 +31,8 @@ import org.springframework.util.ObjectUtils;
 
 public class RongCloudMethodUtil {
 
-    public final static String appKey = "0vnjpoad03rzz";// 申请的融云key
-    public final static String appSecret = "BbTOtrRIF5MOA";// 申请的的云secret
+    public final static String appKey = "0vnjpoad0314z";// 申请的融云key
+    public final static String appSecret = "0uoZVUDt8lROGb";// 申请的的云secret
 
     VoiceMessage voiceMessage = new VoiceMessage("hello", "helloExtra", 20L);
 

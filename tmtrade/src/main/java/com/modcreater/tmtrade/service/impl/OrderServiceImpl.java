@@ -116,7 +116,7 @@ public class OrderServiceImpl implements OrderService {
         if (unitPrice != 0 && receivedOrderInfo.getPaymentAmount() / userOrder.getNumber() - (unitPrice) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
         }
-        userOrder.setPaymentAmount(userOrder.getPaymentAmount());
+        userOrder.setPaymentAmount(receivedOrderInfo.getPaymentAmount());
         userOrder.setCreateDate(System.currentTimeMillis() / 1000);
         userOrder.setRemark(receivedOrderInfo.getUserRemark());
         if (orderMapper.addNewOrder(userOrder) == 0) {

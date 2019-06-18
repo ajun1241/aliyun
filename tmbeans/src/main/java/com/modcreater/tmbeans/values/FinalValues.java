@@ -24,18 +24,6 @@ public class FinalValues {
      */
     public static final Integer SEARCH_WEEK_NUM = 6;
     /**
-     * 10分钟(秒)
-     */
-    public static final Long TIME_CARD_DURATION = 600L;
-    /**
-     * 一个月(单位:秒,计算用户支付用)
-     */
-    public static final Long MONTH = getPayTime(1);
-    /**
-     * 一年(单位:秒,计算用户支付用)
-     */
-    public static final Long YEAR = getPayTime(12);
-    /**
      * 标准的一个月的天数
      */
     public static final Integer STANDARD_MONTH_DAY = 30;
@@ -43,6 +31,18 @@ public class FinalValues {
      * 标准的一年的天数
      */
     public static final Integer STANDARD_YEAR_DAY = 365;
+    /**
+     * 10分钟(秒)
+     */
+    public static final Long TIME_CARD_DURATION = 600L;
+    /**
+     * 一个月(单位:秒,计算用户支付用)
+     */
+    public static Long MONTH = getPayTime(1);
+    /**
+     * 一年(单位:秒,计算用户支付用)
+     */
+    public static Long YEAR = getPayTime(12);
 
 
     private static Long getPayTime(int monthNum) {

@@ -2,6 +2,8 @@ package com.modcreater.tmbiz.config;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmdao.mapper.EventMapper;
+import com.modcreater.tmutils.DateUtil;
+import com.modcreater.tmutils.SingleEventUtil;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -24,13 +26,29 @@ public class EventUtil {
         List<SingleEvent> clashList=new ArrayList<>();
         List<SingleEvent> singleEventList = eventMapper.queryClashEventList(singleEvent);
         for (SingleEvent singleEvent1 : singleEventList) {
-           if (((Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) < Long.parseLong(singleEvent.getEndtime()))
-                   || (Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getStarttime()) < Long.parseLong(singleEvent.getEndtime()))
-                   || (Long.valueOf(singleEvent1.getEndtime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) < Long.parseLong(singleEvent.getEndtime()))
-                   || (Long.valueOf(singleEvent1.getStarttime()) <= Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) >= Long.parseLong(singleEvent.getEndtime()))) ){
-                   //冲突事件添加进集合
-                   clashList.add(singleEvent1);
-           }
+            //是重复事件
+            if (singleEvent.getIsLoop()==1){
+                Boolean[] repeatTime = SingleEventUtil.getRepeatTime(singleEvent);
+                int week = DateUtil.stringToWeek(String.valueOf(System.currentTimeMillis()/1000));
+                if (repeatTime[week]){
+                    if (((Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) < Long.parseLong(singleEvent.getEndtime()))
+                            || (Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getStarttime()) < Long.parseLong(singleEvent.getEndtime()))
+                            || (Long.valueOf(singleEvent1.getEndtime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) < Long.parseLong(singleEvent.getEndtime()))
+                            || (Long.valueOf(singleEvent1.getStarttime()) <= Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) >= Long.parseLong(singleEvent.getEndtime()))) ){
+                        //冲突事件添加进集合
+                        clashList.add(singleEvent1);
+                    }
+                }
+            }else {
+                //不是重复事件
+                if (((Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) < Long.parseLong(singleEvent.getEndtime()))
+                        || (Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getStarttime()) < Long.parseLong(singleEvent.getEndtime()))
+                        || (Long.valueOf(singleEvent1.getEndtime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) < Long.parseLong(singleEvent.getEndtime()))
+                        || (Long.valueOf(singleEvent1.getStarttime()) <= Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) >= Long.parseLong(singleEvent.getEndtime()))) ){
+                    //冲突事件添加进集合
+                    clashList.add(singleEvent1);
+                }
+            }
         }
         return clashList;
     }

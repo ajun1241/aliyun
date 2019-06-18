@@ -373,7 +373,7 @@
             <if test="eventid != null">
                 and eventId != #{eventid}
             </if>
-            and isOverdue=0
+            and isOverdue=0 and isLoop=#{isLoop}
         </where>
     </select>
 
@@ -546,6 +546,9 @@
             draft
         </if>
         where userId = #{userId} and eventId = #{eventId} and isOverdue in (0,1)
+    </select>
+    <select id="queryAllLoopEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from singleevent where isLoop = 1 and isOverdue = 0 and endTime &lt;= #{time}
     </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent

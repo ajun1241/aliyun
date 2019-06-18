@@ -307,5 +307,5 @@ public interface EventMapper {
      * 查询所有重复事件
      * @return
      */
-    List<SingleEvent> queryAllLoopEvent();
+    List<SingleEvent> queryAllLoopEvent(Integer time);
 }

@@ -121,7 +121,7 @@ public class TimerConfig {
                 achievementMapper.updateUserStatistics(userStatistics);
             }
             logger.info("修改了" + result + "条事件");
-            List<SingleEvent> allLoopEventResults = eventMapper.queryAllLoopEvent();
+            List<SingleEvent> allLoopEventResults = eventMapper.queryAllLoopEvent(time);
             if (allLoopEventResults.size() > 0) {
                 for (SingleEvent loopEvent : allLoopEventResults) {
                     Boolean[] repeatTime = SingleEventUtil.getRepeatTime(loopEvent);

@@ -17,6 +17,8 @@ import io.rong.messages.ContactNtfMessage;
 import io.rong.messages.InfoNtfMessage;
 import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +54,8 @@ public class AccountServiceImpl implements AccountService {
     private SystemMsgMapper systemMsgMapper;
 
     RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
+
+    private Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
     /**
      * 注册/登录
      * @param loginVo
@@ -69,7 +73,12 @@ public class AccountServiceImpl implements AccountService {
         String token=null;
         Map map=new HashMap();
         Account account=new Account();
-        Account result=accountMapper.checkCode(loginVo.getUserCode());
+        String code=loginVo.getUserCode();
+        String pattern = "^1[\\d]{10}";
+        if (!Pattern.matches(pattern,code)){
+            return DtoUtil.getFalseDto("账号格式不正确",14010);
+        }
+        Account result=accountMapper.checkCode(code);
         //如果已经注册
         if (!ObjectUtils.isEmpty(result)){
             if (StringUtils.isEmpty(result.getUserPassword())){
@@ -367,6 +376,7 @@ public class AccountServiceImpl implements AccountService {
                 ContactNtfMessage contactNtfMessage=new ContactNtfMessage("1",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
                 result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
                 if (result.getCode()!=200){
+                    logger.info("融云消息异常"+result.toString());
                     return DtoUtil.getFalseDto("发送请求失败",17002);
                 }
                 //消息保存在服务器
@@ -416,6 +426,7 @@ public class AccountServiceImpl implements AccountService {
                 ContactNtfMessage contactNtfMessage=new ContactNtfMessage("1",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
                 result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
                 if (result.getCode()!=200){
+                    logger.info("融云消息异常"+result.toString());
                     return DtoUtil.getFalseDto("发送请求失败",17002);
                 }
                 //消息保存在服务器
@@ -477,6 +488,7 @@ public class AccountServiceImpl implements AccountService {
             ContactNtfMessage contactNtfMessage=new ContactNtfMessage("2",extra,sendFriendResponseVo.getUserId(), sendFriendResponseVo.getFriendId(), "我是"+user.getUserName()+"，我已经同意你的好友请求了");
             ResponseResult result=rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),friendId,contactNtfMessage,"","");
             if (result.getCode()!=200){
+                logger.info("融云消息异常"+result.toString());
                 return DtoUtil.getFalseDto("发送请求失败",17002);
             }
             //发送文本消息
