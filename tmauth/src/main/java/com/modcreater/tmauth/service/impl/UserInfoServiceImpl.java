@@ -167,6 +167,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (receivedEventConditions.getIsOverdue() == null || "".equals(receivedEventConditions.getIsOverdue())) {
             return DtoUtil.getFalseDto("条件缺失", 40006);
         }
+        if (!StringUtils.hasText(receivedEventConditions.getSearchType())){
+            return DtoUtil.getFalseDto("条件缺失", 40006);
+        }
+        if (!StringUtils.hasText(receivedEventConditions.getIsOverdue())){
+            return DtoUtil.getFalseDto("条件缺失", 40006);
+        }
         singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         if (receivedEventConditions.getEventName() != null && !"".equals(receivedEventConditions.getEventName())) {
             singleEventCondition.setEventname(receivedEventConditions.getEventName());
@@ -207,8 +213,6 @@ public class UserInfoServiceImpl implements UserInfoService {
                     return DtoUtil.getSuccesWithDataDto("未开通查询服务,不能查看更多", null, 200000);
                 }
             }
-        }else {
-            return DtoUtil.getFalseDto("searchType未接收到", 40005);
         }
         singleEventCondition.setPageNum((Long.valueOf(receivedEventConditions.getPageNum()) - 1) * Long.valueOf(receivedEventConditions.getPageSize()));
         singleEventCondition.setPageSize(Long.valueOf(receivedEventConditions.getPageSize()));
