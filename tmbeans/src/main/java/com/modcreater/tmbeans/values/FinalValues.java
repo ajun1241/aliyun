@@ -1,5 +1,7 @@
 package com.modcreater.tmbeans.values;
 
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -28,22 +30,42 @@ public class FinalValues {
     /**
      * 一个月(单位:秒,计算用户支付用)
      */
-    public static final Long MONTH = 2592000L;
+    public static final Long MONTH = getPayTime(1);
     /**
      * 一年(单位:秒,计算用户支付用)
      */
-    public static final Long YEAR = 31536000L;
+    public static final Long YEAR = getPayTime(12);
+    /**
+     * 标准的一个月的天数
+     */
+    public static final Integer STANDARD_MONTH_DAY = 30;
+    /**
+     * 标准的一年的天数
+     */
+    public static final Integer STANDARD_YEAR_DAY = 365;
 
 
-    private Long getPayMonth() {
+    private static Long getPayTime(int monthNum) {
+        Date date = new Date();
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        int month = calendar.get(Calendar.MONTH);
-        return 1L;
-    }
+        calendar.setTime(date);
+        long today = calendar.getTimeInMillis()/1000;
+        if (monthNum == 1){
+            calendar.add(Calendar.MONTH,1);
+        }else {
+            calendar.add(Calendar.YEAR,1);
+        }
 
-    private Long getPayYear() {
-        return 1L;
+        long nextDay = calendar.getTimeInMillis()/1000;
+        int day = (int)(nextDay - today)/86400;
+        if (monthNum == 1){
+            if (day < STANDARD_MONTH_DAY){
+                day = 30;
+            }
+        }
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE,day);
+        return calendar.getTimeInMillis()/1000;
     }
 
 }
