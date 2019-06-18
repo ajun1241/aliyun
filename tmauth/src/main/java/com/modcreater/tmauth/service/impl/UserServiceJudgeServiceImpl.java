@@ -40,17 +40,19 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
     /**
      * 用户查询功能判断
+     *
      * @param userId
      * @return
      */
     @Override
     public Dto searchServiceJudge(String userId) {
-        ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId,"2");
+        ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId, "2");
         //用户未开通
-        if (ObjectUtils.isEmpty(time)){
-            return DtoUtil.getSuccessDto("该用户尚未开通查询功能",200000);
+        if (ObjectUtils.isEmpty(time)) {
+            return DtoUtil.getSuccessDto("该用户尚未开通查询功能", 200000);
         }
         //开通了,查询次卡是否有剩余
         if (time.getResidueDegree() == 0) {
@@ -65,150 +67,154 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
                 return DtoUtil.getSuccessDto("该用户尚未开通查询功能", 200000);
             }
         }
-        return DtoUtil.getSuccessDto("查询服务已开通",100000);
+        return DtoUtil.getSuccessDto("查询服务已开通", 100000);
     }
 
     @Override
     public Dto searchServiceJudge(String userId, String token) {
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
-        if (StringUtils.isEmpty(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
+        if (StringUtils.isEmpty(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("请重新登录",21014);
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         return searchServiceJudge(userId);
     }
 
     /**
      * 好友功能判断
+     *
      * @param userId
      * @return
      */
     @Override
-    public Dto friendServiceJudge(String userId,String token) {
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+    public Dto friendServiceJudge(String userId, String token) {
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
-        if (StringUtils.isEmpty(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
+        if (StringUtils.isEmpty(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("请重新登录",21014);
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        ServiceRemainingTime service=userServiceMapper.getServiceRemainingTime(userId,"1");
-        if (ObjectUtils.isEmpty(service)){
-            return DtoUtil.getFalseDto("好友功能尚未开通",200000);
+        ServiceRemainingTime service = userServiceMapper.getServiceRemainingTime(userId, "1");
+        if (ObjectUtils.isEmpty(service)) {
+            return DtoUtil.getFalseDto("好友功能尚未开通", 200000);
         }
-        return DtoUtil.getSuccessDto("好友功能已开通",100000);
+        return DtoUtil.getSuccessDto("好友功能已开通", 100000);
     }
 
     /**
-     * 年报功能判断
+     * 报表功能判断
+     *
      * @param userId
      * @return
      */
     @Override
-    public Dto annualReportingServiceJudge(String userId,String token) {
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+    public Dto annualReportingServiceJudge(String userId, String token) {
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
-        if (StringUtils.isEmpty(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
+        if (StringUtils.isEmpty(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("请重新登录",21014);
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId,"4");
+        ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId, "3");
         //用户未开通
-        if (ObjectUtils.isEmpty(time)){
-            return DtoUtil.getSuccessDto("该用户尚未开通报表功能",20000);
+        if (ObjectUtils.isEmpty(time)) {
+            return DtoUtil.getSuccessDto("该用户尚未开通报表功能", 20000);
         }
         //无剩余,判断剩余年/月卡时间
         Long timeRemaining = time.getTimeRemaining();
-        if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis()/1000){
-            return DtoUtil.getSuccessDto("该用户尚未开通备份功能",20000);
+        if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis() / 1000) {
+            return DtoUtil.getSuccessDto("该用户尚未开通报表功能", 20000);
         }
-        return DtoUtil.getSuccessDto("年报功能已开通",100000);
+        return DtoUtil.getSuccessDto("报表服务功能已开通", 100000);
     }
 
     /**
      * 备份功能判断
+     *
      * @param userId
      * @return
      */
     @Override
-    public Dto backupServiceJudge(String userId,String token) {
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+    public Dto backupServiceJudge(String userId, String token) {
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
-        if (StringUtils.isEmpty(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
+        if (StringUtils.isEmpty(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("请重新登录",21014);
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId,"4");
+        ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId, "4");
         //用户未开通
-        if (ObjectUtils.isEmpty(time)){
-            return DtoUtil.getSuccessDto("该用户尚未开通备份功能",20000);
+        if (ObjectUtils.isEmpty(time)) {
+            return DtoUtil.getSuccessDto("该用户尚未开通备份功能", 20000);
         }
         //开通了,查询次卡是否有剩余
-        if (time.getResidueDegree() == 0){
+        if (time.getResidueDegree() == 0) {
             //无剩余,判断剩余年/月卡时间
             Long timeRemaining = time.getTimeRemaining();
-            if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis()/1000){
-                return DtoUtil.getSuccessDto("该用户尚未开通备份功能",20000);
+            if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis() / 1000) {
+                return DtoUtil.getSuccessDto("该用户尚未开通备份功能", 20000);
             }
-        }else {
+        } else {
             //有剩余,判断此次查询完毕后是否剩余为0次
-            time.setResidueDegree(time.getResidueDegree()-1);
+            time.setResidueDegree(time.getResidueDegree() - 1);
             //如果剩余次数为0,判断库存时间是否为0
-            if (time.getResidueDegree() == 0 && time.getStorageTime()!= 0){
+            if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
                 //如果有库存时间,将这个时间加入用户有效的剩余时间中
-                time.setTimeRemaining(System.currentTimeMillis()/1000 + time.getStorageTime());
+                time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
             }
         }
-        return DtoUtil.getSuccessDto("备份功能已开通",100000);
+        return DtoUtil.getSuccessDto("备份功能已开通", 100000);
     }
 
     /**
      * 实名认证判断
+     *
      * @param userId
      * @return
      */
     @Override
-    public Dto realInfoJudge(String userId,String token) {
-        if (StringUtils.isEmpty(userId)){
-            return DtoUtil.getFalseDto("请先登录",21011);
+    public Dto realInfoJudge(String userId, String token) {
+        if (StringUtils.isEmpty(userId)) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
-        if (StringUtils.isEmpty(token)){
-            return DtoUtil.getFalseDto("token未获取到",21013);
+        if (StringUtils.isEmpty(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
         }
-        String redisToken=stringRedisTemplate.opsForValue().get(userId);
-        if (!token.equals(redisToken)){
-            return DtoUtil.getFalseDto("请重新登录",21014);
+        String redisToken = stringRedisTemplate.opsForValue().get(userId);
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        UserRealInfo userRealInfo=realInfoMapper.queryDetail(userId);
-        Map<String,String> map=new HashMap<>();
-        if (ObjectUtils.isEmpty(userRealInfo)){
-            map.put("status","3");
-            return DtoUtil.getSuccesWithDataDto("实名认证尚未开通",map,100000);
-        }else if (userRealInfo.getRealStatus() == 0 ){
-            map.put("status",userRealInfo.getRealStatus().toString());
-            return DtoUtil.getSuccesWithDataDto("实名认证正在认证中，请稍等",map,100000);
-        }else if (userRealInfo.getRealStatus() == 2 ){
-            map.put("status",userRealInfo.getRealStatus().toString());
-            return DtoUtil.getSuccesWithDataDto("实名认证已驳回，请重新上传认证",map,100000);
-        }else {
-            map.put("status",userRealInfo.getRealStatus().toString());
-            return DtoUtil.getSuccesWithDataDto("实名认证已完成",map,100000);
+        UserRealInfo userRealInfo = realInfoMapper.queryDetail(userId);
+        Map<String, String> map = new HashMap<>();
+        if (ObjectUtils.isEmpty(userRealInfo)) {
+            map.put("status", "3");
+            return DtoUtil.getSuccesWithDataDto("实名认证尚未开通", map, 100000);
+        } else if (userRealInfo.getRealStatus() == 0) {
+            map.put("status", userRealInfo.getRealStatus().toString());
+            return DtoUtil.getSuccesWithDataDto("实名认证正在认证中，请稍等", map, 100000);
+        } else if (userRealInfo.getRealStatus() == 2) {
+            map.put("status", userRealInfo.getRealStatus().toString());
+            return DtoUtil.getSuccesWithDataDto("实名认证已驳回，请重新上传认证", map, 100000);
+        } else {
+            map.put("status", userRealInfo.getRealStatus().toString());
+            return DtoUtil.getSuccesWithDataDto("实名认证已完成", map, 100000);
         }
     }
 
@@ -248,6 +254,6 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
                 }
             }
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+        return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 }
