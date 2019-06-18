@@ -119,7 +119,7 @@ public class OrderServiceImpl implements OrderService {
         double unitPrice = orderMapper.getUnitPrice(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
         if (unitPrice != 0 && receivedOrderInfo.getPaymentAmount() / userOrder.getNumber() - (unitPrice) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
-        }
+    }
         userOrder.setPaymentAmount(unitPrice);
         userOrder.setCreateDate(System.currentTimeMillis() / 1000);
         userOrder.setRemark(receivedOrderInfo.getUserRemark());

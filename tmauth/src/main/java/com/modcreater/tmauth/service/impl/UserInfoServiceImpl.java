@@ -195,31 +195,29 @@ public class UserInfoServiceImpl implements UserInfoService {
             singleEventCondition.setDay(Long.valueOf(startDate.substring(6, 8)));
         }
         if (!StringUtils.hasText(receivedEventConditions.getPageNum()) || receivedEventConditions.getPageNum().equals("0")) {
-            singleEventCondition.setPageNum(1L);
+            receivedEventConditions.setPageNum("1");
         }
         if (!StringUtils.hasText(receivedEventConditions.getPageSize()) || receivedEventConditions.getPageSize().equals("0")) {
-            singleEventCondition.setPageSize(7L);
-        }
-
-        //此处判断用户是否开启了查询服务
-        if (!isSearchServiceNice(receivedEventConditions)){
-            if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")) {
-                return DtoUtil.getSuccesWithDataDto("未开通查询服务,不能查看更多", null, 200000);
-            }
-            receivedEventConditions.setPageNum("1");
             receivedEventConditions.setPageSize("7");
         }
-
+        //此处判断用户是否开启了查询服务
+        if (StringUtils.hasText(receivedEventConditions.getSearchType()) && receivedEventConditions.getSearchType().equals("0") && receivedEventConditions.getIsOverdue().equals("1")){
+            if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")){
+                if (!isSearchServiceNice(receivedEventConditions)) {
+                    return DtoUtil.getSuccesWithDataDto("未开通查询服务,不能查看更多", null, 200000);
+                }
+            }
+        }else {
+            return DtoUtil.getFalseDto("searchType未接收到", 40005);
+        }
         singleEventCondition.setPageNum((Long.valueOf(receivedEventConditions.getPageNum()) - 1) * Long.valueOf(receivedEventConditions.getPageSize()));
         singleEventCondition.setPageSize(Long.valueOf(receivedEventConditions.getPageSize()));
-        List<SingleEvent> singleEventList;
+        List<SingleEvent> singleEventList = new ArrayList<>();
         List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
         if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("0")) {
             singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
         } else if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("1")) {
             singleEventList = eventMapper.queryDraft(singleEventCondition);
-        } else {
-            return DtoUtil.getFalseDto("searchType未接收到", 40005);
         }
         if (singleEventList.size() == 0) {
             return DtoUtil.getSuccessDto("没有查询到事件", 200000);
@@ -612,7 +610,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         return DtoUtil.getFalseDto("修改失败", 200000);
     }
 
-    public boolean isSearchServiceNice(ReceivedEventConditions receivedEventConditions){
+    public boolean isSearchServiceNice(ReceivedEventConditions receivedEventConditions) {
         //此处判断用户是否开启了查询服务
         ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(receivedEventConditions.getUserId(), "2");
         //用户未开通
@@ -627,17 +625,13 @@ public class UserInfoServiceImpl implements UserInfoService {
                 return false;
             }
         } else {
-            if (time.getTimeCardDuration() < System.currentTimeMillis()/1000){
-                time.setResidueDegree(time.getResidueDegree() - 1);
-                //增加次卡时长
-                time.setTimeCardDuration(System.currentTimeMillis()/1000 + FinalValues.TIME_CARD_DURATION);
-                //判断剩余次数-1后是否为0,如果为0...
-                if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
-                    //如果有库存时间,将这个时间加入用户有效的剩余时间中
-                    time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
-                    long l = 0L;
-                    time.setStorageTime(l);
-                }
+            time.setResidueDegree(time.getResidueDegree() - 1);
+            //判断剩余次数-1后是否为0,如果为0...
+            if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
+                //如果有库存时间,将这个时间加入用户有效的剩余时间中
+                time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
+                long l = 0L;
+                time.setStorageTime(l);
             }
         }
         userServiceMapper.updateServiceRemainingTime(time);
