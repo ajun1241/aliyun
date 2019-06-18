@@ -127,7 +127,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userId,"4");
         //用户未开通
         if (ObjectUtils.isEmpty(time)){
-            return DtoUtil.getSuccessDto("该用户尚未开通备份功能",20000);
+            return DtoUtil.getSuccessDto("该用户尚未开通报表功能",20000);
         }
         //无剩余,判断剩余年/月卡时间
         Long timeRemaining = time.getTimeRemaining();

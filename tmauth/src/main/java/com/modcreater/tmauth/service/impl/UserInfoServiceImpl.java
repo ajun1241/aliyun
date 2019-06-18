@@ -319,6 +319,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(redisToken)) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
+        Dto dto = userServiceJudgeService.annualReportingServiceJudge(userId,token);
+        if (dto.getResCode() != 100000){
+            return DtoUtil.getSuccessDto("尚未开通年报服务",200000);
+        }
         //已完成事件的总分钟数
         Long totalMinutes = 0L;
         //返回数据

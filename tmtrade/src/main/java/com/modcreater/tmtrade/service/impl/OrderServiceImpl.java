@@ -145,6 +145,12 @@ public class OrderServiceImpl implements OrderService {
         return 0;
     }
 
+    /**
+     * 此处最重要的一点!!! : 年报的storageTime是用来记录用户最近一次开通年费报表的时间
+     * @param receivedVerifyInfo
+     * @param token
+     * @return
+     */
     @Override
     public Dto payInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token) {
         if (StringUtils.isEmpty(receivedVerifyInfo.getUserId())){
@@ -198,14 +204,21 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             } else if (userOrders.getServiceType().equals("year")) {
+                Long reportStorageTime = 0L;
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * YEAR + System.currentTimeMillis() / 1000, 0L,0L)) == 0) {
+                    if (userOrders.getServiceId().equals("3")){
+                        reportStorageTime = System.currentTimeMillis()/1000;
+                    }
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * YEAR + System.currentTimeMillis() / 1000, reportStorageTime,0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
                     if (time.getResidueDegree() == 0) {
                         Long timeRemaining = time.getTimeRemaining() + YEAR * userOrders.getNumber();
                         time.setTimeRemaining(timeRemaining);
+                        if (userOrders.getServiceId().equals("3")){
+                            time.setStorageTime(System.currentTimeMillis()/1000);
+                        }
                     } else {
                         Long storageTime = time.getStorageTime() + YEAR * userOrders.getNumber();
                         time.setStorageTime(storageTime);
