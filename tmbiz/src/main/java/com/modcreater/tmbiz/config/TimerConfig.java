@@ -1,6 +1,8 @@
 package com.modcreater.tmbiz.config;
 
 import com.modcreater.tmbeans.databaseparam.EventStatusScan;
+import com.modcreater.tmbeans.databaseresult.AllLoopEventResult;
+import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.TimedTask;
 import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmdao.mapper.AchievementMapper;
@@ -10,6 +12,7 @@ import com.modcreater.tmdao.mapper.TimedTaskMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
+import com.modcreater.tmutils.SingleEventUtil;
 import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
 import org.slf4j.Logger;
@@ -29,8 +32,9 @@ import java.util.*;
 
 /**
  * Description:
- *  EnableScheduling   1.开启定时任务
- *  EnableAsync        2.开启多线程
+ * EnableScheduling   1.开启定时任务
+ * EnableAsync        2.开启多线程
+ *
  * @Author: AJun
  * @Date: 2019/5/31 13:58
  */
@@ -52,38 +56,38 @@ public class TimerConfig {
     @Resource
     private AchievementMapper achievementMapper;
 
-    private Logger logger= LoggerFactory.getLogger(TimerConfig.class);
+    private Logger logger = LoggerFactory.getLogger(TimerConfig.class);
 
     @Scheduled(fixedDelay = 60000)
-    public void backerEventTimer(){
+    public void backerEventTimer() {
         try {
-            List<TimedTask> taskList=timedTaskMapper.queryWaitExecute();
+            List<TimedTask> taskList = timedTaskMapper.queryWaitExecute();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
-            Date date1=new Date();
+            Date date1 = new Date();
             Date date2;
-            for (TimedTask task:taskList) {
-                date2=simpleDateFormat.parse(task.getTimer());
+            for (TimedTask task : taskList) {
+                date2 = simpleDateFormat.parse(task.getTimer());
                 System.out.println(task.getTimer());
-                if (date1.getTime()/60000==date2.getTime()/60000){
+                if (date1.getTime() / 60000 == date2.getTime() / 60000) {
                     //发送消息给支持者
-                    RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
-                    TxtMessage txtMessage=new TxtMessage(task.getContent(),"");
-                    String[] targetId={task.getBackerId().toString()};
-                    ResponseResult result = rongCloudMethodUtil.sendSystemMessage(task.getUserId().toString(),targetId,txtMessage,"","");
-                    if (result.getCode()!=200){
-                        logger.info("发送消息失败，任务编号："+task.getId());
-                    }else {
-                        logger.info("发送消息成功，任务编号："+task.getId());
+                    RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
+                    TxtMessage txtMessage = new TxtMessage(task.getContent(), "");
+                    String[] targetId = {task.getBackerId().toString()};
+                    ResponseResult result = rongCloudMethodUtil.sendSystemMessage(task.getUserId().toString(), targetId, txtMessage, "", "");
+                    if (result.getCode() != 200) {
+                        logger.info("发送消息失败，任务编号：" + task.getId());
+                    } else {
+                        logger.info("发送消息成功，任务编号：" + task.getId());
                     }
                     //修改任务状态
-                    TimedTask timedTask=new TimedTask();
+                    TimedTask timedTask = new TimedTask();
                     timedTask.setTaskStatus(1L);
                     timedTask.setUserId(task.getUserId());
                     timedTask.setEventId(task.getEventId());
-                    if (timedTaskMapper.updateTimedTask(timedTask)==0){
-                        logger.info("修改状态失败，任务编号："+task.getId());
-                    }else {
-                        logger.info("修改状态成功，任务编号："+task.getId());
+                    if (timedTaskMapper.updateTimedTask(timedTask) == 0) {
+                        logger.info("修改状态失败，任务编号：" + task.getId());
+                    } else {
+                        logger.info("修改状态成功，任务编号：" + task.getId());
                     }
                 }
             }
@@ -104,12 +108,12 @@ public class TimerConfig {
         eventStatusScan.setThisMonth(Long.valueOf(today.substring(4, 6)));
         eventStatusScan.setToday(Long.valueOf(today.substring(6)));
         Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
-        eventStatusScan.setTime((long)time);
+        eventStatusScan.setTime((long) time);
         List<Long> userIds = eventMapper.queryExpiredEvents(eventStatusScan);
         logger.info("有" + userIds.size() + "条事件待修改");
         if (userIds.size() != 0) {
             Long result = eventMapper.updateExpiredEvents(eventStatusScan);
-            for (Long userId : userIds){
+            for (Long userId : userIds) {
                 UserStatistics userStatistics = new UserStatistics();
                 userStatistics.setUserId(userId);
                 userStatistics.setUnfinished(-1L);
@@ -117,16 +121,39 @@ public class TimerConfig {
                 achievementMapper.updateUserStatistics(userStatistics);
             }
             logger.info("修改了" + result + "条事件");
+            List<SingleEvent> allLoopEventResults = eventMapper.queryAllLoopEvent();
+            if (allLoopEventResults.size() > 0) {
+                for (SingleEvent loopEvent : allLoopEventResults) {
+                    Boolean[] repeatTime = SingleEventUtil.getRepeatTime(loopEvent);
+                    int week = DateUtil.stringToWeek(String.valueOf(System.currentTimeMillis() / 1000));
+                    if (repeatTime[week]) {
+                        if (Long.valueOf(loopEvent.getEndtime()) >= time) {
+                            loopEvent.setYear(eventStatusScan.getYear());
+                            loopEvent.setMonth(eventStatusScan.getMonth());
+                            loopEvent.setDay(eventStatusScan.getDay());
+                            loopEvent.setEventid(System.currentTimeMillis());
+                            loopEvent.setIsOverdue(1L);
+                            loopEvent.setIsLoop(0);
+                            eventMapper.uploadingEvents(loopEvent);
+
+                            UserStatistics userStatistics = new UserStatistics();
+                            userStatistics.setUserId(loopEvent.getUserid());
+                            userStatistics.setCompleted(1L);
+                            achievementMapper.updateUserStatistics(userStatistics);
+                        }
+                    }
+                }
+            }
         }
     }
 
     @Scheduled(cron = "0 * * * * ?")
-    public void orderStatusScan(){
-        Long timestamp = System.currentTimeMillis()/1000;
+    public void orderStatusScan() {
+        Long timestamp = System.currentTimeMillis() / 1000;
         Long orders = orderMapper.queryExpiredOrders(timestamp);
         logger.info("有" + orders + "个订单待修改");
-        if (orders != 0){
-            logger.info("修改了"+orderMapper.updateExpiredOrders(timestamp)+"个订单");
+        if (orders != 0) {
+            logger.info("修改了" + orderMapper.updateExpiredOrders(timestamp) + "个订单");
         }
     }
 }

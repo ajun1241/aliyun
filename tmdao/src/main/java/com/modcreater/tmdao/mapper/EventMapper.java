@@ -302,4 +302,10 @@ public interface EventMapper {
      * @return
      */
     SingleEvent getAEvent(@Param("userId") String userId,@Param("eventId") Long eventId,@Param("type") String type);
+
+    /**
+     * 查询所有重复事件
+     * @return
+     */
+    List<SingleEvent> queryAllLoopEvent();
 }

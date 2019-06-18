@@ -83,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
             }
             if (receivedOrderInfo.getNumber() == null || receivedOrderInfo.getNumber() == 0) {
                 receivedOrderInfo.setNumber(1L);
-            } else if (receivedOrderInfo.getNumber() != 1){
+            } else if (receivedOrderInfo.getNumber() != 1) {
                 return DtoUtil.getFalseDto("数量错误", 60018);
             }
         }
@@ -115,8 +115,8 @@ public class OrderServiceImpl implements OrderService {
         double unitPrice = orderMapper.getUnitPrice(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
         if (unitPrice != 0 && receivedOrderInfo.getPaymentAmount() / userOrder.getNumber() - (unitPrice) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
-    }
-        userOrder.setPaymentAmount(unitPrice);
+        }
+        userOrder.setPaymentAmount(userOrder.getPaymentAmount());
         userOrder.setCreateDate(System.currentTimeMillis() / 1000);
         userOrder.setRemark(receivedOrderInfo.getUserRemark());
         if (orderMapper.addNewOrder(userOrder) == 0) {
@@ -143,14 +143,15 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 此处最重要的一点!!! : 年报的storageTime是用来记录用户最近一次开通年费报表的时间
+     *
      * @param receivedVerifyInfo
      * @param token
      * @return
      */
     @Override
     public Dto payInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token) {
-        if (StringUtils.isEmpty(receivedVerifyInfo.getUserId())){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(receivedVerifyInfo.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
@@ -162,7 +163,7 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("未获取到订单号", 60004);
         }
         UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
-        if (userOrders.getOrderStatus().equals("3")){
+        if (userOrders.getOrderStatus().equals("3")) {
             return DtoUtil.getFalseDto("订单已过期,请不要重复提交", 60021);
         }
         if (userOrders.getOrderStatus().equals("2")) {
@@ -172,7 +173,7 @@ public class OrderServiceImpl implements OrderService {
             ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId());
             if (userOrders.getServiceType().equals("time")) {
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), userOrders.getNumber(), 0L, 0L,0L)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), userOrders.getNumber(), 0L, 0L, 0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
@@ -184,7 +185,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else if (userOrders.getServiceType().equals("month")) {
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.MONTH + System.currentTimeMillis() / 1000, 0L,0L)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.MONTH + System.currentTimeMillis() / 1000, 0L, 0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
@@ -202,18 +203,18 @@ public class OrderServiceImpl implements OrderService {
             } else if (userOrders.getServiceType().equals("year")) {
                 Long reportStorageTime = 0L;
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userOrders.getServiceId().equals("3")){
-                        reportStorageTime = System.currentTimeMillis()/1000;
+                    if (userOrders.getServiceId().equals("3")) {
+                        reportStorageTime = System.currentTimeMillis() / 1000;
                     }
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.YEAR + System.currentTimeMillis() / 1000, reportStorageTime,0L)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.YEAR + System.currentTimeMillis() / 1000, reportStorageTime, 0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
                     if (time.getResidueDegree() == 0) {
                         Long timeRemaining = time.getTimeRemaining() + FinalValues.YEAR * userOrders.getNumber();
                         time.setTimeRemaining(timeRemaining);
-                        if (userOrders.getServiceId().equals("3")){
-                            time.setStorageTime(System.currentTimeMillis()/1000);
+                        if (userOrders.getServiceId().equals("3")) {
+                            time.setStorageTime(System.currentTimeMillis() / 1000);
                         }
                     } else {
                         Long storageTime = time.getStorageTime() + FinalValues.YEAR * userOrders.getNumber();
@@ -224,7 +225,7 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             } else if (userOrders.getServiceType().equals("perpetual")) {
-                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L, 0L,0L)) == 0) {
+                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L, 0L, 0L)) == 0) {
                     return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                 }
             }
@@ -305,8 +306,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto alipay(ReceivedOrderInfo receivedOrderInfo, String token) {
-        if (StringUtils.isEmpty(receivedOrderInfo.getUserId())){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(receivedOrderInfo.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
@@ -345,8 +346,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto wxPayOrderSubmitted(ReceivedOrderInfo receivedOrderInfo, String token) throws Exception {
-        if (StringUtils.isEmpty(receivedOrderInfo.getUserId())){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(receivedOrderInfo.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
@@ -527,8 +528,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto isFriendServiceOpened(ReceivedId receivedId, String token) {
-        if (StringUtils.isEmpty(receivedId.getUserId())){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(receivedId.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
@@ -544,8 +545,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto searchUserService(ReceivedServiceIdUserId receivedServiceIdUserId, String token) {
-        if (StringUtils.isEmpty(receivedServiceIdUserId.getUserId())){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(receivedServiceIdUserId.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
@@ -554,63 +555,63 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         ServiceRemainingTime serviceRemainingTime = userServiceMapper.getServiceRemainingTime(receivedServiceIdUserId.getUserId(), receivedServiceIdUserId.getServiceId());
-        if (ObjectUtils.isEmpty(serviceRemainingTime)){
-            return DtoUtil.getSuccesWithDataDto("查询成功","您尚未开通此功能",100000);
+        if (ObjectUtils.isEmpty(serviceRemainingTime)) {
+            return DtoUtil.getSuccesWithDataDto("查询成功", "您尚未开通此功能", 100000);
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         if (serviceRemainingTime.getServiceId().equals("2")) {
             if (serviceRemainingTime.getResidueDegree() == 0) {
                 String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
                 if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
-                    return DtoUtil.getSuccesWithDataDto("查询成功","您的查询服务将在" + time + "到期",100000);
+                    return DtoUtil.getSuccesWithDataDto("查询成功", "您的查询服务将在" + time + "到期", 100000);
                 } else if (serviceRemainingTime.getTimeRemaining() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务尚未开通",100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务尚未开通", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务将在" + time + "到期",100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务将在" + time + "到期", 100000);
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + ",月/年卡将在次卡消耗完后开始计算",100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + ",月/年卡将在次卡消耗完后开始计算", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString(),100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString(), 100000);
                 }
             }
         }
         if (serviceRemainingTime.getServiceId().equals("3")) {
             String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
             if (serviceRemainingTime.getTimeRemaining() == 0) {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "年报服务尚未开通",100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", "年报服务尚未开通", 100000);
             } else if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "年报服务将在" + time + "过期",100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", "年报服务将在" + time + "过期", 100000);
             } else {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "年报服务已过期",100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", "年报服务已过期", 100000);
             }
         }
         if (serviceRemainingTime.getServiceId().equals("4")) {
             if (serviceRemainingTime.getResidueDegree() == 0) {
                 String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
                 if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务将在" + time + "到期",100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务将在" + time + "到期", 100000);
                 } else if (serviceRemainingTime.getTimeRemaining() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务尚未开通",100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务尚未开通", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务已过期",100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务已过期", 100000);
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + ",月/年卡将在次卡消耗完后开始计算",100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + ",月/年卡将在次卡消耗完后开始计算", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString(),100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString(), 100000);
                 }
             }
         }
-        return DtoUtil.getFalseDto("参数有误",60020);
+        return DtoUtil.getFalseDto("参数有误", 60020);
     }
 
     @Override
     public Dto searchUserOrders(ReceivedId receivedId, String token) {
-        if (StringUtils.isEmpty(receivedId.getUserId())){
-            return DtoUtil.getFalseDto("请先登录",21011);
+        if (StringUtils.isEmpty(receivedId.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
         if (!StringUtils.hasText(token)) {
             return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
@@ -619,10 +620,10 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         List<ShowUserOrders> userOrdersList = orderMapper.getUserAllOrders(receivedId.getUserId());
-        if (userOrdersList.size() == 0){
-            return DtoUtil.getSuccessDto("未查询到订单",200000);
+        if (userOrdersList.size() == 0) {
+            return DtoUtil.getSuccessDto("未查询到订单", 200000);
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",userOrdersList,100000);
+        return DtoUtil.getSuccesWithDataDto("查询成功", userOrdersList, 100000);
     }
 
     /**
@@ -634,7 +635,7 @@ public class OrderServiceImpl implements OrderService {
      * @param timeRemaining 剩余时间
      * @return ServiceRemainingTime对象
      */
-    private ServiceRemainingTime setServiceRemainingTime(String userId, String serviceId, Long residueDegree, Long timeRemaining, Long storageTime,Long timeCardDuration) {
+    private ServiceRemainingTime setServiceRemainingTime(String userId, String serviceId, Long residueDegree, Long timeRemaining, Long storageTime, Long timeCardDuration) {
         ServiceRemainingTime serviceRemainingTime = new ServiceRemainingTime();
         serviceRemainingTime.setUserId(userId);
         serviceRemainingTime.setServiceId(serviceId);

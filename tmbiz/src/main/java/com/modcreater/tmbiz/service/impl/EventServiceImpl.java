@@ -97,9 +97,9 @@ public class EventServiceImpl implements EventService {
         singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
-        if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+        /*if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
             return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
-        }
+        }*/
         if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
             //未完成+1
             UserStatistics userStatistics = new UserStatistics();
@@ -158,11 +158,11 @@ public class EventServiceImpl implements EventService {
         SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
         singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
         SingleEvent result = eventMapper.querySingleEventTime(singleEvent);
-        if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
+        /*if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
             if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
                 return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
             }
-        }
+        }*/
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
         if (eventMapper.alterEventsByUserId(singleEvent) > 0) {
@@ -661,9 +661,9 @@ public class EventServiceImpl implements EventService {
             SingleEvent singleEvent = JSONObject.parseObject(addbackerVo.getSingleEvent(), SingleEvent.class);
             singleEvent.setUserid(Long.parseLong(addbackerVo.getUserId()));
             //事件时间冲突判断
-            if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+            /*if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
                 return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
-            }
+            }*/
             if (eventMapper.uploadingEvents(singleEvent) == 0) {
                 return DtoUtil.getFalseDto("事件添加失败", 25001);
             }
