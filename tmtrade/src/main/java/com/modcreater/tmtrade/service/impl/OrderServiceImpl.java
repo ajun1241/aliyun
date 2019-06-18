@@ -13,6 +13,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.ServiceRemainingTime;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.show.order.ShowUserOrders;
+import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedServiceIdUserId;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
@@ -66,11 +67,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
-    public static final Long MONTH = 2592000L;
-    public static final Long YEAR = 31536000L;
-    public static final Long MONTH_TIME = System.currentTimeMillis() / 1000 + 2592000;
-    public static final Long YEAR_TIME = System.currentTimeMillis() / 1000 + 31536000;
 
     private static final Logger logger = LoggerFactory.getLogger("trade");
 
@@ -188,15 +184,15 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else if (userOrders.getServiceType().equals("month")) {
                 if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * MONTH + System.currentTimeMillis() / 1000, 0L,0L)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.MONTH + System.currentTimeMillis() / 1000, 0L,0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
                     if (time.getResidueDegree() == 0) {
-                        Long timeRemaining = time.getTimeRemaining() + MONTH * userOrders.getNumber();
+                        Long timeRemaining = time.getTimeRemaining() + FinalValues.MONTH * userOrders.getNumber();
                         time.setTimeRemaining(timeRemaining);
                     } else {
-                        Long storageTime = time.getStorageTime() + MONTH * userOrders.getNumber();
+                        Long storageTime = time.getStorageTime() + FinalValues.MONTH * userOrders.getNumber();
                         time.setStorageTime(storageTime);
                     }
                     if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
@@ -209,18 +205,18 @@ public class OrderServiceImpl implements OrderService {
                     if (userOrders.getServiceId().equals("3")){
                         reportStorageTime = System.currentTimeMillis()/1000;
                     }
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * YEAR + System.currentTimeMillis() / 1000, reportStorageTime,0L)) == 0) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.YEAR + System.currentTimeMillis() / 1000, reportStorageTime,0L)) == 0) {
                         return DtoUtil.getFalseDto("用户服务添加失败", 60016);
                     }
                 } else {
                     if (time.getResidueDegree() == 0) {
-                        Long timeRemaining = time.getTimeRemaining() + YEAR * userOrders.getNumber();
+                        Long timeRemaining = time.getTimeRemaining() + FinalValues.YEAR * userOrders.getNumber();
                         time.setTimeRemaining(timeRemaining);
                         if (userOrders.getServiceId().equals("3")){
                             time.setStorageTime(System.currentTimeMillis()/1000);
                         }
                     } else {
-                        Long storageTime = time.getStorageTime() + YEAR * userOrders.getNumber();
+                        Long storageTime = time.getStorageTime() + FinalValues.YEAR * userOrders.getNumber();
                         time.setStorageTime(storageTime);
                     }
                     if (userServiceMapper.updateServiceRemainingTime(time) == 0) {

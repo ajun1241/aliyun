@@ -1,5 +1,8 @@
 package com.modcreater.tmbeans.values;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -22,5 +25,25 @@ public class FinalValues {
      * 10分钟(秒)
      */
     public static final Long TIME_CARD_DURATION = 600L;
+    /**
+     * 一个月(单位:秒,计算用户支付用)
+     */
+    public static final Long MONTH = 2592000L;
+    /**
+     * 一年(单位:秒,计算用户支付用)
+     */
+    public static final Long YEAR = 31536000L;
+
+
+    private Long getPayMonth() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        int month = calendar.get(Calendar.MONTH);
+        return 1L;
+    }
+
+    private Long getPayYear() {
+        return 1L;
+    }
 
 }
