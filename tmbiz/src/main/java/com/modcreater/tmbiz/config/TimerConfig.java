@@ -125,27 +125,30 @@ public class TimerConfig {
                 achievementMapper.updateUserStatistics(userStatistics);
             }
             logger.info("修改了" + result + "条事件");
-            List<SingleEvent> allLoopEventResults = eventMapper.queryAllLoopEvent(time);
-            if (allLoopEventResults.size() > 0) {
-                for (SingleEvent loopEvent : allLoopEventResults) {
-                    Boolean[] repeatTime = SingleEventUtil.getRepeatTime(loopEvent);
-                    int week = DateUtil.stringToWeek(String.valueOf(System.currentTimeMillis() / 1000));
-                    week = week == 7 ? 0 : week;
-                    if (repeatTime[week]) {
-                        if (Long.valueOf(loopEvent.getEndtime()) >= time) {
-                            loopEvent.setYear(eventStatusScan.getThisYear());
-                            loopEvent.setMonth(eventStatusScan.getThisMonth());
-                            loopEvent.setDay(eventStatusScan.getToday());
-                            loopEvent.setEventid(System.currentTimeMillis());
-                            loopEvent.setIsOverdue(1L);
-                            loopEvent.setIsLoop(0);
-                            eventMapper.uploadingEvents(loopEvent);
+        }
+        List<SingleEvent> allLoopEventResults = eventMapper.queryAllLoopEvent(time);
+        if (allLoopEventResults.size() > 0) {
+            for (SingleEvent loopEvent : allLoopEventResults) {
+                Boolean[] repeatTime = SingleEventUtil.getRepeatTime(loopEvent);
+                int week = DateUtil.stringToWeek(null);
+                System.out.println(week);
+                week = week == 7 ? 0 : week;
+                if (repeatTime[week]) {
+                    week = week == 0 ? 6 : week - 1;
+                    boolean result = Long.valueOf(loopEvent.getEndtime()) <= time || (repeatTime[week] && Long.valueOf(loopEvent.getEndtime()) == 1440);
+                    if (result) {
+                        loopEvent.setYear(eventStatusScan.getThisYear());
+                        loopEvent.setMonth(eventStatusScan.getThisMonth());
+                        loopEvent.setDay(eventStatusScan.getToday());
+                        loopEvent.setEventid(System.currentTimeMillis());
+                        loopEvent.setIsOverdue(1L);
+                        loopEvent.setIsLoop(0);
+                        eventMapper.uploadingEvents(loopEvent);
 
-                            UserStatistics userStatistics = new UserStatistics();
-                            userStatistics.setUserId(loopEvent.getUserid());
-                            userStatistics.setCompleted(1L);
-                            achievementMapper.updateUserStatistics(userStatistics);
-                        }
+                        UserStatistics userStatistics = new UserStatistics();
+                        userStatistics.setUserId(loopEvent.getUserid());
+                        userStatistics.setCompleted(1L);
+                        achievementMapper.updateUserStatistics(userStatistics);
                     }
                 }
             }

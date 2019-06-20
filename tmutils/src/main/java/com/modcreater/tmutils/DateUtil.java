@@ -1,6 +1,7 @@
 package com.modcreater.tmutils;
 
 import com.modcreater.tmbeans.utils.NaturalWeek;
+import org.springframework.util.StringUtils;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -36,19 +37,20 @@ public class DateUtil {
     }
 
     /**
-     * 时间戳转周
-     *
-     * @param s
+     * 20190620格式的时间转换为周几
+     * @param day(20190620)
      * @return
      */
-    public static int stringToWeek(String s) {
+    public static int stringToWeek(String day) {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date date = new Date();
-        try {
-            date = simpleDateFormat.parse(s);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if (StringUtils.hasText(day)){
+            try {
+                date = simpleDateFormat.parse(day);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
         calendar.setTime(date);
         int week = calendar.get(Calendar.DAY_OF_WEEK) - 1;

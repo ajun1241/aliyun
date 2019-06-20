@@ -25,7 +25,7 @@ public class EventUtil {
     public  List<SingleEvent> eventClashUtil(SingleEvent singleEvent) {
         List<SingleEvent> clashList=new ArrayList<>();
         List<SingleEvent> singleEventList = eventMapper.queryClashEventList(singleEvent);
-        int week = DateUtil.stringToWeek(String.valueOf(System.currentTimeMillis()/1000));
+        int week = DateUtil.stringToWeek(null);
         week = week == 7 ? 0 : week;
         for (SingleEvent singleEvent1 : singleEventList) {
             //是重复事件
