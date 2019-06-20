@@ -462,7 +462,8 @@
     <select id="queryExpiredEvents" resultType="java.lang.Long">
         select userId from singleevent
         where isLoop = 0 and isOverdue = 0
-        and year &lt;= #{thisYear} and month &lt;= #{thisMonth} and day &lt;= #{today} and endTime &lt;= #{time}
+        and (year &lt;= #{thisYear} and month &lt;= #{thisMonth} and day &lt;= #{today} and endTime &lt;= #{time})
+        or (year = #{lastYear} and month = #{lastMonth} and day = #{yesterday} and endTime = 1440)
     </select>
 
     <select id="getUserEventsGroupByTypeInWeek"
@@ -559,8 +560,8 @@
     <update id="updateExpiredEvents">
         update singleevent set isOverdue = 1
         where isLoop = 0 and isOverdue = 0
-        and year &lt;= #{thisYear} and month &lt;= #{thisMonth} and day &lt;= #{today} and endTime &lt;= #{time}
-
+        and (year &lt;= #{thisYear} and month &lt;= #{thisMonth} and day &lt;= #{today} and endTime &lt;= #{time})
+        or (year = #{lastYear} and month = #{lastMonth} and day = #{yesterday} and endTime = 1440)
     </update>
     <!--以下为每天凌晨4点操作一次
     update singleevent set isOverdue = 1

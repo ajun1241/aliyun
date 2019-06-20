@@ -25,11 +25,12 @@ public class EventUtil {
     public  List<SingleEvent> eventClashUtil(SingleEvent singleEvent) {
         List<SingleEvent> clashList=new ArrayList<>();
         List<SingleEvent> singleEventList = eventMapper.queryClashEventList(singleEvent);
+        int week = DateUtil.stringToWeek(String.valueOf(System.currentTimeMillis()/1000));
+        week = week == 7 ? 0 : week;
         for (SingleEvent singleEvent1 : singleEventList) {
             //是重复事件
             if (singleEvent.getIsLoop()==1){
                 Boolean[] repeatTime = SingleEventUtil.getRepeatTime(singleEvent);
-                int week = DateUtil.stringToWeek(String.valueOf(System.currentTimeMillis()/1000));
                 if (repeatTime[week]){
                     if (((Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getEndtime()) < Long.parseLong(singleEvent.getEndtime()))
                             || (Long.valueOf(singleEvent1.getStarttime()) > Long.parseLong(singleEvent.getStarttime()) && Long.valueOf(singleEvent1.getStarttime()) < Long.parseLong(singleEvent.getEndtime()))

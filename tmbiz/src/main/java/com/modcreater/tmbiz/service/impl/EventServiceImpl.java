@@ -414,6 +414,7 @@ public class EventServiceImpl implements EventService {
         dayEvents.setMySingleEventList(showSingleEventList);
         //查询重复事件
         int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
+        week = week == 7 ? 0 : week;
         //根据用户ID查询重复事件
         List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getUserId());
         //判断上一条查询结果是否有数据

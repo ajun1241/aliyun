@@ -103,10 +103,14 @@ public class TimerConfig {
     @Scheduled(cron = "30 * * * * ?")
     public void eventStatusScan() {
         StringBuilder today = new StringBuilder(DateUtil.getDay(0));
+        StringBuilder yesterday = new StringBuilder(DateUtil.getDay(-1));
         EventStatusScan eventStatusScan = new EventStatusScan();
         eventStatusScan.setThisYear(Long.valueOf(today.substring(0, 4)));
         eventStatusScan.setThisMonth(Long.valueOf(today.substring(4, 6)));
         eventStatusScan.setToday(Long.valueOf(today.substring(6)));
+        eventStatusScan.setLastYear(Long.valueOf(yesterday.substring(0, 4)));
+        eventStatusScan.setLastMonth(Long.valueOf(yesterday.substring(4, 6)));
+        eventStatusScan.setYesterday(Long.valueOf(yesterday.substring(6)));
         Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
         eventStatusScan.setTime((long) time);
         List<Long> userIds = eventMapper.queryExpiredEvents(eventStatusScan);
@@ -126,11 +130,12 @@ public class TimerConfig {
                 for (SingleEvent loopEvent : allLoopEventResults) {
                     Boolean[] repeatTime = SingleEventUtil.getRepeatTime(loopEvent);
                     int week = DateUtil.stringToWeek(String.valueOf(System.currentTimeMillis() / 1000));
+                    week = week == 7 ? 0 : week;
                     if (repeatTime[week]) {
                         if (Long.valueOf(loopEvent.getEndtime()) >= time) {
-                            loopEvent.setYear(eventStatusScan.getYear());
-                            loopEvent.setMonth(eventStatusScan.getMonth());
-                            loopEvent.setDay(eventStatusScan.getDay());
+                            loopEvent.setYear(eventStatusScan.getThisYear());
+                            loopEvent.setMonth(eventStatusScan.getThisMonth());
+                            loopEvent.setDay(eventStatusScan.getToday());
                             loopEvent.setEventid(System.currentTimeMillis());
                             loopEvent.setIsOverdue(1L);
                             loopEvent.setIsLoop(0);
