@@ -105,4 +105,10 @@ public class AccountController {
     public Dto uplHeadImg(@RequestBody HeadImgVo headImgVo, HttpServletRequest request){
         return userService.uplHeadImg(headImgVo,request.getHeader("token"));
     }
+
+    @PostMapping("sessiondetail")
+    @ApiOperation("查询用户列表信息")
+    public Dto querySessionListDetail(@RequestBody FriendshipVo friendshipVo, HttpServletRequest request){
+        return userService.querySessionListDetail(friendshipVo,request.getHeader("token"));
+    }
 }

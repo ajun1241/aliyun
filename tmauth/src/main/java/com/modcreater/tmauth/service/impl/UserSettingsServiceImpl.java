@@ -30,6 +30,7 @@ import java.util.Map;
  * @Date: 2019-05-21
  * Time: 10:15
  */
+@SuppressWarnings("AlibabaUndefineMagicConstant")
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class UserSettingsServiceImpl implements UserSettingsService {
@@ -61,6 +62,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         return DtoUtil.getFalseDto("修改失败",50001);
     }
 
+    @SuppressWarnings("AlibabaUndefineMagicConstant")
     @Override
     public Dto updateNotAllowed(ReceivedShowFriendList receivedShowFriendList, String token) {
         if (StringUtils.isEmpty(receivedShowFriendList.getId())){
@@ -77,6 +79,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
         if (!StringUtils.hasText(receivedShowFriendList.getShowFriendList())){
             return DtoUtil.getFalseDto("未获取到列表",200000);
         }
+        //noinspection AlibabaUndefineMagicConstant
         if (receivedShowFriendList.getShowFriendList().contains("invite")){
             System.out.println("invite修改");
             ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);

@@ -258,4 +258,5 @@ public interface EventService {
      * @return
      */
     Dto searchFriendEventOnce(ReceivedFriendEventOnce receivedFriendEventOnce, String token);
+
 }

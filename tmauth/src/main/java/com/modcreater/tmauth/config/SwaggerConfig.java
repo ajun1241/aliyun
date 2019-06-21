@@ -19,12 +19,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.ArrayList;
 import java.util.List;
 
-/*@Configuration */// applicationContext.xml    springboot
-/*@EnableSwagger2
-@ComponentScan("com.modcreater.tmauth.controller")*/
-/*@Component*/
+@Configuration // applicationContext.xml    springboot
+@EnableSwagger2
+@ComponentScan("com.modcreater.tmauth.controller")
+@Component
 public class SwaggerConfig {
-    /*@Bean
+    @Bean
     public Docket createRestApi() {
         //添加head参数配置start
         ParameterBuilder tokenPar = new ParameterBuilder();
@@ -48,5 +48,5 @@ public class SwaggerConfig {
                 .termsOfServiceUrl("")
                 .version("1.0")
                 .build();
-    }*/
+    }
 }

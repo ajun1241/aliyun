@@ -26,17 +26,23 @@ public class FeedbackInviteMessage extends BaseMessage {
      * 总人数
      */
     private String total = "";
+
     private String extraData = "";
+
     private String extra = "";
+
+    private String msgId = "";
+
     private static final transient String TYPE = "ZX:FeedbackInviteMsg";
 
-    public FeedbackInviteMessage(String agree, String refuse, String noReply, String total, String extraData, String extra) {
+    public FeedbackInviteMessage(String agree, String refuse, String noReply, String total, String extraData, String extra,String msgId) {
         this.agree = agree;
         this.refuse = refuse;
         this.noReply = noReply;
         this.total = total;
         this.extraData = extraData;
         this.extra = extra;
+        this.msgId = msgId;
     }
 
     @Override
@@ -90,6 +96,14 @@ public class FeedbackInviteMessage extends BaseMessage {
 
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+
+    public String getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(String msgId) {
+        this.msgId = msgId;
     }
 
     @Override

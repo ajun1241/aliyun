@@ -1,7 +1,6 @@
 package com.modcreater.tmbiz.config;
 
 import com.modcreater.tmbeans.databaseparam.EventStatusScan;
-import com.modcreater.tmbeans.databaseresult.AllLoopEventResult;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.TimedTask;
 import com.modcreater.tmbeans.pojo.UserStatistics;
@@ -10,14 +9,12 @@ import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmdao.mapper.TimedTaskMapper;
 import com.modcreater.tmutils.DateUtil;
-import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
 import com.modcreater.tmutils.SingleEventUtil;
 import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;

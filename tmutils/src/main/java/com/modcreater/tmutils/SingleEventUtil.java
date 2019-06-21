@@ -262,21 +262,21 @@ public class SingleEventUtil {
                     different.append(key + "更改为：" + m1.get(key) + "日；");
                 } else if (("事件类型").equals(key)) {
                     //0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他
-                    if (m1.get(key).equals("0")) {
+                    if ("0".equals(m1.get(key))) {
                         different.append(key + "更改为：学习；");
-                    } else if (m1.get(key).equals("1")) {
+                    } else if ("1".equals(m1.get(key))) {
                         different.append(key + "更改为：工作；");
-                    } else if (m1.get(key).equals("2")) {
+                    } else if ("2".equals(m1.get(key))) {
                         different.append(key + "更改为：商务；");
-                    } else if (m1.get(key).equals("3")) {
+                    } else if ("3".equals(m1.get(key))) {
                         different.append(key + "更改为：休闲；");
-                    } else if (m1.get(key).equals("4")) {
+                    } else if ("4".equals(m1.get(key))) {
                         different.append(key + "更改为：家庭；");
-                    } else if (m1.get(key).equals("5")) {
+                    } else if ("5".equals(m1.get(key))) {
                         different.append(key + "更改为：节日；");
-                    } else if (m1.get(key).equals("6")) {
+                    } else if ("6".equals(m1.get(key))) {
                         different.append(key + "更改为：假期；");
-                    } else if (m1.get(key).equals("7")) {
+                    } else if ("7".equals(m1.get(key))) {
                         different.append(key + "更改为：其他；");
                     }
                 } else {

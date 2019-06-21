@@ -4,18 +4,26 @@ package com.modcreater.tmbiz;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.show.MyToken;
 import com.modcreater.tmbiz.config.EventUtil;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.messageutil.InviteMessage;
 import io.rong.RongCloud;
+import io.rong.messages.TxtMessage;
 import io.rong.methods.message._private.Private;
+import io.rong.methods.message.system.MsgSystem;
+import io.rong.methods.user.User;
+import io.rong.models.Result;
 import io.rong.models.message.PrivateMessage;
 import io.rong.models.response.ResponseResult;
+import io.rong.models.response.TokenResult;
+import io.rong.models.user.UserModel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
@@ -120,25 +128,42 @@ public class TmbizApplicationTests {
         }
         System.out.println(Arrays.toString(result1.toArray()));
         System.out.println("******************************************");
-        System.out.println(result2.toArray());
+        System.out.println(result2.toArray().toString());
         System.out.println("******************************************");
         System.out.println(result3);
 
     }
 
     @Test
-    public void test5() throws ParseException {
-        String s="{\"friendsId\":\"100035,100030\",\"others\":\"薛腾\"}";
-        System.out.println(s);
-        EventPersons eventPersons= JSONObject.parseObject(s,EventPersons.class);
-        System.out.println(eventPersons.getFriendsId());
+    public void test5() throws Exception {
+        RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
+        MsgSystem system = rongCloud.message.system;
+        User User = rongCloud.user;
+
+        UserModel user = new UserModel()
+                .setId("100000")
+                .setName("智袖")
+                .setPortrait("https://mdxc2019-1258779334.cos.ap-chengdu.myqcloud.com/icon/icon.png");
+        TokenResult result = User.register(user);
+        MyToken myToken= JSONObject.parseObject(result.toString(),MyToken.class);
+        System.out.println("getToken:  " + result.toString());
+
+        /**
+         *
+         * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/user/user.html#refresh
+         *
+         * 刷新用户信息方法
+         */
+        Result refreshResult = User.update(user);
+        System.out.println("refresh:  " + refreshResult.toString());
     }
 
     @Test
     public void test() throws Exception {
-        RongCloud rongCloud = RongCloud.getInstance("0vnjpoad03rzz", "BbTOtrRIF5MOA");
-        String[] targetIds = {"100033"};
-        InviteMessage inviteMessage = new InviteMessage("这是一条测试消息","2019/6/6","","","");
+        RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
+        String[] targetIds = {"100122"};
+//        InviteMessage inviteMessage = new InviteMessage("这是一条测试消息","2019/6/6","","","");
+        TxtMessage txtMessage=new TxtMessage("猜猜我是谁","");
         Private Private = rongCloud.message.msgPrivate;
         /*MsgSystem system = rongCloud.message.system;
         Group group = rongCloud.message.group;
@@ -152,10 +177,10 @@ public class TmbizApplicationTests {
          * */
 
         PrivateMessage privateMessage = new PrivateMessage()
-                .setSenderId("100023")
+                .setSenderId("100000")
                 .setTargetId(targetIds)
-                .setObjectName(inviteMessage.getType())
-                .setContent(inviteMessage)
+                .setObjectName(txtMessage.getType())
+                .setContent(txtMessage)
                 .setPushContent("")
                 .setPushData("{\"pushData\":\"hello\"}")
                 .setCount("4")

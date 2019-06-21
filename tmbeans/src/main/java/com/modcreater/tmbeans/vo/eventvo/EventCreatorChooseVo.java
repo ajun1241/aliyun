@@ -20,4 +20,6 @@ public class EventCreatorChooseVo implements Serializable {
     private String userId;
 
     private String extraData;
+
+    private String msgId;
 }

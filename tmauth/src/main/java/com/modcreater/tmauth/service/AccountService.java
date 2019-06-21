@@ -1,6 +1,7 @@
 package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.Friendship;
 import com.modcreater.tmbeans.vo.AccountVo;
 import com.modcreater.tmbeans.vo.AddPwdVo;
 import com.modcreater.tmbeans.vo.LoginVo;
@@ -131,4 +132,11 @@ public interface AccountService {
      * @return
      */
     Dto uplHeadImg(HeadImgVo headImgVo,String token);
+
+    /**
+     * 查询会话列表好友信息（头像、昵称）
+     * @param friendshipVo
+     * @return
+     */
+    Dto querySessionListDetail(FriendshipVo friendshipVo,String token);
 }

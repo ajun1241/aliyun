@@ -89,11 +89,6 @@ public class AccountServiceImpl implements AccountService {
                 map.put("gender",result.getGender());
                 map.put("birthday",result.getBirthday());
                 map.put("headImgUrl",result.getHeadImgUrl());
-
-               /* map.put("IDCard",result.getIDCard());
-                map.put("userType",result.getUserType());
-                map.put("realName",result.getRealName());
-                map.put("userAddress",result.getUserAddress());*/
                 map.put("dnd","1");
                 map.put("userSign",result.getUserSign());
                 return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
@@ -127,10 +122,6 @@ public class AccountServiceImpl implements AccountService {
             map.put("gender",result.getGender());
             map.put("birthday",result.getBirthday());
             map.put("headImgUrl",result.getHeadImgUrl());
-            /*map.put("IDCard",result.getIDCard());
-            map.put("userType",result.getUserType());
-            map.put("realName",result.getRealName());
-            map.put("userAddress",result.getUserAddress());*/
             map.put("userSign",result.getUserSign());
             map.put("token",token);
             //查询用户是否开启了勿扰模式
@@ -163,10 +154,6 @@ public class AccountServiceImpl implements AccountService {
             map.put("gender",result.getGender());
             map.put("birthday",result.getBirthday());
             map.put("headImgUrl",result.getHeadImgUrl());
-            /*map.put("IDCard",result.getIDCard());
-            map.put("userType",result.getUserType());
-            map.put("realName",result.getRealName());
-            map.put("userAddress",result.getUserAddress());*/
             map.put("dnd","1");
             map.put("userSign",result.getUserSign());
             return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
@@ -588,9 +575,6 @@ public class AccountServiceImpl implements AccountService {
         }
         //成就
         List<String> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
-        /*if (achievement.size()==0){
-            return DtoUtil.getFalseDto("查询成就失败",200000);
-        }*/
         map.put("userId",account.getId().toString());
         map.put("userCode",account.getUserCode());
         map.put("userName",account.getUserName());
@@ -861,5 +845,37 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("用户信息修改失败",13002);
         }
         return DtoUtil.getSuccessDto("用户信息修改成功",100000);
+    }
+
+    /**
+     * 查询会话列表好友信息（头像、昵称）
+     * @param friendshipVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto querySessionListDetail(FriendshipVo friendshipVo,String token) {
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("token未获取到",21013);
+        }
+        if (ObjectUtils.isEmpty(friendshipVo)){
+            return DtoUtil.getFalseDto("请求数据未获取到",21013);
+        }
+        if (StringUtils.isEmpty(friendshipVo.getUserId())){
+            return DtoUtil.getFalseDto("userId未获取到",21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(friendshipVo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        Account account=accountMapper.queryAccount(friendshipVo.getFriendId());
+        if (ObjectUtils.isEmpty(account)){
+            return DtoUtil.getSuccesWithDataDto("好友信息查询失败",null,200000);
+        }else {
+            Map<String,String> map=new HashMap<>();
+            map.put("userId",account.getId().toString());
+            map.put("userName",account.getUserName());
+            map.put("headImgUrl",account.getHeadImgUrl());
+            return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
+        }
     }
 }
