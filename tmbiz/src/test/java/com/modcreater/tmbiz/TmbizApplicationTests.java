@@ -8,6 +8,7 @@ import com.modcreater.tmbeans.show.MyToken;
 import com.modcreater.tmbiz.config.EventUtil;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.messageutil.InviteMessage;
+import com.modcreater.tmutils.messageutil.NotifyMessage;
 import io.rong.RongCloud;
 import io.rong.messages.TxtMessage;
 import io.rong.methods.message._private.Private;
@@ -161,9 +162,10 @@ public class TmbizApplicationTests {
     @Test
     public void test() throws Exception {
         RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
-        String[] targetIds = {"100122"};
+        String[] targetIds = {"100033"};
 //        InviteMessage inviteMessage = new InviteMessage("这是一条测试消息","2019/6/6","","","");
-        TxtMessage txtMessage=new TxtMessage("猜猜我是谁","");
+//        TxtMessage txtMessage=new TxtMessage("猜猜我是谁","");
+        NotifyMessage notifyMessage=new NotifyMessage("jkasfjj艰苦撒旦弗兰克","1");
         Private Private = rongCloud.message.msgPrivate;
         /*MsgSystem system = rongCloud.message.system;
         Group group = rongCloud.message.group;
@@ -179,8 +181,8 @@ public class TmbizApplicationTests {
         PrivateMessage privateMessage = new PrivateMessage()
                 .setSenderId("100000")
                 .setTargetId(targetIds)
-                .setObjectName(txtMessage.getType())
-                .setContent(txtMessage)
+                .setObjectName(notifyMessage.getType())
+                .setContent(notifyMessage)
                 .setPushContent("")
                 .setPushData("{\"pushData\":\"hello\"}")
                 .setCount("4")

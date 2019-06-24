@@ -1823,7 +1823,7 @@ public class EventServiceImpl implements EventService {
             for (Long eventId : receivedDeleteEventIds.getEventIds()) {
                 SingleEvent singleEvent = eventMapper.getAEvent(receivedDeleteEventIds.getUserId(), eventId, receivedDeleteEventIds.getDeleteType());
                 if (eventMapper.deleteByDeleteType(eventId, receivedDeleteEventIds.getDeleteType(), receivedDeleteEventIds.getUserId()) == 0) {
-                    return DtoUtil.getFalseDto("删除失败", 21016);
+                    return DtoUtil.getFalseDto("删除失败", 21006);
                 }
             }
         } catch (Exception e) {
