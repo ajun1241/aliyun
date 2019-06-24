@@ -161,37 +161,7 @@ public class TmbizApplicationTests {
 
     @Test
     public void test() throws Exception {
-        RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
-        String[] targetIds = {"100033"};
-//        InviteMessage inviteMessage = new InviteMessage("这是一条测试消息","2019/6/6","","","");
-//        TxtMessage txtMessage=new TxtMessage("猜猜我是谁","");
-        NotifyMessage notifyMessage=new NotifyMessage("jkasfjj艰苦撒旦弗兰克","1");
-        Private Private = rongCloud.message.msgPrivate;
-        /*MsgSystem system = rongCloud.message.system;
-        Group group = rongCloud.message.group;
-        Chatroom chatroom = rongCloud.message.chatroom;
-        Discussion discussion = rongCloud.message.discussion;
-        History history = rongCloud.message.history;*/
-        /**
-         * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/message/private.html#send
-         *
-         * 发送单聊消息
-         * */
 
-        PrivateMessage privateMessage = new PrivateMessage()
-                .setSenderId("100000")
-                .setTargetId(targetIds)
-                .setObjectName(notifyMessage.getType())
-                .setContent(notifyMessage)
-                .setPushContent("")
-                .setPushData("{\"pushData\":\"hello\"}")
-                .setCount("4")
-                .setVerifyBlacklist(0)
-                .setIsPersisted(0)
-                .setIsCounted(0)
-                .setIsIncludeSender(0);
-        ResponseResult privateResult = Private.send(privateMessage);
-        System.out.println("send private message:  " + privateResult.toString());
     }
 
 }
