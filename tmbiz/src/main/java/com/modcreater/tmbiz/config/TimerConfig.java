@@ -114,13 +114,6 @@ public class TimerConfig {
         logger.info("有" + userIds.size() + "条事件待修改");
         if (userIds.size() != 0) {
             Long result = eventMapper.updateExpiredEvents(eventStatusScan);
-            for (Long userId : userIds) {
-                UserStatistics userStatistics = new UserStatistics();
-                userStatistics.setUserId(userId);
-                userStatistics.setUnfinished(-1L);
-                userStatistics.setCompleted(1L);
-                achievementMapper.updateUserStatistics(userStatistics);
-            }
             logger.info("修改了" + result + "条事件");
         }
         List<SingleEvent> allLoopEventResults = eventMapper.queryAllLoopEvent(time);
@@ -128,11 +121,10 @@ public class TimerConfig {
             for (SingleEvent loopEvent : allLoopEventResults) {
                 Boolean[] repeatTime = SingleEventUtil.getRepeatTime(loopEvent);
                 int week = DateUtil.stringToWeek(null);
-                System.out.println(week);
                 week = week == 7 ? 0 : week;
                 if (repeatTime[week]) {
                     week = week == 0 ? 6 : week - 1;
-                    boolean result = Long.valueOf(loopEvent.getEndtime()) <= time || (repeatTime[week] && Long.valueOf(loopEvent.getEndtime()) == 1440);
+                    boolean result = ((Integer.parseInt(loopEvent.getEndtime()) == time) || (repeatTime[week] && Long.valueOf(loopEvent.getEndtime()) == 1440));
                     if (result) {
                         loopEvent.setYear(eventStatusScan.getThisYear());
                         loopEvent.setMonth(eventStatusScan.getThisMonth());
@@ -141,11 +133,6 @@ public class TimerConfig {
                         loopEvent.setIsOverdue(1L);
                         loopEvent.setIsLoop(0);
                         eventMapper.uploadingEvents(loopEvent);
-
-                        UserStatistics userStatistics = new UserStatistics();
-                        userStatistics.setUserId(loopEvent.getUserid());
-                        userStatistics.setCompleted(1L);
-                        achievementMapper.updateUserStatistics(userStatistics);
                     }
                 }
             }

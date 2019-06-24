@@ -80,11 +80,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!StringUtils.hasText(userId)) {
             return DtoUtil.getSuccessDto("没有查询到用户信息", 200000);
         }
-        UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
         ShowUserStatistics showUserStatistics = new ShowUserStatistics();
-        showUserStatistics.setCompleted(userStatistics.getCompleted());
-        showUserStatistics.setUnfinished(userStatistics.getUnfinished());
-        showUserStatistics.setDrafts(userStatistics.getDrafts());
+        showUserStatistics.setCompleted(eventMapper.countCompletedEvents(Long.valueOf(userId)));
+        showUserStatistics.setUnfinished(eventMapper.countUnfinishedEvents(Long.valueOf(userId)));
+        showUserStatistics.setDrafts(eventMapper.countDrafts(Long.valueOf(userId)));
         List<String> imgUrlList = queryUserAchievementInBase(userId);
         Map<String, Object> result = new HashMap<>(3);
         Account account = accountMapper.queryAccount(userId);
@@ -132,10 +131,6 @@ public class UserInfoServiceImpl implements UserInfoService {
                 List<UserAchievement> userAchievementList = achievementMapper.queryUserAchievement(userId, achievement.getId());
                 if (userAchievementList.size() == 0) {
                     if (userStatistics.getLoggedDays() >= (achievement.getLoggedDaysCondition()).longValue()) {
-                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                        continue;
-                    }
-                    if (achievement.getFinishedEventsCondition().longValue() != 0 && userStatistics.getCompleted() >= achievement.getFinishedEventsCondition().longValue()) {
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                     }
                 }
@@ -203,7 +198,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!StringUtils.hasText(receivedEventConditions.getPageNum()) || receivedEventConditions.getPageNum().equals("0")) {
             receivedEventConditions.setPageNum("1");
         }
-        if (!StringUtils.hasText(receivedEventConditions.getPageSize()) || receivedEventConditions.getPageSize().equals("0")) {
+        if (!StringUtils.hasText(receivedEventConditions.getPageSize()) || !receivedEventConditions.getPageSize().equals("7")) {
             receivedEventConditions.setPageSize("7");
         }
         //此处判断用户是否开启了查询服务

@@ -551,6 +551,15 @@
     <select id="queryAllLoopEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select * from singleevent where isLoop = 1 and isOverdue = 0 and endTime &lt;= #{time}
     </select>
+    <select id="countCompletedEvents" resultType="java.lang.Long">
+        select count(id) from singleevent where userId = #{id} and isOverdue = 1 and isLoop = 0
+    </select>
+    <select id="countUnfinishedEvents" resultType="java.lang.Long">
+        select count(id) from singleevent where userId = #{id} and isOverdue = 0 and isLoop = 0
+    </select>
+    <select id="countDrafts" resultType="java.lang.Long">
+        select count(id) from draft where userId = #{id} and isOverdue = 0
+    </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent
     where isLoop = 0 and isOverdue = 0

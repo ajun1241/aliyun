@@ -49,7 +49,7 @@ public class AccountServiceImpl implements AccountService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
-    private UserServiceMapper userServiceMapper;
+    private EventMapper eventMapper;
     @Resource
     private SystemMsgMapper systemMsgMapper;
 
@@ -258,8 +258,8 @@ public class AccountServiceImpl implements AccountService {
         //日规划,月规划
         MyDetail result=accountMapper.queryPlanByDayAndMonth(account.getId().toString(),myDate[2],myDate[0],myDate[1]);
         //已完成
-        UserStatistics userStatistics=achievementMapper.queryUserStatistics(account.getId().toString());
-        if (ObjectUtils.isEmpty(userStatistics)|| ObjectUtils.isEmpty(result)){
+        Long completedEvents = eventMapper.countCompletedEvents(account.getId());
+        if (ObjectUtils.isEmpty(result)){
             return DtoUtil.getFalseDto("好友其他信息失败",200000);
         }
         //判断这俩人是不是已经是好友
@@ -281,7 +281,7 @@ public class AccountServiceImpl implements AccountService {
             map.put("userSign",account.getUserSign());
             map.put("dayPlan",result.getDay());
             map.put("monthPlan",result.getMonth());
-            map.put("finish",userStatistics.getCompleted().toString());
+            map.put("finish",completedEvents);
             map.put("achievement",achievement);
             map.put("isFriend",1);
             return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
@@ -298,7 +298,7 @@ public class AccountServiceImpl implements AccountService {
         map.put("userSign",account.getUserSign());
         map.put("dayPlan",result.getDay());
         map.put("monthPlan",result.getMonth());
-        map.put("finish",userStatistics.getCompleted().toString());
+        map.put("finish",completedEvents);
         map.put("isFriend",0);
         return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
     }
@@ -709,8 +709,8 @@ public class AccountServiceImpl implements AccountService {
             //日规划,月规划
             MyDetail result=accountMapper.queryPlanByDayAndMonth(account.getId().toString(),myDate[2],myDate[0],myDate[1]);
             //已完成
-            UserStatistics userStatistics=achievementMapper.queryUserStatistics(account.getId().toString());
-            if (ObjectUtils.isEmpty(userStatistics)|| ObjectUtils.isEmpty(result)){
+            Long completed = eventMapper.countCompletedEvents(systemMsgRecord.getFromId());
+            if (ObjectUtils.isEmpty(result)){
                 return DtoUtil.getFalseDto("好友其他信息失败",200000);
             }
             msgVo.setHeadImgUrl(account.getHeadImgUrl());
@@ -726,7 +726,7 @@ public class AccountServiceImpl implements AccountService {
             msgVo.setFriendId(systemMsgRecord.getFromId().toString());
             msgVo.setDayPlan(result.getDay());
             msgVo.setMonthPlan(result.getMonth());
-            msgVo.setFinish(userStatistics.getCompleted().toString());
+            msgVo.setFinish(completed.toString());
             list.add(msgVo);
         }
         map.put("msgList",list);

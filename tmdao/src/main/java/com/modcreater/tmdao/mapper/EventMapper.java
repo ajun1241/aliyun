@@ -308,4 +308,25 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> queryAllLoopEvent(Integer time);
+
+    /**
+     * 根据userId查询已完成事件
+     * @param id
+     * @return
+     */
+    Long countCompletedEvents(Long id);
+
+    /**
+     * 根据userId查询未完成事件
+     * @param id
+     * @return
+     */
+    Long countUnfinishedEvents(Long id);
+
+    /**
+     * 根据userId查询草稿箱事件数量
+     * @param id
+     * @return
+     */
+    Long countDrafts(Long id);
 }
