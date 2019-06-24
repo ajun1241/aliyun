@@ -511,7 +511,7 @@
         and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1
     </select>
     <select id="getChangingEventStatus" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select isOverdue from singleevent where userId = #{userId} and eventId = #{eventId} and isOverdue = #{eventStatus}
+        select isOverdue,isLoop from singleevent where userId = #{userId} and eventId = #{eventId} and isOverdue = #{eventStatus}
     </select>
     <select id="queryEventsWithFewInfo" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select eventId,userId,eventName,startTime,endTime from singleevent
