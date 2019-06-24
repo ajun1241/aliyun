@@ -95,9 +95,9 @@ public class TimerConfig {
     }
 
     /**
-     * 以下为每分钟的第30s进行过期事件过滤修改
+     * 以下为每分钟的第0s进行过期事件过滤修改
      */
-    @Scheduled(cron = "30 * * * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     public void eventStatusScan() {
         StringBuilder today = new StringBuilder(DateUtil.getDay(0));
         StringBuilder yesterday = new StringBuilder(DateUtil.getDay(-1));
@@ -132,6 +132,7 @@ public class TimerConfig {
                         loopEvent.setEventid(System.currentTimeMillis());
                         loopEvent.setIsOverdue(1L);
                         loopEvent.setIsLoop(0);
+                        loopEvent.setRepeaTtime("[false,false,false,false,false,false,false]");
                         eventMapper.uploadingEvents(loopEvent);
                     }
                 }
@@ -139,7 +140,7 @@ public class TimerConfig {
         }
     }
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "30 * * * * ?")
     public void orderStatusScan() {
         Long timestamp = System.currentTimeMillis() / 1000;
         Long orders = orderMapper.queryExpiredOrders(timestamp);

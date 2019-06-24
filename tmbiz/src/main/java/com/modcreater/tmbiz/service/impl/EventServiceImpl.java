@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -124,7 +125,12 @@ public class EventServiceImpl implements EventService {
         if (!ObjectUtils.isEmpty(eventMapper.getChangingEventStatus(deleteEventVo))) {
             return DtoUtil.getFalseDto("重复操作:已经操作过了", 21003);
         }
-        System.out.println(deleteEventVo.getUserId() + "操作删除");
+        SingleEvent singleEvent = eventMapper.getAEvent(deleteEventVo.getUserId(),Long.valueOf(deleteEventVo.getEventId()),"singleevent");
+        if (!ObjectUtils.isEmpty(singleEvent)) {
+            if (singleEvent.getIsLoop() == 1 && deleteEventVo.getEventStatus().equals("1")) {
+                return DtoUtil.getSuccessDto("修改事件状态成功", 100000);
+            }
+        }
         if (eventMapper.withdrawEventsByUserId(deleteEventVo) > 0) {
             return DtoUtil.getSuccessDto("修改事件状态成功", 100000);
         }
