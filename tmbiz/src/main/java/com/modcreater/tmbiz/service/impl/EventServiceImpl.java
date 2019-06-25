@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -285,14 +286,23 @@ public class EventServiceImpl implements EventService {
             }
         }
         ArrayList<Object> drafts = JSONObject.parseObject(draftVo.getSingleEvents(), ArrayList.class);
+        StringBuffer stringBuffer = new StringBuffer(new SimpleDateFormat("yyyyMMdd").format(new Date()));
         for (Object draft : drafts) {
             System.out.println(draft);
             SingleEvent draft1 = JSONObject.parseObject(draft.toString(), SingleEvent.class);
+            try {
+                draft1.setPerson(JSONObject.parseObject(draft1.getPerson(), EventPersons.class).toString());
+            } catch (Exception e) {
+                draft1.setPerson("{\"friendsId\":\"100030\",\"others\":\"\"}");
+            }
             //查看草稿是否已存在
             if (eventMapper.queryDraftCount(draftVo.getUserId(), draft1.getEventid().toString()) == 0) {
                 //上传
                 draft1.setUserid(Long.parseLong(draftVo.getUserId()));
                 draft1.setIsLoop(SingleEventUtil.isLoopEvent(draft1.getRepeaTtime()) ? 1 : 0);
+                draft1.setYear(draft1.getYear() == 0 ? null : draft1.getYear());
+                draft1.setMonth(draft1.getMonth() == 0 ? null : draft1.getMonth());
+                draft1.setDay(draft1.getDay() == 0 ? null : draft1.getDay());
                 if (eventMapper.uplDraft(draft1) == 0) {
                     return DtoUtil.getFalseDto("上传草稿失败", 27002);
                 }
@@ -300,8 +310,6 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("该草稿已存在", 27003);
             }
         }
-
-        StringBuffer dataNum = new StringBuffer(draftVo.getSingleEvents());
         //修改用户服务剩余时间
         if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
             //回滚
@@ -333,7 +341,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
-        System.out.println("修改草稿:" + singleEvent.toString());
+//        System.out.println("修改草稿:" + singleEvent.toString());
         if (ObjectUtils.isEmpty(singleEvent)) {
             return DtoUtil.getFalseDto("获取草稿失败", 21111);
         }
