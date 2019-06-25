@@ -555,7 +555,7 @@
         select count(id) from singleevent where userId = #{id} and isOverdue = 1 and isLoop = 0
     </select>
     <select id="countUnfinishedEvents" resultType="java.lang.Long">
-        select count(id) from singleevent where userId = #{id} and isOverdue = 0 and isLoop = 0
+        select count(id) from singleevent where userId = #{id} and isOverdue = 0
     </select>
     <select id="countDrafts" resultType="java.lang.Long">
         select count(id) from draft where userId = #{id} and isOverdue = 0

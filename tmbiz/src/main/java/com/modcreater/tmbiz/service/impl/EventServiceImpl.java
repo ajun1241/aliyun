@@ -292,11 +292,7 @@ public class EventServiceImpl implements EventService {
             if (eventMapper.queryDraftCount(draftVo.getUserId(), draft1.getEventid().toString()) == 0) {
                 //上传
                 draft1.setUserid(Long.parseLong(draftVo.getUserId()));
-                if (SingleEventUtil.isLoopEvent(draft1.getRepeaTtime())) {
-                    draft1.setIsLoop(1);
-                } else {
-                    draft1.setIsLoop(0);
-                }
+                draft1.setIsLoop(SingleEventUtil.isLoopEvent(draft1.getRepeaTtime()) ? 1 : 0);
                 if (eventMapper.uplDraft(draft1) == 0) {
                     return DtoUtil.getFalseDto("上传草稿失败", 27002);
                 }
@@ -306,14 +302,6 @@ public class EventServiceImpl implements EventService {
         }
 
         StringBuffer dataNum = new StringBuffer(draftVo.getSingleEvents());
-        Long times = 0L;
-        String condition = "eventid";
-        for (int i = 0; i < dataNum.length(); i++) {
-            if (dataNum.indexOf(condition, i) != -1) {
-                i = dataNum.indexOf(condition, i);
-                times++;
-            }
-        }
         //修改用户服务剩余时间
         if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
             //回滚
