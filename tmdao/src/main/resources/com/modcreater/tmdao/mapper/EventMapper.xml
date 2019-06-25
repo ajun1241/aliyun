@@ -244,10 +244,10 @@
             <if test="eventname != null and eventname != ''">
                 and eventName like "%"#{eventname}"%"
             </if>
-            <if test="type != null and type != ''">
+            <if test="type != null">
                 and type = #{type}
             </if>
-            <if test="level != null and level != ''">
+            <if test="level != null">
                 and level = #{level}
             </if>
             <if test="year != null and year != ''">
@@ -422,10 +422,10 @@
             <if test="eventname != null and eventname != ''">
                 and eventName like "%"#{eventname}"%"
             </if>
-            <if test="type != null and type != ''">
+            <if test="type != null">
                 and type = #{type}
             </if>
-            <if test="level != null and level != ''">
+            <if test="level != null">
                 and level = #{level}
             </if>
             <if test="year != null and year != ''">
@@ -437,7 +437,7 @@
             <if test="day != null and day != ''">
                 and day = #{day}
             </if>
-            <if test="isOverdue != null and isOverdue != ''">
+            <if test="isOverdue != null">
                 and isOverdue = #{isOverdue}
             </if>
             <if test="starttime != null and starttime != 0 and endtime != null and endtime != 0">
@@ -555,7 +555,7 @@
         select count(id) from singleevent where userId = #{id} and isOverdue = 1 and isLoop = 0
     </select>
     <select id="countUnfinishedEvents" resultType="java.lang.Long">
-        select count(id) from singleevent where userId = #{id} and isOverdue = 0 and isLoop = 0
+        select count(id) from singleevent where userId = #{id} and isOverdue = 0
     </select>
     <select id="countDrafts" resultType="java.lang.Long">
         select count(id) from draft where userId = #{id} and isOverdue = 0
