@@ -67,4 +67,7 @@
     <update id="updateExpiredOrders">
         update userorders set orderStatus = 3 where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800
     </update>
+    <update id="updateOrderStatus">
+        update userorders set orderStatus = #{status} where id = #{outTradeNo}
+    </update>
 </mapper>

@@ -2,10 +2,7 @@ package com.modcreater.tmtrade.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserOrders;
-import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
-import com.modcreater.tmbeans.vo.trade.ReceivedServiceIdUserId;
-import com.modcreater.tmbeans.vo.trade.ReceivedUserIdTradeId;
-import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
+import com.modcreater.tmbeans.vo.trade.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import org.springframework.stereotype.Service;
 
@@ -111,4 +108,12 @@ public interface OrderService {
      * @return
      */
     Dto searchUserOrders(ReceivedId receivedId, String token);
+
+    /**
+     * 查询商品价格
+     * @param receivedGoodsInfo
+     * @param token
+     * @return
+     */
+    Dto getServicePrice(ReceivedGoodsInfo receivedGoodsInfo, String token);
 }

@@ -46,7 +46,7 @@ public class JudgeController {
     }
 
     @PostMapping("annualreportingservicejudge")
-    @ApiOperation("年报服务判断")
+    @ApiOperation("报表服务判断")
     public Dto reportServiceJudge(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return judgeService.annualReportingServiceJudge(receivedId.getUserId(),request.getHeader("token"));
     }

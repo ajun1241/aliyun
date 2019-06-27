@@ -4,6 +4,7 @@ import com.modcreater.tmauth.config.annotation.GLOT;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.userinfovo.*;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -24,80 +25,45 @@ public class UserInfoController {
     @Resource
     private UserInfoService userInfoService;
 
-    /**
-     * 显示用户详情
-     * @param receivedId
-     * @param request
-     * @return
-     */
     @GLOT
     @RequestMapping(value = "showuserdetails",method = RequestMethod.POST)
+    @ApiOperation("显示用户详情")
     public Dto showUserDetails(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return userInfoService.showUserDetails(receivedId.getUserId(),request.getHeader("token"));
     }
 
-    /**
-     * 筛选已完成的事件
-     * @param receivedEventConditions
-     * @param request
-     * @return
-     */
     @RequestMapping(value = "filtrateuserevents",method = RequestMethod.POST)
+    @ApiOperation("筛选事件")
     public Dto filtrateUserEvents(@RequestBody ReceivedEventConditions receivedEventConditions,HttpServletRequest request){
         return userInfoService.filtrateUserEvents(receivedEventConditions,request.getHeader("token"));
     }
 
-    /**
-     * 数据统计
-     * @param receivedId
-     * @param request
-     * @return
-     */
     @RequestMapping(value = "statisticanalysisofdata",method = RequestMethod.POST)
+    @ApiOperation("数据统计")
     public Dto statisticAnalysisOfData(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.statisticAnalysisOfData(receivedId.getUserId(),request.getHeader("token"));
     }
 
-    /**
-     * 周报
-     * @param receivedId
-     * @param request
-     * @return
-     */
     @RequestMapping(value = "weeklyreport",method = RequestMethod.POST)
+    @ApiOperation("周报")
     public Dto weeklyReport(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.weeklyReport(receivedId.getUserId(),request.getHeader("token"));
     }
 
-    /**
-     * 查询用户成就
-     * @param receivedId
-     * @param request
-     * @return
-     */
     @RequestMapping(value = "searchachievement",method = RequestMethod.POST)
+    @ApiOperation("查询用户成就")
     public Dto searchAchievement(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.queryUserAchievement(receivedId.getUserId(),request.getHeader("token"));
     }
 
-    /**
-     * 查询我的一周
-     * @param receivedId
-     * @param request
-     * @return
-     */
     @RequestMapping(value = "myweek",method = RequestMethod.POST)
+    @ApiOperation("我的一周")
     public Dto myWeek(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return userInfoService.myWeek(receivedId.getUserId(),request.getHeader("token"));
     }
 
-    /**
-     * 修改用户信息
-     * @param receivedAlterUserInfo
-     * @param request
-     * @return
-     */
     @PostMapping(value = "alterusersign")
+    @ApiOperation("修改用户信息(部分)")
     public Dto alterUserSign(@RequestBody ReceivedAlterUserInfo receivedAlterUserInfo,HttpServletRequest request){
         return userInfoService.alterUserSign(receivedAlterUserInfo,request.getHeader("token"));
     }

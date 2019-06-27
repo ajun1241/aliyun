@@ -67,4 +67,12 @@ public interface OrderMapper {
      * @return
      */
     List<ShowUserOrders> getUserAllOrders(String userId);
+
+    /**
+     * 修改订单状态
+     * @param outTradeNo
+     * @param status
+     * @return
+     */
+    int updateOrderStatus(@Param("outTradeNo") String outTradeNo,@Param("status") int status);
 }
