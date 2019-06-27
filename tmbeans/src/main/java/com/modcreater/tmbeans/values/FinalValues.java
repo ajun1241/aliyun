@@ -65,7 +65,7 @@ public class FinalValues {
         }
         calendar.setTime(date);
         calendar.add(Calendar.DATE,day);
-        return calendar.getTimeInMillis()/1000;
+        return calendar.getTimeInMillis()/1000 - System.currentTimeMillis()/1000;
     }
 
 }
