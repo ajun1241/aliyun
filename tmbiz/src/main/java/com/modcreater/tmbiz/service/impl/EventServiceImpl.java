@@ -1443,9 +1443,9 @@ public class EventServiceImpl implements EventService {
             //先拿到事件
             SingleEvent singleEvent = JSONObject.parseObject(eventCreatorChooseVo.getExtraData(), SingleEvent.class);
             //这里少了个判断状态
-            if (msgStatusMapper.queryMsg(eventCreatorChooseVo.getMsgId()).getStatus()!=2){
+            /*if (msgStatusMapper.queryMsg(eventCreatorChooseVo.getMsgId()).getStatus()!=2){
                 return DtoUtil.getFalseDto("该事件不能重复选择",2333);
-            }
+            }*/
             if (!ObjectUtils.isEmpty(eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString()))){
                 return DtoUtil.getFalseDto("该事件已经添加成功不能重复选择",2333);
             }

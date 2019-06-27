@@ -14,6 +14,7 @@ import com.modcreater.tmbeans.pojo.ServiceRemainingTime;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.show.order.ShowUserOrders;
 import com.modcreater.tmbeans.values.FinalValues;
+import com.modcreater.tmbeans.vo.trade.ReceivedGoodsInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedServiceIdUserId;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
@@ -69,6 +70,8 @@ public class OrderServiceImpl implements OrderService {
     private StringRedisTemplate stringRedisTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger("trade");
+
+    private static final Double FALSE_GOODS_PRICE = 1000000.00;
 
     @Override
     public Dto createNewOrder(ReceivedOrderInfo receivedOrderInfo) {
@@ -164,81 +167,17 @@ public class OrderServiceImpl implements OrderService {
         }
         UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
         if (userOrders.getOrderStatus().equals("3")) {
-            return DtoUtil.getFalseDto("订单已过期,请不要重复提交", 60021);
+            return DtoUtil.getFalseDto("订单已过期", 60021);
         }
-        if (userOrders.getOrderStatus().equals("2")) {
-            return DtoUtil.getFalseDto("订单已完成,请不要重复提交", 60019);
-        }
-        if (userOrders.getOrderStatus().equals("1")) {
-            ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId());
-            if (userOrders.getServiceType().equals("time")) {
-                if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), userOrders.getNumber(), 0L, 0L, 0L)) == 0) {
-                        return DtoUtil.getFalseDto("用户服务添加失败", 60016);
-                    }
-                } else {
-                    Long residueDegree = time.getResidueDegree() + userOrders.getNumber();
-                    time.setResidueDegree(residueDegree);
-                    if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
-                        return DtoUtil.getFalseDto("用户服务添加失败", 60016);
-                    }
-                }
-            } else if (userOrders.getServiceType().equals("month")) {
-                if (ObjectUtils.isEmpty(time)) {
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.MONTH + System.currentTimeMillis() / 1000, 0L, 0L)) == 0) {
-                        return DtoUtil.getFalseDto("用户服务添加失败", 60016);
-                    }
-                } else {
-                    if (time.getResidueDegree() == 0) {
-                        Long timeRemaining = time.getTimeRemaining() + FinalValues.MONTH * userOrders.getNumber();
-                        time.setTimeRemaining(timeRemaining);
-                    } else {
-                        Long storageTime = time.getStorageTime() + FinalValues.MONTH * userOrders.getNumber();
-                        time.setStorageTime(storageTime);
-                    }
-                    if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
-                        return DtoUtil.getFalseDto("用户服务添加失败", 60016);
-                    }
-                }
-            } else if (userOrders.getServiceType().equals("year")) {
-                Long reportStorageTime = 0L;
-                if (ObjectUtils.isEmpty(time)) {
-                    if (userOrders.getServiceId().equals("3")) {
-                        reportStorageTime = System.currentTimeMillis() / 1000;
-                    }
-                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.YEAR + System.currentTimeMillis() / 1000, reportStorageTime, 0L)) == 0) {
-                        return DtoUtil.getFalseDto("用户服务添加失败", 60016);
-                    }
-                } else {
-                    if (time.getResidueDegree() == 0) {
-                        Long timeRemaining = time.getTimeRemaining() + FinalValues.YEAR * userOrders.getNumber();
-                        time.setTimeRemaining(timeRemaining);
-                        if (userOrders.getServiceId().equals("3")) {
-                            time.setStorageTime(System.currentTimeMillis() / 1000);
-                        }
-                    } else {
-                        Long storageTime = time.getStorageTime() + FinalValues.YEAR * userOrders.getNumber();
-                        time.setStorageTime(storageTime);
-                    }
-                    if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
-                        return DtoUtil.getFalseDto("用户服务添加失败", 60016);
-                    }
-                }
-            } else if (userOrders.getServiceType().equals("perpetual")) {
-                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L, 0L, 0L)) == 0) {
-                    return DtoUtil.getFalseDto("用户服务添加失败", 60016);
-                }
-            }
-            userOrders.setOrderStatus("2");
-            if (orderMapper.updateUserOrder(userOrders) > 0) {
-                return DtoUtil.getSuccessDto("订单支付成功", 100000);
-            }
+        if (userOrders.getOrderStatus().equals("2")){
+            return DtoUtil.getSuccessDto("订单支付成功", 100000);
         }
         return DtoUtil.getFalseDto("订单支付失败", 60003);
     }
 
     @Override
     public String alipayNotify(HttpServletRequest request) {
+        System.out.println("支付宝异步回调");
         Map<String, String> params = new HashMap<String, String>();
         Map<String, String[]> requestParams = request.getParameterMap();
         //1.从支付宝回调的request域中取值
@@ -288,6 +227,9 @@ public class OrderServiceImpl implements OrderService {
                 //更新交易表中状态
                 int returnResult = updateOrderStatusToPrepaid(userOrders);
                 if (returnResult > 0) {
+                    if (!makeOrderSuccess(outTradeNo)){
+                        orderMapper.updateOrderStatus(outTradeNo,4);
+                    }
                     return "success";
                 } else {
                     System.out.println("订单状态修改失败");
@@ -626,6 +568,24 @@ public class OrderServiceImpl implements OrderService {
         return DtoUtil.getSuccesWithDataDto("查询成功", userOrdersList, 100000);
     }
 
+    @Override
+    public Dto getServicePrice(ReceivedGoodsInfo receivedGoodsInfo, String token) {
+        if (StringUtils.isEmpty(receivedGoodsInfo.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
+        }
+        Double price = orderMapper.getUnitPrice(receivedGoodsInfo.getServiceId(), receivedGoodsInfo.getServiceType());
+        if (price != 0) {
+            price *= receivedGoodsInfo.getNum();
+            return DtoUtil.getSuccesWithDataDto("", price, 100000);
+        } else if (price.equals(FALSE_GOODS_PRICE)) {
+            return DtoUtil.getFalseDto("商品类型错误", 200000);
+        }
+        return DtoUtil.getFalseDto("价格获取失败", 200000);
+    }
+
     /**
      * 为ServiceRemainingTime赋值
      *
@@ -644,5 +604,73 @@ public class OrderServiceImpl implements OrderService {
         serviceRemainingTime.setStorageTime(storageTime);
         serviceRemainingTime.setTimeCardDuration(timeCardDuration);
         return serviceRemainingTime;
+    }
+
+    private boolean makeOrderSuccess(String orderNo) {
+        UserOrders userOrders = orderMapper.getUserOrder(orderNo);
+        if (userOrders.getOrderStatus().equals("1")) {
+            ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId());
+            if (userOrders.getServiceType().equals("time")) {
+                if (ObjectUtils.isEmpty(time)) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), userOrders.getNumber(), 0L, 0L, 0L)) == 0) {
+                        return false;
+                    }
+                } else {
+                    Long residueDegree = time.getResidueDegree() + userOrders.getNumber();
+                    time.setResidueDegree(residueDegree);
+                    if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
+                        return false;
+                    }
+                }
+            } else if (userOrders.getServiceType().equals("month")) {
+                if (ObjectUtils.isEmpty(time)) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.MONTH + System.currentTimeMillis() / 1000, 0L, 0L)) == 0) {
+                        return false;
+                    }
+                } else {
+                    if (time.getResidueDegree() == 0) {
+                        Long timeRemaining = time.getTimeRemaining() + FinalValues.MONTH * userOrders.getNumber();
+                        time.setTimeRemaining(timeRemaining);
+                    } else {
+                        Long storageTime = time.getStorageTime() + FinalValues.MONTH * userOrders.getNumber();
+                        time.setStorageTime(storageTime);
+                    }
+                    if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
+                        return false;
+                    }
+                }
+            } else if (userOrders.getServiceType().equals("year")) {
+                Long reportStorageTime = 0L;
+                if (ObjectUtils.isEmpty(time)) {
+                    if (userOrders.getServiceId().equals("3")) {
+                        reportStorageTime = System.currentTimeMillis() / 1000;
+                    }
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.YEAR + System.currentTimeMillis() / 1000, reportStorageTime, 0L)) == 0) {
+                        return false;
+                    }
+                } else {
+                    if (time.getResidueDegree() == 0) {
+                        Long timeRemaining = time.getTimeRemaining() + FinalValues.YEAR * userOrders.getNumber();
+                        time.setTimeRemaining(timeRemaining);
+                        if (userOrders.getServiceId().equals("3")) {
+                            time.setStorageTime(System.currentTimeMillis() / 1000);
+                        }
+                    } else {
+                        Long storageTime = time.getStorageTime() + FinalValues.YEAR * userOrders.getNumber();
+                        time.setStorageTime(storageTime);
+                    }
+                    if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
+                        return false;
+                    }
+                }
+            } else if (userOrders.getServiceType().equals("perpetual")) {
+                if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L, 0L, 0L)) == 0) {
+                    return false;
+                }
+            }
+            userOrders.setOrderStatus("2");
+            return orderMapper.updateUserOrder(userOrders) > 0;
+        }
+        return false;
     }
 }

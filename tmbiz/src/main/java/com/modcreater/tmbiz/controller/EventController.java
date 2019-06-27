@@ -27,115 +27,72 @@ public class EventController {
     @Resource
     private EventService eventService;
 
-    /**
-     * 添加一条事件
-     *
-     * @param uploadingEventVo
-     * @return
-     */
     @RequestMapping(value = "upl", method = RequestMethod.POST)
+    @ApiOperation("添加一个事件")
     public Dto uploadingEvents(@RequestBody UploadingEventVo uploadingEventVo, HttpServletRequest request) {
         return eventService.addNewEvents(uploadingEventVo,request.getHeader("token"));
     }
 
-    /**
-     * 修改事件状态
-     *
-     * @param deleteEventVo
-     * @return
-     */
     @RequestMapping(value = "del", method = RequestMethod.POST)
+    @ApiOperation("修改事件状态")
     public Dto deleteEvent(@RequestBody DeleteEventVo deleteEventVo, HttpServletRequest request) {
         return eventService.deleteEvents(deleteEventVo,request.getHeader("token"));
     }
 
-    /**
-     * 修改一条事件
-     *
-     * @param updateEventVo
-     * @return
-     */
     @RequestMapping(value = "upd", method = RequestMethod.POST)
+    @ApiOperation("修改一个事件")
     public Dto updateEvents(@RequestBody UpdateEventVo updateEventVo, HttpServletRequest request) {
         return eventService.updateEvents(updateEventVo,request.getHeader("token"));
     }
 
-    /**
-     * 第一次登录事件数据同步
-     * @param synchronousUpdateVo
-     * @return
-     */
     @RequestMapping(value = "firupl",method = RequestMethod.POST)
+    @ApiOperation("第一次登陆事件同步")
     public Dto firstUplEvent(@RequestBody SynchronousUpdateVo synchronousUpdateVo, HttpServletRequest request){
         return eventService.firstUplEvent(synchronousUpdateVo,request.getHeader("token"));
     }
 
-    /**
-     * 草稿上传
-     * @param draftVo
-     * @return
-     */
     @RequestMapping(value = "upldraft",method = RequestMethod.POST)
+    @ApiOperation("草稿上传")
     public Dto uplDraft(@RequestBody DraftVo draftVo, HttpServletRequest request){
         return eventService.uplDraft(draftVo,request.getHeader("token"));
     }
 
-    /**
-     * 草稿修改
-     * @param addInviteEventVo
-     * @return
-     */
     @RequestMapping(value = "upddraft",method = RequestMethod.POST)
     @ApiOperation("修改草稿")
     public Dto updDraft(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){
         return eventService.updDraft(addInviteEventVo,request.getHeader("token"));
     }
 
-
-    /**
-     * 根据"日"查找事件
-     * @param searchEventVo
-     * @return
-     */
     @GLOT
     @RequestMapping(value = "seabyday",method = RequestMethod.POST)
+    @ApiOperation("查询一天的事件")
     public Dto searchByDay(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
         return eventService.searchByDayEventIds(searchEventVo,request.getHeader("token"));
     }
 
-    /**
-     * 根据"月"查找事件
-     * @param searchEventVo
-     * @return
-     */
     @GLOT
     @RequestMapping(value = "seabymon",method = RequestMethod.POST)
+    @ApiOperation("查询一个月的事件")
     public Dto searchByMonth(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
         return eventService.searchByDayEventIdsInMonth(searchEventVo,request.getHeader("token"));
     }
 
-    /**
-     * 根据"周"查找事件
-     * @param searchEventVo
-     * @return
-     */
     @GLOT
     @RequestMapping(value = "seabyweek",method = RequestMethod.POST)
+    @ApiOperation("查询一周")
     public Dto searchByWeek(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
         return eventService.searchByDayEventIdsInWeek(searchEventVo,request.getHeader("token"));
     }
 
-    /**
-     * 根据"周"查询事件排序并带有用户是否给予他人查看权限(查看好友的周)
-     * @return
-     */
     @GLOT
     @PostMapping(value = "seabyweekwithprivatepermission")
+    @ApiOperation("查看好友的周")
     public Dto seaByWeekWithPrivatePermission(@RequestBody SearchEventVo searchEventVo,HttpServletRequest request){
         return eventService.seaByWeekWithPrivatePermission(searchEventVo,request.getHeader("token"));
     }
 
     @PostMapping(value = "searchfriendeventonce")
+    @ApiOperation("查询好友的事件详情")
     public Dto searchFriendEventOnce(@RequestBody ReceivedFriendEventOnce receivedFriendEventOnce,HttpServletRequest request){
         return eventService.searchFriendEventOnce(receivedFriendEventOnce,request.getHeader("token"));
     }
@@ -277,31 +234,22 @@ public class EventController {
         return eventService.eventRemoveDraft(addInviteEventVo,request.getHeader("token"));
     }*/
 
-    /**
-     * 查询一条数据
-     * @param receivedSearchOnce
-     * @param request
-     * @return
-     */
     @GLOT
     @PostMapping(value = "searchonce")
+    @ApiOperation("查询一个事件详情")
     public Dto searchOnce(@RequestBody ReceivedSearchOnce receivedSearchOnce,HttpServletRequest request){
         return eventService.searchOnce(receivedSearchOnce,request.getHeader("token"));
     }
 
     @GLOT
     @PostMapping(value = "searchdraftonce")
+    @ApiOperation("查询一个草稿箱事件")
     public Dto searchDraftOnce(@RequestBody ReceivedSearchOnce receivedSearchOnce,HttpServletRequest request){
         return eventService.searchDraftOnce(receivedSearchOnce,request.getHeader("token"));
     }
 
-    /**
-     * 批量删除
-     * @param receivedDeleteEventIds
-     * @param request
-     * @return
-     */
     @PostMapping(value = "deleteinbatches")
+    @ApiOperation("批量删除")
     public Dto deleteInBatches(@RequestBody ReceivedDeleteEventIds receivedDeleteEventIds, HttpServletRequest request){
         return eventService.deleteInBatches(receivedDeleteEventIds,request.getHeader("token"));
     }
