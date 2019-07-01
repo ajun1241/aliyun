@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmdao.mapper.TempEventMapper">
+    <insert id="addTempEvent" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
+        insert into tempevent values
+            (null ,
+            #{eventid},
+            #{userid},
+            #{eventname},
+            #{starttime},
+            #{endtime},
+            #{address},
+            #{level},
+            #{flag},
+            #{person},
+            #{remarks},
+            #{repeaTtime},
+            #{isOverdue},
+            #{remindTime},
+            #{day},
+            #{month},
+            #{year},
+            #{type},
+            #{isLoop})
+    </insert>
+    <delete id="deleteTempEvent">
+        delete from tempevent where userId=#{userId} and eventId=#{eventId}
+    </delete>
+    <select id="queryTempEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from tempevent where userId=#{userId} and eventId=#{eventId}
+    </select>
+</mapper>

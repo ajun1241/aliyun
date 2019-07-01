@@ -17,32 +17,8 @@ public interface BackerMapper {
      * 添加事件支持者
      * @param userId
      * @param backerId
-     * @param eventId
      * @return
      */
-    int addBackers(String userId,String[] backerId,String eventId);
+    int addBackers(String userId,String backerId);
 
-    /**
-     * 修改支持者回应
-     * @param backers
-     * @return
-     */
-    int updateBackerStatus(Backers backers);
-
-    /**
-     * 查询一个事件的支持者
-     * @param userId
-     * @param eventId
-     * @return
-     */
-    List<String> queryBackers(String userId,String eventId);
-
-    /**
-     * 查询支持者详情
-     * @param userId
-     * @param eventId
-     * @param backerId
-     * @return
-     */
-    Backers queryBackerDetail(String userId,String eventId,String backerId);
 }

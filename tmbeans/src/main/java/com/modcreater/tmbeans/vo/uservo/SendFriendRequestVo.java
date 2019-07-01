@@ -25,6 +25,6 @@ public class SendFriendRequestVo implements Serializable {
     private String content;
     private String userId;
     private String friendId;
-
+    private String hide;
     private String appType;
 }

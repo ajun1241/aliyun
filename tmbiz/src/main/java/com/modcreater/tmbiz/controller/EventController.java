@@ -98,15 +98,16 @@ public class EventController {
     }
 
     /**
-     * 回应一条邀请事件
+     * 回应修改邀请事件
      * @param feedbackEventInviteVo
      * @return
      */
     @PostMapping(value = "feedbackeventinvite")
-    @ApiOperation("回应一条邀请事件")
+    @ApiOperation("回应修改邀请事件")
     public Dto feedbackEventInvite(@RequestBody FeedbackEventInviteVo feedbackEventInviteVo, HttpServletRequest request){
         return eventService.feedbackEventInvite(feedbackEventInviteVo,request.getHeader("token"));
     }
+
     /**
      * 添加一条邀请事件
      * @param addInviteEventVo
@@ -117,6 +118,18 @@ public class EventController {
     public Dto addInviteEvent(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){
         return eventService.addInviteEvent(addInviteEventVo,request.getHeader("token"));
     }
+
+    /**
+     * 回应新增邀请
+     * @param feedbackInviteVo
+     * @return
+     */
+    @PostMapping(value = "feedbackinvite")
+    @ApiOperation("回应新增邀请")
+    public Dto feedbackInvite(@RequestBody FeedbackInviteVo feedbackInviteVo, HttpServletRequest request){
+        return eventService.feedbackInvite(feedbackInviteVo,request.getHeader("token"));
+    }
+
     /**
      * 修改邀请事件
      * @param addInviteEventVo
@@ -129,25 +142,25 @@ public class EventController {
     }
 
     /**
-     * 创建者选择
+     * 修改邀请事件创建者选择
      * @param eventCreatorChooseVo
      * @return
      */
     @PostMapping(value = "eventcreatorchoose")
-    @ApiOperation("创建者选择")
+    @ApiOperation("修改邀请事件创建者选择")
     public Dto eventCreatorChoose(@RequestBody EventCreatorChooseVo eventCreatorChooseVo, HttpServletRequest request){
         return eventService.eventCreatorChoose(eventCreatorChooseVo,request.getHeader("token"));
     }
 
     /**
-     * 修改事件时创建者选择
-     * @param eventCreatorChooseVo
+     * 邀请事件添加成员
+     * @param addInviterVo
      * @return
      */
-    @PostMapping(value = "eventupdchoose")
-    /*@ApiOperation("修改事件时创建者选择")*/
-    public Dto eventUpdChoose(@RequestBody EventCreatorChooseVo eventCreatorChooseVo, HttpServletRequest request){
-        return eventService.eventUpdChoose(eventCreatorChooseVo,request.getHeader("token"));
+    @PostMapping(value = "addinviter")
+    @ApiOperation("邀请事件添加成员")
+    public Dto addInviter(@RequestBody AddInviterVo addInviterVo, HttpServletRequest request){
+        return eventService.addInviter(addInviterVo,request.getHeader("token"));
     }
 
     /**

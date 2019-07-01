@@ -13,29 +13,23 @@ import java.io.Serializable;
 @Data
 public class FeedbackEventInviteVo implements Serializable {
     private String appType;
-
     /**
-     * 0 ：时间没到；1：时间到了
-     */
-    private String timeUp;
-
-    /**
-     * 选择（0；同意; 1：不同意; 2：未回应）
+     * 选择（1；同意; 0：不同意;）
      */
     private String choose;
 
     private String userId;
 
     /**
-     * 发送邀请时的扩展数据
+     * 发送邀请时的事件id
      */
 
-    private String extraData;
+    private String eventId;
 
     /**
-     * 拒绝理由
+     * 消息来源Id
      */
-    private String rejectContent;
+    private String fromId;
 
     /**
      * 忽略冲突任然添加(0:拒绝；1：确认)

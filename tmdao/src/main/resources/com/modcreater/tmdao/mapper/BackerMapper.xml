@@ -3,23 +3,8 @@
 <mapper namespace="com.modcreater.tmdao.mapper.BackerMapper">
 
     <insert id="addBackers">
-        insert into backers(userId, eventId, backerId)
-        values
-        <foreach collection="backerId" item="item" index="index" separator=",">
-            (#{userId},#{eventId},#{item})
-        </foreach>
+        insert into backers(userId, backerId)
+        values(#{userId},#{backerId})
     </insert>
 
-    <update id="updateBackerStatus" parameterType="com.modcreater.tmbeans.pojo.Backers">
-        update backers set status=#{status}
-        where userId=#{userId} and eventId=#{eventId} and backerId=#{backerId}
-    </update>
-
-    <select id="queryBackers" resultType="java.lang.String">
-        select backerId from backers where userId=#{userId} and eventId=#{eventId}
-    </select>
-
-    <select id="queryBackerDetail" resultType="com.modcreater.tmbeans.pojo.Backers">
-        select * from backers where userId=#{userId} and eventId=#{eventId} and backerId=#{backerId}
-    </select>
 </mapper>

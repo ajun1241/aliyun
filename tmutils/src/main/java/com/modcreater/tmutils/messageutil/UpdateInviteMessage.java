@@ -13,7 +13,10 @@ import io.rong.util.GsonUtil;
 public class UpdateInviteMessage extends BaseMessage {
     private String content = "";
     private String date = "";
-    private String extraData = "";
+    /**
+     * 事件Id
+     */
+    private String eventId = "";
     private String extra = "";
     /**
      *   消息id
@@ -21,10 +24,10 @@ public class UpdateInviteMessage extends BaseMessage {
     private String msgId = "";
     private static final transient String TYPE = "ZX:UpdInviteMsg";
 
-    public UpdateInviteMessage(String content, String date, String extraData, String extra, String msgId) {
+    public UpdateInviteMessage(String content, String date, String eventId, String extra, String msgId) {
         this.content = content;
         this.date = date;
-        this.extraData = extraData;
+        this.eventId = eventId;
         this.extra = extra;
         this.msgId = msgId;
     }
@@ -50,12 +53,12 @@ public class UpdateInviteMessage extends BaseMessage {
         this.date = date;
     }
 
-    public String getExtraData() {
-        return extraData;
+    public String getEventId() {
+        return eventId;
     }
 
-    public void setExtraData(String extraData) {
-        this.extraData = extraData;
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
     public String getExtra() {

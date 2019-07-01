@@ -13,6 +13,9 @@ import io.rong.util.GsonUtil;
 public class InviteMessage extends BaseMessage {
     private String content = "";
     private String date = "";
+    /**
+     * 事件的详情
+     */
     private String extraData = "";
     private String extra = "";
     /**

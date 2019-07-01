@@ -344,6 +344,12 @@ public class AccountServiceImpl implements AccountService {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return DtoUtil.getFalseDto("添加好友失败",16003);
             }
+            //权限设置
+            UpdateFriendJurisdictionVo updateFriendJurisdictionVo=new UpdateFriendJurisdictionVo();
+            updateFriendJurisdictionVo.setUserId(sendFriendRequestVo.getUserId());
+            updateFriendJurisdictionVo.setFriendId(sendFriendRequestVo.getFriendId());
+            updateFriendJurisdictionVo.setHide(sendFriendRequestVo.getHide());
+            accountMapper.updateFriendJurisdiction(updateFriendJurisdictionVo);
             //发送添加信息
             ResponseResult result;
             Map<String,String> map=new HashMap<>();
@@ -395,6 +401,12 @@ public class AccountServiceImpl implements AccountService {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return DtoUtil.getFalseDto("添加好友失败",16003);
             }
+            //权限设置
+            UpdateFriendJurisdictionVo updateFriendJurisdictionVo=new UpdateFriendJurisdictionVo();
+            updateFriendJurisdictionVo.setUserId(sendFriendRequestVo.getUserId());
+            updateFriendJurisdictionVo.setFriendId(sendFriendRequestVo.getFriendId());
+            updateFriendJurisdictionVo.setHide(sendFriendRequestVo.getHide());
+            accountMapper.updateFriendJurisdiction(updateFriendJurisdictionVo);
             //发送添加信息
             ResponseResult result;
             Map<String,String> map=new HashMap<>();
@@ -855,6 +867,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Dto querySessionListDetail(FriendshipVo friendshipVo,String token) {
+        System.out.println(friendshipVo.toString());
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }

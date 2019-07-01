@@ -1,13 +1,19 @@
 package com.modcreater.tmbiz.config;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.SingleEventUtil;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -52,5 +58,34 @@ public class EventUtil {
             }
         }
         return clashList;
+    }
+
+    /**
+     * 修改其他参与者的事件
+     * @param me
+     * @param singleEvent
+     */
+    public void updateInviterEvent(SingleEvent singleEvent,String me)throws Exception {
+        EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+        String person=eventPersons.getFriendsId();
+        if (StringUtils.isEmpty(person)){
+            person=me;
+        }else {
+            person=person.concat(","+me);
+        }
+        eventPersons.setFriendsId(person);
+        //修改创建者事件
+        eventMapper.updInviteEventPerson(singleEvent.getUserid().toString(),singleEvent.getEventid().toString(),JSON.toJSONString(eventPersons));
+        //修改参与者的事件
+        EventPersons eventPersons1=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+        String person1=eventPersons1.getFriendsId();
+        if (!StringUtils.isEmpty(person1)){
+            for (String inviteId:person1.split(",")) {
+                SingleEvent singleEvent2=eventMapper.queryEventOne(inviteId,singleEvent.getEventid().toString());
+                EventPersons eventPersons2=JSONObject.parseObject(singleEvent2.getPerson(),EventPersons.class);
+                eventPersons2.setFriendsId(eventPersons2.getFriendsId().concat(","+me));
+                eventMapper.updInviteEventPerson(inviteId,singleEvent.getEventid().toString(),JSON.toJSONString(eventPersons2));
+            }
+        }
     }
 }

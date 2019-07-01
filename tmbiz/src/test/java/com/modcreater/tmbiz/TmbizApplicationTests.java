@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.MyToken;
 import com.modcreater.tmbiz.config.EventUtil;
+import com.modcreater.tmbiz.service.impl.EventServiceImpl;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.messageutil.InviteMessage;
 import com.modcreater.tmutils.messageutil.NotifyMessage;
@@ -21,6 +22,8 @@ import io.rong.models.response.TokenResult;
 import io.rong.models.user.UserModel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -44,7 +47,7 @@ public class TmbizApplicationTests {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
+    private Logger logger = LoggerFactory.getLogger(TmbizApplicationTests.class);
     @Test
     public void contextLoads() throws Exception {
         /*Calendar calendar = Calendar.getInstance();
@@ -52,7 +55,7 @@ public class TmbizApplicationTests {
         Date time = new Date(timeStamp);
         System.out.println(time);
         System.out.println(timeStamp);*/
-        Calendar calendar = Calendar.getInstance();
+        /*Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date date = simpleDateFormat.parse("20190511");
         calendar.setTime(date);
@@ -60,28 +63,46 @@ public class TmbizApplicationTests {
         if (week < 0){
             week = 0;
         }
-        System.out.println(week);
+        System.out.println(week);*/
     }
 
     @Test
     public void test1() {
-        /*stringRedisTemplate.opsForValue().set("2","3");*/
+        /*try {
+            ArrayList<String> personList1 = new ArrayList<>();
+            personList1.add("1");
+            personList1.add("2");
+            personList1.add("3");
+            personList1.add("4");
+            personList1.add("5");
+            logger.debug("圣埃蒂安");
+            for (int i = 0; i < personList1.size()+1; i++) {
+                System.out.println(personList1.get(i));
+
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            System.out.println(e.getMessage());
+        }*/
     }
 
     @Test
     public void test2() {
-        String[] s ={"1","2","3","4","5"};
-        String[] x=new String[s.length+1];
-        for (int i = 0; i <x.length-1 ; i++) {
-            x[i]=s[i];
-        }
-        x[x.length-1]="6";
-        System.out.println(Arrays.toString(x));
+        List list1=new ArrayList();
+        list1.add("1");
+        list1.add("2");
+        list1.add("3");
+        List list2=new ArrayList();
+        list2.add("4");
+        list2.add("2");
+        list2.add("6");
+        list1.addAll(list2);
+        System.out.println(Arrays.toString(list1.toArray(new String[list1.size()])));
     }
 
     @Test
     public void test3() {
-        Map<String,Object> m1=new HashMap<>();
+        /*Map<String,Object> m1=new HashMap<>();
         m1.put("1","1");
         m1.put("2","2");
         m1.put("3","asd");
@@ -101,11 +122,11 @@ public class TmbizApplicationTests {
                 different.append(key+"更改为"+m1.get(key)+";");
             }
         }
-        System.out.println(different.replace(different.length()-1,different.length(),"."));
+        System.out.println(different.replace(different.length()-1,different.length(),"."));*/
     }
     @Test
     public void test4() {
-        String[] as = new String[]{"0","1","2","3"};
+        /*String[] as = new String[]{"0","1","2","3"};
         String[] bs = new String[]{"1","2","5"};
         List<String> list1 = Arrays.asList(bs);
         List<String> list2 = Arrays.asList(as);
@@ -131,13 +152,13 @@ public class TmbizApplicationTests {
         System.out.println("******************************************");
         System.out.println(result2.toArray().toString());
         System.out.println("******************************************");
-        System.out.println(result3);
+        System.out.println(result3);*/
 
     }
 
     @Test
     public void test5() throws Exception {
-        RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
+        /*RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
         MsgSystem system = rongCloud.message.system;
         User User = rongCloud.user;
 
@@ -149,34 +170,34 @@ public class TmbizApplicationTests {
         MyToken myToken= JSONObject.parseObject(result.toString(),MyToken.class);
         System.out.println("getToken:  " + result.toString());
 
-        /**
+        *//**
          *
          * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/user/user.html#refresh
          *
          * 刷新用户信息方法
-         */
+         *//*
         Result refreshResult = User.update(user);
-        System.out.println("refresh:  " + refreshResult.toString());
+        System.out.println("refresh:  " + refreshResult.toString());*/
     }
 
     @Test
     public void test() throws Exception {
-        RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
+        /*RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
         String[] targetIds = {"100033"};
 //        InviteMessage inviteMessage = new InviteMessage("这是一条测试消息","2019/6/6","","","");
 //        TxtMessage txtMessage=new TxtMessage("猜猜我是谁","");
         NotifyMessage notifyMessage=new NotifyMessage("jkasfjj艰苦撒旦弗兰克","1");
         Private Private = rongCloud.message.msgPrivate;
-        /*MsgSystem system = rongCloud.message.system;
+        *//*MsgSystem system = rongCloud.message.system;
         Group group = rongCloud.message.group;
         Chatroom chatroom = rongCloud.message.chatroom;
         Discussion discussion = rongCloud.message.discussion;
-        History history = rongCloud.message.history;*/
-        /**
+        History history = rongCloud.message.history;*//*
+        *//**
          * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/message/private.html#send
          *
          * 发送单聊消息
-         * */
+         * *//*
 
         PrivateMessage privateMessage = new PrivateMessage()
                 .setSenderId("100000")
@@ -191,7 +212,7 @@ public class TmbizApplicationTests {
                 .setIsCounted(0)
                 .setIsIncludeSender(0);
         ResponseResult privateResult = Private.send(privateMessage);
-        System.out.println("send private message:  " + privateResult.toString());
+        System.out.println("send private message:  " + privateResult.toString());*/
     }
 
 }

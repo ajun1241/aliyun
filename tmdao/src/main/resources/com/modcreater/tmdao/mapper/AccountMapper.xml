@@ -108,17 +108,17 @@
     <update id="updateFriendJurisdiction" parameterType="com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo">
         update friendship
         <set>
-            <if test="invite  >= 0 ">
+            <if test="invite != null and invite != ''">
                 invite=#{invite},
             </if>
-             <if test="sustain >= 0 ">
+             <if test="sustain != null and sustain != '' ">
                  sustain=#{sustain},
             </if>
-              <if test="hide  >= 0 ">
+              <if test="hide != null and hide != '' ">
                  hide=#{hide},
             </if>
         </set>
-        where userId=#{userId} and friendId=#{friendId} and status=20
+        where userId=#{userId} and friendId=#{friendId}
     </update>
 
     <update id="updateFriendJurisdictionForSingleCondition" statementType="STATEMENT">

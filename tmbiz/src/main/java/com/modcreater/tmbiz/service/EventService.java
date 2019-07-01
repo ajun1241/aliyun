@@ -99,6 +99,14 @@ public interface EventService {
     Dto addInviteEvent(AddInviteEventVo addInviteEventVo,String token);
 
     /**
+     * 新增邀请事件回应邀请
+     * @param feedbackInviteVo
+     * @param token
+     * @return
+     */
+    Dto feedbackInvite(FeedbackInviteVo feedbackInviteVo,String token);
+
+    /**
      * 修改一条邀请事件
      * @param addInviteEventVo
      * @param token
@@ -107,15 +115,7 @@ public interface EventService {
     Dto updInviteEvent(AddInviteEventVo addInviteEventVo,String token);
 
     /**
-     * 删除一条邀请事件
-     * @param receivedSearchOnce
-     * @param token
-     * @return
-     */
-    Dto delInviteEvent(ReceivedSearchOnce receivedSearchOnce,String token);
-
-    /**
-     * 回应事件邀请
+     * 回应邀请事件修改
      * @param feedbackEventInviteVo
      * @param token
      * @return
@@ -123,15 +123,7 @@ public interface EventService {
     Dto feedbackEventInvite(FeedbackEventInviteVo feedbackEventInviteVo,String token);
 
     /**
-     * 回应修改事件邀请
-     * @param feedbackEventInviteVo
-     * @param token
-     * @return
-     */
-//    Dto feedbackUpdEventInvite(FeedbackEventInviteVo feedbackEventInviteVo,String token);
-
-    /**
-     * 创建事件时创建者选择
+     * 修改事件时创建者选择
      * @param eventCreatorChooseVo
      * @param token
      * @return
@@ -139,12 +131,12 @@ public interface EventService {
     Dto eventCreatorChoose(EventCreatorChooseVo eventCreatorChooseVo,String token);
 
     /**
-     * 修改事件时创建者选择
-     * @param eventCreatorChooseVo
+     * 删除一条邀请事件
+     * @param receivedSearchOnce
      * @param token
      * @return
      */
-    Dto eventUpdChoose(EventCreatorChooseVo eventCreatorChooseVo,String token);
+    Dto delInviteEvent(ReceivedSearchOnce receivedSearchOnce,String token);
 
     /**
      * 根据天条件查询forIOS
@@ -171,37 +163,12 @@ public interface EventService {
     Dto addEventBacker(AddBackerVo addbackerVo, String token);
 
     /**
-     * 回应事件支持
-     * @param feedbackEventBackerVo
-     * @param token
-     * @return
-     */
-    Dto feedbackEventBacker(FeedbackEventBackerVo feedbackEventBackerVo,String token);
-
-    /**
-     * 修改支持事件
-     * @param addbackerVo
-     * @param token
-     * @return
-     */
-    Dto updBackerEvent(AddBackerVo addbackerVo, String token);
-
-    /**
-     * 删除支持事件
-     * @param deleteEventVo
-     * @param token
-     * @return
-     */
-    Dto delBackerEvent(DeleteEventVo deleteEventVo,String token);
-
-    /**
      * 查询一个事件
      * @param receivedSearchOnce
      * @param token
      * @return
      */
     Dto searchOnce(ReceivedSearchOnce receivedSearchOnce, String token);
-
 
     /**
      * 根据Id的数组批量删除事件
@@ -228,22 +195,6 @@ public interface EventService {
     Dto eventRemoveDraft(AddInviteEventVo addInviteEventVo,String token);
 
     /**
-     * 变更邀请事件成员
-     * @param updatePersonsVo
-     * @param token
-     * @return
-     */
-    Dto updateInvitePerson(UpdatePersonsVo updatePersonsVo, String token);
-
-    /**
-     * 变更支持事件成员
-     * @param updatePersonsVo
-     * @param token
-     * @return
-     */
-    Dto updateBackers(UpdatePersonsVo updatePersonsVo, String token);
-
-    /**
      * 查询一条消息的状态（暂用邀请事件）
      * @param queryMsgStatusVo
      * @param token
@@ -259,4 +210,11 @@ public interface EventService {
      */
     Dto searchFriendEventOnce(ReceivedFriendEventOnce receivedFriendEventOnce, String token);
 
+    /**
+     * 邀请事件添加参与者
+     * @param addInviterVo
+     * @param token
+     * @return
+     */
+    Dto addInviter(AddInviterVo addInviterVo,String token);
 }

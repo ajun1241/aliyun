@@ -166,7 +166,7 @@ public interface AccountMapper {
     MyDetail queryPlanByDayAndMonth(String  userId, String  day, String year , String  month);
 
     /**
-     * 查询两人的好友详细信息
+     * 查询两人的好友详细信息(没有判断已经是好友)
      * @param userId
      * @param friendId
      * @return

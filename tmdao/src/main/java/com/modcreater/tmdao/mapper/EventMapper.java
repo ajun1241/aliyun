@@ -329,4 +329,13 @@ public interface EventMapper {
      * @return
      */
     Long countDrafts(Long id);
+
+    /**
+     * 修改邀请事件人员
+     * @param userId
+     * @param eventId
+     * @param person
+     * @return
+     */
+    int updInviteEventPerson(String userId,String eventId,String person);
 }
