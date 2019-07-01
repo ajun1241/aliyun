@@ -1,7 +1,9 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.Backers;
+import com.modcreater.tmbeans.show.backer.ShowFriendList;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,4 +23,33 @@ public interface BackerMapper {
      */
     int addBackers(String userId,String backerId);
 
+    /**
+     * 获取好友列表
+     * @param userId
+     * @return
+     */
+    List<ShowFriendList> getFriendList(String userId);
+
+    /**
+     * 获取我的支持者
+     * @param userId
+     * @return
+     */
+    Backers getMyBacker(String userId);
+
+    /**
+     * 修改用户支持者
+     * @param userId
+     * @param friendId
+     * @return
+     */
+    int updateBacke(@Param("userId") String userId,@Param("friendId") String friendId);
+
+    /**
+     * 删除我的支持者
+     * @param userId
+     * @param friendId
+     * @return
+     */
+    int deleteBacker(@Param("userId")String userId,@Param("friendId") String friendId);
 }

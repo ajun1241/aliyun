@@ -10,10 +10,10 @@ import java.util.Date;
 @Data
 public class Backers {
 
-  private Long id;
-  private Long userId;
-  private Long backerId;
+  private String id;
+  private String userId;
+  private String backerId;
   private Date createDate;
-  private Long status;
+  private String status;
 
 }

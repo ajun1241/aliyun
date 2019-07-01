@@ -6,5 +6,24 @@
         insert into backers(userId, backerId)
         values(#{userId},#{backerId})
     </insert>
+    <update id="updateBacke">
+        update backers set backerId = #{friendId} where userId = #{userId}
+    </update>
+    <delete id="deleteBacker">
+        delete from backers where userId = #{userId}
+    </delete>
+    <select id="getFriendList" resultType="com.modcreater.tmbeans.show.backer.ShowFriendList">
+        select f.friendId 'userId',
+        a.userCode,
+        a.headImgUrl,
+        a.userName,
+        a.gender
+        from account a,friendship f
+        where f.friendId = a.id
+        and f.userId = #{userId}
+    </select>
+    <select id="getMyBacker" resultType="com.modcreater.tmbeans.pojo.Backers">
+        select * from backers where userId = #{userId}
+    </select>
 
 </mapper>
