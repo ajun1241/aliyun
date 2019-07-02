@@ -83,16 +83,16 @@ public class BackerServiceImpl implements BackerService {
         }
         List<Long> friends = accountMapper.queryAllFriendList(receivedChangeBackerInfo.getUserId());
         boolean status = false;
-        if (friends.size() != 0){
-            for (Long friendId : friends){
-                if (friendId.toString().equals(receivedChangeBackerInfo.getFriendId())){
+        if (friends.size() != 0) {
+            for (Long friendId : friends) {
+                if (friendId.toString().equals(receivedChangeBackerInfo.getFriendId())) {
                     status = true;
                     break;
                 }
             }
         }
-        if (!status){
-            return DtoUtil.getFalseDto("只能将好友设置为您的支持者",22003);
+        if (!status) {
+            return DtoUtil.getFalseDto("只能将好友设置为您的支持者", 22003);
         }
         Backers backer = backerMapper.getMyBacker(receivedChangeBackerInfo.getUserId());
         if (ObjectUtils.isEmpty(backer)) {
@@ -139,11 +139,14 @@ public class BackerServiceImpl implements BackerService {
                 result.put("userName", account.getUserName());
                 result.put("headImgUrl", account.getHeadImgUrl());
                 result.put("gender", account.getGender().toString());
+                if (!StringUtils.hasText(account.getUserSign())) {
+                    account.setUserSign("");
+                }
                 result.put("userSign", account.getUserSign());
             }
         }
         if (result.size() == 0) {
-            return DtoUtil.getSuccessDto("查询成功", 200000);
+            return DtoUtil.getSuccesWithDataDto("查询成功", null, 200000);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
