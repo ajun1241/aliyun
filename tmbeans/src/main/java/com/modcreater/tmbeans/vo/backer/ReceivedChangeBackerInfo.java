@@ -18,7 +18,4 @@ public class ReceivedChangeBackerInfo {
     private String appType;
 
     private String friendId;
-
-    private String status;
-
 }

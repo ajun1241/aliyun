@@ -27,6 +27,6 @@ public class ShowFriendList {
     /**
      * 是否是本次操作用户所选中的支持者,0为是,1为默认不是
      */
-    private String status = "1";
+    private Integer status = 1;
 
 }

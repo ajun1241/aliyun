@@ -62,12 +62,12 @@ public class BackerServiceImpl implements BackerService {
         if (!ObjectUtils.isEmpty(backer)) {
             for (ShowFriendList showFriendList : friendList) {
                 if (backer.getBackerId().equals(showFriendList.getFriendId())) {
-                    showFriendList.setStatus("0");
+                    showFriendList.setStatus(0);
                 }
             }
         }
-        Map<String,Object> result = new HashMap<>();
-        result.put("friendList",friendList);
+        Map<String, Object> result = new HashMap<>();
+        result.put("friendList", friendList);
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 
@@ -98,22 +98,17 @@ public class BackerServiceImpl implements BackerService {
         }
         Backers backer = backerMapper.getMyBacker(receivedChangeBackerInfo.getUserId());
         if (ObjectUtils.isEmpty(backer)) {
-            if (receivedChangeBackerInfo.getStatus().equals("0")) {
-                backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId());
+            if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0){
                 return DtoUtil.getSuccessDto("修改成功", 100000);
             }
         } else {
             if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId())) {
-                if (receivedChangeBackerInfo.getStatus().equals("1")) {
-                    if (backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
-                        return DtoUtil.getSuccessDto("修改成功", 100000);
-                    }
+                if (backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
+                    return DtoUtil.getSuccessDto("修改成功", 100000);
                 }
             } else {
-                if (receivedChangeBackerInfo.getStatus().equals("0")) {
-                    if (backerMapper.updateBacke(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
-                        return DtoUtil.getSuccessDto("修改成功", 100000);
-                    }
+                if (backerMapper.updateBacke(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
+                    return DtoUtil.getSuccessDto("修改成功", 100000);
                 }
             }
         }
