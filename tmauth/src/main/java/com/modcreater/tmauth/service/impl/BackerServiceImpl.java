@@ -83,27 +83,31 @@ public class BackerServiceImpl implements BackerService {
         if (!token.equals(redisToken)) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        List<Long> friends = accountMapper.queryAllFriendList(receivedChangeBackerInfo.getUserId());
-        boolean status = false;
-        if (friends.size() != 0) {
-            for (Long friendId : friends) {
-                if (friendId.toString().equals(receivedChangeBackerInfo.getFriendId())) {
-                    status = true;
-                    break;
+        if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())){
+            List<Long> friends = accountMapper.queryAllFriendList(receivedChangeBackerInfo.getUserId());
+            boolean status = false;
+            if (friends.size() != 0) {
+                for (Long friendId : friends) {
+                    if (friendId.toString().equals(receivedChangeBackerInfo.getFriendId())) {
+                        status = true;
+                        break;
+                    }
                 }
             }
-        }
-        if (!status) {
-            return DtoUtil.getFalseDto("只能将好友设置为您的支持者", 22003);
+            if (!status) {
+                return DtoUtil.getFalseDto("只能将好友设置为您的支持者", 22003);
+            }
         }
         Backers backer = backerMapper.getMyBacker(receivedChangeBackerInfo.getUserId());
         if (ObjectUtils.isEmpty(backer)) {
-            if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0){
-                return DtoUtil.getSuccessDto("修改成功", 100000);
+            if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
+                if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
+                    return DtoUtil.getSuccessDto("修改成功", 100000);
+                }
             }
         } else {
-            if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId())) {
-                if (backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
+            if (!StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
+                if (backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId()) > 0) {
                     return DtoUtil.getSuccessDto("修改成功", 100000);
                 }
             } else {
