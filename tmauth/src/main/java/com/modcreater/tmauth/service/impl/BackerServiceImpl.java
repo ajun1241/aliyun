@@ -66,7 +66,9 @@ public class BackerServiceImpl implements BackerService {
                 }
             }
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功", friendList, 100000);
+        Map<String,Object> result = new HashMap<>();
+        result.put("friendList",friendList);
+        return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 
     @Override
