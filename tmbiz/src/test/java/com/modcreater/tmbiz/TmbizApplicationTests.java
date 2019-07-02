@@ -7,6 +7,7 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.MyToken;
 import com.modcreater.tmbiz.config.EventUtil;
 import com.modcreater.tmbiz.service.impl.EventServiceImpl;
+import com.modcreater.tmdao.mapper.BackerMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.messageutil.InviteMessage;
 import com.modcreater.tmutils.messageutil.NotifyMessage;
@@ -44,6 +45,9 @@ public class TmbizApplicationTests {
 
     @Resource
     private EventUtil eventUtil;
+
+    @Resource
+    private BackerMapper backerMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -88,16 +92,13 @@ public class TmbizApplicationTests {
 
     @Test
     public void test2() {
-        List list1=new ArrayList();
-        list1.add("1");
-        list1.add("2");
-        list1.add("3");
-        List list2=new ArrayList();
-        list2.add("4");
-        list2.add("2");
-        list2.add("6");
-        list1.addAll(list2);
-        System.out.println(Arrays.toString(list1.toArray(new String[list1.size()])));
+        /*SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
+        String[] now=simpleDateFormat.format(new Date()).split("-");
+        List<Map<String, Object>> backerForEvent = backerMapper.findBackerForEvent(now[0], now[1], "03");
+        for (Map<String,Object> map:backerForEvent) {
+            System.out.println(map.toString());
+            System.out.println(map.get("backerId"));;
+        }*/
     }
 
     @Test

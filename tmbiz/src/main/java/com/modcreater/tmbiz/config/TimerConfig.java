@@ -3,7 +3,6 @@ package com.modcreater.tmbiz.config;
 import com.modcreater.tmbeans.databaseparam.EventStatusScan;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.TimedTask;
-import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmdao.mapper.OrderMapper;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -55,7 +53,7 @@ public class TimerConfig {
 
     private Logger logger = LoggerFactory.getLogger(TimerConfig.class);
 
-    @Scheduled(fixedDelay = 60000)
+/*    @Scheduled(fixedDelay = 60000)
     public void backerEventTimer() {
         try {
             List<TimedTask> taskList = timedTaskMapper.queryWaitExecute();
@@ -92,7 +90,7 @@ public class TimerConfig {
             e.printStackTrace();
         }
         System.out.println("第一个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
-    }
+    }*/
 
     /**
      * 以下为每分钟的第0s进行过期事件过滤修改

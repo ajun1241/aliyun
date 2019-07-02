@@ -176,54 +176,6 @@ public class EventController {
     }
 
     /**
-     *添加一条事件支持
-     * @param addbackerVo
-     * @param request
-     * @return
-     */
-    @PostMapping(value = "addeventbacker")
-    @ApiOperation("添加一条事件支持")
-    public Dto addEventBacker(@RequestBody AddBackerVo addbackerVo, HttpServletRequest request){
-        return eventService.addEventBacker(addbackerVo,request.getHeader("token"));
-    }
-
-    /**
-     *修改一条事件支持
-     * @param addbackerVo
-     * @param request
-     * @return
-     */
-    @PostMapping(value = "updbackerevent")
-    @ApiOperation("修改一条事件支持")
-    public Dto updBackerEvent(@RequestBody AddBackerVo addbackerVo, HttpServletRequest request){
-        return eventService.updBackerEvent(addbackerVo,request.getHeader("token"));
-    }
-
-    /**
-     *删除一条事件支持
-     * @param deleteEventVo
-     * @param request
-     * @return
-     */
-    @PostMapping(value = "delbackerevent")
-    @ApiOperation("删除一条事件支持")
-    public Dto delBackerEvent(@RequestBody DeleteEventVo deleteEventVo, HttpServletRequest request){
-        return eventService.delBackerEvent(deleteEventVo,request.getHeader("token"));
-    }
-
-    /**
-     *回应事件支持
-     * @param feedbackEventBackerVo
-     * @param request
-     * @return
-     */
-    @PostMapping(value = "feedbackeventbacker")
-    @ApiOperation("回应事件支持")
-    public Dto feedbackEventBacker(@RequestBody FeedbackEventBackerVo feedbackEventBackerVo,HttpServletRequest request){
-        return eventService.feedbackEventBacker(feedbackEventBackerVo,request.getHeader("token"));
-    }
-
-    /**
      *
      * @param receivedSearchOnce
      * @param request
@@ -235,17 +187,6 @@ public class EventController {
         return eventService.delInviteEvent(receivedSearchOnce,request.getHeader("token"));
     }
 
-    /**
-     * 将事件从事件表移除到草稿箱
-     * @param addInviteEventVo
-     * @param request
-     * @return
-     */
-    /*@PostMapping(value = "eventmovetodraft")
-    @ApiOperation("将事件从事件表移除到草稿箱")
-    public Dto eventRemoveDraft(@RequestBody AddInviteEventVo addInviteEventVo,HttpServletRequest request){
-        return eventService.eventRemoveDraft(addInviteEventVo,request.getHeader("token"));
-    }*/
 
     @GLOT
     @PostMapping(value = "searchonce")
