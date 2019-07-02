@@ -23,6 +23,9 @@ import io.rong.models.user.UserModel;
 import io.rong.util.GsonUtil;
 import org.springframework.util.ObjectUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * @Author: AJun
@@ -37,7 +40,6 @@ public class RongCloudMethodUtil {
     VoiceMessage voiceMessage = new VoiceMessage("hello", "helloExtra", 20L);
 
     RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret);
-
     //自定义 api 地址方式
     //RongCloud rongCloud = RongCloud.getInstance(appKey, appSecret,api);
 
@@ -54,7 +56,6 @@ public class RongCloudMethodUtil {
      * 注册用户，生成用户在融云的唯一身份标识 Token
      */
     public String createToken(String userId,String userName,String headImgUrl) throws Exception {
-
 
         User User = rongCloud.user;
 
@@ -125,7 +126,39 @@ public class RongCloudMethodUtil {
         return privateResult;
     }
 
+    /**
+     * 融云系统推送
+     * @param content
+     * @param fromUserId
+     * @param toUserId
+     * @param objectName
+     * @param pushContent
+     * @param pushData
+     */
+    public static void pushSystemMessage(String content, String fromUserId,
+                                         String toUserId, String objectName, String pushContent,
+                                         String pushData) {
 
+        String systemMessage = "https://api.cn.rong.io/message/system/publish.json";
+        Map<String, String> params = new HashMap<String, String>();
+        // String content="{\"content\":\"2\"}";
+        params.put("content", content);
+        params.put("fromUserId", fromUserId);
+        params.put("toUserId", toUserId);
+        params.put("objectName", objectName);
+        params.put("pushContent", pushContent);
+        params.put("pushData", pushData);
+        byte[] resultArray;
+        try {
+            resultArray = RongCloudUtil.post(systemMessage, params, "UTF-8",
+                    20000);
+            String result = new String(resultArray);
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println("发送信息出错了");
+        }
+
+    }
 
     /**
      * 移除黑名单

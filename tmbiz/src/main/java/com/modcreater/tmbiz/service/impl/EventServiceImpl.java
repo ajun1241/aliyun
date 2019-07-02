@@ -598,76 +598,6 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * 添加事件支持者
-     *
-     * @param addbackerVo
-     * @param token
-     * @return
-     */
-    @Override
-    public Dto addEventBacker(AddBackerVo addbackerVo, String token) {
-        if (StringUtils.isEmpty(token)) {
-            return DtoUtil.getFalseDto("token未获取到", 21013);
-        }
-        if (ObjectUtils.isEmpty(addbackerVo)) {
-            return DtoUtil.getFalseDto("添加邀请事件数据未获取到", 26001);
-        }
-        if (StringUtils.isEmpty(addbackerVo.getUserId())) {
-            return DtoUtil.getFalseDto("userId不能为空", 21011);
-        }
-        if (!token.equals(stringRedisTemplate.opsForValue().get(addbackerVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
-        }
-        if (StringUtils.isEmpty(addbackerVo.getFriendIds())) {
-            return DtoUtil.getFalseDto("支持者不能空", 25002);
-        }
-        try {
-            String[] backers = addbackerVo.getFriendIds().split(",");
-            //判断好友是否开启了权限
-            List<String> personList = new ArrayList<>();
-            for (int i = 0; i < backers.length; i++) {
-                Friendship friendship = accountMapper.queryFriendshipDetail(backers[i], addbackerVo.getUserId());
-                if (friendship.getInvite() == 1) {
-                    //只添加满足条件的人
-                    personList.add(backers[i]);
-                }
-            }
-            //添加事件进数据库
-            SingleEvent singleEvent = JSONObject.parseObject(addbackerVo.getSingleEvent(), SingleEvent.class);
-            singleEvent.setUserid(Long.parseLong(addbackerVo.getUserId()));
-            //事件时间冲突判断
-            /*if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
-                return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
-            }*/
-            if (eventMapper.uploadingEvents(singleEvent) == 0) {
-                return DtoUtil.getFalseDto("事件添加失败", 25001);
-            }
-            if (personList.size()>0){
-                //添加支持者状态
-                backerMapper.addBackers(addbackerVo.getUserId(), personList.toArray((new String[]{})), singleEvent.getEventid().toString());
-                //发送信息给被邀请者
-//            Account account=accountMapper.queryAccount(addbackerVo.getUserId());
-                RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
-                String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
-                //消息格式未定
-
-
-
-                InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, singleEvent.toString(), "", "");
-                ResponseResult result = rongCloudMethodUtil.sendSystemMessage(addbackerVo.getUserId(), personList.toArray((new String[]{})), inviteMessage, "", "");
-                if (result.getCode() != 200) {
-                    logger.info("融云消息异常"+result.toString());
-                    return DtoUtil.getFalseDto("发送消息失败", 17002);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return DtoUtil.getFalseDto("消息发送出错", 26002);
-        }
-        return DtoUtil.getSuccessDto("消息发送成功", 100000);
-    }
-
-    /**
      * 添加一条邀请事件
      *
      * @param addInviteEventVo
@@ -926,7 +856,7 @@ public class EventServiceImpl implements EventService {
                 singleEvent.setPerson(singleEvent1.getPerson());
                 tempEventMapper.addTempEvent(singleEvent);
                 //如果只邀请了一个人,直接给创建者发消息
-                if (eventPersons.getFriendsId().equals(singleEventVice.getCreateBy())){
+                if (eventPersons.getFriendsId().equals(singleEventVice.getCreateBy().toString())){
                     Account account = accountMapper.queryAccount(addInviteEventVo.getUserId());
                     RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                     //内容修改

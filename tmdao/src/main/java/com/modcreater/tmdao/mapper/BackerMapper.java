@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description:
@@ -52,4 +53,13 @@ public interface BackerMapper {
      * @return
      */
     int deleteBacker(@Param("userId")String userId,@Param("friendId") String friendId);
+
+    /**
+     * 查询当天的事件
+     * @param year
+     * @param month
+     * @param day
+     * @return
+     */
+    List<Map<String,Object>> findBackerForEvent(String year,String month,String day);
 }

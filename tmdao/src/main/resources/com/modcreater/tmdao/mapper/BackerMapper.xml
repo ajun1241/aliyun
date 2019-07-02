@@ -26,4 +26,14 @@
         select * from backers where userId = #{userId}
     </select>
 
+    <select id="findBackerForEvent" resultType="java.util.Map">
+        SELECT e.*,b.backerId FROM backers AS b, singleevent AS e
+        WHERE b.userId=e.userId
+        AND `month` = #{month}
+        AND `day` = #{day}
+        AND `year` = #{year}
+        AND isOverdue=0
+        AND `level`=5
+    </select>
+
 </mapper>

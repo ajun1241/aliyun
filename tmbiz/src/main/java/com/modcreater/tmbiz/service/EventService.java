@@ -155,14 +155,6 @@ public interface EventService {
     Dto seaByWeekWithPrivatePermission(SearchEventVo searchEventVo,String token);
 
     /**
-     * 添加事件支持者
-     * @param addbackerVo
-     * @param token
-     * @return
-     */
-    Dto addEventBacker(AddBackerVo addbackerVo, String token);
-
-    /**
      * 查询一个事件
      * @param receivedSearchOnce
      * @param token
