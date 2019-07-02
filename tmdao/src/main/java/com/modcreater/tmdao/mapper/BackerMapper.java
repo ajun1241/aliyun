@@ -49,10 +49,9 @@ public interface BackerMapper {
     /**
      * 删除我的支持者
      * @param userId
-     * @param friendId
      * @return
      */
-    int deleteBacker(@Param("userId")String userId,@Param("friendId") String friendId);
+    int deleteBacker(@Param("userId")String userId);
 
     /**
      * 查询当天的事件
