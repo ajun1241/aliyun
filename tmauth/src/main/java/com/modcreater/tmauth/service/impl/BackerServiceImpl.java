@@ -4,16 +4,24 @@ import com.modcreater.tmauth.service.BackerService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.Backers;
+import com.modcreater.tmbeans.pojo.MsgStatus;
 import com.modcreater.tmbeans.show.backer.ShowFriendList;
 import com.modcreater.tmbeans.vo.backer.ReceivedBeSupporterFeedback;
 import com.modcreater.tmbeans.vo.backer.ReceivedChangeBackerInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.BackerMapper;
+import com.modcreater.tmdao.mapper.MsgStatusMapper;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.RongCloudMethodUtil;
+import com.modcreater.tmutils.messageutil.AddBackerMessage;
+import io.rong.models.response.ResponseResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -42,6 +50,11 @@ public class BackerServiceImpl implements BackerService {
 
     @Resource
     private AccountMapper accountMapper;
+
+    @Resource
+    private MsgStatusMapper msgStatusMapper;
+
+    private Logger logger = LoggerFactory.getLogger(BackerServiceImpl.class);
 
     @Override
     public Dto getFriendList(ReceivedId receivedId, String token) {
@@ -73,49 +86,77 @@ public class BackerServiceImpl implements BackerService {
     }
 
     @Override
-    public Dto changeBacker(ReceivedChangeBackerInfo receivedChangeBackerInfo, String token) {
-        if (StringUtils.isEmpty(receivedChangeBackerInfo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("token未获取到", 21013);
-        }
-        String redisToken = stringRedisTemplate.opsForValue().get(receivedChangeBackerInfo.getUserId());
-        if (!token.equals(redisToken)) {
-            return DtoUtil.getFalseDto("请重新登录", 21014);
-        }
-        if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())){
-            List<Long> friends = accountMapper.queryAllFriendList(receivedChangeBackerInfo.getUserId());
-            boolean status = false;
-            if (friends.size() != 0) {
-                for (Long friendId : friends) {
-                    if (friendId.toString().equals(receivedChangeBackerInfo.getFriendId())) {
-                        status = true;
-                        break;
+    public synchronized Dto changeBacker(ReceivedChangeBackerInfo receivedChangeBackerInfo, String token) {
+        try {
+            if (StringUtils.isEmpty(receivedChangeBackerInfo.getUserId())) {
+                return DtoUtil.getFalseDto("请先登录", 21011);
+            }
+            if (!StringUtils.hasText(token)) {
+                return DtoUtil.getFalseDto("token未获取到", 21013);
+            }
+            String redisToken = stringRedisTemplate.opsForValue().get(receivedChangeBackerInfo.getUserId());
+            if (!token.equals(redisToken)) {
+                return DtoUtil.getFalseDto("请重新登录", 21014);
+            }
+            if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
+                List<Long> friends = accountMapper.queryAllFriendList(receivedChangeBackerInfo.getUserId());
+                boolean status = false;
+                if (friends.size() != 0) {
+                    for (Long friendId : friends) {
+                        if (friendId.toString().equals(receivedChangeBackerInfo.getFriendId())) {
+                            status = true;
+                            break;
+                        }
+                    }
+                }
+                if (!status) {
+                    return DtoUtil.getFalseDto("只能将好友设置为您的支持者", 22003);
+                }
+            }
+            Backers backer = backerMapper.getMyBacker(receivedChangeBackerInfo.getUserId());
+            Account account = accountMapper.queryAccount(receivedChangeBackerInfo.getFriendId());
+            MsgStatus msgStatus = new MsgStatus();
+            msgStatus.setUserId(Long.valueOf(receivedChangeBackerInfo.getUserId()));
+            msgStatus.setType(2L);
+            Integer msgId = msgStatusMapper.addNewMsg(msgStatus);
+            AddBackerMessage addBackerMessage = new AddBackerMessage();
+            addBackerMessage.setContent("来来来,当我的支持者,搞起!");
+            addBackerMessage.setMsgId(msgId.toString());
+            RongCloudMethodUtil rong = new RongCloudMethodUtil();
+            String[] friendId = {receivedChangeBackerInfo.getFriendId()};
+            if (ObjectUtils.isEmpty(backer)) {
+                if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
+                    ResponseResult result = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), friendId, 0, addBackerMessage);
+                    if (result.getCode() != 200) {
+                        logger.info("添加邀请事件时融云消息异常" + result.toString());
+                    }
+                    if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
+                        return DtoUtil.getSuccessDto("修改成功", 100000);
+                    }
+                }
+
+            } else {
+                if (!StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
+                    if (backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId()) > 0) {
+                        return DtoUtil.getSuccessDto("修改成功", 100000);
+                    }
+                } else {
+                    if (!receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId())){
+                        ResponseResult result = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), friendId, 0, addBackerMessage);
+                        if (result.getCode() != 200) {
+                            logger.info("添加邀请事件时融云消息异常" + result.toString());
+                        }
+                        if (backerMapper.updateBacke(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
+                            return DtoUtil.getSuccessDto("修改成功", 100000);
+                        }
+                    }else {
+                        return DtoUtil.getFalseDto("您已经将ta设置为您的支持者了", 22002);
                     }
                 }
             }
-            if (!status) {
-                return DtoUtil.getFalseDto("只能将好友设置为您的支持者", 22003);
-            }
-        }
-        Backers backer = backerMapper.getMyBacker(receivedChangeBackerInfo.getUserId());
-        if (ObjectUtils.isEmpty(backer)) {
-            if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
-                if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
-                    return DtoUtil.getSuccessDto("修改成功", 100000);
-                }
-            }
-        } else {
-            if (!StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
-                if (backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId()) > 0) {
-                    return DtoUtil.getSuccessDto("修改成功", 100000);
-                }
-            } else {
-                if (backerMapper.updateBacke(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId()) > 0) {
-                    return DtoUtil.getSuccessDto("修改成功", 100000);
-                }
-            }
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("修改失败", 22002);
         }
         return DtoUtil.getFalseDto("修改失败", 22002);
     }

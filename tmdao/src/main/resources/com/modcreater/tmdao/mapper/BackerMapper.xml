@@ -25,7 +25,7 @@
         and f.userId = #{userId}
     </select>
     <select id="getMyBacker" resultType="com.modcreater.tmbeans.pojo.Backers">
-        select * from backers where userId = #{userId}
+        select * from backers where userId = #{userId} and status = 1
     </select>
 
     <select id="findBackerForEvent" resultType="java.util.Map">

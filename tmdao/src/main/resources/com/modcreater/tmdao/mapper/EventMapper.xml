@@ -255,7 +255,7 @@
     </select>
 
     <select id="queryEventsByConditions" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select eventId,userId,eventName,person,day,month,year
+        select eventId,userId,eventName,person,day,month,year,address,type
         from singleevent
         <where>
             1 = 1
@@ -433,7 +433,7 @@
     </select>
 
     <select id="queryDraft" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select eventId,userId,eventName,person,day,month,year
+        select eventId,userId,eventName,person,day,month,year,address,type
         from draft
         <where>
             1 = 1
