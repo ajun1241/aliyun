@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.QueryMsgStatusVo;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbiz.config.annotation.GLOT;
 import com.modcreater.tmbiz.service.EventService;
 import io.swagger.annotations.ApiOperation;
@@ -218,6 +219,12 @@ public class EventController {
     @ApiOperation("查询一条消息状态")
     public Dto queryMsgStatus(@RequestBody QueryMsgStatusVo queryMsgStatusVo, HttpServletRequest request){
         return eventService.queryMsgStatus(queryMsgStatusVo,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "gettodayplans")
+    @ApiOperation("查询今天的计划")
+    public Dto getTodayPlans(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return eventService.getTodayPlans(receivedId,request.getHeader("token"));
     }
 
 }

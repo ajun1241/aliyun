@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.QueryMsgStatusVo;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
 /**
  * Created with IntelliJ IDEA.
@@ -209,4 +210,12 @@ public interface EventService {
      * @return
      */
     Dto addInviter(AddInviterVo addInviterVo,String token);
+
+    /**
+     * 查询今天的计划
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto getTodayPlans(ReceivedId receivedId, String token);
 }

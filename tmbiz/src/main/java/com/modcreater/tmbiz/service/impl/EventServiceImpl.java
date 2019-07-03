@@ -8,6 +8,7 @@ import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.vo.QueryMsgStatusVo;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmbiz.config.EventUtil;
 import com.modcreater.tmdao.mapper.*;
@@ -366,6 +367,7 @@ public class EventServiceImpl implements EventService {
         }
         //拆分dayEventId并将查询条件逐一添加到对象中
         SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
+        singleEvent.setIsOverdue(StringUtils.hasText(searchEventVo.getFriendId()) && searchEventVo.getFriendId().equals("seaPlans") ? null : 0L);
         //只根据level升序
         List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByDayOrderByLevel(singleEvent);
         List<ShowSingleEvent> showSingleEventListOrderByLevel = new ArrayList<>();
@@ -1320,6 +1322,18 @@ public class EventServiceImpl implements EventService {
             logger.error(e.getMessage(),e);
         }
         return DtoUtil.getSuccessDto("消息已发送",100000);
+    }
+
+    @Override
+    public Dto getTodayPlans(ReceivedId receivedId, String token) {
+        if (!ObjectUtils.isEmpty(receivedId)){
+            SearchEventVo searchEventVo = new SearchEventVo();
+            searchEventVo.setUserId(receivedId.getUserId());
+            searchEventVo.setDayEventId(DateUtil.getDay(0));
+            searchEventVo.setFriendId("seaPlans");
+            return searchByDayEventIds(searchEventVo,token);
+        }
+        return DtoUtil.getSuccesWithDataDto("未获取到今天的事件",null,200000);
     }
 
     @Override
