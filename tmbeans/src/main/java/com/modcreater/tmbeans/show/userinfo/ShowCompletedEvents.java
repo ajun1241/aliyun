@@ -32,4 +32,8 @@ public class ShowCompletedEvents {
      */
     private String date;
 
+    private String address;
+
+    private String type;
+
 }

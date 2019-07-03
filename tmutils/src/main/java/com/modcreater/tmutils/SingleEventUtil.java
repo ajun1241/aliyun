@@ -211,6 +211,8 @@ public class SingleEventUtil {
         showCompletedEvents.setUserId(singleEvent.getUserid().toString());
         showCompletedEvents.setEventName(singleEvent.getEventname());
         showCompletedEvents.setDate(singleEvent.getYear().toString() + "-" + singleEvent.getMonth() + "-" + singleEvent.getDay());
+        showCompletedEvents.setAddress(singleEvent.getAddress());
+        showCompletedEvents.setType(singleEvent.getType().toString());
         return showCompletedEvents;
     }
 
