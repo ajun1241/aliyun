@@ -13,7 +13,9 @@
         delete from backers where userId = #{userId}
     </delete>
     <select id="getFriendList" resultType="com.modcreater.tmbeans.show.backer.ShowFriendList">
-        select f.friendId 'userId',
+        select
+        f.userId,
+        f.friendId,
         a.userCode,
         a.headImgUrl,
         a.userName,

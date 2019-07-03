@@ -1,6 +1,7 @@
 package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.backer.ReceivedBeSupporterFeedback;
 import com.modcreater.tmbeans.vo.backer.ReceivedChangeBackerInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
@@ -37,4 +38,12 @@ public interface BackerService {
      * @return
      */
     Dto getMyBacker(ReceivedId receivedId, String token);
+
+    /**
+     * 是否称为支持者做出响应
+     * @param receivedBeSupporterFeedback
+     * @param token
+     * @return
+     */
+    Dto beSupporterFeedback(ReceivedBeSupporterFeedback receivedBeSupporterFeedback, String token);
 }

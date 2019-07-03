@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.Backers;
 import com.modcreater.tmbeans.show.backer.ShowFriendList;
+import com.modcreater.tmbeans.vo.backer.ReceivedBeSupporterFeedback;
 import com.modcreater.tmbeans.vo.backer.ReceivedChangeBackerInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AccountMapper;
@@ -150,5 +151,21 @@ public class BackerServiceImpl implements BackerService {
             return DtoUtil.getSuccesWithDataDto("查询成功", null, 200000);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+    }
+
+    @Override
+    public Dto beSupporterFeedback(ReceivedBeSupporterFeedback receivedBeSupporterFeedback, String token) {
+        if (StringUtils.isEmpty(receivedBeSupporterFeedback.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
+        }
+        String redisToken = stringRedisTemplate.opsForValue().get(receivedBeSupporterFeedback.getUserId());
+        if (!token.equals(redisToken)) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+
+        return null;
     }
 }
