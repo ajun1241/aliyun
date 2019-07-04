@@ -18,7 +18,6 @@ public class EventMsg {
     private String eventId;
     private String msgSenderId;
     private String content;
-    private String msgId;
     private Long createDate;
 
 }

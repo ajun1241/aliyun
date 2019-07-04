@@ -4,6 +4,10 @@
     <insert id="addNewMsg" parameterType="com.modcreater.tmbeans.pojo.MsgStatus" useGeneratedKeys="true" keyProperty="id">
         insert into msgstatus(userId, type) values (#{userId},#{type})
     </insert>
+    <insert id="addNewEventMsg">
+        insert into eventmsg(msgOwnerId, eventId, msgSenderId, content, createDate)
+        values (#{msgOwnerId},#{eventId},#{msgSenderId},#{content},#{createDate})
+    </insert>
 
     <update id="updateMsgStatus">
       update msgstatus set status=#{status} where id=#{id}

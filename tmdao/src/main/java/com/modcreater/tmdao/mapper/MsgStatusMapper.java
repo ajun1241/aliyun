@@ -32,4 +32,15 @@ public interface MsgStatusMapper {
      * @return
      */
     int updateMsgStatus(String status,String id);
+
+    /**
+     *
+     * @param msgOwnerId
+     * @param eventId
+     * @param msgSenderId
+     * @param content
+     * @param createDate
+     * @return
+     */
+    int addNewEventMsg(String msgOwnerId, Long eventId, String msgSenderId, String content,  Long createDate);
 }

@@ -228,7 +228,7 @@ public class BackerServiceImpl implements BackerService {
         }
         Backers backer = backerMapper.getMyBacker(receivedBeSupporterFeedback.getReceiverId());
         if (!ObjectUtils.isEmpty(backer) && backer.getStatus().equals("0")) {
-            int i = backerMapper.updateMsgStatus(receivedBeSupporterFeedback.getMsgId(), receivedBeSupporterFeedback.getUserId(), receivedBeSupporterFeedback.getStatus());
+            int i = backerMapper.updateMsgStatus(receivedBeSupporterFeedback.getMsgId(), receivedBeSupporterFeedback.getReceiverId(), receivedBeSupporterFeedback.getStatus());
             if (i <= 0) {
                 return DtoUtil.getFalseDto("消息已过期", 22012);
             }
