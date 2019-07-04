@@ -26,6 +26,7 @@
         from account a,friendship f
         where f.friendId = a.id
         and f.userId = #{userId}
+        and status = 20
     </select>
     <select id="getMyBacker" resultType="com.modcreater.tmbeans.pojo.Backers">
         select * from backers where userId = #{userId}
