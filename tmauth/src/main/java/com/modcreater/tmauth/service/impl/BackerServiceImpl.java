@@ -104,7 +104,11 @@ public class BackerServiceImpl implements BackerService {
                 return DtoUtil.getFalseDto("操作错误",22013);
             }
             if (!ObjectUtils.isEmpty(backer) && backer.getStatus().equals("0")) {
-                return DtoUtil.getFalseDto("请等待您上一个邀请的好友回应", 22002);
+                if (System.currentTimeMillis()/1000 - backer.getCreateDate() < 1800){
+                    return DtoUtil.getFalseDto("请等待您上一个邀请的好友回应", 22002);
+                }else {
+                    backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId());
+                }
             }
             if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
                 List<Long> friends = accountMapper.queryAllFriendList(receivedChangeBackerInfo.getUserId());
