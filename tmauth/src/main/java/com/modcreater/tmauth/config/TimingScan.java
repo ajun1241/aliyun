@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.AchievementMapper;
 import com.modcreater.tmdao.mapper.BackerMapper;
+import com.modcreater.tmdao.mapper.MsgStatusMapper;
 import com.modcreater.tmutils.RongCloudMethodUtil;
 import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
@@ -47,6 +48,9 @@ public class TimingScan {
     @Resource
     private BackerMapper backerMapper;
 
+    @Resource
+    private MsgStatusMapper msgStatusMapper;
+
     /**
      * 每天0点将所有用户登录天数修改状态归零
      */
@@ -83,6 +87,7 @@ public class TimingScan {
                 if (result.getCode()!=200){
                     logger.info("融云消息异常："+result.toString());
                 }
+                msgStatusMapper.addNewEventMsg(map.get("backerId").toString(),1L,SYSTEMID,":"+account.getUserName()+"在明天有很重要的事情,记得提醒TA",System.currentTimeMillis()/1000);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);

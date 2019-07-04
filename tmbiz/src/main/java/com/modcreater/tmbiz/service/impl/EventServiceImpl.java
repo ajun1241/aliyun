@@ -669,6 +669,7 @@ public class EventServiceImpl implements EventService {
                     logger.info("添加邀请事件时融云消息异常"+result.toString());
                     return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
+                msgStatusMapper.addNewEventMsg(personList1.get(i),singleEvent.getEventid(),addInviteEventVo.getUserId(),"邀请你参与事件",System.currentTimeMillis()/1000);
             }
             //list2给创建者发送拒绝信息
             for (int i = 0; i < personList2.size(); i++) {
@@ -679,6 +680,7 @@ public class EventServiceImpl implements EventService {
                     logger.info("新增邀请事件回应邀请时融云消息异常："+result.toString());
                     return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
+                msgStatusMapper.addNewEventMsg(addInviteEventVo.getUserId(),singleEvent.getEventid(),personList2.get(i),"拒绝了你的事件",System.currentTimeMillis()/1000);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
@@ -747,9 +749,13 @@ public class EventServiceImpl implements EventService {
                 //提醒其他参与者新成员加入
                 RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
                 TxtMessage txtMessage=new TxtMessage("用户“"+accountMapper.queryAccount(feedbackInviteVo.getUserId()).getUserName()+"”加入了事件“"+singleEvent.getEventname()+"”","");
-                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,person.split(","),0,txtMessage);
+                String[] persons = person.split(",");
+                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,persons,0,txtMessage);
                 if (result.getCode()!=200){
                     logger.info("新增邀请事件回应邀请时融云消息异常："+result.toString());
+                }
+                for (String s : persons){
+                    msgStatusMapper.addNewEventMsg(s,singleEvent.getEventid(),SYSTEMID,"帮您添加了一条新的邀请事件",System.currentTimeMillis()/1000);
                 }
                 //更改邀请消息状态
                 msgStatusMapper.updateMsgStatus("0", feedbackInviteVo.getMsgId());
@@ -762,6 +768,7 @@ public class EventServiceImpl implements EventService {
                 if (result.getCode()!=200){
                     logger.info("新增邀请事件回应邀请时融云消息异常："+result.toString());
                 }
+                msgStatusMapper.addNewEventMsg(feedbackInviteVo.getFromId(),singleEvent.getEventid(),feedbackInviteVo.getUserId(),"拒绝了你的一条事件",System.currentTimeMillis()/1000);
                 //更改邀请消息状态
                 msgStatusMapper.updateMsgStatus("1", feedbackInviteVo.getMsgId());
             }
@@ -865,6 +872,7 @@ public class EventServiceImpl implements EventService {
                         logger.info("修改一条邀请事件时融云消息异常"+result.toString());
                         return DtoUtil.getFalseDto("消息发送失败",21040);
                     }
+                    msgStatusMapper.addNewEventMsg(friendId,singleEvent.getEventid(),addInviteEventVo.getUserId(),"想修改一条你创建的邀请事件",System.currentTimeMillis()/1000);
                 }
             }else {//不是创建者修改
                 //把要修改的事件放到临时表
@@ -892,6 +900,7 @@ public class EventServiceImpl implements EventService {
                         logger.info("修改一条邀请事件时融云消息异常"+result.toString());
                         return DtoUtil.getFalseDto("消息发送失败",21040);
                     }
+                    msgStatusMapper.addNewEventMsg(singleEventVice.getCreateBy().toString(),singleEvent.getEventid(),addInviteEventVo.getUserId(),"想修改一条你创建的邀请事件",System.currentTimeMillis()/1000);
                 }else {
                     //如果不止一人
                     //生成统计表(不包括创建者)
@@ -927,6 +936,7 @@ public class EventServiceImpl implements EventService {
                                 logger.info("修改一条邀请事件时融云消息异常"+result.toString());
                                 return DtoUtil.getFalseDto("消息发送失败",21040);
                             }
+                            msgStatusMapper.addNewEventMsg(friendId,singleEvent.getEventid(),addInviteEventVo.getUserId(),"想修改一条你创建的邀请事件",System.currentTimeMillis()/1000);
                         }
                     }
                 }
@@ -1021,6 +1031,7 @@ public class EventServiceImpl implements EventService {
                         logger.info("回应邀请事件修改时融云消息异常"+result.toString());
                         return DtoUtil.getFalseDto("消息发送失败",21040);
                     }
+                    msgStatusMapper.addNewEventMsg(vice.getCreateBy().toString(),singleEvent.getEventid(),SYSTEMID,":超过50%的人接受修改你创建的邀请事件",System.currentTimeMillis()/1000);
                 }
                 //修改消息状态
                 msgStatusMapper.updateMsgStatus("0", feedbackEventInviteVo.getMsgId());
@@ -1047,10 +1058,14 @@ public class EventServiceImpl implements EventService {
                     EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
                     String inviteIds=eventPersons.getFriendsId().concat(","+singleEvent.getUserid().toString());
                     logger.info("回应邀请事件修改时给谁发了消息==>"+Arrays.toString(inviteIds.split(",")));
-                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,inviteIds.split(","),0,txtMessage);
+                    String[] inviters = inviteIds.split(",");
+                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,inviters,0,txtMessage);
                     if (result.getCode() != 200) {
                         logger.info("回应邀请事件修改时融云消息异常"+result.toString());
                         return DtoUtil.getFalseDto("消息发送失败",21040);
+                    }
+                    for (String s : inviters){
+                        msgStatusMapper.addNewEventMsg(s,singleEvent.getEventid(),SYSTEMID,":您的事件修改失败",System.currentTimeMillis()/1000);
                     }
                 }
                 //修改消息状态
@@ -1118,10 +1133,14 @@ public class EventServiceImpl implements EventService {
                 RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
                 TxtMessage txtMessage=new TxtMessage("事件“"+singleEvent.getEventname()+"”已经修改成功","");
                 logger.info("修改事件时创建者选择时给谁发了消息==>"+Arrays.toString(list.toArray(new String[list.size()])));
-                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,list.toArray(new String[list.size()]),0,txtMessage);
+                String[] userIds = list.toArray(new String[list.size()]);
+                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,userIds,0,txtMessage);
                 if (result.getCode() != 200) {
                     logger.info("修改事件时创建者选择时融云消息异常"+result.toString());
                     return DtoUtil.getFalseDto("消息发送失败",21040);
+                }
+                for (String s : userIds){
+                    msgStatusMapper.addNewEventMsg(s,singleEvent.getEventid(),SYSTEMID,":事件修改成功",System.currentTimeMillis()/1000);
                 }
                 //修改消息状态
                 msgStatusMapper.updateMsgStatus("0", eventCreatorChooseVo.getMsgId());
@@ -1135,10 +1154,14 @@ public class EventServiceImpl implements EventService {
                 RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
                 TxtMessage txtMessage=new TxtMessage("事件“"+singleEvent.getEventname()+"”修改失败","");
                 logger.info("修改事件时创建者选择时给谁发了消息==>"+Arrays.toString(list.toArray(new String[list.size()])));
-                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,list.toArray(new String[list.size()]),0,txtMessage);
+                String[] userIds = list.toArray(new String[list.size()]);
+                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,userIds,0,txtMessage);
                 if (result.getCode() != 200) {
                     logger.info("修改事件时创建者选择时融云消息异常"+result.toString());
                     return DtoUtil.getFalseDto("消息发送失败",21040);
+                }
+                for (String s : userIds){
+                    msgStatusMapper.addNewEventMsg(s,singleEvent.getEventid(),SYSTEMID,"",System.currentTimeMillis()/1000);
                 }
                 //修改消息状态
                 msgStatusMapper.updateMsgStatus("1", eventCreatorChooseVo.getMsgId());
@@ -1217,6 +1240,9 @@ public class EventServiceImpl implements EventService {
                     logger.info("融云消息异常"+result2.toString());
                     return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
+                for (String s : targetId){
+                    msgStatusMapper.addNewEventMsg(s,singleEvent.getEventid(),SYSTEMID,":您被分配为一条事件的创建者,快去看看吧",System.currentTimeMillis()/1000);
+                }
             } else {
                 //如果不是创建者删除
                 //从自己的事件表里移除
@@ -1259,6 +1285,7 @@ public class EventServiceImpl implements EventService {
                     logger.info("融云消息异常"+result.toString());
                     return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
+                msgStatusMapper.addNewEventMsg(singleEventVice.getCreateBy().toString(),singleEvent.getEventid(),SYSTEMID,":"+account.getUserName() + "退出了您创建的事件",System.currentTimeMillis()/1000);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
@@ -1599,6 +1626,7 @@ public class EventServiceImpl implements EventService {
             if (result.getCode()!=200){
                 logger.info("新增邀请事件回应邀请时融云消息异常："+result.toString());
             }
+            msgStatusMapper.addNewEventMsg(userId,singleEvent.getEventid(),personList2.get(i),"拒绝了您的事件邀请",System.currentTimeMillis()/1000);
         }
     }
 }

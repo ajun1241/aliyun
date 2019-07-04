@@ -141,6 +141,9 @@ public class BackerServiceImpl implements BackerService {
                     if (result.getCode() != 200) {
                         logger.info("添加支持者时融云消息异常" + result.toString());
                     }
+                    for (String s : friendId){
+                        msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),":来来来,当我的支持者,搞起!",System.currentTimeMillis()/1000);
+                    }
                     if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000) > 0) {
                         return DtoUtil.getSuccessDto("修改成功", 100000);
                     }
@@ -152,6 +155,9 @@ public class BackerServiceImpl implements BackerService {
                     if (result.getCode() != 200) {
                         logger.info("发送删除支持者时融云消息异常" + result.toString());
                     }
+                    for (String s : friendId){
+                        msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),"取消了您作为ta支持者的身份",System.currentTimeMillis()/1000);
+                    }
                     if (backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId()) > 0) {
                         return DtoUtil.getSuccessDto("修改成功", 100000);
                     }
@@ -161,9 +167,15 @@ public class BackerServiceImpl implements BackerService {
                         if (result1.getCode() != 200) {
                             logger.info("发送删除支持者时融云消息异常" + result1.toString());
                         }
+                        for (String s : friendId){
+                            msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),"取消了您作为ta支持者的身份",System.currentTimeMillis()/1000);
+                        }
                         ResponseResult result2 = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), friendId, 0, addBackerMessage);
                         if (result2.getCode() != 200) {
                             logger.info("添加邀请事件时融云消息异常" + result2.toString());
+                        }
+                        for (String s : friendId){
+                            msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),":来来来,当我的支持者,搞起!",System.currentTimeMillis()/1000);
                         }
                         if (backerMapper.updateBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000) > 0) {
                             return DtoUtil.getSuccessDto("修改成功", 100000);
