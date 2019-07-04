@@ -3,10 +3,7 @@ package com.modcreater.tmauth.service.impl;
 import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.dto.MyDetail;
-import com.modcreater.tmbeans.pojo.Account;
-import com.modcreater.tmbeans.pojo.Friendship;
-import com.modcreater.tmbeans.pojo.SystemMsgRecord;
-import com.modcreater.tmbeans.pojo.UserStatistics;
+import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.userinfo.ShowUserInfo;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
@@ -50,6 +47,8 @@ public class AccountServiceImpl implements AccountService {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private EventMapper eventMapper;
+    @Resource
+    private BackerMapper backerMapper;
     @Resource
     private SystemMsgMapper systemMsgMapper;
 
@@ -253,14 +252,14 @@ public class AccountServiceImpl implements AccountService {
         //好友表信息
         Account account=accountMapper.queryFriendByUserCode(queFridenVo.getUserCode());
         if (ObjectUtils.isEmpty(account)){
-            return DtoUtil.getFalseDto("搜索好友失败",200000);
+            return DtoUtil.getSuccesWithDataDto("搜索好友失败",null,200000);
         }
         //日规划,月规划
         MyDetail result=accountMapper.queryPlanByDayAndMonth(account.getId().toString(),myDate[2],myDate[0],myDate[1]);
         //已完成
         Long completedEvents = eventMapper.countCompletedEvents(account.getId());
         if (ObjectUtils.isEmpty(result)){
-            return DtoUtil.getFalseDto("好友其他信息失败",200000);
+            return DtoUtil.getSuccesWithDataDto("好友其他信息失败",null,200000);
         }
         //判断这俩人是不是已经是好友
         int i=accountMapper.queryFriendRel(queFridenVo.getUserId(),account.getId().toString());
@@ -270,7 +269,7 @@ public class AccountServiceImpl implements AccountService {
             //成就
             List<String> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
             if (achievement.size()==0){
-                return DtoUtil.getFalseDto("查询成就失败",200000);
+                return DtoUtil.getSuccesWithDataDto("查询成就失败",null,200000);
             }
             map.put("userId",account.getId().toString());
             map.put("userCode",account.getUserCode());
@@ -281,7 +280,7 @@ public class AccountServiceImpl implements AccountService {
             map.put("userSign",account.getUserSign());
             map.put("dayPlan",result.getDay());
             map.put("monthPlan",result.getMonth());
-            map.put("finish",completedEvents);
+            map.put("finish",completedEvents.toString());
             map.put("achievement",achievement);
             map.put("isFriend",1);
             return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
@@ -298,7 +297,7 @@ public class AccountServiceImpl implements AccountService {
         map.put("userSign",account.getUserSign());
         map.put("dayPlan",result.getDay());
         map.put("monthPlan",result.getMonth());
-        map.put("finish",completedEvents);
+        map.put("finish",completedEvents.toString());
         map.put("isFriend",0);
         return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
     }
@@ -530,22 +529,40 @@ public class AccountServiceImpl implements AccountService {
         }
         int pageIndex=(Integer.parseInt(userIdVo.getPageNumber())-1)*pageSize;
         List<Account> accountList=accountMapper.queryFriendList(userIdVo.getUserId(),pageIndex,pageSize);
-        System.out.println("查询好友列表时输出的为什么会失败==》"+accountList.toString());
+        Backers backers=backerMapper.getMyBacker(userIdVo.getUserId());
+        String backerId="";
+        if (!StringUtils.isEmpty(backers)){
+            backerId=backers.getBackerId();
+        }
+        Map<String,Object> result=new HashMap<>();
+        result.put("backer",null);
         List<Map> maps=new ArrayList<>();
         for (Account account:accountList) {
             Map map=new HashMap();
-            map.put("friendId",account.getId());
-            map.put("userCode",account.getUserCode());
-            map.put("userName",account.getUserName());
-            map.put("headImgUrl",account.getHeadImgUrl());
-            map.put("gender",account.getGender());
-            map.put("userSign",account.getUserSign());
-            maps.add(map);
+            //找到支持者
+            if (account.getId().toString().equals(backerId)){
+                map.put("friendId",account.getId());
+                map.put("userCode",account.getUserCode());
+                map.put("userName",account.getUserName());
+                map.put("headImgUrl",account.getHeadImgUrl());
+                map.put("gender",account.getGender());
+                map.put("userSign",account.getUserSign());
+                result.put("backer",map);
+            }else {
+                map.put("friendId",account.getId());
+                map.put("userCode",account.getUserCode());
+                map.put("userName",account.getUserName());
+                map.put("headImgUrl",account.getHeadImgUrl());
+                map.put("gender",account.getGender());
+                map.put("userSign",account.getUserSign());
+                maps.add(map);
+            }
         }
+        result.put("friends",maps);
         if (ObjectUtils.isEmpty(accountList)){
-            return DtoUtil.getFalseDto("查询好友列表失败",200000);
+            return DtoUtil.getSuccesWithDataDto("查询好友列表失败",null,200000);
         }
-        return DtoUtil.getSuccesWithDataDto("查询好友列表成功",maps,100000);
+        return DtoUtil.getSuccesWithDataDto("查询好友列表成功",result,100000);
     }
 
     /**
@@ -576,14 +593,14 @@ public class AccountServiceImpl implements AccountService {
         //好友表信息
         Account account=accountMapper.queryAccount(queFridenVo.getFriendId());
         if (ObjectUtils.isEmpty(account)){
-            return DtoUtil.getFalseDto("查询好友详情失败",200000);
+            return DtoUtil.getSuccesWithDataDto("查询好友详情失败",null,200000);
         }
         //日规划,月规划
         MyDetail result=accountMapper.queryPlanByDayAndMonth(account.getId().toString(),myDate[2],myDate[0],myDate[1]);
         //已完成
         UserStatistics userStatistics=achievementMapper.queryUserStatistics(account.getId().toString());
         if (ObjectUtils.isEmpty(userStatistics)|| ObjectUtils.isEmpty(result)){
-            return DtoUtil.getFalseDto("好友其他信息失败",200000);
+            return DtoUtil.getSuccesWithDataDto("好友其他信息失败",null,200000);
         }
         //成就
         List<String> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
@@ -708,7 +725,7 @@ public class AccountServiceImpl implements AccountService {
         //查询所有消息
         List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"-1","newFriend");
         if (systemMsgRecordList.size()==0){
-            return DtoUtil.getFalseDto("没有好友请求消息",200000);
+            return DtoUtil.getSuccesWithDataDto("没有好友请求消息",null,200000);
         }
         List list=new ArrayList();
         for (SystemMsgRecord systemMsgRecord:systemMsgRecordList) {
@@ -723,7 +740,7 @@ public class AccountServiceImpl implements AccountService {
             //已完成
             Long completed = eventMapper.countCompletedEvents(systemMsgRecord.getFromId());
             if (ObjectUtils.isEmpty(result)){
-                return DtoUtil.getFalseDto("好友其他信息失败",200000);
+                return DtoUtil.getSuccesWithDataDto("好友其他信息失败",null,200000);
             }
             msgVo.setHeadImgUrl(account.getHeadImgUrl());
             msgVo.setUserName(account.getUserName());
@@ -768,7 +785,7 @@ public class AccountServiceImpl implements AccountService {
         Map<String,Object> map=new HashMap<>();
         List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"0","");
         if (systemMsgRecordList.size()==0){
-            return DtoUtil.getFalseDto("没有未读消息",200000);
+            return DtoUtil.getSuccesWithDataDto("没有未读消息",null,200000);
         }
         map.put("count",systemMsgRecordList.size());
         return DtoUtil.getSuccesWithDataDto("未读消息条数获取成功",map,100000);
@@ -819,7 +836,7 @@ public class AccountServiceImpl implements AccountService {
         }
         Account account= accountMapper.queryAccount(queryUserVo.getId());
         if (ObjectUtils.isEmpty(account)){
-            return DtoUtil.getFalseDto("查询用户信息失败",200000);
+            return DtoUtil.getSuccesWithDataDto("查询用户信息失败",null,200000);
         }
         account.setUserPassword(null);
         ShowUserInfo showUserInfo = new ShowUserInfo();

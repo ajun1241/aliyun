@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbiz.config.annotation.GLOT;
+import com.modcreater.tmbiz.config.annotation.Safety;
 import com.modcreater.tmbiz.service.EventService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -65,6 +66,7 @@ public class EventController {
     }
 
     @GLOT
+    @Safety
     @RequestMapping(value = "seabyday",method = RequestMethod.POST)
     @ApiOperation("查询一天的事件")
     public Dto searchByDay(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
@@ -154,17 +156,6 @@ public class EventController {
     }
 
     /**
-     * 邀请事件添加成员
-     * @param addInviterVo
-     * @return
-     */
-    @PostMapping(value = "addinviter")
-    @ApiOperation("邀请事件添加成员")
-    public Dto addInviter(@RequestBody AddInviterVo addInviterVo, HttpServletRequest request){
-        return eventService.addInviter(addInviterVo,request.getHeader("token"));
-    }
-
-    /**
      * 根据天条件查询forIOS
      * @param searchConditionsForIOS
      * @param request
@@ -225,6 +216,12 @@ public class EventController {
     @ApiOperation("查询今天的计划")
     public Dto getTodayPlans(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return eventService.getTodayPlans(receivedId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "inviteeventjudge")
+    @ApiOperation("判断邀请事件的最高权限")
+    public Dto inviteEventJudge(@RequestBody ReceivedSearchOnce receivedSearchOnce, HttpServletRequest request){
+        return eventService.inviteEventJudge(receivedSearchOnce,request.getHeader("token"));
     }
 
 }

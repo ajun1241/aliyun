@@ -54,20 +54,20 @@ public class AppServiceImpl implements AppService {
     @Override
     public Dto getAuthenticationActivityNotice(ReceivedNotice receivedNotice, String token) {
         if (ObjectUtils.isEmpty(receivedNotice)) {
-            return DtoUtil.getFalseDto("公告获取失败", 200000);
+            return DtoUtil.getSuccesWithDataDto("公告获取失败", null,200000);
         }
         if (!StringUtils.hasText(receivedNotice.getNoticeName()) || !StringUtils.hasText(receivedNotice.getNoticeTypeId())) {
-            return DtoUtil.getFalseDto("公告获取失败", 200000);
+            return DtoUtil.getSuccesWithDataDto("公告获取失败",null, 200000);
         }
         UserNotice userNotice = appMapper.getUserNotice(receivedNotice.getUserId());
         if (ObjectUtils.isEmpty(userNotice)) {
             if (appMapper.addUserNotice(receivedNotice.getUserId(),receivedNotice.getNoticeName()) == 0) {
-                return DtoUtil.getFalseDto("操作失败", 200000);
+                return DtoUtil.getSuccesWithDataDto("操作失败", null,200000);
             }
         }
         userNotice = appMapper.getUserNotice(receivedNotice.getUserId());
         if (userNotice.getTodayNotifications() == 1) {
-            return DtoUtil.getSuccessDto("已经通知过了", 200000);
+            return DtoUtil.getSuccesWithDataDto("已经通知过了",null, 200000);
         }
         String content = appMapper.getNoticeContent(receivedNotice.getNoticeTypeId(), receivedNotice.getNoticeName(),receivedNotice.getDate());
         if (StringUtils.hasText(content)) {
@@ -78,6 +78,6 @@ public class AppServiceImpl implements AppService {
             appMapper.updateUserNotice(user);
             return DtoUtil.getSuccesWithDataDto("获取成功", content, 100000);
         }
-        return DtoUtil.getSuccessDto("未获取到公告",200000);
+        return DtoUtil.getSuccesWithDataDto("未获取到公告",null,200000);
     }
 }

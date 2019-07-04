@@ -14,10 +14,12 @@ import com.modcreater.tmutils.messageutil.NotifyMessage;
 import io.rong.RongCloud;
 import io.rong.messages.TxtMessage;
 import io.rong.methods.message._private.Private;
+import io.rong.methods.message.history.History;
 import io.rong.methods.message.system.MsgSystem;
 import io.rong.methods.user.User;
 import io.rong.models.Result;
 import io.rong.models.message.PrivateMessage;
+import io.rong.models.response.HistoryMessageResult;
 import io.rong.models.response.ResponseResult;
 import io.rong.models.response.TokenResult;
 import io.rong.models.user.UserModel;
@@ -69,25 +71,16 @@ public class TmbizApplicationTests {
         }
         System.out.println(week);*/
     }
-
+    private String ceshi(){
+        System.out.println("SHAN");
+        return "abc";
+    }
     @Test
     public void test1() {
-        /*try {
-            ArrayList<String> personList1 = new ArrayList<>();
-            personList1.add("1");
-            personList1.add("2");
-            personList1.add("3");
-            personList1.add("4");
-            personList1.add("5");
-            logger.debug("圣埃蒂安");
-            for (int i = 0; i < personList1.size()+1; i++) {
-                System.out.println(personList1.get(i));
-
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            System.out.println(e.getMessage());
-        }*/
+      /*  Map<String,Object> map=new HashMap<>();
+        map.put("1","");
+//        map.put("1","2");
+        System.out.println(map.toString());*/
     }
 
     @Test
@@ -160,6 +153,10 @@ public class TmbizApplicationTests {
     @Test
     public void test5() throws Exception {
         /*RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
+        History history = rongCloud.message.history;
+        HistoryMessageResult historyMessageResult = (HistoryMessageResult)history.get("2019070311");
+        System.out.println("get history  message:  " + historyMessageResult.toString());*/
+        /*
         MsgSystem system = rongCloud.message.system;
         User User = rongCloud.user;
 
@@ -170,13 +167,6 @@ public class TmbizApplicationTests {
         TokenResult result = User.register(user);
         MyToken myToken= JSONObject.parseObject(result.toString(),MyToken.class);
         System.out.println("getToken:  " + result.toString());
-
-        *//**
-         *
-         * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/user/user.html#refresh
-         *
-         * 刷新用户信息方法
-         *//*
         Result refreshResult = User.update(user);
         System.out.println("refresh:  " + refreshResult.toString());*/
     }

@@ -13,6 +13,7 @@ import com.modcreater.tmbiz.service.EventService;
 import com.modcreater.tmbiz.config.EventUtil;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.*;
+import com.modcreater.tmutils.messageutil.CreateInviteMessage;
 import com.modcreater.tmutils.messageutil.InviteMessage;
 import com.modcreater.tmutils.messageutil.UpdateInviteMessage;
 import io.rong.messages.TxtMessage;
@@ -666,6 +667,7 @@ public class EventServiceImpl implements EventService {
                 ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), new String[]{personList1.get(i)}, 0, inviteMessage);
                 if (result.getCode() != 200) {
                     logger.info("添加邀请事件时融云消息异常"+result.toString());
+                    return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
             }
             //list2给创建者发送拒绝信息
@@ -675,6 +677,7 @@ public class EventServiceImpl implements EventService {
                 ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(personList2.get(i),new String[]{addInviteEventVo.getUserId()},0,txtMessage);
                 if (result.getCode()!=200){
                     logger.info("新增邀请事件回应邀请时融云消息异常："+result.toString());
+                    return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
             }
         } catch (Exception e) {
@@ -794,7 +797,8 @@ public class EventServiceImpl implements EventService {
             singleEventVice.setUserId(singleEvent.getUserid());
             singleEventVice.setEventId(singleEvent.getEventid());
             singleEventVice = eventViceMapper.queryEventVice(singleEventVice);
-            if (!ObjectUtils.isEmpty(tempEventMapper.queryTempEvent(singleEvent.getEventid().toString(),singleEventVice.getUserId().toString()))){
+            SingleEvent st=tempEventMapper.queryTempEvent(singleEvent.getEventid().toString(),singleEventVice.getCreateBy().toString());
+            if (!ObjectUtils.isEmpty(st)){
                 return DtoUtil.getFalseDto("该事件正在修改中，不能修改",2333);
             }
             Map<String, String> m1 = SingleEvent.toMap(singleEvent);
@@ -807,8 +811,18 @@ public class EventServiceImpl implements EventService {
                 return DtoUtil.getFalseDto("没有任何更改", 29102);
             }
             logger.info("修改的内容"+different);
-            //如果是创建者修改
             EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+            //如果有新成员加入
+            EventPersons eventPersons2=JSONObject.parseObject(singleEventOld.getPerson(),EventPersons.class);
+            if (!eventPersons.getFriendsId().equals(eventPersons2.getFriendsId())){
+                //找出新成员
+
+                //给新成员发邀请消息
+//                toldNewInviter();
+                //对修改后的事件参与成员做处理
+                singleEvent.setPerson(JSON.toJSONString(eventPersons2));
+            }
+            //如果是创建者修改
             if (singleEvent.getUserid().equals(singleEventVice.getCreateBy())){
                 //如果暂时只有一个人
                 if (StringUtils.isEmpty(eventPersons.getFriendsId())){
@@ -823,7 +837,7 @@ public class EventServiceImpl implements EventService {
                 tempEventMapper.addTempEvent(singleEvent);
                 //生成统计表
                 List<StatisticsTable> tables = new ArrayList<>();
-                String[] friendsId=eventPersons.getFriendsId().split(",");
+                String[] friendsId=eventPersons2.getFriendsId().split(",");
                 for (String userId : friendsId) {
                     StatisticsTable statisticsTable = new StatisticsTable();
                     statisticsTable.setCreatorId(singleEventVice.getCreateBy());
@@ -849,6 +863,7 @@ public class EventServiceImpl implements EventService {
                     ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),new String[]{friendId},0,updateInviteMessage);
                     if (result.getCode() != 200) {
                         logger.info("修改一条邀请事件时融云消息异常"+result.toString());
+                        return DtoUtil.getFalseDto("消息发送失败",21040);
                     }
                 }
             }else {//不是创建者修改
@@ -858,6 +873,7 @@ public class EventServiceImpl implements EventService {
                 singleEvent.setPerson(singleEvent1.getPerson());
                 tempEventMapper.addTempEvent(singleEvent);
                 //如果只邀请了一个人,直接给创建者发消息
+                logger.info("修改一条邀请事件时的参与者："+eventPersons.toString());
                 if (eventPersons.getFriendsId().equals(singleEventVice.getCreateBy().toString())){
                     Account account = accountMapper.queryAccount(addInviteEventVo.getUserId());
                     RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
@@ -870,10 +886,11 @@ public class EventServiceImpl implements EventService {
                     if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
                         logger.info("修改一条邀请事件时消息状态保存失败,id====>"+msgStatus.getId());
                     }
-                    UpdateInviteMessage updateInviteMessage = new UpdateInviteMessage(content, "", singleEvent.getEventid().toString(), "2", msgStatus.getId().toString());
-                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),new String[]{singleEventVice.getCreateBy().toString()},0,updateInviteMessage);
+                    CreateInviteMessage createInviteMessage = new CreateInviteMessage(content, singleEvent.getEventid().toString(), "2", msgStatus.getId().toString());
+                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),new String[]{singleEventVice.getCreateBy().toString()},0,createInviteMessage);
                     if (result.getCode() != 200) {
                         logger.info("修改一条邀请事件时融云消息异常"+result.toString());
+                        return DtoUtil.getFalseDto("消息发送失败",21040);
                     }
                 }else {
                     //如果不止一人
@@ -908,6 +925,7 @@ public class EventServiceImpl implements EventService {
                             ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),new String[]{friendId},0,updateInviteMessage);
                             if (result.getCode() != 200) {
                                 logger.info("修改一条邀请事件时融云消息异常"+result.toString());
+                                return DtoUtil.getFalseDto("消息发送失败",21040);
                             }
                         }
                     }
@@ -997,10 +1015,11 @@ public class EventServiceImpl implements EventService {
                     if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
                         logger.info("回应邀请事件修改时消息状态保存失败,id====>"+msgStatus.getId());
                     }
-                    UpdateInviteMessage updateInviteMessage=new UpdateInviteMessage(content,"",singleEvent.getEventid().toString(),"2", msgStatus.getId().toString());
-                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,new String[]{vice.getCreateBy().toString()},0,updateInviteMessage);
+                    CreateInviteMessage createInviteMessage=new CreateInviteMessage(content,singleEvent.getEventid().toString(),"2", msgStatus.getId().toString());
+                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,new String[]{vice.getCreateBy().toString()},0,createInviteMessage);
                     if (result.getCode() != 200) {
                         logger.info("回应邀请事件修改时融云消息异常"+result.toString());
+                        return DtoUtil.getFalseDto("消息发送失败",21040);
                     }
                 }
                 //修改消息状态
@@ -1031,6 +1050,7 @@ public class EventServiceImpl implements EventService {
                     ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,inviteIds.split(","),0,txtMessage);
                     if (result.getCode() != 200) {
                         logger.info("回应邀请事件修改时融云消息异常"+result.toString());
+                        return DtoUtil.getFalseDto("消息发送失败",21040);
                     }
                 }
                 //修改消息状态
@@ -1101,6 +1121,7 @@ public class EventServiceImpl implements EventService {
                 ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,list.toArray(new String[list.size()]),0,txtMessage);
                 if (result.getCode() != 200) {
                     logger.info("修改事件时创建者选择时融云消息异常"+result.toString());
+                    return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
                 //修改消息状态
                 msgStatusMapper.updateMsgStatus("0", eventCreatorChooseVo.getMsgId());
@@ -1117,6 +1138,7 @@ public class EventServiceImpl implements EventService {
                 ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,list.toArray(new String[list.size()]),0,txtMessage);
                 if (result.getCode() != 200) {
                     logger.info("修改事件时创建者选择时融云消息异常"+result.toString());
+                    return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
                 //修改消息状态
                 msgStatusMapper.updateMsgStatus("1", eventCreatorChooseVo.getMsgId());
@@ -1193,6 +1215,7 @@ public class EventServiceImpl implements EventService {
                 ResponseResult result2 = rongCloudMethodUtil.sendPrivateMsg(SYSTEMID, targetId, 0, txtMessage);
                 if (result2.getCode() != 200) {
                     logger.info("融云消息异常"+result2.toString());
+                    return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
             } else {
                 //如果不是创建者删除
@@ -1234,6 +1257,7 @@ public class EventServiceImpl implements EventService {
                 ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(SYSTEMID, new String[]{singleEventVice.getCreateBy().toString()}, 0, txtMessage);
                 if (result.getCode() != 200) {
                     logger.info("融云消息异常"+result.toString());
+                    return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
             }
         } catch (Exception e) {
@@ -1241,87 +1265,6 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("事件删除失败", 26002);
         }
         return DtoUtil.getSuccessDto("事件删除成功", 100000);
-    }
-    /**
-     * 邀请事件添加参与者
-     * @param addInviterVo
-     * @param token
-     * @return
-     */
-    @Override
-    public Dto addInviter(AddInviterVo addInviterVo, String token) {
-        try {
-            if (!token.equals(stringRedisTemplate.opsForValue().get(addInviterVo.getUserId()))) {
-                return DtoUtil.getFalseDto("请重新登录", 21014);
-            }
-            //判断事件有效
-            SingleEvent singleEvent=eventMapper.queryEventOne(addInviterVo.getUserId(),addInviterVo.getEventId());
-            if (ObjectUtils.isEmpty(singleEvent)){
-                return DtoUtil.getFalseDto("事件已过期或者被删除",2333);
-            }
-            //判断是否有权限添加
-            SingleEventVice singleEventVice = new SingleEventVice();
-            singleEventVice.setUserId(Long.parseLong(addInviterVo.getUserId()));
-            singleEventVice.setEventId(Long.parseLong(addInviterVo.getEventId()));
-            singleEventVice = eventViceMapper.queryEventVice(singleEventVice);
-            if (ObjectUtils.isEmpty(singleEventVice)){
-                //在事件副表插入创建者
-                singleEventVice.setCreateBy(Long.parseLong(addInviterVo.getUserId()));
-                singleEventVice.setUserId(singleEvent.getUserid());
-                singleEventVice.setEventId(singleEvent.getEventid());
-                eventViceMapper.createEventVice(singleEventVice);
-            }
-            if (!addInviterVo.getUserId().equals(singleEventVice.getCreateBy().toString())){
-                return DtoUtil.getFalseDto("你没有权限添加成员",20111);
-            }
-            //邀请的好友数据
-            String[] persons = addInviterVo.getFriendsId().split(",");
-            //要发送信息的人员
-            ArrayList<String> personList1 = new ArrayList<>();
-            //屏蔽的人员
-            ArrayList<String> personList2 = new ArrayList<>();
-            //判断好友是否开启了邀请权限
-            for (int i = 0; i < persons.length; i++) {
-                Friendship friendship = accountMapper.queryFriendshipDetail(persons[i], addInviterVo.getUserId());
-                UserSettings settings=userSettingsMapper.queryAllSettings(persons[i]);
-                if (friendship.getInvite() == 1 && settings.getFriendInvite()==0) {
-                    //只添加满足条件的人
-                    personList1.add(persons[i]);
-                }else{
-                    //查询屏蔽人的id
-                    personList2.add(persons[i]);
-                }
-            }
-            //发送信息
-            //给list1发送邀请信息
-            for (int i = 0; i <personList1.size() ; i++) {
-                MsgStatus msgStatus = new MsgStatus();
-                msgStatus.setType(1L);
-                msgStatus.setUserId(Long.parseLong(personList1.get(i)));
-                if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
-                    logger.info("添加邀请事件时消息状态保存失败,id====>"+msgStatus.getId());
-                }
-                RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
-                String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
-                InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date,JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2", msgStatus.getId().toString());
-                ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviterVo.getUserId(), new String[]{personList1.get(i)}, 0, inviteMessage);
-                if (result.getCode() != 200) {
-                    logger.info("添加邀请事件时融云消息异常"+result.toString());
-                }
-            }
-            //list2给创建者发送拒绝信息
-            for (int i = 0; i < personList2.size(); i++) {
-                RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
-                TxtMessage txtMessage=new TxtMessage("我拒绝了你的事件：“"+singleEvent.getEventname()+"”的邀请","");
-                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(personList2.get(i),new String[]{addInviterVo.getUserId()},0,txtMessage);
-                if (result.getCode()!=200){
-                    logger.info("新增邀请事件回应邀请时融云消息异常："+result.toString());
-                }
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-        }
-        return DtoUtil.getSuccessDto("消息已发送",100000);
     }
 
     @Override
@@ -1469,14 +1412,14 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21013);
         }
         MsgStatus msgStatus = msgStatusMapper.queryMsg(queryMsgStatusVo.getMsgId());
+        if (ObjectUtils.isEmpty(msgStatus)) {
+            return DtoUtil.getFalseDto("查询消息状态失败", 200000);
+        }
         Map<String, String> map = new HashMap<>();
         map.put("id", msgStatus.getId().toString());
         map.put("userId", msgStatus.getUserId().toString());
         map.put("status", msgStatus.getStatus().toString());
         map.put("type", msgStatus.getType().toString());
-        if (ObjectUtils.isEmpty(msgStatus)) {
-            return DtoUtil.getFalseDto("查询消息状态失败", 200000);
-        }
         return DtoUtil.getSuccesWithDataDto("查询消息状态成功", map, 100000);
     }
 
@@ -1506,6 +1449,38 @@ public class EventServiceImpl implements EventService {
         result.put("event", SingleEventUtil.getShowSingleEvent(singleEvent));
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
+    /**
+     * 判断邀请事件最高权限
+     * @param receivedSearchOnce
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto inviteEventJudge(ReceivedSearchOnce receivedSearchOnce, String token) {
+        Map<String,String> map=new HashMap<>();
+        map.put("authority","0");
+        try {
+            if (!token.equals(stringRedisTemplate.opsForValue().get(receivedSearchOnce.getUserId()))) {
+                return DtoUtil.getFalseDto("请重新登录", 21013);
+            }
+            //判断是否有权限添加
+            SingleEventVice singleEventVice = new SingleEventVice();
+            singleEventVice.setUserId(Long.parseLong(receivedSearchOnce.getUserId()));
+            singleEventVice.setEventId(Long.parseLong(receivedSearchOnce.getEventId()));
+            singleEventVice = eventViceMapper.queryEventVice(singleEventVice);
+            if (!ObjectUtils.isEmpty(singleEventVice)){
+                if (receivedSearchOnce.getUserId().equals(singleEventVice.getCreateBy().toString())){
+                    map.put("authority","1");
+                    return DtoUtil.getSuccesWithDataDto("请求成功",map,100000);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return DtoUtil.getFalseDto("请求失败",2333);
+        }
+        return DtoUtil.getSuccesWithDataDto("请求成功",map,100000);
+    }
+
 
     private List<List<ShowSingleEvent>> getShowSingleEventListList(List<SingleEvent> list) {
         List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
@@ -1575,5 +1550,55 @@ public class EventServiceImpl implements EventService {
             dayEventsList.add(dayEvents);
         }
         return dayEventsList;
+    }
+
+    /**
+     * 给新邀请的成员发消息
+     * @param newFriends
+     */
+    private void toldNewInviter(String[] newFriends,SingleEvent singleEvent,String userId) throws Exception {
+        String[] persons = newFriends;
+        //要发送信息的人员
+        ArrayList<String> personList1 = new ArrayList<>();
+        //屏蔽的人员
+        ArrayList<String> personList2 = new ArrayList<>();
+        //判断好友是否开启了邀请权限
+        for (int i = 0; i < persons.length; i++) {
+            Friendship friendship = accountMapper.queryFriendshipDetail(persons[i], userId);
+            UserSettings settings=userSettingsMapper.queryAllSettings(persons[i]);
+            if (friendship.getInvite() == 1 && settings.getFriendInvite()==0) {
+                //只添加满足条件的人
+                personList1.add(persons[i]);
+            }else{
+                //查询屏蔽人的id
+                personList2.add(persons[i]);
+            }
+        }
+        //发送信息
+        //给list1发送邀请信息
+        for (int i = 0; i <personList1.size() ; i++) {
+            MsgStatus msgStatus = new MsgStatus();
+            msgStatus.setType(1L);
+            msgStatus.setUserId(Long.parseLong(personList1.get(i)));
+            if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
+                logger.info("添加邀请事件时消息状态保存失败,id====>"+msgStatus.getId());
+            }
+            RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
+            String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
+            InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date,JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2", msgStatus.getId().toString());
+            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(userId, new String[]{personList1.get(i)}, 0, inviteMessage);
+            if (result.getCode() != 200) {
+                logger.info("添加邀请事件时融云消息异常"+result.toString());
+            }
+        }
+        //list2给创建者发送拒绝信息
+        for (int i = 0; i < personList2.size(); i++) {
+            RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+            TxtMessage txtMessage=new TxtMessage("我拒绝了你的事件：“"+singleEvent.getEventname()+"”的邀请","");
+            ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(personList2.get(i),new String[]{userId},0,txtMessage);
+            if (result.getCode()!=200){
+                logger.info("新增邀请事件回应邀请时融云消息异常："+result.toString());
+            }
+        }
     }
 }

@@ -203,13 +203,6 @@ public interface EventService {
      */
     Dto searchFriendEventOnce(ReceivedFriendEventOnce receivedFriendEventOnce, String token);
 
-    /**
-     * 邀请事件添加参与者
-     * @param addInviterVo
-     * @param token
-     * @return
-     */
-    Dto addInviter(AddInviterVo addInviterVo,String token);
 
     /**
      * 查询今天的计划
@@ -218,4 +211,12 @@ public interface EventService {
      * @return
      */
     Dto getTodayPlans(ReceivedId receivedId, String token);
+
+    /**
+     * 判断邀请事件最高权限
+     * @param receivedSearchOnce
+     * @param token
+     * @return
+     */
+    Dto inviteEventJudge(ReceivedSearchOnce receivedSearchOnce,String token);
 }
