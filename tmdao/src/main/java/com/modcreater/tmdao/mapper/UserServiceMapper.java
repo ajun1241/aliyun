@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.EventMsg;
 import com.modcreater.tmbeans.pojo.ServiceRemainingTime;
 import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import org.apache.ibatis.annotations.Mapper;
@@ -55,4 +56,11 @@ public interface UserServiceMapper {
      * @return
      */
     List<ServiceRemainingTime> getAllServiceRemainingTime(String userId);
+
+    /**
+     * 查询用户历史消息
+     * @param userId
+     * @return
+     */
+    List<EventMsg> getHistoryMsgList(String userId);
 }

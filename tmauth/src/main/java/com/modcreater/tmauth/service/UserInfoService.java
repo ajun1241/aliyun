@@ -2,10 +2,7 @@ package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserAchievement;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedAlterUserInfo;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdIsOverdue;
+import com.modcreater.tmbeans.vo.userinfovo.*;
 
 import java.util.List;
 
@@ -81,4 +78,12 @@ public interface UserInfoService {
      * @return
      */
     Dto alterUserSign(ReceivedAlterUserInfo receivedAlterUserInfo, String token);
+
+    /**
+     * 获取消息列表
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto getMsgList(ReceivedId receivedId, String token);
 }

@@ -40,7 +40,7 @@ public interface BackerService {
     Dto getMyBacker(ReceivedId receivedId, String token);
 
     /**
-     * 是否称为支持者做出响应
+     * 是否成为支持者做出响应
      * @param receivedBeSupporterFeedback
      * @param token
      * @return

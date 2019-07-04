@@ -41,4 +41,7 @@
     <select id="getAllServiceRemainingTime" resultType="com.modcreater.tmbeans.pojo.ServiceRemainingTime">
         select <include refid="serviceRemainingTime"/> from serviceremainingtime where userId = #{userId}
     </select>
+    <select id="getHistoryMsgList" resultType="com.modcreater.tmbeans.pojo.EventMsg">
+        select * from eventmsg where msgOwnerId = #{userId} order by id desc limit 3
+    </select>
 </mapper>

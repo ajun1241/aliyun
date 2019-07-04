@@ -49,7 +49,7 @@ public class BackerController {
     }
 
     @PostMapping("besupporterfeedback")
-    @ApiOperation("是否称为支持者做出响应")
+    @ApiOperation("是否成为支持者做出响应")
     public Dto beSupporterFeedback(ReceivedBeSupporterFeedback receivedBeSupporterFeedback , HttpServletRequest request){
         return backerService.beSupporterFeedback(receivedBeSupporterFeedback,request.getHeader("token"));
     }

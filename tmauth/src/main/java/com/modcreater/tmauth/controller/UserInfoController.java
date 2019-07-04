@@ -67,4 +67,10 @@ public class UserInfoController {
     public Dto alterUserSign(@RequestBody ReceivedAlterUserInfo receivedAlterUserInfo,HttpServletRequest request){
         return userInfoService.alterUserSign(receivedAlterUserInfo,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getmsglist")
+    @ApiOperation("获取消息列表")
+    public Dto getMsgList(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
+        return userInfoService.getMsgList(receivedId,request.getHeader("token"));
+    }
 }

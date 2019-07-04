@@ -17,6 +17,7 @@ import com.modcreater.tmbeans.utils.NaturalWeek;
 import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedAlterUserInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
@@ -611,6 +612,35 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getSuccessDto("修改成功", 100000);
         }
         return DtoUtil.getFalseDto("修改失败", 200000);
+    }
+
+    @Override
+    public Dto getMsgList(ReceivedId receivedId, String token) {
+        if (StringUtils.isEmpty(receivedId.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        List<EventMsg> eventMsgs = userServiceMapper.getHistoryMsgList(receivedId.getUserId());
+        if (eventMsgs.size() == 0){
+            return DtoUtil.getSuccessDto("查询成功",200000);
+        }
+        List<Map<String ,Object>> result = new ArrayList<>();
+        for (EventMsg eventMsg : eventMsgs){
+            Account account = accountMapper.queryAccount(eventMsg.getMsgSenderId());
+            if (ObjectUtils.isEmpty(account)){
+                return DtoUtil.getFalseDto("操作失败",23001);
+            }
+            Map<String ,Object> em = new HashMap<>();
+            em.put("createDate",eventMsg.getCreateDate());
+            em.put("content",account.getUserName() + eventMsg.getContent());
+            result.add(em);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
     public boolean isSearchServiceNice(ReceivedEventConditions receivedEventConditions) {
