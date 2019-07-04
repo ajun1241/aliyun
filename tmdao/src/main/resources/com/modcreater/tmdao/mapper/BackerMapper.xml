@@ -3,11 +3,14 @@
 <mapper namespace="com.modcreater.tmdao.mapper.BackerMapper">
 
     <insert id="addBackers">
-        insert into backers(userId, backerId)
-        values(#{userId},#{backerId})
+        insert into backers(userId, backerId, createDate)
+        values(#{userId},#{backerId},#{createDate})
     </insert>
-    <update id="updateBacke">
-        update backers set backerId = #{friendId} where userId = #{userId}
+    <update id="updateBacker">
+        update backers set backerId = #{friendId} ,status = 0 ,createDate = #{createDate} where userId = #{userId}
+    </update>
+    <update id="updateMsgStatus">
+        update msgstatus set status = #{status} where id = #{msgId} and  userId = #{userId}
     </update>
     <delete id="deleteBacker">
         delete from backers where userId = #{userId}
@@ -25,7 +28,7 @@
         and f.userId = #{userId}
     </select>
     <select id="getMyBacker" resultType="com.modcreater.tmbeans.pojo.Backers">
-        select * from backers where userId = #{userId} and status = 1
+        select * from backers where userId = #{userId}
     </select>
 
     <select id="findBackerForEvent" resultType="java.util.Map">
@@ -36,6 +39,9 @@
         AND `year` = #{year}
         AND isOverdue=0
         AND `level`=5
+    </select>
+    <select id="getRealMyBacker" resultType="com.modcreater.tmbeans.pojo.Backers">
+        select * from backers where userId = #{userId} and status = 1
     </select>
 
 </mapper>

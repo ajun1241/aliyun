@@ -13,7 +13,7 @@ public class Backers {
   private String id;
   private String userId;
   private String backerId;
-  private Date createDate;
+  private Long createDate;
   private String status;
 
 }

@@ -18,6 +18,8 @@ public class ReceivedBeSupporterFeedback {
     private String appType;
 
     private String receiverId;
+
+    private String msgId;
     /**
      * 0接受1不接受
      */

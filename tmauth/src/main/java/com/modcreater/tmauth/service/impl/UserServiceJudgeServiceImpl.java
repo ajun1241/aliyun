@@ -107,7 +107,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         if (ObjectUtils.isEmpty(service)) {
             return DtoUtil.getFalseDto("好友功能尚未开通", 200000);
         }
-        return DtoUtil.getSuccessDto("好友功能已开通", 100000);
+        return DtoUtil.getSuccesWithDataDto("好友功能已开通","1", 100000);
     }
 
     /**
