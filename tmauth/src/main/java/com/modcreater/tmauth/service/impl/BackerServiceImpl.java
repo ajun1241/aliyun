@@ -129,10 +129,10 @@ public class BackerServiceImpl implements BackerService {
             MsgStatus msgStatus = new MsgStatus();
             msgStatus.setUserId(Long.valueOf(receivedChangeBackerInfo.getUserId()));
             msgStatus.setType(2L);
-            Integer msgId = msgStatusMapper.addNewMsg(msgStatus);
+            msgStatusMapper.addNewMsg(msgStatus);
             AddBackerMessage addBackerMessage = new AddBackerMessage();
             addBackerMessage.setContent("来来来,当我的支持者,搞起!");
-            addBackerMessage.setMsgId(msgId.toString());
+            addBackerMessage.setMsgId(msgStatus.getId().toString());
             RongCloudMethodUtil rong = new RongCloudMethodUtil();
             String[] friendId = {ObjectUtils.isEmpty(backer) ? receivedChangeBackerInfo.getFriendId() : backer.getBackerId()};
             if (ObjectUtils.isEmpty(backer)) {
