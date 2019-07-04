@@ -83,8 +83,8 @@ public interface BackerMapper {
     /**
      * 修改支持者状态
      * @param receiverId
-     * @param i
+     * @param status
      * @return
      */
-    int updateBackerStatus(String receiverId, int i);
+    int updateBackerStatus(@Param("userId") String receiverId,@Param("status") int status);
 }

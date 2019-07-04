@@ -12,6 +12,9 @@
     <update id="updateMsgStatus">
         update msgstatus set status = #{status} where id = #{msgId} and  userId = #{userId}
     </update>
+    <update id="updateBackerStatus">
+        update backers set status = #{status} where userId = #{userId}
+    </update>
     <delete id="deleteBacker">
         delete from backers where userId = #{userId}
     </delete>
