@@ -1,28 +1,19 @@
 package com.modcreater.tmbiz;
 
 //import com.modcreater.tmbeans.pojo.TestSingEvent;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.modcreater.tmbeans.dto.EventPersons;
+import com.modcreater.tmbeans.pojo.Informationsafety;
 import com.modcreater.tmbeans.pojo.SingleEvent;
-import com.modcreater.tmbeans.show.MyToken;
 import com.modcreater.tmbiz.config.EventUtil;
-import com.modcreater.tmbiz.service.impl.EventServiceImpl;
+import com.modcreater.tmbiz.config.aop.InfoSafety;
 import com.modcreater.tmdao.mapper.BackerMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
-import com.modcreater.tmutils.messageutil.InviteMessage;
-import com.modcreater.tmutils.messageutil.NotifyMessage;
+import com.modcreater.tmutils.SingleEventUtil;
 import io.rong.RongCloud;
-import io.rong.messages.TxtMessage;
-import io.rong.methods.message._private.Private;
 import io.rong.methods.message.history.History;
-import io.rong.methods.message.system.MsgSystem;
-import io.rong.methods.user.User;
-import io.rong.models.Result;
-import io.rong.models.message.PrivateMessage;
 import io.rong.models.response.HistoryMessageResult;
 import io.rong.models.response.ResponseResult;
-import io.rong.models.response.TokenResult;
-import io.rong.models.user.UserModel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -30,11 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RunWith(SpringRunner.class)
@@ -77,21 +65,19 @@ public class TmbizApplicationTests {
     }
     @Test
     public void test1() {
-      /*  Map<String,Object> map=new HashMap<>();
-        map.put("1","");
-//        map.put("1","2");
-        System.out.println(map.toString());*/
+        /*Informationsafety informationSafety=new Informationsafety();
+        Map<String,Object> map=new HashMap<>();
+        map.put("clientHardwareInfo","华为mete200");
+        map.put("id","100033");
+        map.put("shanchu1","13");
+        String m=JSON.toJSONString(map);
+        informationSafety= JSONObject.parseObject(m,Informationsafety.class);
+        System.out.println(informationSafety.toString());*/
     }
 
     @Test
     public void test2() {
-        /*SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
-        String[] now=simpleDateFormat.format(new Date()).split("-");
-        List<Map<String, Object>> backerForEvent = backerMapper.findBackerForEvent(now[0], now[1], "03");
-        for (Map<String,Object> map:backerForEvent) {
-            System.out.println(map.toString());
-            System.out.println(map.get("backerId"));;
-        }*/
+
     }
 
     @Test
@@ -120,42 +106,20 @@ public class TmbizApplicationTests {
     }
     @Test
     public void test4() {
-        /*String[] as = new String[]{"0","1","2","3"};
-        String[] bs = new String[]{"1","2","5"};
-        List<String> list1 = Arrays.asList(bs);
-        List<String> list2 = Arrays.asList(as);
-        //用来装差集
-        List<String> result1 = new ArrayList<String>();
-        List<String> result2 = new ArrayList<String>();
-        List<String> result3 = new ArrayList<String>();
-        for(String a : as){
-            //判断是否包含
-            if(!list1.contains(a)){
-                result1.add(a);
-            }else {
-                result3.add(a);
-            }
-        }
-        for(String b : bs){
-            //判断是否包含
-            if(!list2.contains(b)){
-                result2.add(b);
-            }
-        }
-        System.out.println(Arrays.toString(result1.toArray()));
-        System.out.println("******************************************");
-        System.out.println(result2.toArray().toString());
-        System.out.println("******************************************");
-        System.out.println(result3);*/
-
+        /*String o="{\"address\":\"湖州\",\"day\":18,\"endtime\":1440,\"eventid\":1560855712,\"eventname\":\"就算不上班\",\"flag\":1,\"isOverdue\":0,\"level\":2,\"month\":6,\"person\":\"{\"friendsId\":\\\\\\\"100089\\\\\\\",\\\\\\\"others\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"remarks\\\":\\\"\\\",\\\"remindTime\\\":30,\\\"repeaTtime\\\":[false,false,false,false,false,false,false],\\\"starttime\\\":1146,\\\"type\\\":0,\\\"userid\\\":0,\\\"year\\\":2019}";
+        String n="";
+        SingleEvent singleEvent1=JSONObject.parseObject(o,SingleEvent.class);
+        SingleEvent singleEvent2=JSONObject.parseObject(n,SingleEvent.class);
+        List list=SingleEventUtil.eventDifferent(SingleEvent.toMap(singleEvent1),SingleEvent.toMap(singleEvent2));
+        logger.info("差异数据"+list.toString());*/
     }
 
     @Test
     public void test5() throws Exception {
         /*RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
         History history = rongCloud.message.history;
-        HistoryMessageResult historyMessageResult = (HistoryMessageResult)history.get("2019070311");
-        System.out.println("get history  message:  " + historyMessageResult.toString());*/
+        ResponseResult removeHistoryMessageResult = history.remove("2018030210");
+        System.out.println("remove history  message:  " + removeHistoryMessageResult.toString());*/
         /*
         MsgSystem system = rongCloud.message.system;
         User User = rongCloud.user;

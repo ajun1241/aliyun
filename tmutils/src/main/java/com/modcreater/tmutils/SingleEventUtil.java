@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -221,28 +222,34 @@ public class SingleEventUtil {
      *
      * @return
      */
-    public static StringBuffer eventDifferent(Map<String, String> m1, Map<String, String> m2) {
+    public static List<Object> eventDifferent(Map<String, String> m1, Map<String, String> m2) {
         //比较差异
-        StringBuffer different = new StringBuffer();
+        List<Object> different = new ArrayList<>();
+
         for (String key : m1.keySet()) {
+            Map<String,String> map=new HashMap<>();
             if (!m1.get(key).equals(m2.get(key))) {
                 if (("开始时间").equals(key)) {
-                    different.append(key + "更改为：" + Long.parseLong(m1.get(key).toString()) / 60 + ":" + Long.parseLong(m1.get(key).toString()) % 60 + "；");
+                    map.put("title",key+ "更改为：");
+                    map.put("content",Long.parseLong(m1.get(key)) / 60 + ":" + Long.parseLong(m1.get(key)) % 60);
                 } else if (("结束时间").equals(key)) {
-                    different.append(key + "更改为：" + Long.parseLong(m1.get(key).toString()) / 60 + ":" + Long.parseLong(m1.get(key).toString()) % 60 + "；");
+                    map.put("title",key+ "更改为：");
+                    map.put("content",Long.parseLong(m1.get(key)) / 60 + ":" + Long.parseLong(m1.get(key)) % 60);
                 } else if (("优先级").equals(key)) {
+                    map.put("title",key+ "更改为：");
                     //2：不紧迫也不重要；3：紧迫但不重要；4：重要又不紧迫；5：重要又紧迫
                     if ("2".equals(m1.get(key))) {
-                        different.append(key + "更改为：不紧迫也不重要；");
+                        map.put("content","不紧迫也不重要");
                     } else if ("3".equals(m1.get(key))) {
-                        different.append(key + "更改为：紧迫但不重要；");
+                        map.put("content","紧迫但不重要");
                     } else if ("4".equals(m1.get(key))) {
-                        different.append(key + "更改为：重要又不紧迫；");
+                        map.put("content","重要又不紧迫");
                     } else if ("5".equals(m1.get(key))) {
-                        different.append(key + "更改为：重要又紧迫；");
+                        map.put("content","重要又紧迫");
                     }
                 } else if (("重复次数").equals(key)) {
-                    String[] arr = m1.get(key).toString().replace("[", "").replace("]", "").split(",");
+                    map.put("title",key+ "更改为：");
+                    String[] arr = m1.get(key).replace("[", "").replace("]", "").split(",");
                     StringBuffer stringBuffer = new StringBuffer();
                     for (int i = 0; i < arr.length; i++) {
                         if ("true".equals(arr[i])) {
@@ -250,40 +257,44 @@ public class SingleEventUtil {
                         }
                     }
                     if (StringUtils.isEmpty(stringBuffer)) {
-                        different.append(key + "更改为：不重复事件；");
+                        map.put("content","不重复事件");
                     } else {
-                        different.append(key + "更改为：每周" + stringBuffer.replace(stringBuffer.length() - 1, stringBuffer.length(), "") + "重复；");
+                        map.put("content","每周" + stringBuffer.replace(stringBuffer.length() - 1, stringBuffer.length(), "") + "重复");
                     }
                 } else if (("提醒时间").equals(key)) {
-                    different.append(key + "更改为：时间开始前" + m1.get(key) + "分钟；");
+                    map.put("title",key+ "更改为：");
+                    map.put("content","时间开始前" + m1.get(key) + "分钟");
                 } else if (("年").equals(key)) {
-                    different.append(key + "更改为：" + m1.get(key) + "年；");
+                    map.put("title",key+ "更改为：");
+                    map.put("content",m1.get(key) + "年");
                 } else if (("月").equals(key)) {
-                    different.append(key + "更改为：" + m1.get(key) + "月；");
+                    map.put("title",key+ "更改为：");
+                    map.put("content",m1.get(key) + "月");
                 } else if (("日").equals(key)) {
-                    different.append(key + "更改为：" + m1.get(key) + "日；");
+                    map.put("title",key+ "更改为：");
+                    map.put("content",m1.get(key) + "日");
                 } else if (("事件类型").equals(key)) {
+                    map.put("title",key+ "更改为：");
                     //0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他
                     if ("0".equals(m1.get(key))) {
-                        different.append(key + "更改为：学习；");
+                        map.put("content","学习");
                     } else if ("1".equals(m1.get(key))) {
-                        different.append(key + "更改为：工作；");
+                        map.put("content","工作");
                     } else if ("2".equals(m1.get(key))) {
-                        different.append(key + "更改为：商务；");
+                        map.put("content","商务");
                     } else if ("3".equals(m1.get(key))) {
-                        different.append(key + "更改为：休闲；");
+                        map.put("content","休闲");
                     } else if ("4".equals(m1.get(key))) {
-                        different.append(key + "更改为：家庭；");
+                        map.put("content","家庭");
                     } else if ("5".equals(m1.get(key))) {
-                        different.append(key + "更改为：节日；");
+                        map.put("content","节日");
                     } else if ("6".equals(m1.get(key))) {
-                        different.append(key + "更改为：假期；");
+                        map.put("content","假期");
                     } else if ("7".equals(m1.get(key))) {
-                        different.append(key + "更改为：其他；");
+                        map.put("content","其他");
                     }
-                } else {
-                    different.append(key + "更改为：" + m1.get(key) + "；");
                 }
+                different.add(map);
             }
         }
         return different;

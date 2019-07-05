@@ -813,24 +813,35 @@ public class EventServiceImpl implements EventService {
             SingleEvent singleEventOld = eventMapper.queryEventOne(singleEvent.getUserid().toString(), singleEvent.getEventid().toString());
             Map<String, String> m2 = SingleEvent.toMap(singleEventOld);
             //比较差异
-            StringBuffer different = SingleEventUtil.eventDifferent(m1, m2);
-            if (StringUtils.isEmpty(different) || different.length() == 0) {
+            List different = SingleEventUtil.eventDifferent(m1, m2);
+            if (different.size()==0) {
                 return DtoUtil.getFalseDto("没有任何更改", 29102);
             }
             logger.info("修改的内容"+different);
             EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
             //如果有新成员加入
             EventPersons eventPersons2=JSONObject.parseObject(singleEventOld.getPerson(),EventPersons.class);
-            if (!eventPersons.getFriendsId().equals(eventPersons2.getFriendsId())){
-                //找出新成员
-
-                //给新成员发邀请消息
-//                toldNewInviter();
-                //对修改后的事件参与成员做处理
-                singleEvent.setPerson(JSON.toJSONString(eventPersons2));
+            //找出新成员
+            String[] oldPerson=eventPersons2.getFriendsId().split(",");
+            String[] newPerson=eventPersons.getFriendsId().split(",");
+            List<String> o=Arrays.asList(oldPerson);
+            logger.info("修改一条邀请事件时输出的老成员"+o.toString());
+            List<String> n=Arrays.asList(newPerson);
+            logger.info("修改一条邀请事件时输出的新成员"+n.toString());
+            List<String> newFriends=new ArrayList<>();
+            for (String person:newPerson) {
+                if (!o.contains(person)){
+                    newFriends.add(person);
+                }
             }
             //如果是创建者修改
             if (singleEvent.getUserid().equals(singleEventVice.getCreateBy())){
+                if (newFriends.size()>0){
+                    //给新成员发邀请消息
+                    toldNewInviter(newFriends.toArray(new String[newFriends.size()]),singleEventOld,addInviteEventVo.getUserId());
+                    //对修改后的事件参与成员做处理
+                    singleEvent.setPerson(JSON.toJSONString(eventPersons2));
+                }
                 //如果暂时只有一个人
                 if (StringUtils.isEmpty(eventPersons.getFriendsId())){
                     //直接修改
@@ -858,7 +869,7 @@ public class EventServiceImpl implements EventService {
                     Account account = accountMapper.queryAccount(addInviteEventVo.getUserId());
                     RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                     //内容修改
-                    String content = account.getUserName() + "请求修改事件“" + singleEventOld.getEventname() + "”：" + different.replace(different.length() - 1, different.length(), "。");
+                    String content = account.getUserName() + "请求修改事件“" + singleEventOld.getEventname() + "”："/* + different.replace(different.length() - 1, different.length(), "。")*/;
                     //消息状态保存在数据库
                     MsgStatus msgStatus = new MsgStatus();
                     msgStatus.setType(1L);
@@ -886,7 +897,7 @@ public class EventServiceImpl implements EventService {
                     Account account = accountMapper.queryAccount(addInviteEventVo.getUserId());
                     RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                     //内容修改
-                    String content = account.getUserName() + "请求修改事件“" + singleEventOld.getEventname() + "”：" + different.replace(different.length() - 1, different.length(), "。");
+                    String content = account.getUserName() + "请求修改事件“" + singleEventOld.getEventname() + "”：" /*+ different.replace(different.length() - 1, different.length(), "。")*/;
                     //消息状态保存在数据库
                     MsgStatus msgStatus = new MsgStatus();
                     msgStatus.setType(1L);
@@ -922,7 +933,7 @@ public class EventServiceImpl implements EventService {
                             Account account = accountMapper.queryAccount(addInviteEventVo.getUserId());
                             RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                             //内容修改
-                            String content = account.getUserName() + "请求修改事件“" + singleEventOld.getEventname() + "”：" + different.replace(different.length() - 1, different.length(), "。");
+                            String content = account.getUserName() + "请求修改事件“" + singleEventOld.getEventname() + "”：" /*+ different.replace(different.length() - 1, different.length(), "。")*/;
                             //消息状态保存在数据库
                             MsgStatus msgStatus = new MsgStatus();
                             msgStatus.setType(1L);
@@ -1016,9 +1027,9 @@ public class EventServiceImpl implements EventService {
                     SingleEvent singleEventOld = eventMapper.queryEventOne(singleEvent.getUserid().toString(), singleEvent.getEventid().toString());
                     Map<String, String> m2 = SingleEvent.toMap(singleEventOld);
                     //比较差异
-                    StringBuffer different = SingleEventUtil.eventDifferent(m1, m2);
+                    List different = SingleEventUtil.eventDifferent(m1, m2);
                     RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
-                    String content="超过50%的人接受修改事件“" + singleEventOld.getEventname() + "”：" + different.replace(different.length() - 1, different.length(), "。");
+                    String content="超过50%的人接受修改事件“" + singleEventOld.getEventname() + "”：" /*+ different.replace(different.length() - 1, different.length(), "。")*/;
                     MsgStatus msgStatus = new MsgStatus();
                     msgStatus.setType(1L);
                     msgStatus.setUserId(Long.valueOf(SYSTEMID));
@@ -1584,6 +1595,7 @@ public class EventServiceImpl implements EventService {
      * @param newFriends
      */
     private void toldNewInviter(String[] newFriends,SingleEvent singleEvent,String userId) throws Exception {
+        logger.info("新成员"+Arrays.toString(newFriends));
         String[] persons = newFriends;
         //要发送信息的人员
         ArrayList<String> personList1 = new ArrayList<>();

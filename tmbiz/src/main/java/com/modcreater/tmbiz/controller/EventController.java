@@ -116,6 +116,7 @@ public class EventController {
      * @param addInviteEventVo
      * @return
      */
+    @Safety
     @PostMapping(value = "addinviteevent")
     @ApiOperation("添加一条邀请事件")
     public Dto addInviteEvent(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){

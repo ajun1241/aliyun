@@ -130,7 +130,10 @@ public class AccountServiceImpl implements AccountService {
             //未注册时
             account.setUserCode(loginVo.getUserCode());
             account.setUserType(loginVo.getUserType());
-            account.setUserName(loginVo.getUserCode());
+            Random random=new Random();
+            int i=random.nextInt(1000000);
+            String name="智袖新用户_"+i;
+            account.setUserName(name);
             account.setGender(0L);
             account.setBirthday(DateUtil.dateToStamp(new Date()));
             account.setIDCard("");
