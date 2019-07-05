@@ -258,11 +258,12 @@ public class BackerServiceImpl implements BackerService {
                 RongCloudMethodUtil rong = new RongCloudMethodUtil();
                 Account account = accountMapper.queryAccount(receivedBeSupporterFeedback.getUserId());
                 String[] receiver = {receivedBeSupporterFeedback.getReceiverId()};
-                ResponseResult result1 = rong.sendPrivateMsg("100000",receiver, 0, new TxtMessage(account.getUserName() + "同意了您的支持者邀请", ""));
+                String msg = receivedBeSupporterFeedback.getStatus().equals("0") ? "同意了您的支持者邀请" : "拒绝了您的支持者邀请";
+                ResponseResult result1 = rong.sendPrivateMsg("100000",receiver, 0, new TxtMessage(account.getUserName() + msg, ""));
                 if (result1.getCode() != 200){
                     logger.info("添加邀请事件时融云消息异常" + result1.toString());
                 }
-                msgStatusMapper.addNewEventMsg(receivedBeSupporterFeedback.getReceiverId(),1L,"100000","同意了您的支持者邀请",System.currentTimeMillis()/1000);
+                msgStatusMapper.addNewEventMsg(receivedBeSupporterFeedback.getReceiverId(),1L,account.getId().toString(),msg,System.currentTimeMillis()/1000);
                 return DtoUtil.getSuccessDto("", 100000);
             }
         } catch (Exception e) {
