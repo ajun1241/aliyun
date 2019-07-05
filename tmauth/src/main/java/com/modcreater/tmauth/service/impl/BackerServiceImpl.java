@@ -243,16 +243,30 @@ public class BackerServiceImpl implements BackerService {
         if (msgStatus.getStatus().equals("3") || System.currentTimeMillis()/1000 - backer.getCreateDate() >= 1800){
             return DtoUtil.getFalseDto("消息已过期", 22012);
         }
-        if (!ObjectUtils.isEmpty(backer) && backer.getStatus().equals("0") && System.currentTimeMillis()/1000 - backer.getCreateDate() >= 1800) {
-            int i = backerMapper.updateMsgStatus(receivedBeSupporterFeedback.getMsgId(), receivedBeSupporterFeedback.getReceiverId(), receivedBeSupporterFeedback.getStatus());
-            if (i <= 0) {
-                return DtoUtil.getFalseDto("消息已过期", 22012);
+        try {
+            if (!ObjectUtils.isEmpty(backer) && backer.getStatus().equals("0") && System.currentTimeMillis()/1000 - backer.getCreateDate() < 1800) {
+                int i = backerMapper.updateMsgStatus(receivedBeSupporterFeedback.getMsgId(), receivedBeSupporterFeedback.getReceiverId(), receivedBeSupporterFeedback.getStatus());
+                if (i <= 0) {
+                    return DtoUtil.getFalseDto("消息已过期", 22012);
+                }
+                if (backerMapper.updateBackerStatus(receivedBeSupporterFeedback.getReceiverId(), receivedBeSupporterFeedback.getStatus().equals("0") ? 1 : 2) <= 0) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return DtoUtil.getFalseDto("操作失败", 22002);
+                }
+                RongCloudMethodUtil rong = new RongCloudMethodUtil();
+                Account account = accountMapper.queryAccount(receivedBeSupporterFeedback.getUserId());
+                String[] receiver = {receivedBeSupporterFeedback.getReceiverId()};
+                ResponseResult result1 = rong.sendPrivateMsg("100000",receiver, 0, new TxtMessage(account.getUserName() + "同意了您的支持者邀请", ""));
+                if (result1.getCode() != 200){
+                    logger.info("添加邀请事件时融云消息异常" + result1.toString());
+                }
+                msgStatusMapper.addNewEventMsg(receivedBeSupporterFeedback.getReceiverId(),1L,"100000","同意了您的支持者邀请",System.currentTimeMillis()/1000);
+                return DtoUtil.getSuccessDto("", 100000);
             }
-            if (backerMapper.updateBackerStatus(receivedBeSupporterFeedback.getReceiverId(), receivedBeSupporterFeedback.getStatus().equals("0") ? 1 : 2) <= 0) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return DtoUtil.getFalseDto("操作失败", 22002);
-            }
-            return DtoUtil.getSuccessDto("", 100000);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("操作失败", 22002);
         }
         return DtoUtil.getFalseDto("消息已过期", 22012);
     }
