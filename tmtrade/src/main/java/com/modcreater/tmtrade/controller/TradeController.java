@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
 import com.modcreater.tmbeans.vo.trade.ReceivedServiceIdUserId;
 import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmtrade.config.annotation.Safety;
 import com.modcreater.tmtrade.service.OrderService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,7 @@ public class TradeController {
     @Resource
     private OrderService orderService;
 
+    @Safety
     @PostMapping(value = "appalipay")
     @ApiOperation("支付宝通道")
     public Dto aliPayOrderSubmitted(@RequestBody ReceivedOrderInfo receivedOrderInfo, HttpServletRequest httpServletRequest) throws Exception{
@@ -57,6 +59,7 @@ public class TradeController {
         return orderService.wxPayNotify(request);
     }
 
+    @Safety
     @PostMapping(value = "payinfoverify")
     @ApiOperation("C/S订单同步")
     public Dto payInfoVerify(@RequestBody ReceivedVerifyInfo receivedVerifyInfo, HttpServletRequest request){

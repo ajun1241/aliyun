@@ -3,6 +3,10 @@ package com.modcreater.tmutils.messageutil;
 import io.rong.messages.BaseMessage;
 import io.rong.util.GsonUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Description:
  *
@@ -10,32 +14,45 @@ import io.rong.util.GsonUtil;
  * @Date: 2019/6/6 16:13
  */
 public class CreateInviteMessage extends BaseMessage {
-
-    private String content = "";
     /**
      * 事件Id
      */
     private String eventId = "";
-
-    private String extra = "";
-
+    /**
+     * 修改前事件名称
+     */
+    private String eventName = "";
+    /**
+     * 几处修改
+     */
+    private String count = "";
+    /**
+     * 修改前事件类型
+     */
+    private String eventType = "";
+    /**
+     *  修改详情list
+     */
+    private List<Map<String,String>> details=new ArrayList<>();
+    /**
+     *   消息id
+     */
     private String msgId = "";
+    /**
+     * 预留的扩展内容
+     */
+    private String extra = "";
 
     private static final transient String TYPE = "ZX:CreateInviteMsg";
 
-    public CreateInviteMessage(String content, String eventId, String extra, String msgId) {
-        this.content = content;
+    public CreateInviteMessage(String eventId, String eventName, String count, String eventType, List<Map<String, String>> details, String msgId, String extra) {
         this.eventId = eventId;
-        this.extra = extra;
+        this.eventName = eventName;
+        this.count = count;
+        this.eventType = eventType;
+        this.details = details;
         this.msgId = msgId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+        this.extra = extra;
     }
 
     public String getEventId() {
@@ -46,12 +63,36 @@ public class CreateInviteMessage extends BaseMessage {
         this.eventId = eventId;
     }
 
-    public String getExtra() {
-        return extra;
+    public String getEventName() {
+        return eventName;
     }
 
-    public void setExtra(String extra) {
-        this.extra = extra;
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public List<Map<String, String>> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<Map<String, String>> details) {
+        this.details = details;
     }
 
     public String getMsgId() {
@@ -60,6 +101,14 @@ public class CreateInviteMessage extends BaseMessage {
 
     public void setMsgId(String msgId) {
         this.msgId = msgId;
+    }
+
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
     }
 
     @Override

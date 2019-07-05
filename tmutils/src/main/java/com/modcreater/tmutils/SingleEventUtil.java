@@ -222,34 +222,34 @@ public class SingleEventUtil {
      *
      * @return
      */
-    public static List<Object> eventDifferent(Map<String, String> m1, Map<String, String> m2) {
+    public static List<Map<String,String>> eventDifferent(Map<String, String> newMap, Map<String, String> oldMap) {
         //比较差异
-        List<Object> different = new ArrayList<>();
+        List<Map<String,String>> different = new ArrayList<>();
 
-        for (String key : m1.keySet()) {
+        for (String key : newMap.keySet()) {
             Map<String,String> map=new HashMap<>();
-            if (!m1.get(key).equals(m2.get(key))) {
+            if (!newMap.get(key).equals(oldMap.get(key))) {
                 if (("开始时间").equals(key)) {
                     map.put("title",key+ "更改为：");
-                    map.put("content",Long.parseLong(m1.get(key)) / 60 + ":" + Long.parseLong(m1.get(key)) % 60);
+                    map.put("content",Long.parseLong(newMap.get(key)) / 60 + ":" + Long.parseLong(newMap.get(key)) % 60);
                 } else if (("结束时间").equals(key)) {
                     map.put("title",key+ "更改为：");
-                    map.put("content",Long.parseLong(m1.get(key)) / 60 + ":" + Long.parseLong(m1.get(key)) % 60);
+                    map.put("content",Long.parseLong(newMap.get(key)) / 60 + ":" + Long.parseLong(newMap.get(key)) % 60);
                 } else if (("优先级").equals(key)) {
                     map.put("title",key+ "更改为：");
                     //2：不紧迫也不重要；3：紧迫但不重要；4：重要又不紧迫；5：重要又紧迫
-                    if ("2".equals(m1.get(key))) {
+                    if ("2".equals(newMap.get(key))) {
                         map.put("content","不紧迫也不重要");
-                    } else if ("3".equals(m1.get(key))) {
+                    } else if ("3".equals(newMap.get(key))) {
                         map.put("content","紧迫但不重要");
-                    } else if ("4".equals(m1.get(key))) {
+                    } else if ("4".equals(newMap.get(key))) {
                         map.put("content","重要又不紧迫");
-                    } else if ("5".equals(m1.get(key))) {
+                    } else if ("5".equals(newMap.get(key))) {
                         map.put("content","重要又紧迫");
                     }
                 } else if (("重复次数").equals(key)) {
                     map.put("title",key+ "更改为：");
-                    String[] arr = m1.get(key).replace("[", "").replace("]", "").split(",");
+                    String[] arr = newMap.get(key).replace("[", "").replace("]", "").split(",");
                     StringBuffer stringBuffer = new StringBuffer();
                     for (int i = 0; i < arr.length; i++) {
                         if ("true".equals(arr[i])) {
@@ -263,36 +263,45 @@ public class SingleEventUtil {
                     }
                 } else if (("提醒时间").equals(key)) {
                     map.put("title",key+ "更改为：");
-                    map.put("content","时间开始前" + m1.get(key) + "分钟");
+                    map.put("content","时间开始前" + newMap.get(key) + "分钟");
                 } else if (("年").equals(key)) {
                     map.put("title",key+ "更改为：");
-                    map.put("content",m1.get(key) + "年");
+                    map.put("content",newMap.get(key) + "年");
                 } else if (("月").equals(key)) {
                     map.put("title",key+ "更改为：");
-                    map.put("content",m1.get(key) + "月");
+                    map.put("content",newMap.get(key) + "月");
                 } else if (("日").equals(key)) {
                     map.put("title",key+ "更改为：");
-                    map.put("content",m1.get(key) + "日");
+                    map.put("content",newMap.get(key) + "日");
                 } else if (("事件类型").equals(key)) {
                     map.put("title",key+ "更改为：");
                     //0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他
-                    if ("0".equals(m1.get(key))) {
+                    if ("0".equals(newMap.get(key))) {
                         map.put("content","学习");
-                    } else if ("1".equals(m1.get(key))) {
+                    } else if ("1".equals(newMap.get(key))) {
                         map.put("content","工作");
-                    } else if ("2".equals(m1.get(key))) {
+                    } else if ("2".equals(newMap.get(key))) {
                         map.put("content","商务");
-                    } else if ("3".equals(m1.get(key))) {
+                    } else if ("3".equals(newMap.get(key))) {
                         map.put("content","休闲");
-                    } else if ("4".equals(m1.get(key))) {
+                    } else if ("4".equals(newMap.get(key))) {
                         map.put("content","家庭");
-                    } else if ("5".equals(m1.get(key))) {
+                    } else if ("5".equals(newMap.get(key))) {
                         map.put("content","节日");
-                    } else if ("6".equals(m1.get(key))) {
+                    } else if ("6".equals(newMap.get(key))) {
                         map.put("content","假期");
-                    } else if ("7".equals(m1.get(key))) {
+                    } else if ("7".equals(newMap.get(key))) {
                         map.put("content","其他");
                     }
+                }else if (("事件名称").equals(key)){
+                    map.put("title",key+ "更改为：");
+                    map.put("content",newMap.get(key));
+                }else if (("地址").equals(key)){
+                    map.put("title",key+ "更改为：");
+                    map.put("content",newMap.get(key));
+                }else if (("备注").equals(key)){
+                    map.put("title",key+ "更改为：");
+                    map.put("content",newMap.get(key));
                 }
                 different.add(map);
             }

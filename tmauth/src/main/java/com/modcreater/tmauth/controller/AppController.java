@@ -1,5 +1,6 @@
 package com.modcreater.tmauth.controller;
 
+import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.AppService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.app.ReceivedAppInfo;
@@ -35,6 +36,8 @@ public class AppController {
      * @param request
      * @return
      */
+
+    @Safety
     @PostMapping(value = "update")
     @ApiOperation("更新APP")
     public Dto updateApp(@RequestBody ReceivedAppInfo appInfo, HttpServletRequest request) {

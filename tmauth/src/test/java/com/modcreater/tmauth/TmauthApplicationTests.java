@@ -35,14 +35,14 @@ public class TmauthApplicationTests {
     private EventMapper eventMapper;
     @Test
     public void contextLoads() {
-        String code="100000adv00";
+       /* String code="100000adv00";
         String pattern = "^1[\\d]{10}";
-        System.out.println(Pattern.matches(pattern,code));
+        System.out.println(Pattern.matches(pattern,code));*/
 
     }
     @Test
     public void test(){
-        List names=new ArrayList<String>();
+        /*List names=new ArrayList<String>();
 
         names.add("1");
 
@@ -52,6 +52,6 @@ public class TmauthApplicationTests {
 
         String[] arrStr=new String[]{"a","b","c"};
 
-        System.out.println(String.join("-", arrStr));
+        System.out.println(String.join("-", arrStr));*/
     }
 }

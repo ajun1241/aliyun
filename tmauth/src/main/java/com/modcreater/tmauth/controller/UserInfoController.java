@@ -1,6 +1,7 @@
 package com.modcreater.tmauth.controller;
 
 import com.modcreater.tmauth.config.annotation.GLOT;
+import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.userinfovo.*;
@@ -62,6 +63,7 @@ public class UserInfoController {
         return userInfoService.myWeek(receivedId.getUserId(),request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "alterusersign")
     @ApiOperation("修改用户信息(部分)")
     public Dto alterUserSign(@RequestBody ReceivedAlterUserInfo receivedAlterUserInfo,HttpServletRequest request){

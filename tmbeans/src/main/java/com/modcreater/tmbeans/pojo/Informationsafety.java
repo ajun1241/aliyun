@@ -11,7 +11,7 @@ public class Informationsafety {
   private Long operationType;
   private String networkSourceAddress;
   private String networkTargetAddress;
-  private String clientHardwareInfo;
+  private String appType;
   private String operationContent;
 
 }
