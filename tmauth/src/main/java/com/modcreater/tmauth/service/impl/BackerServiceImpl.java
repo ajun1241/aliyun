@@ -125,7 +125,7 @@ public class BackerServiceImpl implements BackerService {
                     return DtoUtil.getFalseDto("只能将好友设置为您的支持者", 22003);
                 }
             }
-            Account account = accountMapper.queryAccount(ObjectUtils.isEmpty(backer) ? receivedChangeBackerInfo.getFriendId() : backer.getBackerId());
+            Account account = accountMapper.queryAccount(receivedChangeBackerInfo.getUserId());
             MsgStatus msgStatus = new MsgStatus();
             msgStatus.setUserId(Long.valueOf(receivedChangeBackerInfo.getUserId()));
             msgStatus.setType(2L);
