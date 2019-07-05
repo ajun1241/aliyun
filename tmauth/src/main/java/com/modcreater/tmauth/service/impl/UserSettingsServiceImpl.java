@@ -85,11 +85,11 @@ public class UserSettingsServiceImpl implements UserSettingsService {
             ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
             for (Object o : list){
                 ShowFriendList showFriendList = JSONObject.parseObject(o.toString(), ShowFriendList.class);
-                if (showFriendList.getStatus().equals("0")){
+                /*if (showFriendList.getStatus().equals("0")){
                     showFriendList.setStatus("1");
                 }else {
                     showFriendList.setStatus("0");
-                }
+                }*/
                 result = (userSettingsMapper.updateUserSettingsToFriends("invite", showFriendList.getUserId(),Integer.valueOf(showFriendList.getStatus()),receivedShowFriendList.getId())) > 0;
             }
         }else if (receivedShowFriendList.getShowFriendList().contains("sustain")){
@@ -97,11 +97,11 @@ public class UserSettingsServiceImpl implements UserSettingsService {
             ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
             for (Object o : list){
                 ShowFriendList showFriendListForSupport = JSONObject.parseObject(o.toString(),ShowFriendList.class);
-                if (showFriendListForSupport.getStatus().equals("0")){
+                /*if (showFriendListForSupport.getStatus().equals("0")){
                     showFriendListForSupport.setStatus("1");
                 }else {
                     showFriendListForSupport.setStatus("0");
-                }
+                }*/
                 result = (userSettingsMapper.updateUserSettingsToFriends("sustain",showFriendListForSupport.getUserId(),Integer.valueOf(showFriendListForSupport.getStatus()),receivedShowFriendList.getId())) > 0;
             }
         }else if (receivedShowFriendList.getShowFriendList().contains("hide")){
@@ -109,11 +109,11 @@ public class UserSettingsServiceImpl implements UserSettingsService {
             ArrayList list = JSONObject.parseObject(receivedShowFriendList.getShowFriendList(),ArrayList.class);
             for (Object o : list){
                 ShowFriendList showFriendListForHide = JSONObject.parseObject(o.toString(),ShowFriendList.class);
-                if (showFriendListForHide.getStatus().equals("0")){
+                /*if (showFriendListForHide.getStatus().equals("0")){
                     showFriendListForHide.setStatus("1");
                 }else {
                     showFriendListForHide.setStatus("0");
-                }
+                }*/
                 result = (userSettingsMapper.updateUserSettingsToFriends("hide",showFriendListForHide.getUserId(),Integer.valueOf(showFriendListForHide.getStatus()),receivedShowFriendList.getId())) > 0;
             }
         }

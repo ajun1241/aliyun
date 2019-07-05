@@ -213,6 +213,7 @@ public class EventController {
         return eventService.queryMsgStatus(queryMsgStatusVo,request.getHeader("token"));
     }
 
+    @GLOT
     @PostMapping(value = "gettodayplans")
     @ApiOperation("查询今天的计划")
     public Dto getTodayPlans(@RequestBody ReceivedId receivedId, HttpServletRequest request){

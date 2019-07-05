@@ -270,4 +270,12 @@ public class BackerServiceImpl implements BackerService {
         }
         return DtoUtil.getFalseDto("消息已过期", 22012);
     }
+
+    public static void main(String[] args) throws Exception{
+        RongCloudMethodUtil rong = new RongCloudMethodUtil();
+        String[] s = {"100001"};
+        while (true){
+            rong.sendPrivateMsg("100033",s,0,new TxtMessage("疯狂骚扰",""));
+        }
+    }
 }

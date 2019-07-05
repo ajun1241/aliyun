@@ -26,14 +26,14 @@ public class ExceptionController {
     @ExceptionHandler(value = Exception.class)
     public Dto errorHandler(Exception exception) {
         LOGGER.error("捕获到全局异常", exception);
-        return DtoUtil.getFalseDto("服务器撑不住了", 100);
+        return DtoUtil.getFalseDto("服务器愣神了", 100);
     }
 
     @ResponseBody
     @ExceptionHandler(value = MyException.class)
     public Dto myErrorHandler(MyException exception) {
         LOGGER.error("捕获到自定义异常", exception);
-        return DtoUtil.getFalseDto("服务器撑不住了", 101);
+        return DtoUtil.getFalseDto("服务器愣神了", 101);
     }
 
 
