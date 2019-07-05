@@ -163,18 +163,20 @@ public class BackerServiceImpl implements BackerService {
                     }
                 } else {
                     if (!receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId())) {
-                        ResponseResult result1 = rong.sendPrivateMsg("100000", friendId, 0, new TxtMessage(account.getUserName() + "取消了您作为ta支持者的身份", ""));
+                        String[] deletedId = {backer.getBackerId()};
+                        ResponseResult result1 = rong.sendPrivateMsg("100000", deletedId, 0, new TxtMessage(account.getUserName() + "取消了您作为ta支持者的身份", ""));
                         if (result1.getCode() != 200) {
                             logger.info("发送删除支持者时融云消息异常" + result1.toString());
                         }
-                        for (String s : friendId){
+                        for (String s : deletedId){
                             msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),"取消了您作为ta支持者的身份",System.currentTimeMillis()/1000);
                         }
-                        ResponseResult result2 = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), friendId, 0, addBackerMessage);
+                        String[] changedId = {receivedChangeBackerInfo.getFriendId()};
+                        ResponseResult result2 = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), changedId, 0, addBackerMessage);
                         if (result2.getCode() != 200) {
                             logger.info("添加邀请事件时融云消息异常" + result2.toString());
                         }
-                        for (String s : friendId){
+                        for (String s : changedId){
                             msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),":来来来,当我的支持者,搞起!",System.currentTimeMillis()/1000);
                         }
                         if (backerMapper.updateBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000 ,msgStatus.getId()) > 0) {
@@ -269,13 +271,5 @@ public class BackerServiceImpl implements BackerService {
             return DtoUtil.getFalseDto("操作失败", 22002);
         }
         return DtoUtil.getFalseDto("消息已过期", 22012);
-    }
-
-    public static void main(String[] args) throws Exception{
-        RongCloudMethodUtil rong = new RongCloudMethodUtil();
-        String[] s = {"100001"};
-        while (true){
-            rong.sendPrivateMsg("100033",s,0,new TxtMessage("疯狂骚扰",""));
-        }
     }
 }
