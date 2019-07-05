@@ -144,7 +144,7 @@ public class BackerServiceImpl implements BackerService {
                     for (String s : friendId){
                         msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),":来来来,当我的支持者,搞起!",System.currentTimeMillis()/1000);
                     }
-                    if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000) > 0) {
+                    if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000 ,msgStatus.getId()) > 0) {
                         return DtoUtil.getSuccessDto("修改成功", 100000);
                     }
                 }
@@ -177,7 +177,7 @@ public class BackerServiceImpl implements BackerService {
                         for (String s : friendId){
                             msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),":来来来,当我的支持者,搞起!",System.currentTimeMillis()/1000);
                         }
-                        if (backerMapper.updateBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000) > 0) {
+                        if (backerMapper.updateBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000 ,msgStatus.getId()) > 0) {
                             return DtoUtil.getSuccessDto("修改成功", 100000);
                         }
                     } else {
@@ -239,7 +239,11 @@ public class BackerServiceImpl implements BackerService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         Backers backer = backerMapper.getMyBacker(receivedBeSupporterFeedback.getReceiverId());
-        if (!ObjectUtils.isEmpty(backer) && backer.getStatus().equals("0")) {
+        MsgStatus msgStatus = msgStatusMapper.queryMsg(receivedBeSupporterFeedback.getMsgId());
+        if (msgStatus.getStatus().equals("3") || System.currentTimeMillis()/1000 - backer.getCreateDate() >= 1800){
+            return DtoUtil.getFalseDto("消息已过期", 22012);
+        }
+        if (!ObjectUtils.isEmpty(backer) && backer.getStatus().equals("0") && System.currentTimeMillis()/1000 - backer.getCreateDate() >= 1800) {
             int i = backerMapper.updateMsgStatus(receivedBeSupporterFeedback.getMsgId(), receivedBeSupporterFeedback.getReceiverId(), receivedBeSupporterFeedback.getStatus());
             if (i <= 0) {
                 return DtoUtil.getFalseDto("消息已过期", 22012);

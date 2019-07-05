@@ -2,6 +2,9 @@ package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.MsgStatus;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * Description:
@@ -31,10 +34,10 @@ public interface MsgStatusMapper {
      * @param id
      * @return
      */
-    int updateMsgStatus(String status,String id);
+    int updateMsgStatus(@Param("status") String status, @Param("id") String id);
 
     /**
-     *
+     * 添加新的历史消息
      * @param msgOwnerId
      * @param eventId
      * @param msgSenderId
@@ -42,5 +45,13 @@ public interface MsgStatusMapper {
      * @param createDate
      * @return
      */
-    int addNewEventMsg(String msgOwnerId, Long eventId, String msgSenderId, String content,  Long createDate);
+    int addNewEventMsg(@Param("msgOwnerId") String msgOwnerId,@Param("eventId") Long eventId,@Param("msgSenderId") String msgSenderId,@Param("content") String content,@Param("createDate")  Long createDate);
+
+    /**
+     * 查询需要将状态修改为3的消息
+     * @param type
+     * @param time
+     * @return
+     */
+    List<Long> getNeedChangedIds(@Param("type") String type ,@Param("time") Long time);
 }

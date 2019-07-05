@@ -94,4 +94,15 @@ public class TimingScan {
         }
     }
 
+    @Scheduled(cron = "0 * * * * ?")
+    public void msgStatusChange(){
+        List<Long> needChangedIds = msgStatusMapper.getNeedChangedIds("2",System.currentTimeMillis()/1000);
+        if (needChangedIds.size() != 0){
+            for (Long msgId : needChangedIds){
+                int i = msgStatusMapper.updateMsgStatus("3",msgId.toString());
+                logger.info("修改了" + i + "条消息");
+            }
+        }
+    }
+
 }

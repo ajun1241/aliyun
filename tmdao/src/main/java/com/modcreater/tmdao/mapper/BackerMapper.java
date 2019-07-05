@@ -21,9 +21,10 @@ public interface BackerMapper {
      * @param userId
      * @param backerId
      * @param createDate
+     * @param msgId
      * @return
      */
-    int addBackers(@Param("userId") String userId,@Param("backerId") String backerId,@Param("createDate") Long createDate);
+    int addBackers(@Param("userId") String userId,@Param("backerId") String backerId,@Param("createDate") Long createDate ,@Param("msgId") Long msgId);
 
     /**
      * 获取好友列表
@@ -51,9 +52,10 @@ public interface BackerMapper {
      * @param userId
      * @param friendId
      * @param createDate
+     * @param msgId
      * @return
      */
-    int updateBacker(@Param("userId") String userId,@Param("friendId") String friendId,@Param("createDate") Long createDate);
+    int updateBacker(@Param("userId") String userId,@Param("friendId") String friendId,@Param("createDate") Long createDate ,@Param("msgId") Long msgId);
 
     /**
      * 删除我的支持者
@@ -83,8 +85,8 @@ public interface BackerMapper {
     /**
      * 修改支持者状态
      * @param receiverId
-     * @param i
+     * @param status
      * @return
      */
-    int updateBackerStatus(String receiverId, int i);
+    int updateBackerStatus(@Param("userId") String receiverId,@Param("status") int status);
 }

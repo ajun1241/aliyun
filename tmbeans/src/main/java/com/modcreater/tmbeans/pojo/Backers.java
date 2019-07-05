@@ -15,5 +15,6 @@ public class Backers {
   private String backerId;
   private Long createDate;
   private String status;
+  private String msgId;
 
 }

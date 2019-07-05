@@ -16,4 +16,7 @@
     <select id="queryMsg" resultType="com.modcreater.tmbeans.pojo.MsgStatus">
         select * from msgstatus where id=#{id}
     </select>
+    <select id="getNeedChangedIds" resultType="java.lang.Long">
+        select b.msgId from backers b ,msgstatus m where m.type = 2 and m.status = 2 and m.id = b.msgId and #{time} - b.createDate >= 1800
+    </select>
 </mapper>

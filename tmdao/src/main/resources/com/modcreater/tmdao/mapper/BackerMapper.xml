@@ -3,14 +3,17 @@
 <mapper namespace="com.modcreater.tmdao.mapper.BackerMapper">
 
     <insert id="addBackers">
-        insert into backers(userId, backerId, createDate)
-        values(#{userId},#{backerId},#{createDate})
+        insert into backers(userId, backerId, createDate ,msgId)
+        values(#{userId},#{backerId},#{createDate},#{msgId})
     </insert>
     <update id="updateBacker">
-        update backers set backerId = #{friendId} ,status = 0 ,createDate = #{createDate} where userId = #{userId}
+        update backers set backerId = #{friendId} ,status = 0 ,createDate = #{createDate} ,msgId = #{msgId} where userId = #{userId}
     </update>
     <update id="updateMsgStatus">
         update msgstatus set status = #{status} where id = #{msgId} and  userId = #{userId}
+    </update>
+    <update id="updateBackerStatus">
+        update backers set status = #{status} where userId = #{userId}
     </update>
     <delete id="deleteBacker">
         delete from backers where userId = #{userId}
