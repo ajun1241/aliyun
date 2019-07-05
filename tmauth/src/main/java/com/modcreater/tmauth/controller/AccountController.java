@@ -1,5 +1,6 @@
 package com.modcreater.tmauth.controller;
 
+import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.AccountService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.AccountVo;
@@ -21,12 +22,14 @@ public class AccountController {
     @Resource
     private AccountService userService;
 
+    @Safety
     @PostMapping("addpwd")
     @ApiOperation("添加密码")
     public Dto addPassword(@RequestBody AddPwdVo addPwdVo){
         return userService.addPassword(addPwdVo);
     }
 
+    @Safety
     @PostMapping("registered")
     @ApiOperation("注册/登录")
     public Dto registered(@RequestBody LoginVo loginVo){
@@ -40,6 +43,7 @@ public class AccountController {
         return userService.queryAccount(queryUserVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping("updateaccount")
     @ApiOperation("修改账户信息")
     public Dto updateAccount(@RequestBody UpdAccountInfo accountVo, HttpServletRequest request){
@@ -52,12 +56,14 @@ public class AccountController {
         return userService.queryFriendByUserCode(queFridenVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping("sendfriendrequest")
     @ApiOperation("发送添加好友请求")
     public Dto sendFriendRequest(@RequestBody SendFriendRequestVo requestVo, HttpServletRequest request){
         return userService.sendFriendRequest(requestVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping("sendfriendresponse")
     @ApiOperation("发送同意添加好友请求")
     public Dto sendFriendResponse(@RequestBody FriendshipVo responseVo, HttpServletRequest request){
@@ -76,12 +82,14 @@ public class AccountController {
         return userService.queryFriendList(userIdVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping("updateFriendJurisdiction")
     @ApiOperation("修改好友权限")
     public Dto updateFriendJurisdiction(@RequestBody UpdateFriendJurisdictionVo updateFriendJurisdictionVo, HttpServletRequest request){
         return userService.updateFriendJurisdiction(updateFriendJurisdictionVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping("deleteFriendship")
     @ApiOperation("解除好友关系")
     public Dto deleteFriendship(@RequestBody FriendshipVo deleteFriendshipVo, HttpServletRequest request){
@@ -100,6 +108,7 @@ public class AccountController {
         return userService.queryAllUnreadMsgCount(receivedId,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping("uplheadimg")
     @ApiOperation("上传头像")
     public Dto uplHeadImg(@RequestBody HeadImgVo headImgVo, HttpServletRequest request){

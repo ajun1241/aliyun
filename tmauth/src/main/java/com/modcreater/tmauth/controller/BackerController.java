@@ -1,5 +1,6 @@
 package com.modcreater.tmauth.controller;
 
+import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.BackerService;
 import com.modcreater.tmauth.service.UserSettingsService;
 import com.modcreater.tmbeans.dto.Dto;
@@ -23,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
  * @Date: 2019-07-01
  * Time: 15:11
  */
+
+
 @RestController
 @RequestMapping("/backer/")
 public class BackerController {
@@ -30,12 +33,14 @@ public class BackerController {
     @Resource
     private BackerService backerService;
 
+
     @PostMapping("getmyfriendlist")
     @ApiOperation("获取好友列表")
     public Dto getFriendList(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return backerService.getFriendList(receivedId,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping("changebacker")
     @ApiOperation("修改我的支持者")
     public Dto changeBacker(@RequestBody ReceivedChangeBackerInfo receivedChangeBackerInfo , HttpServletRequest request){
@@ -48,6 +53,7 @@ public class BackerController {
         return backerService.getMyBacker(receivedId,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping("besupporterfeedback")
     @ApiOperation("是否成为支持者做出响应")
     public Dto beSupporterFeedback(@RequestBody ReceivedBeSupporterFeedback receivedBeSupporterFeedback , HttpServletRequest request){

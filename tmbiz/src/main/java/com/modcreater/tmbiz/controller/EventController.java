@@ -29,36 +29,42 @@ public class EventController {
     @Resource
     private EventService eventService;
 
+    @Safety
     @RequestMapping(value = "upl", method = RequestMethod.POST)
     @ApiOperation("添加一个事件")
     public Dto uploadingEvents(@RequestBody UploadingEventVo uploadingEventVo, HttpServletRequest request) {
         return eventService.addNewEvents(uploadingEventVo,request.getHeader("token"));
     }
 
+    @Safety
     @RequestMapping(value = "del", method = RequestMethod.POST)
     @ApiOperation("修改事件状态")
     public Dto deleteEvent(@RequestBody DeleteEventVo deleteEventVo, HttpServletRequest request) {
         return eventService.deleteEvents(deleteEventVo,request.getHeader("token"));
     }
 
+    @Safety
     @RequestMapping(value = "upd", method = RequestMethod.POST)
     @ApiOperation("修改一个事件")
     public Dto updateEvents(@RequestBody UpdateEventVo updateEventVo, HttpServletRequest request) {
         return eventService.updateEvents(updateEventVo,request.getHeader("token"));
     }
 
+    @Safety
     @RequestMapping(value = "firupl",method = RequestMethod.POST)
     @ApiOperation("第一次登陆事件同步")
     public Dto firstUplEvent(@RequestBody SynchronousUpdateVo synchronousUpdateVo, HttpServletRequest request){
         return eventService.firstUplEvent(synchronousUpdateVo,request.getHeader("token"));
     }
 
+    @Safety
     @RequestMapping(value = "upldraft",method = RequestMethod.POST)
     @ApiOperation("草稿上传")
     public Dto uplDraft(@RequestBody DraftVo draftVo, HttpServletRequest request){
         return eventService.uplDraft(draftVo,request.getHeader("token"));
     }
 
+    @Safety
     @RequestMapping(value = "upddraft",method = RequestMethod.POST)
     @ApiOperation("修改草稿")
     public Dto updDraft(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){
@@ -66,7 +72,6 @@ public class EventController {
     }
 
     @GLOT
-    @Safety
     @RequestMapping(value = "seabyday",method = RequestMethod.POST)
     @ApiOperation("查询一天的事件")
     public Dto searchByDay(@RequestBody SearchEventVo searchEventVo, HttpServletRequest request){
@@ -105,6 +110,7 @@ public class EventController {
      * @param feedbackEventInviteVo
      * @return
      */
+    @Safety
     @PostMapping(value = "feedbackeventinvite")
     @ApiOperation("回应修改邀请事件")
     public Dto feedbackEventInvite(@RequestBody FeedbackEventInviteVo feedbackEventInviteVo, HttpServletRequest request){
@@ -128,6 +134,7 @@ public class EventController {
      * @param feedbackInviteVo
      * @return
      */
+    @Safety
     @PostMapping(value = "feedbackinvite")
     @ApiOperation("回应新增邀请")
     public Dto feedbackInvite(@RequestBody FeedbackInviteVo feedbackInviteVo, HttpServletRequest request){
@@ -139,6 +146,7 @@ public class EventController {
      * @param addInviteEventVo
      * @return
      */
+    @Safety
     @PostMapping(value = "updinviteevent")
     @ApiOperation("修改邀请事件")
     public Dto updInviteEvent(@RequestBody AddInviteEventVo addInviteEventVo, HttpServletRequest request){
@@ -150,6 +158,7 @@ public class EventController {
      * @param eventCreatorChooseVo
      * @return
      */
+    @Safety
     @PostMapping(value = "eventcreatorchoose")
     @ApiOperation("修改邀请事件创建者选择")
     public Dto eventCreatorChoose(@RequestBody EventCreatorChooseVo eventCreatorChooseVo, HttpServletRequest request){
@@ -174,12 +183,12 @@ public class EventController {
      * @param request
      * @return
      */
+    @Safety
     @PostMapping(value = "delinviteevent")
     @ApiOperation("删除邀请事件")
     public Dto delInviteEvent(@RequestBody ReceivedSearchOnce receivedSearchOnce,HttpServletRequest request){
         return eventService.delInviteEvent(receivedSearchOnce,request.getHeader("token"));
     }
-
 
     @GLOT
     @PostMapping(value = "searchonce")
@@ -195,6 +204,7 @@ public class EventController {
         return eventService.searchDraftOnce(receivedSearchOnce,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "deleteinbatches")
     @ApiOperation("批量删除")
     public Dto deleteInBatches(@RequestBody ReceivedDeleteEventIds receivedDeleteEventIds, HttpServletRequest request){

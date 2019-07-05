@@ -1,5 +1,6 @@
 package com.modcreater.tmauth.controller;
 
+import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.ManageService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.ComplaintVo;
@@ -28,12 +29,14 @@ public class ManageController {
     @Resource
     private ManageService manageService;
 
+    @Safety
     @PostMapping(value = "uploadrn")
     @ApiOperation("实名认证")
     public Dto verify(@RequestBody ReceivedUserRealInfo receivedUserRealInfo, HttpServletRequest request){
         return manageService.uploadUserRealInfo(receivedUserRealInfo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "complaint")
     @ApiOperation("投诉")
     public Dto complaint(@RequestBody ComplaintVo complaintVo, HttpServletRequest request){

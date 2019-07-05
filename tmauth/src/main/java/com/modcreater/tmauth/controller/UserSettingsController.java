@@ -1,5 +1,6 @@
 package com.modcreater.tmauth.controller;
 
+import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.UserSettingsService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
@@ -32,6 +33,7 @@ public class UserSettingsController {
      * @param request
      * @return
      */
+    @Safety
     @RequestMapping(value = "updateusersettings",method = RequestMethod.POST)
     public Dto updateUserSettings(@RequestBody UserSettingsIdAndStatus idAndStatus,HttpServletRequest request){
         return userSettingsService.updateUserSettings(idAndStatus.getStatus(),idAndStatus.getUserId(),idAndStatus.getType(),request.getHeader("token"));
@@ -43,6 +45,7 @@ public class UserSettingsController {
      * @param request
      * @return
      */
+    @Safety
     @RequestMapping(value = "updatenotallowed",method = RequestMethod.POST)
     public Dto updateNotAllowed(@RequestBody ReceivedShowFriendList receivedShowFriendList, HttpServletRequest request){
         return userSettingsService.updateNotAllowed(receivedShowFriendList,request.getHeader("token"));
@@ -54,6 +57,7 @@ public class UserSettingsController {
      * @param request
      * @return
      */
+    @Safety
     @RequestMapping(value = "getusersettings",method = RequestMethod.POST)
     public Dto getUserSettings(@RequestBody ReceivedId receivedId ,HttpServletRequest request) {
         return userSettingsService.getUserSettings(receivedId.getUserId(), request.getHeader("token"));

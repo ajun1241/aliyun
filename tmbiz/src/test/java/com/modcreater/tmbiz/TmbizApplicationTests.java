@@ -106,12 +106,12 @@ public class TmbizApplicationTests {
     }
     @Test
     public void test4() {
-        /*String o="{\"address\":\"湖州\",\"day\":18,\"endtime\":1440,\"eventid\":1560855712,\"eventname\":\"就算不上班\",\"flag\":1,\"isOverdue\":0,\"level\":2,\"month\":6,\"person\":\"{\"friendsId\":\\\\\\\"100089\\\\\\\",\\\\\\\"others\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"remarks\\\":\\\"\\\",\\\"remindTime\\\":30,\\\"repeaTtime\\\":[false,false,false,false,false,false,false],\\\"starttime\\\":1146,\\\"type\\\":0,\\\"userid\\\":0,\\\"year\\\":2019}";
-        String n="";
+        /*String o="{\"address\":\"湖州\",\"day\":18,\"endtime\":1440,\"eventid\":1560855712,\"eventname\":\"就算不上班\",\"flag\":1,\"isOverdue\":0,\"level\":2,\"month\":6,\"person\":\"{\\\"friendsId\\\":\\\"100089\\\",\\\"others\\\":\\\"\\\"}\",\"remarks\":\"\",\"remindTime\":30,\"repeaTtime\":[false,false,false,false,false,false,false],\"starttime\":1146,\"type\":0,\"userid\":0,\"year\":2019}";
+        String n="{\"address\":\"解开了\",\"day\":18,\"endtime\":1440,\"eventid\":1560855712,\"eventname\":\"就班\",\"flag\":1,\"isOverdue\":0,\"level\":5,\"month\":6,\"person\":\"{\\\"friendsId\\\":\\\"100089,100030\\\",\\\"others\\\":\\\"\\\"}\",\"remarks\":\"\",\"remindTime\":30,\"repeaTtime\":[false,false,false,false,false,false,false],\"starttime\":1146,\"type\":0,\"userid\":0,\"year\":2019}";
         SingleEvent singleEvent1=JSONObject.parseObject(o,SingleEvent.class);
         SingleEvent singleEvent2=JSONObject.parseObject(n,SingleEvent.class);
-        List list=SingleEventUtil.eventDifferent(SingleEvent.toMap(singleEvent1),SingleEvent.toMap(singleEvent2));
-        logger.info("差异数据"+list.toString());*/
+        List list=SingleEventUtil.eventDifferent(SingleEvent.toMap(singleEvent2),SingleEvent.toMap(singleEvent1));
+        logger.info("差异数据"+list);*/
     }
 
     @Test

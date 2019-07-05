@@ -1,4 +1,4 @@
-package com.modcreater.tmbiz.config.annotation;
+package com.modcreater.tmtrade.config.annotation;
 
 import java.lang.annotation.*;
 
