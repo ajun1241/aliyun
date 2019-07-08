@@ -1,19 +1,21 @@
 package com.modcreater.tmutils;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
+import com.alibaba.fastjson.JSON;
+import io.rong.util.GsonUtil;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Map;
 
 public class RongCloudUtil {
 
-    public final static String appKey = "0vnjpoad03rzz";// 申请的融云key
-    public final static String appSecret = "BbTOtrRIF5MOA";// 申请的的云secret
+    public final static String appKey = "0vnjpoad0314z";// 申请的融云key
+    public final static String appSecret = "0uoZVUDt8lROGb";// 申请的的云secret
     private final static int[] abcde = { 0x67452301, 0xefcdab89, 0x98badcfe,
             0x10325476, 0xc3d2e1f0 };// sha1加密产参数
     // 摘要数据存储数组
@@ -225,61 +227,52 @@ public class RongCloudUtil {
      *            url地址
      * @param params
      *            参数集合
-     * @param encode
-     *            请求编码
      * @param timeout
      *            超时时间（秒）
      * @return byte[] byte数组
      * @throws Exception
      */
-    public static byte[] post(String path, Map<String, String> params,
-                              String encode, int timeout) throws Exception {
+    public static byte[] post(String path, Map<String, Object> params, int timeout) throws Exception {
         byte[] resultBuffer = null;
+        //Nonce随机数
         Double nonce = Math.floor(Math.random() * 100000 + 100000);
-        Long timestamp = Timestamp.valueOf("2015-3-18 00:00:00").getTime();
+        //时间戳
+        Long timestamp = System.currentTimeMillis()/1000;
+        //数据签名
         String signature = getDigestOfString((appSecret + nonce + timestamp)
                 .getBytes());
-        StringBuilder parambuilder = new StringBuilder("");
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                parambuilder.append(entry.getKey()).append("=")
-                        .append(URLEncoder.encode(entry.getValue(), encode))
-                        .append("&");
-            }
-            parambuilder.deleteCharAt(parambuilder.length() - 1);
-        }
-        byte[] data = parambuilder.toString().getBytes();
+        //把要发送的数据格式转为 application/json
+        String body= JSON.toJSONString(params);
+        //建立连接
         URL url = new URL(path);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setDoOutput(true);
-        conn.setUseCaches(false);
-        conn.setConnectTimeout(timeout * 1000);
-        conn.setReadTimeout(timeout * 1000);
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty(
-                "Accept",
-                "image/gif, image/jpeg, image/pjpeg, image/pjpeg, application/x-shockwave-flash, application/xaml+xml, application/vnd.ms-xpsdocument, application/x-ms-xbap, application/x-ms-application, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*");
-        conn.setRequestProperty("Accept-Language", "zh-CN");
-        conn.setRequestProperty("App-Key", appKey);
-        conn.setRequestProperty("Nonce", nonce + "");
-        conn.setRequestProperty("Timestamp", timestamp + "");
-        conn.setRequestProperty("Signature", signature);
-        conn.setRequestProperty(
-                "User-Agent",
-                "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)");
-        conn.setRequestProperty("Content-Type",
-                "application/x-www-form-urlencoded");
-        conn.setRequestProperty("Content-Length", String.valueOf(data.length));
-        conn.setRequestProperty("Connection", "Keep-Alive");
-        DataOutputStream outStream = new DataOutputStream(
-                conn.getOutputStream());
-        outStream.write(data);
-        outStream.flush();
-        outStream.close();
-        if (conn.getResponseCode() == 200) {
-            resultBuffer = readStream(conn.getInputStream());
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+        connection.setDoInput(true);
+        connection.setUseCaches(false);
+        connection.setConnectTimeout(timeout);
+        connection.setReadTimeout(timeout);
+        connection.setRequestProperty("App-Key", appKey);
+        connection.setRequestProperty("Nonce", nonce + "");
+        connection.setRequestProperty("Timestamp", timestamp + "");
+        connection.setRequestProperty("Signature", signature);
+        //设置参数类型是json格式
+        connection.setRequestProperty("Content-Type", "application/json;charset=utf-8");
+        connection.setRequestProperty("Content-Length", String.valueOf(body.length()));
+        connection.setRequestProperty("Connection", "Keep-Alive");
+        connection.connect();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
+        writer.write(body);
+        writer.flush();
+        writer.close();
+        int responseCode = connection.getResponseCode();
+        System.out.println("返回状态码："+responseCode);
+        if(responseCode == HttpURLConnection.HTTP_OK){
+            //将流转换为数组。
+            resultBuffer = readStream(connection.getInputStream());
+            System.out.println(Arrays.toString(resultBuffer));
         }
-        conn.disconnect();
+        connection.disconnect();
         return resultBuffer;
     }
 

@@ -532,7 +532,7 @@ public class AccountServiceImpl implements AccountService {
         }
         int pageIndex=(Integer.parseInt(userIdVo.getPageNumber())-1)*pageSize;
         List<Account> accountList=accountMapper.queryFriendList(userIdVo.getUserId(),pageIndex,pageSize);
-        Backers backers=backerMapper.getMyBacker(userIdVo.getUserId());
+        Backers backers=backerMapper.getRealMyBacker(userIdVo.getUserId());
         String backerId="";
         if (!StringUtils.isEmpty(backers)){
             backerId=backers.getBackerId();

@@ -9,6 +9,7 @@ import com.modcreater.tmbiz.config.EventUtil;
 import com.modcreater.tmbiz.config.aop.InfoSafety;
 import com.modcreater.tmdao.mapper.BackerMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
+import com.modcreater.tmutils.RongCloudUtil;
 import com.modcreater.tmutils.SingleEventUtil;
 import io.rong.RongCloud;
 import io.rong.methods.message.history.History;
@@ -75,9 +76,38 @@ public class TmbizApplicationTests {
         System.out.println(informationSafety.toString());*/
     }
 
+    /**
+     *
+     * {"platform":["ios","android"],
+     * "audience":{"tag":["女","年轻"],"tag_or":["北京","上海"],"userid":["123","456"],"is_to_all":false},
+     * "notification":{"alert":"this is a push","ios": {"title": "标题","alert": "override alert","extras": {"id": "1","name": "2"}},"android": {"alert": "override alert","extras": {"id": "1","name": "2"}}}}
+     *
+     *  向指定用户发送
+     * {"platform":["ios","android"],"audience":{"userid":["123","456"],"is_to_all":false},"notification":{"alert":"this is a push"}}
+     */
     @Test
     public void test2() {
-
+        try {
+            String systemMessage = "https://api-cn.ronghub.com/push.json";
+            Map<String, Object> params = new HashMap<>();
+            Map<String, Object> a=new HashMap<>();
+            Map<String, Object> b=new HashMap<>();
+            List<String> list=new ArrayList<>();
+            list.add("100030");
+            list.add("100090");
+            a .put("userid",list);
+            a .put("is_to_all",false);
+            b.put("alert","伦纳德拒绝了你的邀请");
+            // String content="{\"content\":\"2\"}";
+            params.put("platform", "ios");
+            params.put("audience",a);
+            params.put("notification",b);
+            byte[]  resultArray = RongCloudUtil.post(systemMessage, params, 20000);
+            System.out.println(resultArray.length);
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                System.out.println("发送信息出错了");
+            }
     }
 
     @Test

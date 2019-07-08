@@ -70,12 +70,6 @@ public class EventServiceImpl implements EventService {
     private EventViceMapper eventViceMapper;
 
     @Resource
-    private BackerMapper backerMapper;
-
-    @Resource
-    private TimedTaskMapper timedTaskMapper;
-
-    @Resource
     private UserServiceMapper userServiceMapper;
 
     @Resource
@@ -874,13 +868,14 @@ public class EventServiceImpl implements EventService {
                     if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
                         logger.info("修改一条邀请事件时消息状态保存失败,id====>"+msgStatus.getId());
                     }
-                    UpdateInviteMessage updateInviteMessage = new UpdateInviteMessage(singleEvent.getEventid().toString(),singleEventOld.getEventname(),String.valueOf(different.size()),singleEventOld.getType().toString(),different, msgStatus.getId().toString(),"");
+                    UpdateInviteMessage updateInviteMessage = new UpdateInviteMessage(singleEvent.getEventid().toString(),singleEventOld.getEventname(),String.valueOf(different.size()),singleEventOld.getType().toString(),different, msgStatus.getId().toString(),"1");
+                    logger.info(updateInviteMessage.toString());
                     ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),new String[]{friendId},0,updateInviteMessage);
                     if (result.getCode() != 200) {
                         logger.info("修改一条邀请事件时融云消息异常"+result.toString());
                         return DtoUtil.getFalseDto("消息发送失败",21040);
                     }
-                    msgStatusMapper.addNewEventMsg(friendId,singleEvent.getEventid(),addInviteEventVo.getUserId(),"想修改一条你创建的邀请事件",System.currentTimeMillis()/1000);
+                    msgStatusMapper.addNewEventMsg(friendId,singleEvent.getEventid(),addInviteEventVo.getUserId(),"想修改邀请事件",System.currentTimeMillis()/1000);
                 }
             }else {//不是创建者修改
                 //把要修改的事件放到临时表
@@ -899,13 +894,14 @@ public class EventServiceImpl implements EventService {
                     if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
                         logger.info("修改一条邀请事件时消息状态保存失败,id====>"+msgStatus.getId());
                     }
-                    CreateInviteMessage createInviteMessage = new CreateInviteMessage(singleEvent.getEventid().toString(),singleEventOld.getEventname(),String.valueOf(different.size()),singleEventOld.getType().toString(),different, msgStatus.getId().toString(),"");
+                    CreateInviteMessage createInviteMessage = new CreateInviteMessage(singleEvent.getEventid().toString(),singleEventOld.getEventname(),String.valueOf(different.size()),singleEventOld.getType().toString(),different, msgStatus.getId().toString(),"1");
+                    logger.info(createInviteMessage.toString());
                     ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,new String[]{singleEventVice.getCreateBy().toString()},0,createInviteMessage);
                     if (result.getCode() != 200) {
                         logger.info("修改一条邀请事件时融云消息异常"+result.toString());
                         return DtoUtil.getFalseDto("消息发送失败",21040);
                     }
-                    msgStatusMapper.addNewEventMsg(singleEventVice.getCreateBy().toString(),singleEvent.getEventid(),addInviteEventVo.getUserId(),"想修改一条你创建的邀请事件",System.currentTimeMillis()/1000);
+                    msgStatusMapper.addNewEventMsg(singleEventVice.getCreateBy().toString(),singleEvent.getEventid(),addInviteEventVo.getUserId(),"想修改邀请事件",System.currentTimeMillis()/1000);
                 }else {
                     //如果不止一人
                     //生成统计表(不包括创建者)
@@ -932,13 +928,14 @@ public class EventServiceImpl implements EventService {
                             if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
                                 logger.info("修改一条邀请事件时消息状态保存失败,id====>"+msgStatus.getId());
                             }
-                            UpdateInviteMessage updateInviteMessage = new UpdateInviteMessage(singleEvent.getEventid().toString(),singleEventOld.getEventname(),String.valueOf(different.size()),singleEventOld.getType().toString(),different, msgStatus.getId().toString(),"");
+                            UpdateInviteMessage updateInviteMessage = new UpdateInviteMessage(singleEvent.getEventid().toString(),singleEventOld.getEventname(),String.valueOf(different.size()),singleEventOld.getType().toString(),different, msgStatus.getId().toString(),"1");
+                            logger.info(updateInviteMessage.toString());
                             ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(),new String[]{friendId},0,updateInviteMessage);
                             if (result.getCode() != 200) {
                                 logger.info("修改一条邀请事件时融云消息异常"+result.toString());
                                 return DtoUtil.getFalseDto("消息发送失败",21040);
                             }
-                            msgStatusMapper.addNewEventMsg(friendId,singleEvent.getEventid(),addInviteEventVo.getUserId(),"想修改一条你创建的邀请事件",System.currentTimeMillis()/1000);
+                            msgStatusMapper.addNewEventMsg(friendId,singleEvent.getEventid(),addInviteEventVo.getUserId(),"想修改邀请事件",System.currentTimeMillis()/1000);
                         }
                     }
                 }
