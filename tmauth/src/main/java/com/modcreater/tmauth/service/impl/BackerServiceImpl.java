@@ -199,9 +199,9 @@ public class BackerServiceImpl implements BackerService {
                         if (backerMapper.updateBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000 ,msgStatus.getId()) > 0) {
                             return DtoUtil.getSuccessDto("修改成功", 100000);
                         }
-                    } else if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId())){
+                    } else if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId()) && backer.getStatus().equals("1")){
                         return DtoUtil.getFalseDto("您已经将ta设置为您的支持者了", 22002);
-                    }else if (backer.getStatus().equals("2")){
+                    }else if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId()) && backer.getStatus().equals("2")){
                         backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId());
                         return DtoUtil.getFalseDto("操作失败了,请再试一次哦", 22005);
                     }
