@@ -138,7 +138,7 @@ public class BackerServiceImpl implements BackerService {
             String[] friendId = {ObjectUtils.isEmpty(backer) ? receivedChangeBackerInfo.getFriendId() : backer.getBackerId()};
             if (ObjectUtils.isEmpty(backer)) {
                 if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
-                    Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getUserId(),receivedChangeBackerInfo.getFriendId());
+                    Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(),receivedChangeBackerInfo.getUserId());
                     if (friendship.getSustain().equals("0")){
                         ResponseResult result = rong.sendPrivateMsg("100000", friendId, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
                         if (result.getCode() != 200) {
@@ -180,7 +180,7 @@ public class BackerServiceImpl implements BackerService {
                         for (String s : deletedId){
                             msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),"取消了您作为ta支持者的身份",System.currentTimeMillis()/1000);
                         }
-                        Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getUserId(),receivedChangeBackerInfo.getFriendId());
+                        Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(),receivedChangeBackerInfo.getUserId());
                         if (friendship.getSustain().equals("0")){
                             ResponseResult result = rong.sendPrivateMsg("100000", friendId, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
                             if (result.getCode() != 200) {
