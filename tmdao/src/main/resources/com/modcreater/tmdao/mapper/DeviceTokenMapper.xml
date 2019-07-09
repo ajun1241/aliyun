@@ -10,7 +10,7 @@
         set deviceToken=#{deviceToken}, appType=#{appType}
         where userId=#{userId}
     </update>
-    <select id="queryDeviceToken" resultType="com.modcreater.tmbeans.pojo.Userdevicetoken">
+    <select id="queryDeviceToken" resultType="com.modcreater.tmbeans.pojo.UserDeviceToken">
         select * from userdevicetoken where userId=#{userId}
     </select>
 </mapper>

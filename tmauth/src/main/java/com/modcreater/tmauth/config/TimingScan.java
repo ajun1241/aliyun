@@ -63,14 +63,14 @@ public class TimingScan {
     /**
      * 每天八点查询明天有支持者的事件，发送信息给支持者
      */
-    @Scheduled(cron = "0 0 8 * * ?")
+    @Scheduled(cron = "0 45 15 * * ?")
     public void remindBacker(){
         try {
             //获取后一天的日期
             Date date=new Date();
             Calendar calendar = new GregorianCalendar();
             calendar.setTime(date);
-            calendar.add(Calendar.DATE,1);
+            calendar.add(Calendar.DATE,0);
             date=calendar.getTime();
             SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
             String[] now=simpleDateFormat.format(date).split("-");

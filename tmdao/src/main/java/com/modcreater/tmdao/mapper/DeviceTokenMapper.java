@@ -1,6 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
-import com.modcreater.tmbeans.pojo.Userdevicetoken;
+import com.modcreater.tmbeans.pojo.UserDeviceToken;
 
 /**
  * Description:
@@ -33,5 +33,5 @@ public interface DeviceTokenMapper {
      * @param userId
      * @return
      */
-    Userdevicetoken queryDeviceToken(String userId);
+    UserDeviceToken queryDeviceToken(String userId);
 }

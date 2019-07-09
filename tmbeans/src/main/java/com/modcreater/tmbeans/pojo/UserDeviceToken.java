@@ -6,7 +6,7 @@ import lombok.Data;
  * @Author: AJun
  */
 @Data
-public class Userdevicetoken {
+public class UserDeviceToken {
 
   private Long id;
   private Long userId;

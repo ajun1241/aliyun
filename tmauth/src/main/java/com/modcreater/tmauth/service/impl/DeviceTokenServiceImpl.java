@@ -36,14 +36,18 @@ public class DeviceTokenServiceImpl implements DeviceTokenService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(deviceTokenVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21013);
         }
+        int i=0;
         //判断是新增还是更换
         if (ObjectUtils.isEmpty(deviceTokenMapper.queryDeviceToken(deviceTokenVo.getUserId()))){
             //新增
-            deviceTokenMapper.insertDeviceToken(deviceTokenVo.getUserId(),deviceTokenVo.getDeviceToken(),deviceTokenVo.getAppType());
+            i=deviceTokenMapper.insertDeviceToken(deviceTokenVo.getUserId(),deviceTokenVo.getDeviceToken(),deviceTokenVo.getAppType());
         }else {
             //修改
-            deviceTokenMapper.updDeviceToken(deviceTokenVo.getUserId(),deviceTokenVo.getDeviceToken(),deviceTokenVo.getAppType());
+            i=deviceTokenMapper.updDeviceToken(deviceTokenVo.getUserId(),deviceTokenVo.getDeviceToken(),deviceTokenVo.getAppType());
         }
-        return null;
+        if (i>0){
+            return DtoUtil.getSuccessDto("请求成功",100000);
+        }
+        return DtoUtil.getFalseDto("请求失败",21001);
     }
 }
