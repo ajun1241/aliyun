@@ -140,11 +140,12 @@ public class BackerServiceImpl implements BackerService {
                 if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
                     Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(),receivedChangeBackerInfo.getUserId());
                     if (friendship.getSustain().toString().equals("0")){
-                        ResponseResult result = rong.sendPrivateMsg("100000", friendId, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
+                        ResponseResult result = rong.sendPrivateMsg("100000", new String[]{receivedChangeBackerInfo.getUserId()}, 0, new TxtMessage("您的支持者邀请被拒绝了",""));
                         if (result.getCode() != 200) {
                             logger.info("添加支持者时融云消息异常" + result.toString());
                         }
-                        msgStatusMapper.addNewEventMsg(friendId[0],1L,receivedChangeBackerInfo.getUserId(),":您的支持者邀请被拒绝了",System.currentTimeMillis()/1000);
+                        msgStatusMapper.addNewEventMsg(receivedChangeBackerInfo.getUserId(),1L,"100000",":您的支持者邀请被拒绝了",System.currentTimeMillis()/1000);
+                        return DtoUtil.getSuccessDto("消息发送成功", 100000);
                     }
                     ResponseResult result = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), friendId, 0, addBackerMessage);
                     if (result.getCode() != 200) {
@@ -182,11 +183,12 @@ public class BackerServiceImpl implements BackerService {
                         }
                         Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(),receivedChangeBackerInfo.getUserId());
                         if (friendship.getSustain().toString().equals("0")){
-                            ResponseResult result = rong.sendPrivateMsg("100000", friendId, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
+                            ResponseResult result = rong.sendPrivateMsg("100000", new String[]{receivedChangeBackerInfo.getUserId()}, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
                             if (result.getCode() != 200) {
                                 logger.info("添加支持者时融云消息异常" + result.toString());
                             }
-                            msgStatusMapper.addNewEventMsg(friendId[0],1L,receivedChangeBackerInfo.getUserId(),":您的支持者邀请被拒绝了",System.currentTimeMillis()/1000);
+                            msgStatusMapper.addNewEventMsg(receivedChangeBackerInfo.getUserId(),1L,"100000",":您的支持者邀请被拒绝了",System.currentTimeMillis()/1000);
+                            return DtoUtil.getSuccessDto("消息发送成功", 100000);
                         }
                         String[] changedId = {receivedChangeBackerInfo.getFriendId()};
                         ResponseResult result2 = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), changedId, 0, addBackerMessage);
