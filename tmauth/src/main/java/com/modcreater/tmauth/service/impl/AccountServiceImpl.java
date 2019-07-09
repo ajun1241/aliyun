@@ -114,6 +114,8 @@ public class AccountServiceImpl implements AccountService {
             if (accountMapper.updateAccount(account)<=0){
                 return DtoUtil.getFalseDto("生成token失败",14006);
             }
+            //把deviceToken保存在redis中
+            //把appType保存在redis中
             map.put("id",result.getId());
             map.put("userCode",result.getUserCode());
             map.put("isFirst",result.getIsFirst());

@@ -21,7 +21,7 @@ public class ReceivedBeSupporterFeedback {
 
     private String msgId;
     /**
-     * 0接受1不接受
+     * 1接受  0不接受
      */
     private String status;
 

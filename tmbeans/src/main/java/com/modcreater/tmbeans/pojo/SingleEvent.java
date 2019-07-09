@@ -38,10 +38,10 @@ public class SingleEvent implements Serializable {
      * 级别（2：不紧迫也不重要；3：紧迫但不重要；4：重要又不紧迫；5：重要又紧迫）
      */
     private Long level;
-    /**
+/*    *//**
      * 持续时间
-     */
-    private Long duration;
+     *//*
+    private Long duration;*/
     /**
      * 标识：是否为空白事件，0为空白事件，1为其他事件
      */
@@ -101,7 +101,6 @@ public class SingleEvent implements Serializable {
                 ", endtime='" + endtime + '\'' +
                 ", address='" + address + '\'' +
                 ", level=" + level +
-                ", duration=" + duration +
                 ", flag=" + flag +
                 ", person='" + person + '\'' +
                 ", remarks='" + remarks + '\'' +

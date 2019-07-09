@@ -135,7 +135,7 @@ public class RongCloudMethodUtil {
      * @param pushContent
      * @param pushData
      */
-    public static void pushSystemMessage(String content, String fromUserId,
+    /*public static void pushSystemMessage(String content, String fromUserId,
                                          String toUserId, String objectName, String pushContent,
                                          String pushData) {
 
@@ -150,7 +150,7 @@ public class RongCloudMethodUtil {
         params.put("pushData", pushData);
         byte[] resultArray;
         try {
-            resultArray = RongCloudUtil.post(systemMessage, params, "UTF-8",
+            resultArray = RongCloudUtil.post(systemMessage, params,
                     20000);
             String result = new String(resultArray);
             System.out.println(result);
@@ -158,7 +158,7 @@ public class RongCloudMethodUtil {
             System.out.println("发送信息出错了");
         }
 
-    }
+    }*/
 
     /**
      * 移除黑名单

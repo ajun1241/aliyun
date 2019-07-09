@@ -752,7 +752,7 @@ public class EventServiceImpl implements EventService {
                     msgStatusMapper.addNewEventMsg(s,singleEvent.getEventid(),SYSTEMID,"帮您添加了一条新的邀请事件",System.currentTimeMillis()/1000);
                 }
                 //更改邀请消息状态
-                msgStatusMapper.updateMsgStatus("0", feedbackInviteVo.getMsgId());
+                msgStatusMapper.updateMsgStatus(feedbackInviteVo.getChoose(), feedbackInviteVo.getMsgId());
             }else if (NO.equals(feedbackInviteVo.getChoose())){
                 //如果拒绝
                 //提醒事件发起者本人已拒绝
@@ -764,7 +764,7 @@ public class EventServiceImpl implements EventService {
                 }
                 msgStatusMapper.addNewEventMsg(feedbackInviteVo.getFromId(),singleEvent.getEventid(),feedbackInviteVo.getUserId(),"拒绝了你的一条事件",System.currentTimeMillis()/1000);
                 //更改邀请消息状态
-                msgStatusMapper.updateMsgStatus("1", feedbackInviteVo.getMsgId());
+                msgStatusMapper.updateMsgStatus(feedbackInviteVo.getChoose(), feedbackInviteVo.getMsgId());
             }
         } catch (Exception e) {
            logger.error(e.getMessage(),e);
@@ -972,7 +972,7 @@ public class EventServiceImpl implements EventService {
             //判断修改是否过期
             if (ObjectUtils.isEmpty(singleEvent)){
                 //修改消息状态
-                msgStatusMapper.updateMsgStatus("1", feedbackEventInviteVo.getMsgId());
+                msgStatusMapper.updateMsgStatus("3", feedbackEventInviteVo.getMsgId());
                 return DtoUtil.getFalseDto("该事件已修改成功，不能选择",2333);
             }
             //如果同意修改
@@ -1006,7 +1006,7 @@ public class EventServiceImpl implements EventService {
                         eventCreatorChooseVo.setChoose("1");
                         eventCreatorChoose(eventCreatorChooseVo,creatToken);
                         //修改消息状态
-                        msgStatusMapper.updateMsgStatus("1", feedbackEventInviteVo.getMsgId());
+                        msgStatusMapper.updateMsgStatus(feedbackEventInviteVo.getChoose(), feedbackEventInviteVo.getMsgId());
                         return DtoUtil.getSuccessDto("修改结果发送成功", 100000);
                     }
                     //发送统计信息和修改详情给创建者
@@ -1032,7 +1032,7 @@ public class EventServiceImpl implements EventService {
                     msgStatusMapper.addNewEventMsg(vice.getCreateBy().toString(),singleEvent.getEventid(),SYSTEMID,":超过50%的人接受修改你创建的邀请事件",System.currentTimeMillis()/1000);
                 }
                 //修改消息状态
-                msgStatusMapper.updateMsgStatus("0", feedbackEventInviteVo.getMsgId());
+                msgStatusMapper.updateMsgStatus(feedbackEventInviteVo.getChoose(), feedbackEventInviteVo.getMsgId());
             }else {//如果选拒绝
                 //修改统计表
                 StatisticsTable statisticsTable = new StatisticsTable();
@@ -1067,7 +1067,7 @@ public class EventServiceImpl implements EventService {
                     }
                 }
                 //修改消息状态
-                msgStatusMapper.updateMsgStatus("1", feedbackEventInviteVo.getMsgId());
+                msgStatusMapper.updateMsgStatus(feedbackEventInviteVo.getChoose(), feedbackEventInviteVo.getMsgId());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
@@ -1088,14 +1088,18 @@ public class EventServiceImpl implements EventService {
             if (!token.equals(stringRedisTemplate.opsForValue().get(eventCreatorChooseVo.getUserId()))) {
                 return DtoUtil.getFalseDto("请重新登录", 21013);
             }
-            if (msgStatusMapper.queryMsg(eventCreatorChooseVo.getMsgId()).getStatus()!=2){
-                return DtoUtil.getFalseDto("不能重复选择",2333);
+            if (eventCreatorChooseVo.getMsgId()!=null){
+                if (msgStatusMapper.queryMsg(eventCreatorChooseVo.getMsgId()).getStatus()!=2){
+                    return DtoUtil.getFalseDto("不能重复选择",2333);
+                }
             }
             //先拿到事件
             SingleEvent singleEvent=tempEventMapper.queryTempEvent(eventCreatorChooseVo.getEventId(),eventCreatorChooseVo.getUserId());
             if (ObjectUtils.isEmpty(singleEvent)){
                 //修改消息状态
-                msgStatusMapper.updateMsgStatus("0", eventCreatorChooseVo.getMsgId());
+                if (eventCreatorChooseVo.getMsgId()!=null) {
+                    msgStatusMapper.updateMsgStatus("3", eventCreatorChooseVo.getMsgId());
+                }
                 return DtoUtil.getFalseDto("该事件已修改成功，不能选择",2333);
             }
             //存放需要修改事件的用户id
@@ -1141,7 +1145,9 @@ public class EventServiceImpl implements EventService {
                     msgStatusMapper.addNewEventMsg(s,singleEvent.getEventid(),SYSTEMID,":事件修改成功",System.currentTimeMillis()/1000);
                 }
                 //修改消息状态
-                msgStatusMapper.updateMsgStatus("0", eventCreatorChooseVo.getMsgId());
+                if (eventCreatorChooseVo.getMsgId()!=null) {
+                    msgStatusMapper.updateMsgStatus(eventCreatorChooseVo.getChoose(), eventCreatorChooseVo.getMsgId());
+                }
             }else {
                 //如果不同意修改
                 //删除临时表的事件
@@ -1162,7 +1168,9 @@ public class EventServiceImpl implements EventService {
                     msgStatusMapper.addNewEventMsg(s,singleEvent.getEventid(),SYSTEMID,"",System.currentTimeMillis()/1000);
                 }
                 //修改消息状态
-                msgStatusMapper.updateMsgStatus("1", eventCreatorChooseVo.getMsgId());
+                if (eventCreatorChooseVo.getMsgId()!=null) {
+                    msgStatusMapper.updateMsgStatus(eventCreatorChooseVo.getChoose(), eventCreatorChooseVo.getMsgId());
+                }
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
@@ -1379,10 +1387,34 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SingleEvent singleEvent = eventMapper.queryDraftOne(receivedSearchOnce.getUserId(), receivedSearchOnce.getEventId());
-        if (singleEvent != null) {
+
+        Map<String, Object> maps = new HashMap<>();
+        ArrayList<Map> list = new ArrayList<>();
+        if (!StringUtils.isEmpty(singleEvent.getPerson())) {
+            EventPersons eventPersons = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
+            if (!StringUtils.isEmpty(eventPersons.getFriendsId())) {
+                String[] friendsId = eventPersons.getFriendsId().split(",");
+                for (String friendId : friendsId) {
+                    Map map = new HashMap();
+                    Account account = accountMapper.queryAccount(friendId);
+                    map.put("friendId", account.getId().toString());
+                    map.put("userCode", account.getUserCode());
+                    map.put("userName", account.getUserName());
+                    map.put("headImgUrl", account.getHeadImgUrl());
+                    map.put("gender", account.getGender().toString());
+                    list.add(map);
+                }
+            }
+            maps.put("friendsId", list);
+            maps.put("others", eventPersons.getOthers());
+            singleEvent.setPerson(JSON.toJSONString(maps));
+            System.out.println("显示一个事件详情时输出的" + singleEvent.getPerson());
+            return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEvent), 100000);
+        }else {
+            singleEvent.setPerson(JSON.toJSONString(new EventPersons()));
+            System.out.println("显示一个事件详情时输出的" + singleEvent.getPerson());
             return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEvent), 100000);
         }
-        return DtoUtil.getSuccessDto("未查询到事件", 200000);
     }
 
     /**

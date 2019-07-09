@@ -15,6 +15,13 @@ import io.rong.RongCloud;
 import io.rong.methods.message.history.History;
 import io.rong.models.response.HistoryMessageResult;
 import io.rong.models.response.ResponseResult;
+import javapns.devices.Device;
+import javapns.devices.implementations.basic.BasicDevice;
+import javapns.notification.AppleNotificationServerBasicImpl;
+import javapns.notification.PushNotificationManager;
+import javapns.notification.PushNotificationPayload;
+import javapns.notification.PushedNotification;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -87,27 +94,7 @@ public class TmbizApplicationTests {
      */
     @Test
     public void test2() {
-        try {
-            String systemMessage = "https://api-cn.ronghub.com/push.json";
-            Map<String, Object> params = new HashMap<>();
-            Map<String, Object> a=new HashMap<>();
-            Map<String, Object> b=new HashMap<>();
-            List<String> list=new ArrayList<>();
-            list.add("100030");
-            list.add("100090");
-            a .put("userid",list);
-            a .put("is_to_all",false);
-            b.put("alert","伦纳德拒绝了你的邀请");
-            // String content="{\"content\":\"2\"}";
-            params.put("platform", "ios");
-            params.put("audience",a);
-            params.put("notification",b);
-            byte[]  resultArray = RongCloudUtil.post(systemMessage, params, 20000);
-            System.out.println(resultArray.length);
-            } catch (Exception e) {
-                logger.error(e.getMessage(),e);
-                System.out.println("发送信息出错了");
-            }
+
     }
 
     @Test

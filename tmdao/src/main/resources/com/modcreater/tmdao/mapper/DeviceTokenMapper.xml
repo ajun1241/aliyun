@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmdao.mapper.DeviceTokenMapper">
+    <insert id="insertDeviceToken">
+        insert into userdevicetoken(userId, deviceToken, appType) values (#{userId},#{deviceToken},#{appType})
+    </insert>
+
+    <update id="updDeviceToken">
+        update userdevicetoken
+        set deviceToken=#{deviceToken}, appType=#{appType}
+        where userId=#{userId}
+    </update>
+    <select id="queryDeviceToken" resultType="com.modcreater.tmbeans.pojo.Userdevicetoken">
+        select * from userdevicetoken where userId=#{userId}
+    </select>
+</mapper>

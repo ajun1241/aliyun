@@ -38,13 +38,13 @@
         select * from usersettings where userId = #{userId}
     </select>
     <select id="getInviteFriendList" resultType="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
-        select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.invite 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId}
+        select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.invite 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId} and f.status=20
     </select>
     <select id="getSupportFriendList" resultType="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
-        select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.sustain 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId}
+        select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.sustain 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId} and f.status=20
     </select>
     <select id="getHideFriendList" resultType="com.modcreater.tmbeans.show.usersettings.ShowFriendList">
-        select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.hide 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId}
+        select f.friendId 'userId',a.userCode,a.headImgUrl,a.userName,a.gender,f.hide 'status' from account a,friendship f where f.friendId = a.id and f.userId = #{userId} and f.status=20
     </select>
     <select id="getIsHideFromFriend" resultType="java.lang.Integer">
         select hide from friendship where userId = #{friendId} and friendId = #{userId} and status = 20
