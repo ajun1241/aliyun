@@ -4,6 +4,7 @@ import com.modcreater.tmauth.service.BackerService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.Backers;
+import com.modcreater.tmbeans.pojo.Friendship;
 import com.modcreater.tmbeans.pojo.MsgStatus;
 import com.modcreater.tmbeans.show.backer.ShowFriendList;
 import com.modcreater.tmbeans.vo.backer.ReceivedBeSupporterFeedback;
@@ -137,6 +138,14 @@ public class BackerServiceImpl implements BackerService {
             String[] friendId = {ObjectUtils.isEmpty(backer) ? receivedChangeBackerInfo.getFriendId() : backer.getBackerId()};
             if (ObjectUtils.isEmpty(backer)) {
                 if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
+                    Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getUserId(),receivedChangeBackerInfo.getFriendId());
+                    if (friendship.getSustain().equals("0")){
+                        ResponseResult result = rong.sendPrivateMsg("100000", friendId, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
+                        if (result.getCode() != 200) {
+                            logger.info("添加支持者时融云消息异常" + result.toString());
+                        }
+                        msgStatusMapper.addNewEventMsg(friendId[0],1L,receivedChangeBackerInfo.getUserId(),":您的支持者邀请被拒绝了",System.currentTimeMillis()/1000);
+                    }
                     ResponseResult result = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), friendId, 0, addBackerMessage);
                     if (result.getCode() != 200) {
                         logger.info("添加支持者时融云消息异常" + result.toString());
@@ -170,6 +179,14 @@ public class BackerServiceImpl implements BackerService {
                         }
                         for (String s : deletedId){
                             msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),"取消了您作为ta支持者的身份",System.currentTimeMillis()/1000);
+                        }
+                        Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getUserId(),receivedChangeBackerInfo.getFriendId());
+                        if (friendship.getSustain().equals("0")){
+                            ResponseResult result = rong.sendPrivateMsg("100000", friendId, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
+                            if (result.getCode() != 200) {
+                                logger.info("添加支持者时融云消息异常" + result.toString());
+                            }
+                            msgStatusMapper.addNewEventMsg(friendId[0],1L,receivedChangeBackerInfo.getUserId(),":您的支持者邀请被拒绝了",System.currentTimeMillis()/1000);
                         }
                         String[] changedId = {receivedChangeBackerInfo.getFriendId()};
                         ResponseResult result2 = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), changedId, 0, addBackerMessage);
@@ -242,6 +259,9 @@ public class BackerServiceImpl implements BackerService {
         }
         Backers backer = backerMapper.getMyBacker(receivedBeSupporterFeedback.getReceiverId());
         MsgStatus msgStatus = msgStatusMapper.queryMsg(receivedBeSupporterFeedback.getMsgId());
+        if (ObjectUtils.isEmpty(backer)){
+            return DtoUtil.getFalseDto("操作失败 ",22013);
+        }
         if (msgStatus.getStatus().equals("3") || System.currentTimeMillis()/1000 - backer.getCreateDate() >= 1800){
             return DtoUtil.getFalseDto("消息已过期", 22012);
         }
