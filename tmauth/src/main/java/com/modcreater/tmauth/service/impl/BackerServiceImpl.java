@@ -139,7 +139,7 @@ public class BackerServiceImpl implements BackerService {
             if (ObjectUtils.isEmpty(backer)) {
                 if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
                     Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(),receivedChangeBackerInfo.getUserId());
-                    if (friendship.getSustain().equals("0")){
+                    if (friendship.getSustain().toString().equals("0")){
                         ResponseResult result = rong.sendPrivateMsg("100000", friendId, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
                         if (result.getCode() != 200) {
                             logger.info("添加支持者时融云消息异常" + result.toString());
@@ -181,7 +181,7 @@ public class BackerServiceImpl implements BackerService {
                             msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),"取消了您作为ta支持者的身份",System.currentTimeMillis()/1000);
                         }
                         Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(),receivedChangeBackerInfo.getUserId());
-                        if (friendship.getSustain().equals("0")){
+                        if (friendship.getSustain().toString().equals("0")){
                             ResponseResult result = rong.sendPrivateMsg("100000", friendId, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
                             if (result.getCode() != 200) {
                                 logger.info("添加支持者时融云消息异常" + result.toString());
@@ -199,8 +199,11 @@ public class BackerServiceImpl implements BackerService {
                         if (backerMapper.updateBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000 ,msgStatus.getId()) > 0) {
                             return DtoUtil.getSuccessDto("修改成功", 100000);
                         }
-                    } else {
+                    } else if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId())){
                         return DtoUtil.getFalseDto("您已经将ta设置为您的支持者了", 22002);
+                    }else if (backer.getStatus().equals("2")){
+                        backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId());
+                        return DtoUtil.getFalseDto("操作失败了,请再试一次哦", 22005);
                     }
                 }
             }
@@ -283,6 +286,7 @@ public class BackerServiceImpl implements BackerService {
                 if (result1.getCode() != 200){
                     logger.info("添加邀请事件时融云消息异常" + result1.toString());
                 }
+                backerMapper.deleteBacker(receivedBeSupporterFeedback.getUserId());
                 msgStatusMapper.addNewEventMsg(receivedBeSupporterFeedback.getReceiverId(),1L,account.getId().toString(),msg,System.currentTimeMillis()/1000);
                 return DtoUtil.getSuccessDto("", 100000);
             }
