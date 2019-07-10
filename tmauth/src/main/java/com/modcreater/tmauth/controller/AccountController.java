@@ -2,11 +2,9 @@ package com.modcreater.tmauth.controller;
 
 import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.AccountService;
+import com.modcreater.tmauth.service.DeviceTokenService;
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.vo.AccountVo;
-import com.modcreater.tmbeans.vo.AddPwdVo;
-import com.modcreater.tmbeans.vo.LoginVo;
-import com.modcreater.tmbeans.vo.QueryUserVo;
+import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
 import io.swagger.annotations.ApiOperation;
@@ -21,6 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 public class AccountController {
     @Resource
     private AccountService userService;
+
+    @Resource
+    private DeviceTokenService deviceTokenService;
 
     @Safety
     @PostMapping("addpwd")
@@ -119,5 +120,12 @@ public class AccountController {
     @ApiOperation("查询用户列表信息")
     public Dto querySessionListDetail(@RequestBody FriendshipVo friendshipVo, HttpServletRequest request){
         return userService.querySessionListDetail(friendshipVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping("replacedevicetoken")
+    @ApiOperation("更换deviceToken")
+    public Dto replaceDeviceToken(@RequestBody DeviceTokenVo deviceTokenVo, HttpServletRequest request){
+        return deviceTokenService.replaceDeviceToken(deviceTokenVo ,request.getHeader("token"));
     }
 }

@@ -67,10 +67,28 @@ public class TmbizApplicationTests {
         }
         System.out.println(week);*/
     }
-    private String ceshi(){
-        System.out.println("SHAN");
-        return "abc";
+
+    public static void main(String[] args) {
+        String[] s={"0", "1", "2", "3", "4", "5", "6", "7"};
+        int a=3;
+        int b=s.length%a==0?s.length/a:s.length/a+1;
+        List<String[]> list=new ArrayList();
+        for (int i = 0; i <b; i++) {
+            String[] x=new String[a];
+            for (int j = 0; j < a; j++) {
+                int t=j+i*a;
+                if (t>s.length-1){
+                    break;
+                }
+                x[j]=s[t];
+            }
+            list.add(x);
+        }
+        for (String[] m:list) {
+            System.out.println(Arrays.toString(m));
+        }
     }
+
     @Test
     public void test1() {
         /*Informationsafety informationSafety=new Informationsafety();

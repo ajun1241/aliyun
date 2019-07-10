@@ -75,6 +75,9 @@ public class EventServiceImpl implements EventService {
     @Resource
     private MsgStatusMapper msgStatusMapper;
 
+    @Resource
+    private DeviceTokenMapper deviceTokenMapper;
+
     private Logger logger = LoggerFactory.getLogger(EventServiceImpl.class);
     @Resource
     private EventUtil eventUtil;
@@ -663,6 +666,11 @@ public class EventServiceImpl implements EventService {
                     logger.info("添加邀请事件时融云消息异常"+result.toString());
                     return DtoUtil.getFalseDto("消息发送失败",21040);
                 }
+                //如果是ios发送推送信息
+                UserDeviceToken userDeviceToken=deviceTokenMapper.queryDeviceToken(personList1.get(i));
+                if (!ObjectUtils.isEmpty(userDeviceToken) && userDeviceToken.getAppType() == 1L){
+                    PushUtil.APNSPush(userDeviceToken.getDeviceToken(),"你的好友邀请你参与他的事件",1);
+                }
                 msgStatusMapper.addNewEventMsg(personList1.get(i),singleEvent.getEventid(),addInviteEventVo.getUserId(),"邀请你参与事件",System.currentTimeMillis()/1000);
             }
             //list2给创建者发送拒绝信息
@@ -808,10 +816,6 @@ public class EventServiceImpl implements EventService {
             Map<String, String> oldMap = SingleEvent.toMap(singleEventOld);
             //比较差异
             List<Map<String,String>> different = SingleEventUtil.eventDifferent(newMap, oldMap);
-            if (different.size()==0) {
-                return DtoUtil.getFalseDto("没有任何更改", 29102);
-            }
-            logger.info("修改一条邀请事件时输出的修改的内容"+different);
             EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
             //如果有新成员加入
             EventPersons eventPersons2=JSONObject.parseObject(singleEventOld.getPerson(),EventPersons.class);
@@ -828,6 +832,10 @@ public class EventServiceImpl implements EventService {
                     newFriends.add(person);
                 }
             }
+            if (different.size() == 0 && newFriends.size() == 0) {
+                return DtoUtil.getFalseDto("没有任何更改", 29102);
+            }
+            logger.info("修改一条邀请事件时输出的修改的内容"+different);
             //如果是创建者修改
             if (singleEvent.getUserid().equals(singleEventVice.getCreateBy())){
                 if (newFriends.size()>0){
