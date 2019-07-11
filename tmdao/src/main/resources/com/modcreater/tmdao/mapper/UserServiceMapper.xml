@@ -44,4 +44,16 @@
     <select id="getHistoryMsgList" resultType="com.modcreater.tmbeans.pojo.EventMsg">
         select * from eventmsg where msgOwnerId = #{userId} order by id desc limit 3
     </select>
+    <select id="countAMonthEvents" resultType="java.lang.Integer">
+        select count(id) from singleevent
+        <where>
+            userId = #{userId} and month = #{thisMonth} and year = #{thisYear}
+            <if test="isOverdue != null">
+                and isOverdue = #{isOverdue}
+            </if>
+            <if test="isOverdue == null">
+                and isOverdue in (0,1)
+            </if>
+        </where>
+    </select>
 </mapper>

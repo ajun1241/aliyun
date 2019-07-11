@@ -643,6 +643,30 @@ public class UserInfoServiceImpl implements UserInfoService {
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
+    @Override
+    public Dto getCompletedInThisMonth(ReceivedId receivedId, String token) {
+        if (StringUtils.isEmpty(receivedId.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("token未获取到", 21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        Calendar calendar = Calendar.getInstance();
+        int thisMonth = calendar.get(Calendar.MONTH) + 1;
+        int thisYear = calendar.get(Calendar.YEAR);
+        int totalNum = userServiceMapper.countAMonthEvents(receivedId.getUserId(),thisMonth,thisYear,null);
+        int completedNum = userServiceMapper.countAMonthEvents(receivedId.getUserId(),thisMonth,thisYear,"1");
+        int unfinishedNum = totalNum - completedNum;
+        Map<String,Integer> result = new HashMap<>(3);
+        result.put("totalNum",totalNum);
+        result.put("completedNum",completedNum);
+        result.put("unfinishedNum",unfinishedNum);
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
     public boolean isSearchServiceNice(ReceivedEventConditions receivedEventConditions) {
         //此处判断用户是否开启了查询服务
         ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(receivedEventConditions.getUserId(), "2");

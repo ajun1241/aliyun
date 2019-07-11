@@ -75,4 +75,10 @@ public class UserInfoController {
     public Dto getMsgList(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
         return userInfoService.getMsgList(receivedId,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getcompletedinthismonth")
+    @ApiOperation("获取本月总事件数和已完成数量")
+    public Dto getCompletedInThisMonth(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
+        return userInfoService.getCompletedInThisMonth(receivedId,request.getHeader("token"));
+    }
 }

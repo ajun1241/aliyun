@@ -63,4 +63,14 @@ public interface UserServiceMapper {
      * @return
      */
     List<EventMsg> getHistoryMsgList(String userId);
+
+    /**
+     * 根据条件查询一个月的事件数量
+     * @param userId
+     * @param thisMonth
+     * @param thisYear
+     * @param isOverdue
+     * @return
+     */
+    int countAMonthEvents(@Param("userId") String userId,@Param("thisMonth") int thisMonth,@Param("thisYear") int thisYear,@Param("isOverdue") String isOverdue);
 }

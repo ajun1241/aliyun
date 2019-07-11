@@ -86,4 +86,12 @@ public interface UserInfoService {
      * @return
      */
     Dto getMsgList(ReceivedId receivedId, String token);
+
+    /**
+     * 获取本月总事件数和已完成的数量
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto getCompletedInThisMonth(ReceivedId receivedId, String token);
 }
