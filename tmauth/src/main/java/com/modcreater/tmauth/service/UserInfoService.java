@@ -93,5 +93,5 @@ public interface UserInfoService {
      * @param token
      * @return
      */
-    Dto getCompletedInThisMonth(ReceivedId receivedId, String token);
+    Dto getCompletedInThisMonth(ReceivedCompletedInThisMonth receivedId, String token);
 }

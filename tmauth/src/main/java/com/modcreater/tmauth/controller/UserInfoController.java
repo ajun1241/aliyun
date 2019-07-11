@@ -78,7 +78,7 @@ public class UserInfoController {
 
     @PostMapping(value = "getcompletedinthismonth")
     @ApiOperation("获取本月总事件数和已完成数量")
-    public Dto getCompletedInThisMonth(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
+    public Dto getCompletedInThisMonth(@RequestBody ReceivedCompletedInThisMonth receivedId ,HttpServletRequest request){
         return userInfoService.getCompletedInThisMonth(receivedId,request.getHeader("token"));
     }
 }

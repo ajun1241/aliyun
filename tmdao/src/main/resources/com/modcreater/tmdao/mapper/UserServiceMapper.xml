@@ -54,6 +54,7 @@
             <if test="isOverdue == null">
                 and isOverdue in (0,1)
             </if>
+            and isLoop = 0
         </where>
     </select>
 </mapper>

@@ -16,6 +16,7 @@ import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
 import com.modcreater.tmbeans.utils.NaturalWeek;
 import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedAlterUserInfo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedCompletedInThisMonth;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.*;
@@ -644,7 +645,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public Dto getCompletedInThisMonth(ReceivedId receivedId, String token) {
+    public Dto getCompletedInThisMonth(ReceivedCompletedInThisMonth receivedId, String token) {
         if (StringUtils.isEmpty(receivedId.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
@@ -654,11 +655,13 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        Calendar calendar = Calendar.getInstance();
+        /*Calendar calendar = Calendar.getInstance();
         int thisMonth = calendar.get(Calendar.MONTH) + 1;
         int thisYear = calendar.get(Calendar.YEAR);
         int totalNum = userServiceMapper.countAMonthEvents(receivedId.getUserId(),thisMonth,thisYear,null);
-        int completedNum = userServiceMapper.countAMonthEvents(receivedId.getUserId(),thisMonth,thisYear,"1");
+        int completedNum = userServiceMapper.countAMonthEvents(receivedId.getUserId(),thisMonth,thisYear,"1");*/
+        int totalNum = userServiceMapper.countAMonthEvents(receivedId.getUserId(),receivedId.getMonth(),receivedId.getYear(),null);
+        int completedNum = userServiceMapper.countAMonthEvents(receivedId.getUserId(),receivedId.getMonth(),receivedId.getYear(),"1");
         int unfinishedNum = totalNum - completedNum;
         Map<String,Integer> result = new HashMap<>(3);
         result.put("totalNum",totalNum);
