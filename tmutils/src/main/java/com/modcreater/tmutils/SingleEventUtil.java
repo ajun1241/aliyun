@@ -9,10 +9,7 @@ import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -229,14 +226,17 @@ public class SingleEventUtil {
         for (String key : newMap.keySet()) {
             Map<String,String> map=new HashMap<>();
             if (!newMap.get(key).equals(oldMap.get(key))) {
-                if (("开始时间").equals(key)) {
-                    map.put("title",key+ "更改为：");
+                if (("a").equals(key)){
+                    map.put("title","名称更改为：");
+                    map.put("content",newMap.get(key));
+                }else if (("b").equals(key)) {
+                    map.put("title","开始时间更改为：");
                     map.put("content",Long.parseLong(newMap.get(key)) / 60 + ":" + Long.parseLong(newMap.get(key)) % 60);
-                } else if (("结束时间").equals(key)) {
-                    map.put("title",key+ "更改为：");
+                } else if (("c").equals(key)) {
+                    map.put("title","结束时间更改为：");
                     map.put("content",Long.parseLong(newMap.get(key)) / 60 + ":" + Long.parseLong(newMap.get(key)) % 60);
-                } else if (("优先级").equals(key)) {
-                    map.put("title",key+ "更改为：");
+                } else if (("d").equals(key)) {
+                    map.put("title","优先级更改为：");
                     //2：不紧迫也不重要；3：紧迫但不重要；4：重要又不紧迫；5：重要又紧迫
                     if ("2".equals(newMap.get(key))) {
                         map.put("content","不紧迫也不重要");
@@ -247,8 +247,8 @@ public class SingleEventUtil {
                     } else if ("5".equals(newMap.get(key))) {
                         map.put("content","重要又紧迫");
                     }
-                } else if (("重复次数").equals(key)) {
-                    map.put("title",key+ "更改为：");
+                } else if (("e").equals(key)) {
+                    map.put("title","重复时间更改为：");
                     String[] arr = newMap.get(key).replace("[", "").replace("]", "").split(",");
                     StringBuffer stringBuffer = new StringBuffer();
                     for (int i = 0; i < arr.length; i++) {
@@ -261,20 +261,14 @@ public class SingleEventUtil {
                     } else {
                         map.put("content","每周" + stringBuffer.replace(stringBuffer.length() - 1, stringBuffer.length(), "") + "重复");
                     }
-                } else if (("提醒时间").equals(key)) {
-                    map.put("title",key+ "更改为：");
-                    map.put("content","时间开始前" + newMap.get(key) + "分钟");
-                } else if (("年").equals(key)) {
-                    map.put("title",key+ "更改为：");
-                    map.put("content",newMap.get(key) + "年");
-                } else if (("月").equals(key)) {
-                    map.put("title",key+ "更改为：");
-                    map.put("content",newMap.get(key) + "月");
-                } else if (("日").equals(key)) {
-                    map.put("title",key+ "更改为：");
-                    map.put("content",newMap.get(key) + "日");
-                } else if (("事件类型").equals(key)) {
-                    map.put("title",key+ "更改为：");
+                } else if (("f").equals(key)) {
+                    map.put("title","提醒时间更改为：");
+                    map.put("content","事件开始前" + newMap.get(key) + "分钟");
+                } else if (("g").equals(key) || ("h").equals(key) || ("i").equals(key)) {
+                    map.put("title","日期更改为：");
+                    map.put("content",newMap.get("年") + "年"+newMap.get("月") + "月"+newMap.get("日") + "日");
+                }  else if (("j").equals(key)) {
+                    map.put("title","类型更改为：");
                     //0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他
                     if ("0".equals(newMap.get(key))) {
                         map.put("content","学习");
@@ -293,14 +287,11 @@ public class SingleEventUtil {
                     } else if ("7".equals(newMap.get(key))) {
                         map.put("content","其他");
                     }
-                }else if (("事件名称").equals(key)){
-                    map.put("title",key+ "更改为：");
+                }else if (("k").equals(key)){
+                    map.put("title","地址更改为：");
                     map.put("content",newMap.get(key));
-                }else if (("地址").equals(key)){
-                    map.put("title",key+ "更改为：");
-                    map.put("content",newMap.get(key));
-                }else if (("备注").equals(key)){
-                    map.put("title",key+ "更改为：");
+                }else if (("l").equals(key)){
+                    map.put("title", "备注更改为：");
                     map.put("content",newMap.get(key));
                 }
                 different.add(map);

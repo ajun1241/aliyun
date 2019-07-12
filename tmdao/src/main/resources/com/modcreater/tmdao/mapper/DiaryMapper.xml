@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmdao.mapper.DiaryMapper">
+    <insert id="addNewDiary" parameterType="com.modcreater.tmbeans.pojo.Diary">
+        insert into diary(userId, content, diaryImage, moodType,createDate, status) values (#{userId},#{content},#{diaryImage},#{moodType},#{createDate},#{status})
+    </insert>
+
+    <update id="updateDiary">
+        update diary
+        <set>
+            <if test="content != null and content != ''">
+                content=#{content},
+            </if>
+            <if test="diaryImage != null and diaryImage != ''">
+                diaryImage=#{diaryImage},
+            </if>
+            <if test="moodType != -1 ">
+                moodType=#{moodType},
+            </if>
+            <if test="status != -1 ">
+                status=#{status},
+            </if>
+        </set>
+          where diaryId=#{diaryId}
+    </update>
+
+    <delete id="deleteDiary">
+        delete from diary where diaryId=#{diaryId}
+    </delete>
+
+    <select id="queryDiaryList" resultType="com.modcreater.tmbeans.pojo.Diary">
+        select * from diary where userId=#{userId}
+        <if test=" pageIndex >= 0 and pageSize > 0">
+            limit #{pageIndex},#{pageSize}
+        </if>
+    </select>
+
+    <select id="queryDiaryDetail" resultType="com.modcreater.tmbeans.pojo.Diary">
+        select * from diary where diaryId=#{diaryId}
+    </select>
+
+    <select id="queryDiaryByDate" resultType="com.modcreater.tmbeans.pojo.Diary">
+        select * from diary where userId=#{userId} and createDate=#{date}
+    </select>
+
+    <select id="queryFriendsDiaryList" resultType="com.modcreater.tmbeans.pojo.Diary">
+        select * from diary where userId=#{friendId} and status=1
+        <if test=" pageIndex >= 0 and pageSize > 0">
+            limit #{pageIndex},#{pageSize}
+        </if>
+    </select>
+
+</mapper>

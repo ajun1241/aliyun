@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Data
 public class SingleEvent implements Serializable {
@@ -116,19 +117,19 @@ public class SingleEvent implements Serializable {
 
     //将对象中的属性存入集合作比较
     public static Map<String,String> toMap(SingleEvent singleEvent){
-        Map<String,String> map=new HashMap<>();
-        map.put("事件名称",singleEvent.getEventname());
-        map.put("开始时间",singleEvent.getStarttime());
-        map.put("结束时间",singleEvent.getEndtime());
-        map.put("地址",singleEvent.getAddress());
-        map.put("优先级",singleEvent.getLevel().toString());
-        map.put("备注",singleEvent.getRemarks());
-        map.put("重复次数",singleEvent.getRepeaTtime());
-        map.put("提醒时间",singleEvent.getRemindTime());
-        map.put("年",singleEvent.getYear().toString());
-        map.put("月",singleEvent.getMonth().toString());
-        map.put("日",singleEvent.getDay().toString());
-        map.put("事件类型",singleEvent.getType().toString());
+        Map<String,String> map=new TreeMap<>();
+        map.put("a",singleEvent.getEventname());
+        map.put("b",singleEvent.getStarttime());
+        map.put("c",singleEvent.getEndtime());
+        map.put("d",singleEvent.getLevel().toString());
+        map.put("e",singleEvent.getRepeaTtime());
+        map.put("f",singleEvent.getRemindTime());
+        map.put("g",singleEvent.getYear().toString());
+        map.put("h",singleEvent.getMonth().toString());
+        map.put("i",singleEvent.getDay().toString());
+        map.put("j",singleEvent.getType().toString());
+        map.put("k",singleEvent.getAddress());
+        map.put("l",singleEvent.getRemarks());
         return map;
     }
 }
