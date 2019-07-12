@@ -521,13 +521,13 @@ public class EventServiceImpl implements EventService {
         List<DayEvents> dayEventsList = new ArrayList<>();
         if ("1".equals(result.get("userPrivatePermission"))) {
             //按周查询单一事件
-            dayEventsList = getDayEventsList(searchEventVo.getUserId(), "all", searchEventVo.getDayEventId());
+            dayEventsList = getDayEventsList(searchEventVo.getFriendId(), "all", searchEventVo.getDayEventId());
             //按周查询重复事件
             List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEvents(searchEventVo.getFriendId());
             loopEventList = getShowSingleEventListList(loopEventListInDataBase);
         } else if ("2".equals(result.get("userPrivatePermission"))) {
             //按周查询单一事件
-            dayEventsList = getDayEventsList(searchEventVo.getUserId(), "few", searchEventVo.getDayEventId());
+            dayEventsList = getDayEventsList(searchEventVo.getFriendId(), "few", searchEventVo.getDayEventId());
             //按周查询重复事件
             List<SingleEvent> loopEventListInDataBase = eventMapper.queryLoopEventsWithFewInfo(searchEventVo.getFriendId());
             loopEventList = getShowSingleEventListList(loopEventListInDataBase);
