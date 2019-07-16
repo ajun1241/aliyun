@@ -207,7 +207,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (StringUtils.hasText(receivedEventConditions.getSearchType()) && receivedEventConditions.getSearchType().equals("0") && receivedEventConditions.getIsOverdue().equals("1")){
             if (StringUtils.hasText(receivedEventConditions.getPageNum()) && !receivedEventConditions.getPageNum().equals("1")){
                 if (!isSearchServiceNice(receivedEventConditions)) {
-                    return DtoUtil.getSuccesWithDataDto("未开通查询服务,不能查看更多", null, 200000);
+                    return DtoUtil.getSuccesWithDataDto("未开通查询服务,不能查看更多", null, 12003);
                 }
             }
         }

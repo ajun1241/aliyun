@@ -398,6 +398,9 @@ public class EventServiceImpl implements EventService {
                 if (showSingleEvent.getRepeaTtime()[week]) {
                     showSingleEventListOrderByLevel.add(showSingleEvent);
                     showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
+                    if (StringUtils.hasText(searchEventVo.getFriendId()) && searchEventVo.getFriendId().equals("seaPlans")){
+                        dayEvents.getMySingleEventList().add(showSingleEvent);
+                    }
                 }
             }
         }
@@ -507,7 +510,7 @@ public class EventServiceImpl implements EventService {
         try {
             if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 && userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(), searchEventVo.getFriendId()) == 1) {
                 result.put("userPrivatePermission", "1");
-            } else if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 || userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(), searchEventVo.getFriendId()) == 2) {
+            } else if (userSettingsMapper.getFriendHide(searchEventVo.getFriendId()) == 0 && userSettingsMapper.getIsHideFromFriend(searchEventVo.getUserId(), searchEventVo.getFriendId()) == 2) {
                 result.put("userPrivatePermission", "2");
             } else {
                 result.put("userPrivatePermission", "0");
