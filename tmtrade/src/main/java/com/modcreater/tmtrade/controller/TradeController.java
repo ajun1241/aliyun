@@ -67,7 +67,7 @@ public class TradeController {
     }
 
     @PostMapping(value = "isfriendserviceopened")
-    @ApiOperation("判断用户是否开通了还有服务")
+    @ApiOperation("判断用户是否开通了好友服务")
     public Dto isFriendServiceOpened(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return orderService.isFriendServiceOpened(receivedId,request.getHeader("token"));
     }

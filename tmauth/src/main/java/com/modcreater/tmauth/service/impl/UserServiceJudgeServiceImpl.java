@@ -54,16 +54,11 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         if (ObjectUtils.isEmpty(time)) {
             return DtoUtil.getSuccessDto("该用户尚未开通查询功能", 200000);
         }
-        //开通了,查询次卡是否有剩余
+        //开通过,查询次卡是否有剩余
         if (time.getResidueDegree() == 0) {
             //无剩余,判断剩余年/月卡时间
             Long timeRemaining = time.getTimeRemaining();
             if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis() / 1000) {
-                return DtoUtil.getSuccessDto("该用户尚未开通查询功能", 200000);
-            }
-        } else {
-            //判断剩余次数-1后是否为0,如果为0...
-            if (time.getResidueDegree() - 1 == 0) {
                 return DtoUtil.getSuccessDto("该用户尚未开通查询功能", 200000);
             }
         }
@@ -107,7 +102,7 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
         if (ObjectUtils.isEmpty(service)) {
             return DtoUtil.getFalseDto("好友功能尚未开通", 200000);
         }
-        return DtoUtil.getSuccesWithDataDto("好友功能已开通","1", 100000);
+        return DtoUtil.getSuccesWithDataDto("好友功能已开通", "1", 100000);
     }
 
     /**
@@ -170,14 +165,6 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
             Long timeRemaining = time.getTimeRemaining();
             if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis() / 1000) {
                 return DtoUtil.getSuccessDto("该用户尚未开通备份功能", 20000);
-            }
-        } else {
-            //有剩余,判断此次查询完毕后是否剩余为0次
-            time.setResidueDegree(time.getResidueDegree() - 1);
-            //如果剩余次数为0,判断库存时间是否为0
-            if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
-                //如果有库存时间,将这个时间加入用户有效的剩余时间中
-                time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
             }
         }
         return DtoUtil.getSuccessDto("备份功能已开通", 100000);

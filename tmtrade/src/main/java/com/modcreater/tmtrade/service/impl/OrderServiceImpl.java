@@ -513,20 +513,20 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + ",月/年卡将在次卡消耗完后开始计算", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询历史服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡将在次卡消耗完后开始计算", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString(), 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询历史服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次", 100000);
                 }
             }
         }
         if (serviceRemainingTime.getServiceId().equals("3")) {
             String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
             if (serviceRemainingTime.getTimeRemaining() == 0) {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "年报服务尚未开通", 100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", "报表服务尚未开通", 100000);
             } else if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "年报服务将在" + time + "过期", 100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", "报表服务将在" + time + "过期", 100000);
             } else {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "年报服务已过期", 100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", "报表服务已过期", 100000);
             }
         }
         if (serviceRemainingTime.getServiceId().equals("4")) {
