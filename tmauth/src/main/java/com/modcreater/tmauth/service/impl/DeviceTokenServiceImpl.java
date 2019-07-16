@@ -38,7 +38,7 @@ public class DeviceTokenServiceImpl implements DeviceTokenService {
     public Dto replaceDeviceToken(DeviceTokenVo deviceTokenVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(deviceTokenVo.getUserId()))) {
-                return DtoUtil.getFalseDto("请重新登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             logger.info("生成/置换DeviceToken 和 appType:"+deviceTokenVo.toString());
             int i=0;

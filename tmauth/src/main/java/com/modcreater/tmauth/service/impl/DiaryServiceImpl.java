@@ -3,6 +3,7 @@ package com.modcreater.tmauth.service.impl;
 import com.modcreater.tmauth.service.DiaryService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Diary;
+import com.modcreater.tmbeans.vo.DiaryResultVo;
 import com.modcreater.tmbeans.vo.DiaryVo;
 import com.modcreater.tmbeans.vo.QueryDiaryVo;
 import com.modcreater.tmdao.mapper.DiaryMapper;
@@ -16,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -45,7 +47,7 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public Dto addNewDiary(DiaryVo diaryVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(diaryVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
         //判断是否可以添加
@@ -75,7 +77,7 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public Dto updateDiary(DiaryVo diaryVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(diaryVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
         Diary diary=diaryMapper.queryDiaryDetail(diaryVo.getDiaryId());
@@ -105,7 +107,7 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public Dto deleteDiary(DiaryVo diaryVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(diaryVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
         Diary diary=diaryMapper.queryDiaryDetail(diaryVo.getDiaryId());
@@ -128,7 +130,7 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public Dto queryDiaryList(QueryDiaryVo queryDiaryVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(queryDiaryVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         int pageSize=Integer.parseInt(queryDiaryVo.getPageSize());
         if (StringUtils.isEmpty(queryDiaryVo.getPageNumber())){
@@ -136,7 +138,19 @@ public class DiaryServiceImpl implements DiaryService {
         }
         int pageIndex=(Integer.parseInt(queryDiaryVo.getPageNumber())-1)*pageSize;
         List<Diary> list=diaryMapper.queryDiaryList(queryDiaryVo.getUserId().toString(),pageIndex,pageSize);
-        return DtoUtil.getSuccesWithDataDto("查询成功",list,100000);
+        List<DiaryResultVo> result=new ArrayList<>();
+        for (Diary diary:list) {
+            DiaryResultVo resultVo=new DiaryResultVo();
+            resultVo.setDiaryId(diary.getDiaryId());
+            resultVo.setContent(diary.getContent());
+            resultVo.setCreateDate(diary.getCreateDate());
+            resultVo.setMoodType(diary.getMoodType());
+            resultVo.setStatus(diary.getStatus());
+            resultVo.setUserId(diary.getUserId());
+            resultVo.setDiaryImage(diary.getDiaryImage().replace("[","").replace("]","").split(","));
+            result.add(resultVo);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
     /**
@@ -148,13 +162,21 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public Dto queryDiaryDetail(DiaryVo diaryVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(diaryVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         Diary diary=diaryMapper.queryDiaryDetail(diaryVo.getDiaryId());
         if (ObjectUtils.isEmpty(diary)){
             return DtoUtil.getFalseDto("该日记不存在，可能已被删除",200000);
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",diary,100000);
+        DiaryResultVo resultVo=new DiaryResultVo();
+        resultVo.setDiaryId(diary.getDiaryId());
+        resultVo.setContent(diary.getContent());
+        resultVo.setCreateDate(diary.getCreateDate());
+        resultVo.setMoodType(diary.getMoodType());
+        resultVo.setStatus(diary.getStatus());
+        resultVo.setUserId(diary.getUserId());
+        resultVo.setDiaryImage(diary.getDiaryImage().replace("[","").replace("]","").split(","));
+        return DtoUtil.getSuccesWithDataDto("查询成功",resultVo,100000);
     }
 
     /**
@@ -166,7 +188,7 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public Dto queryFriendDiaryList(QueryDiaryVo queryDiaryVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(queryDiaryVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         int pageSize=Integer.parseInt(queryDiaryVo.getPageSize());
         if (StringUtils.isEmpty(queryDiaryVo.getPageNumber())){
@@ -174,6 +196,18 @@ public class DiaryServiceImpl implements DiaryService {
         }
         int pageIndex=(Integer.parseInt(queryDiaryVo.getPageNumber())-1)*pageSize;
         List<Diary> list=diaryMapper.queryFriendsDiaryList(queryDiaryVo.getFriendId(),pageIndex,pageSize);
-        return DtoUtil.getSuccesWithDataDto("查询成功",list,100000);
+        List<DiaryResultVo> result=new ArrayList<>();
+        for (Diary diary:list) {
+            DiaryResultVo resultVo=new DiaryResultVo();
+            resultVo.setDiaryId(diary.getDiaryId());
+            resultVo.setContent(diary.getContent());
+            resultVo.setCreateDate(diary.getCreateDate());
+            resultVo.setMoodType(diary.getMoodType());
+            resultVo.setStatus(diary.getStatus());
+            resultVo.setUserId(diary.getUserId());
+            resultVo.setDiaryImage(diary.getDiaryImage().replace("[","").replace("]","").split(","));
+            result.add(resultVo);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 }

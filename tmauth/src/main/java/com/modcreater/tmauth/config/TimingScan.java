@@ -63,7 +63,7 @@ public class TimingScan {
     /**
      * 每天八点查询明天有支持者的事件，发送信息给支持者
      */
-    @Scheduled(cron = "0 45 15 * * ?")
+    @Scheduled(cron = "0 0 8 * * ?")
     public void remindBacker(){
         try {
             //获取后一天的日期
@@ -88,6 +88,7 @@ public class TimingScan {
                     logger.info("融云消息异常："+result.toString());
                 }
                 msgStatusMapper.addNewEventMsg(map.get("backerId").toString(),1L,SYSTEMID,":"+account.getUserName()+"在明天有很重要的事情,记得提醒TA",System.currentTimeMillis()/1000);
+                break;
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);

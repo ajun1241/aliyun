@@ -97,12 +97,15 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("没有可上传的事件", 21002);
         }
         SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
+        if (singleEvent.getEventname().length()>10){
+            return DtoUtil.getFalseDto("标题太长",20130);
+        }
         singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
-        /*if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+        if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
             return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
-        }*/
+        }
         if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
             return DtoUtil.getSuccessDto("事件上传成功", 100000);
         }
@@ -153,13 +156,80 @@ public class EventServiceImpl implements EventService {
         SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
         singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
         SingleEvent result = eventMapper.querySingleEventTime(singleEvent);
-        /*if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
+        if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
             if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
                 return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
             }
-        }*/
+        }
+        List<String> personList1=new ArrayList();
+        List<String> personList2=new ArrayList();
+        try {
+            EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+            if (!StringUtils.isEmpty(eventPersons.getFriendsId())){
+                String[] persons=eventPersons.getFriendsId().split(",");
+                for (int i = 0; i < persons.length; i++) {
+                    Friendship friendship = accountMapper.queryFriendshipDetail(persons[i], updateEventVo.getUserId());
+                    UserSettings settings=userSettingsMapper.queryAllSettings(persons[i]);
+                    if (friendship.getInvite() == 1 && settings.getFriendInvite()==0) {
+                        //只添加满足条件的人
+                        personList1.add(persons[i]);
+                    }else{
+                        //查询屏蔽人的id
+                        personList2.add(persons[i]);
+                    }
+                }
+                //给list1发送邀请信息
+                for (int i = 0; i <personList1.size() ; i++) {
+                    MsgStatus msgStatus = new MsgStatus();
+                    msgStatus.setType(1L);
+                    msgStatus.setUserId(Long.parseLong(personList1.get(i)));
+                    if (msgStatusMapper.addNewMsg(msgStatus) == 0) {
+                        logger.info("修改事件时消息状态保存失败,id====>"+msgStatus.getId());
+                    }
+                    RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
+                    String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
+                    InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date,JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2", msgStatus.getId().toString());
+                    logger.info(JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)));
+                    ResponseResult result1 = rongCloudMethodUtil.sendPrivateMsg(updateEventVo.getUserId(), new String[]{personList1.get(i)}, 0, inviteMessage);
+
+                    if (result1.getCode() != 200) {
+                        logger.info("修改事件时融云消息异常"+result1.toString());
+                        return DtoUtil.getFalseDto("消息发送失败",21040);
+                    }
+                    //如果是ios发送推送信息
+                    UserDeviceToken userDeviceToken=deviceTokenMapper.queryDeviceToken(personList1.get(i));
+                    if (!ObjectUtils.isEmpty(userDeviceToken) && userDeviceToken.getAppType() == 1L && !StringUtils.isEmpty(userDeviceToken.getDeviceToken())){
+                        PushUtil.APNSPush(userDeviceToken.getDeviceToken(),"你的好友邀请你参与他的事件",1);
+                    }
+                    msgStatusMapper.addNewEventMsg(personList1.get(i),singleEvent.getEventid(),updateEventVo.getUserId(),"邀请你参与事件",System.currentTimeMillis()/1000);
+                }
+                //list2给创建者发送拒绝信息
+                for (int i = 0; i < personList2.size(); i++) {
+                    RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+                    TxtMessage txtMessage=new TxtMessage("我拒绝了你的事件：“"+singleEvent.getEventname()+"”的邀请","");
+                    ResponseResult result2=rongCloudMethodUtil.sendPrivateMsg(personList2.get(i),new String[]{updateEventVo.getUserId()},0,txtMessage);
+                    if (result2.getCode()!=200){
+                        logger.info("新增邀请事件回应邀请时融云消息异常："+result2.toString());
+                        return DtoUtil.getFalseDto("消息发送失败",21040);
+                    }
+                    msgStatusMapper.addNewEventMsg(updateEventVo.getUserId(),singleEvent.getEventid(),personList2.get(i),"拒绝了你的事件",System.currentTimeMillis()/1000);
+                }
+                //在事件副表插入创建者
+                SingleEventVice singleEventVice = new SingleEventVice();
+                singleEventVice.setCreateBy(Long.parseLong(updateEventVo.getUserId()));
+                singleEventVice.setUserId(singleEvent.getUserid());
+                singleEventVice.setEventId(singleEvent.getEventid());
+                eventViceMapper.createEventVice(singleEventVice);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return DtoUtil.getFalseDto("修改事件失败", 21007);
+        }
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
+        EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+        eventPersons.setFriendsId("");
+        singleEvent.setPerson(JSON.toJSONString(eventPersons));
         if (eventMapper.alterEventsByUserId(singleEvent) > 0) {
             return DtoUtil.getSuccessDto("修改成功", 100000);
         }
@@ -257,7 +327,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(draftVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //判断是否已开通或者服务时间未消耗完
         ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(draftVo.getUserId(), "4");
@@ -283,23 +353,22 @@ public class EventServiceImpl implements EventService {
             }
         }
         ArrayList<Object> drafts = JSONObject.parseObject(draftVo.getSingleEvents(), ArrayList.class);
-        StringBuffer stringBuffer = new StringBuffer(new SimpleDateFormat("yyyyMMdd").format(new Date()));
         for (Object draft : drafts) {
             System.out.println(draft);
             SingleEvent draft1 = JSONObject.parseObject(draft.toString(), SingleEvent.class);
             try {
                 draft1.setPerson(JSONObject.parseObject(draft1.getPerson(), EventPersons.class).toString());
             } catch (Exception e) {
-                draft1.setPerson("{\"friendsId\":\"100030\",\"others\":\"\"}");
+                draft1.setPerson("{\"friendsId\":\"\",\"others\":\"\"}");
             }
             //查看草稿是否已存在
             if (eventMapper.queryDraftCount(draftVo.getUserId(), draft1.getEventid().toString()) == 0) {
                 //上传
                 draft1.setUserid(Long.parseLong(draftVo.getUserId()));
                 draft1.setIsLoop(SingleEventUtil.isLoopEvent(draft1.getRepeaTtime()) ? 1 : 0);
-                draft1.setYear(draft1.getYear() == 0 ? null : draft1.getYear());
-                draft1.setMonth(draft1.getMonth() == 0 ? null : draft1.getMonth());
-                draft1.setDay(draft1.getDay() == 0 ? null : draft1.getDay());
+                draft1.setYear(draft1.getYear());
+                draft1.setMonth(draft1.getMonth());
+                draft1.setDay(draft1.getDay());
                 if (eventMapper.uplDraft(draft1) == 0) {
                     return DtoUtil.getFalseDto("上传草稿失败", 27002);
                 }
@@ -335,7 +404,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
 //        System.out.println("修改草稿:" + singleEvent.toString());
@@ -611,7 +680,7 @@ public class EventServiceImpl implements EventService {
     public Dto addInviteEvent(AddInviteEventVo addInviteEventVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
-                return DtoUtil.getFalseDto("请重新登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
             singleEvent.setUserid(Long.parseLong(addInviteEventVo.getUserId()));
@@ -703,7 +772,7 @@ public class EventServiceImpl implements EventService {
     public Dto feedbackInvite(FeedbackInviteVo feedbackInviteVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(feedbackInviteVo.getUserId()))) {
-                return DtoUtil.getFalseDto("请重新登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             //判断不能重复回应
             if (msgStatusMapper.queryMsg(feedbackInviteVo.getMsgId()).getStatus()!=2){
@@ -711,6 +780,7 @@ public class EventServiceImpl implements EventService {
             }
             //判断事件状态
             SingleEvent singleEvent=eventMapper.queryEventOne(feedbackInviteVo.getFromId(),feedbackInviteVo.getEventId());
+            logger.info("事件内容"+singleEvent.toString());
             if (ObjectUtils.isEmpty(singleEvent)){
                 //更改邀请消息状态
                 msgStatusMapper.updateMsgStatus("3", feedbackInviteVo.getMsgId());
@@ -800,7 +870,7 @@ public class EventServiceImpl implements EventService {
     public Dto updInviteEvent(AddInviteEventVo addInviteEventVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
-                return DtoUtil.getFalseDto("请重新登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             logger.info("修改一条邀请事件时输出的接收数据" + addInviteEventVo.toString());
             //接收到的修改信息
@@ -979,7 +1049,7 @@ public class EventServiceImpl implements EventService {
     public Dto feedbackEventInvite(FeedbackEventInviteVo feedbackEventInviteVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getUserId()))) {
-                return DtoUtil.getFalseDto("请重新登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             //不能重复点击按钮
             if (msgStatusMapper.queryMsg(feedbackEventInviteVo.getMsgId()).getStatus()!=2){
@@ -1108,7 +1178,7 @@ public class EventServiceImpl implements EventService {
     public Dto eventCreatorChoose(EventCreatorChooseVo eventCreatorChooseVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(eventCreatorChooseVo.getUserId()))) {
-                return DtoUtil.getFalseDto("请重新登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             if (eventCreatorChooseVo.getMsgId()!=null){
                 if (msgStatusMapper.queryMsg(eventCreatorChooseVo.getMsgId()).getStatus()!=2){
@@ -1179,8 +1249,9 @@ public class EventServiceImpl implements EventService {
                 //通知所有人事件修改失败
                 RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
                 TxtMessage txtMessage=new TxtMessage("事件“"+singleEvent.getEventname()+"”修改失败","");
-                logger.info("修改事件时创建者选择时给谁发了消息==>"+Arrays.toString(list.toArray(new String[list.size()])));
-                String[] userIds = list.toArray(new String[list.size()]);
+                EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+                String[] userIds = eventPersons.getFriendsId().split(",");
+                logger.info("修改事件时创建者选择时给谁发了消息==>"+Arrays.toString(userIds));
                 ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(SYSTEMID,userIds,0,txtMessage);
                 if (result.getCode() != 200) {
                     logger.info("修改事件时创建者选择时融云消息异常"+result.toString());
@@ -1211,7 +1282,7 @@ public class EventServiceImpl implements EventService {
     public Dto delInviteEvent(ReceivedSearchOnce receivedSearchOnce, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(receivedSearchOnce.getUserId()))) {
-                return DtoUtil.getFalseDto("请重新登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             //找到该事件
             SingleEvent singleEvent = eventMapper.queryEventOne(receivedSearchOnce.getUserId(), receivedSearchOnce.getEventId());
@@ -1457,7 +1528,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
         if (ObjectUtils.isEmpty(singleEvent)) {
@@ -1487,7 +1558,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("userId不能为空", 21011);
         }
         if (!token.equals(stringRedisTemplate.opsForValue().get(queryMsgStatusVo.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21013);
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         MsgStatus msgStatus = msgStatusMapper.queryMsg(queryMsgStatusVo.getMsgId());
         if (ObjectUtils.isEmpty(msgStatus)) {
@@ -1539,7 +1610,7 @@ public class EventServiceImpl implements EventService {
         map.put("authority","0");
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(receivedSearchOnce.getUserId()))) {
-                return DtoUtil.getFalseDto("请重新登录", 21013);
+                return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             //判断是否有权限添加
             SingleEventVice singleEventVice = new SingleEventVice();

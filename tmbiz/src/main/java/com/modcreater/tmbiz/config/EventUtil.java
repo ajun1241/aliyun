@@ -66,7 +66,7 @@ public class EventUtil {
      * @param singleEvent
      */
     public void updateInviterEvent(SingleEvent singleEvent,String me)throws Exception {
-        EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+         EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
         String person=eventPersons.getFriendsId();
         if (StringUtils.isEmpty(person)){
             person=me;

@@ -564,9 +564,9 @@ public class AccountServiceImpl implements AccountService {
             }
         }
         result.put("friends",maps);
-        if (ObjectUtils.isEmpty(accountList)){
+        /*if (ObjectUtils.isEmpty(accountList)){
             return DtoUtil.getSuccesWithDataDto("查询好友列表失败",null,200000);
-        }
+        }*/
         return DtoUtil.getSuccesWithDataDto("查询好友列表成功",result,100000);
     }
 
@@ -729,9 +729,9 @@ public class AccountServiceImpl implements AccountService {
 
         //查询所有消息
         List<SystemMsgRecord> systemMsgRecordList=systemMsgMapper.queryAllUnreadMsg(receivedId.getUserId(),"-1","newFriend");
-        if (systemMsgRecordList.size()==0){
+        /*if (systemMsgRecordList.size()==0){
             return DtoUtil.getSuccesWithDataDto("没有好友请求消息",null,200000);
-        }
+        }*/
         List list=new ArrayList();
         for (SystemMsgRecord systemMsgRecord:systemMsgRecordList) {
             System.out.println("我要的数据"+systemMsgRecord.toString());

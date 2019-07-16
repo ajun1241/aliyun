@@ -105,7 +105,8 @@ public class TmbizApplicationTests {
      */
     @Test
     public void test2() {
-        System.out.println(Long.parseLong(null));
+        String s="[1,2]".replace("[","").replace("]","");
+        System.out.println(Arrays.toString(s.split(",")));
     }
 
     @Test
