@@ -126,7 +126,7 @@ public class AccountServiceImpl implements AccountService {
             map.put("userSign",result.getUserSign());
             map.put("token",token);
             //查询用户是否开启了勿扰模式
-            map.put("dnd",userSettingsMapper.getDND(result.getId().toString()).toString());
+            map.put("dnd",userSettingsMapper.getDND(result.getId().toString())!=null?userSettingsMapper.getDND(result.getId().toString()).toString():"");
             return DtoUtil.getSuccesWithDataDto("登录成功",map,100000);
         }else {
             //未注册时

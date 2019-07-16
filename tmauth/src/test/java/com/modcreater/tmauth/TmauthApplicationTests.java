@@ -20,9 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @RunWith(SpringRunner.class)
@@ -43,6 +41,23 @@ public class TmauthApplicationTests {
     }
     @Test
     public void test(){
+        /*Map<String, String> map = new TreeMap<>(
+                new Comparator<String>() {
+                    public int compare(String obj1, String obj2) {
+                        // 降序排序
+                        return obj1.compareTo(obj2);
+                    }
+                });
+        map.put("c", "ccccc");
+        map.put("a", "aaaaa");
+        map.put("b", "bbbbb");
+        map.put("d", "ddddd");
 
+        Set<String> keySet = map.keySet();
+        Iterator<String> iter = keySet.iterator();
+        while (iter.hasNext()) {
+            String key = iter.next();
+            System.out.println(key + ":" + map.get(key));
+        }*/
     }
 }
