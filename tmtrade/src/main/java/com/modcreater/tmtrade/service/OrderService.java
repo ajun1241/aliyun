@@ -116,4 +116,12 @@ public interface OrderService {
      * @return
      */
     Dto getServicePrice(ReceivedGoodsInfo receivedGoodsInfo, String token);
+
+    /**
+     * 查询所有服务的开通状态
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto searchAllUserService(ReceivedId receivedId, String token);
 }

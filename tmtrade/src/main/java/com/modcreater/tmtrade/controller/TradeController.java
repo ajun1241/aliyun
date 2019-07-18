@@ -78,6 +78,12 @@ public class TradeController {
         return orderService.searchUserService(receivedServiceIdUserId,request.getHeader("token"));
     }
 
+    @PostMapping(value = "alluserservice")
+    @ApiOperation("查询用户除好友外的所有服务的开通状态(外显)")
+    public Dto searchAllUserService(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return orderService.searchAllUserService(receivedId,request.getHeader("token"));
+    }
+
     @PostMapping(value = "searchorders")
     @ApiOperation("查询订单详情")
     public Dto searchOrders(@RequestBody ReceivedId receivedId ,HttpServletRequest request){

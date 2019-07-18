@@ -169,7 +169,7 @@ public class OrderServiceImpl implements OrderService {
         if (userOrders.getOrderStatus().equals("3")) {
             return DtoUtil.getFalseDto("订单已过期", 60021);
         }
-        if (userOrders.getOrderStatus().equals("2")){
+        if (userOrders.getOrderStatus().equals("2")) {
             return DtoUtil.getSuccessDto("订单支付成功", 100000);
         }
         return DtoUtil.getFalseDto("订单支付失败", 60003);
@@ -227,8 +227,8 @@ public class OrderServiceImpl implements OrderService {
                 //更新交易表中状态
                 int returnResult = updateOrderStatusToPrepaid(userOrders);
                 if (returnResult > 0) {
-                    if (!makeOrderSuccess(outTradeNo)){
-                        orderMapper.updateOrderStatus(outTradeNo,4);
+                    if (!makeOrderSuccess(outTradeNo)) {
+                        orderMapper.updateOrderStatus(outTradeNo, 4);
                     }
                     return "success";
                 } else {
@@ -584,6 +584,25 @@ public class OrderServiceImpl implements OrderService {
             return DtoUtil.getFalseDto("商品类型错误", 200000);
         }
         return DtoUtil.getFalseDto("价格获取失败", 200000);
+    }
+
+    @Override
+    public Dto searchAllUserService(ReceivedId receivedId, String token) {
+        if (StringUtils.isEmpty(receivedId.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
+        }
+        ReceivedServiceIdUserId receivedServiceIdUserId = new ReceivedServiceIdUserId();
+        receivedServiceIdUserId.setUserId(receivedId.toString());
+        Map<String ,String> result = new HashMap<>();
+        result.put("2","");
+        result.put("3","");
+        result.put("4","");
+        for (int i = 2; i <= 4; i++) {
+            receivedServiceIdUserId.setServiceId(i+"");
+            Dto dto = searchUserService(receivedServiceIdUserId,token);
+            result.put(i+"",dto.getResCode() == 100000 ? dto.getData().toString() : "");
+        }
+        return DtoUtil.getSuccesWithDataDto("获取成功",result,100000);
     }
 
     /**
