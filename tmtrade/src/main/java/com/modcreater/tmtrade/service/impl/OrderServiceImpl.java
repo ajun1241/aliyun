@@ -588,11 +588,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto searchAllUserService(ReceivedId receivedId, String token) {
-        if (StringUtils.isEmpty(receivedId.getUserId())) {
+        if (!StringUtils.hasText(receivedId.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
         ReceivedServiceIdUserId receivedServiceIdUserId = new ReceivedServiceIdUserId();
-        receivedServiceIdUserId.setUserId(receivedId.toString());
+        receivedServiceIdUserId.setUserId(receivedId.getUserId());
         Map<String ,String> result = new HashMap<>();
         result.put("2","");
         result.put("3","");
