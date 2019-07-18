@@ -20,7 +20,7 @@ public class ShowSingleEvent {
     private String endtime;    //结束时间
     private String address;     //地址
     private Long level;      //级别
-    private Long duration;       //持续时间
+//    private Long duration;       //持续时间
     private Long flag;       //标识：是否为空白事件，0为空白事件，1为其他事件
     private String person;  //人物
     private String remarks;  //备注

@@ -288,7 +288,7 @@ public class BackerServiceImpl implements BackerService {
                 if (result1.getCode() != 200){
                     logger.info("添加邀请事件时融云消息异常" + result1.toString());
                 }
-                backerMapper.deleteBacker(receivedBeSupporterFeedback.getUserId());
+//                backerMapper.deleteBacker(receivedBeSupporterFeedback.getUserId());
                 msgStatusMapper.addNewEventMsg(receivedBeSupporterFeedback.getReceiverId(),1L,account.getId().toString(),msg,System.currentTimeMillis()/1000);
                 return DtoUtil.getSuccessDto("", 100000);
             }

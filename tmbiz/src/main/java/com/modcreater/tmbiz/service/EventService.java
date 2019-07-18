@@ -1,6 +1,7 @@
 package com.modcreater.tmbiz.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.Draft;
 import com.modcreater.tmbeans.vo.QueryMsgStatusVo;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
@@ -219,4 +220,20 @@ public interface EventService {
      * @return
      */
     Dto inviteEventJudge(ReceivedSearchOnce receivedSearchOnce,String token);
+
+    /**
+     * 上传草稿为普通事件
+     * @param draftToEventVo
+     * @param token
+     * @return
+     */
+    Dto draftToSingleEvent(DraftToEventVo draftToEventVo,String token);
+
+    /**
+     * 上传草稿为邀请事件
+     * @param draftToEventVo
+     * @param token
+     * @return
+     */
+    Dto draftToInviteEvent(DraftToEventVo draftToEventVo,String token);
 }

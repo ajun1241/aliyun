@@ -15,13 +15,16 @@
         update usernotice set todayNotifications = todayNotifications + #{todayNotifications} where userId = #{userId} and noticeName = #{noticeName}
     </update>
 
-    <select id="getAppVersion" resultType="com.modcreater.tmbeans.pojo.AppVersion">
-        select <include refid="appVersion"/> from appversion where uploadTime &lt;= date(#{now}) order by uploadTime desc limit 0,1
+    <select id="getAppVersion" resultType="java.lang.String">
+        select appVersion from appversion
     </select>
     <select id="getUserNotice" resultType="com.modcreater.tmbeans.pojo.UserNotice">
         select * from usernotice where userId = #{userId}
     </select>
     <select id="getNoticeContent" resultType="java.lang.String">
         select noticeContent from notice where noticeTypeId = #{noticeTypeId} and noticeName = #{noticeName} and startDate = #{date}
+    </select>
+    <select id="getAppUrl" resultType="java.lang.String">
+        select apkUrl from appversion where appVersion = #{appver}
     </select>
 </mapper>

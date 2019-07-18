@@ -88,7 +88,6 @@ public class TimingScan {
                     logger.info("融云消息异常："+result.toString());
                 }
                 msgStatusMapper.addNewEventMsg(map.get("backerId").toString(),1L,SYSTEMID,":"+account.getUserName()+"在明天有很重要的事情,记得提醒TA",System.currentTimeMillis()/1000);
-                break;
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);

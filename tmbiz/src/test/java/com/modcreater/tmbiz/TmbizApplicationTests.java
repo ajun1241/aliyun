@@ -78,8 +78,8 @@ public class TmbizApplicationTests {
     }
 
     public static void main(String[] args) {
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
-        LoggerFactory.getLogger(TmbizApplicationTests.class).info("时间："+simpleDateFormat.format(new Date()));
+       /* SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
+        LoggerFactory.getLogger(TmbizApplicationTests.class).info("时间："+simpleDateFormat.format(new Date()));*/
     }
 
     @Test
@@ -105,8 +105,8 @@ public class TmbizApplicationTests {
      */
     @Test
     public void test2() {
-        String s="[1,2]".replace("[","").replace("]","");
-        System.out.println(Arrays.toString(s.split(",")));
+        /*String s="[1,2]".replace("[","").replace("]","");
+        System.out.println(Arrays.toString(s.split(",")));*/
     }
 
     @Test

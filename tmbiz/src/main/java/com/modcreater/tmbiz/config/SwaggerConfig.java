@@ -18,10 +18,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.ArrayList;
 import java.util.List;
 
-@Configuration
+/*@Configuration
 @EnableSwagger2
 @ComponentScan("com.modcreater.tmbiz.*")
-@Component
+@Component*/
 public class SwaggerConfig {
     @Bean
     public Docket createRestApi() {

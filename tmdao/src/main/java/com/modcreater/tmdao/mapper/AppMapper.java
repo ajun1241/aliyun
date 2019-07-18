@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,10 +21,9 @@ public interface AppMapper {
 
     /**
      * 获取APP版本信息
-     * @param now
      * @return
      */
-    AppVersion getAppVersion(String now);
+    List<String> getAppVersion();
 
     /**
      * 更新APP更新人数
@@ -62,4 +62,11 @@ public interface AppMapper {
      * @return
      */
     int updateUserNotice(UserNotice user);
+
+    /**
+     *
+     * @param appver
+     * @return
+     */
+    String getAppUrl(String appver);
 }

@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
@@ -231,10 +232,26 @@ public class SingleEventUtil {
                     map.put("content",newMap.get(key));
                 }else if (("b").equals(key)) {
                     map.put("title","开始时间更改为：");
-                    map.put("content",Long.parseLong(newMap.get(key)) / 60 + ":" + Long.parseLong(newMap.get(key)) % 60);
+                    String h=Long.parseLong(newMap.get(key)) / 60+"";
+                    String m=Long.parseLong(newMap.get(key)) % 60+"";
+                    if (h.length()==1){
+                        h="0"+h;
+                    }
+                    if (m.length()==1){
+                        m="0"+m;
+                    }
+                    map.put("content",h +":"+ m);
                 } else if (("c").equals(key)) {
                     map.put("title","结束时间更改为：");
-                    map.put("content",Long.parseLong(newMap.get(key)) / 60 + ":" + Long.parseLong(newMap.get(key)) % 60);
+                    String h=Long.parseLong(newMap.get(key)) / 60+"";
+                    String m=Long.parseLong(newMap.get(key)) % 60+"";
+                    if (h.length()==1){
+                        h="0"+h;
+                    }
+                    if (m.length()==1){
+                        m="0"+m;
+                    }
+                    map.put("content",h +":"+ m);
                 } else if (("d").equals(key)) {
                     map.put("title","优先级更改为：");
                     //2：不紧迫也不重要；3：紧迫但不重要；4：重要又不紧迫；5：重要又紧迫
@@ -251,12 +268,28 @@ public class SingleEventUtil {
                     map.put("title","重复时间更改为：");
                     String[] arr = newMap.get(key).replace("[", "").replace("]", "").split(",");
                     StringBuffer stringBuffer = new StringBuffer();
+                    String week="";
                     for (int i = 0; i < arr.length; i++) {
                         if ("true".equals(arr[i])) {
-                            stringBuffer.append(i + "、");
+                            if (i==0){
+                                week="日";
+                            }else if (i==1){
+                                week="一";
+                            }else if (i==2){
+                                week="二";
+                            }else if (i==3){
+                                week="三";
+                            }else if (i==4){
+                                week="四";
+                            }else if (i==5){
+                                week="五";
+                            }else if (i==6){
+                                week="六";
+                            }
+                            stringBuffer.append(week + "、");
                         }
                     }
-                    if (StringUtils.isEmpty(stringBuffer)) {
+                    if (ObjectUtils.isEmpty(stringBuffer)) {
                         map.put("content","不重复事件");
                     } else {
                         map.put("content","每周" + stringBuffer.replace(stringBuffer.length() - 1, stringBuffer.length(), "") + "重复");

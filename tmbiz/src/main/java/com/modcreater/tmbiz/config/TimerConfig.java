@@ -53,45 +53,6 @@ public class TimerConfig {
 
     private Logger logger = LoggerFactory.getLogger(TimerConfig.class);
 
-/*    @Scheduled(fixedDelay = 60000)
-    public void backerEventTimer() {
-        try {
-            List<TimedTask> taskList = timedTaskMapper.queryWaitExecute();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
-            Date date1 = new Date();
-            Date date2;
-            for (TimedTask task : taskList) {
-                date2 = simpleDateFormat.parse(task.getTimer());
-                System.out.println(task.getTimer());
-                if (date1.getTime() / 60000 == date2.getTime() / 60000) {
-                    //发送消息给支持者
-                    RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
-                    TxtMessage txtMessage = new TxtMessage(task.getContent(), "");
-                    String[] targetId = {task.getBackerId().toString()};
-                    ResponseResult result = rongCloudMethodUtil.sendSystemMessage(task.getUserId().toString(), targetId, txtMessage, "", "");
-                    if (result.getCode() != 200) {
-                        logger.info("发送消息失败，任务编号：" + task.getId());
-                    } else {
-                        logger.info("发送消息成功，任务编号：" + task.getId());
-                    }
-                    //修改任务状态
-                    TimedTask timedTask = new TimedTask();
-                    timedTask.setTaskStatus(1L);
-                    timedTask.setUserId(task.getUserId());
-                    timedTask.setEventId(task.getEventId());
-                    if (timedTaskMapper.updateTimedTask(timedTask) == 0) {
-                        logger.info("修改状态失败，任务编号：" + task.getId());
-                    } else {
-                        logger.info("修改状态成功，任务编号：" + task.getId());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println("第一个定时任务开始 : " + LocalDateTime.now().toLocalTime() + "\r\n线程 : " + Thread.currentThread().getName());
-    }*/
-
     /**
      * 以下为每分钟的第0s进行过期事件过滤修改
      */
@@ -127,7 +88,7 @@ public class TimerConfig {
                         loopEvent.setYear(eventStatusScan.getThisYear());
                         loopEvent.setMonth(eventStatusScan.getThisMonth());
                         loopEvent.setDay(eventStatusScan.getToday());
-                        loopEvent.setEventid(System.currentTimeMillis());
+                        loopEvent.setEventid(System.currentTimeMillis()/1000);
                         loopEvent.setIsOverdue(1L);
                         loopEvent.setIsLoop(0);
                         loopEvent.setRepeaTtime("[false,false,false,false,false,false,false]");

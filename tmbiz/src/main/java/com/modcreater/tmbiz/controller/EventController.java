@@ -236,4 +236,30 @@ public class EventController {
         return eventService.inviteEventJudge(receivedSearchOnce,request.getHeader("token"));
     }
 
+    /**
+     * 保存草稿为普通事件
+     * @param draftToEventVo
+     * @param request
+     * @return
+     */
+    @Safety
+    @PostMapping(value = "draftToSingleEvent")
+    @ApiOperation("保存草稿为普通事件")
+    public Dto draftToSingleEvent(@RequestBody DraftToEventVo draftToEventVo, HttpServletRequest request){
+        return eventService.draftToSingleEvent(draftToEventVo,request.getHeader("token"));
+    }
+
+    /**
+     * 保存草稿为邀请事件
+     * @param draftToEventVo
+     * @param request
+     * @return
+     */
+    @Safety
+    @PostMapping(value = "draftToInviteEvent")
+    @ApiOperation("保存草稿为邀请事件")
+    public Dto draftToInviteEvent(@RequestBody DraftToEventVo draftToEventVo, HttpServletRequest request){
+        return eventService.draftToInviteEvent(draftToEventVo,request.getHeader("token"));
+    }
+
 }

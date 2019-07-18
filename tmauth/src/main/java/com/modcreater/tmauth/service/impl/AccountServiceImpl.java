@@ -681,6 +681,24 @@ public class AccountServiceImpl implements AccountService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DtoUtil.getFalseDto("删除好友失败",16008);
         }
+        //删除支持者
+        int a=-1;
+        int b=-1;
+        Backers backers1=backerMapper.getMyBacker(deleteFriendshipVo.getUserId());
+        //如果该用户有支持者且支持者是该好友时
+        if (!ObjectUtils.isEmpty(backers1) && deleteFriendshipVo.getFriendId().equals(backers1.getBackerId())){
+            //删除该好友的支持者
+            a=backerMapper.deleteBacker(backers1.getUserId());
+            //如果该好友有支持者且支持者是该用户时
+            Backers backers2=backerMapper.getMyBacker(deleteFriendshipVo.getFriendId());
+            if (!ObjectUtils.isEmpty(backers2) && deleteFriendshipVo.getUserId().equals(backers2.getBackerId())){
+                //删除该好友的支持者
+                b=backerMapper.deleteBacker(backers2.getUserId());
+            }
+        }
+        if (a==0 || b==0){
+            return DtoUtil.getFalseDto("删除支持者失败",16017);
+        }
         //把添加好友消息删除
         boolean flag=false;
         if (systemMsgMapper.deleteSystemMsg(deleteFriendshipVo.getUserId(),deleteFriendshipVo.getFriendId())>0){

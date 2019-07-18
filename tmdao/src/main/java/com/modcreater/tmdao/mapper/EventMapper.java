@@ -46,6 +46,7 @@ public interface EventMapper {
      * @return
      */
     int withdrawEventsByUserId(DeleteEventVo deleteEventVo);
+
     /**
      * 更新事件
      *
@@ -203,7 +204,7 @@ public interface EventMapper {
      * @param deleteType
      * @return
      */
-    int deleteByDeleteType(@Param("eventId") Long eventId,@Param("deleteType") String deleteType,@Param("userId") String userId);
+    int deleteByDeleteType(@Param("eventId") Long eventId,@Param("deleteType") String deleteType,@Param("userId") String userId,@Param("now")String now);
 
     /**
      * 查询一个草稿事件

@@ -38,7 +38,7 @@
          <if test="deleteType == 'draft'">
              draft
          </if>
-         set isOverdue = 2
+         set isOverdue = 2 , eventId=#{now}
          where eventId = #{eventId} and userId=#{userId}
     </update>
 
@@ -53,9 +53,9 @@
     <delete id="deleteDraft">
         delete from draft
         where
-          eventId = #{eventid}
+          eventId = #{eventId}
         and
-          userId = #{userid}
+          userId = #{userId}
     </delete>
 
     <select id="countIdByDate" resultType="java.lang.Integer">
@@ -98,7 +98,6 @@
                 person = #{person},
                 remarks = #{remarks},
                 repeatTime = #{repeaTtime},
-                isOverdue = #{isOverdue},
                 remindTime = #{remindTime},
                 day = #{day},
                 month = #{month},
@@ -238,14 +237,14 @@
         group by day
     </select>
     <select id="querySingleEventTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select startTime,endTime from singleevent
-        <where>
-            <if test="isLoop != null">
+        select startTime,endTime from singleevent where
+        userid=#{userid} and eventid = #{eventid}
+    </select>
+    <!--<where>
+            <if test="isLoop != -1">
                 isLoop = #{isLoop}
             </if>
-        </where>
-         and userid=#{userid} and eventid = #{eventid}
-    </select>
+        </where>-->
     <select id="queryUserEventsByUserIdIsOverdue" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select eventId,userId,eventName,day,month,year
         from singleevent
