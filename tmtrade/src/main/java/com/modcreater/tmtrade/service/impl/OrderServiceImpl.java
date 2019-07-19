@@ -375,6 +375,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String wxPayNotify(HttpServletRequest request) {
+        System.out.println("微信支付回调成功");
         String resXml = "";
         try {
             InputStream inputStream = request.getInputStream();
@@ -397,6 +398,11 @@ public class OrderServiceImpl implements OrderService {
             }
             resXml = sb.toString();
             String result = payBack(resXml);
+            Map<String, String> notifyMap = WXPayUtil.xmlToMap(resXml);
+            String tradeNo = notifyMap.get("out_trade_no");
+            if (!makeOrderSuccess(tradeNo)) {
+                orderMapper.updateOrderStatus(tradeNo, 4);
+            }
             return result;
         } catch (Exception e) {
             System.out.println("微信手机支付失败:" + e.getMessage());
@@ -625,7 +631,7 @@ public class OrderServiceImpl implements OrderService {
         return serviceRemainingTime;
     }
 
-    private boolean makeOrderSuccess(String orderNo) {
+    public boolean makeOrderSuccess(String orderNo) {
         UserOrders userOrders = orderMapper.getUserOrder(orderNo);
         if (userOrders.getOrderStatus().equals("1")) {
             ServiceRemainingTime time = userServiceMapper.getServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId());
