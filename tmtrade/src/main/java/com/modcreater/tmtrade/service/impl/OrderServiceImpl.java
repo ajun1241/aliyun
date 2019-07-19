@@ -600,13 +600,21 @@ public class OrderServiceImpl implements OrderService {
         ReceivedServiceIdUserId receivedServiceIdUserId = new ReceivedServiceIdUserId();
         receivedServiceIdUserId.setUserId(receivedId.getUserId());
         Map<String ,String> result = new HashMap<>();
-        result.put("2","");
-        result.put("3","");
-        result.put("4","");
+        result.put("searchService","");
+        result.put("annualReportingService","");
+        result.put("backupService","");
+        String key;
         for (int i = 2; i <= 4; i++) {
+            if (i == 2){
+                key = "searchService";
+            }else if (i == 3){
+                key = "annualReportingService";
+            }else {
+                key = "backupService";
+            }
             receivedServiceIdUserId.setServiceId(i+"");
             Dto dto = searchUserService(receivedServiceIdUserId,token);
-            result.put(i+"",dto.getResCode() == 100000 ? dto.getData().toString() : "");
+            result.put(key,dto.getResCode() == 100000 ? dto.getData().toString() : "");
         }
         return DtoUtil.getSuccesWithDataDto("获取成功",result,100000);
     }
