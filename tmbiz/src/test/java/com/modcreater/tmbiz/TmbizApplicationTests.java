@@ -11,6 +11,7 @@ import com.modcreater.tmdao.mapper.BackerMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmutils.RongCloudUtil;
 import com.modcreater.tmutils.SingleEventUtil;
+import com.modcreater.tmutils.messageutil.InviteMessage;
 import com.modcreater.tmutils.messageutil.UpdateInviteMessage;
 import io.rong.RongCloud;
 import io.rong.methods.message._private.Private;
@@ -167,10 +168,11 @@ public class TmbizApplicationTests {
     @Test
     public void test() throws Exception {
         /*RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
-        String[] targetIds = {"100096"};
-//        InviteMessage inviteMessage = new InviteMessage("这是一条测试消息","2019/6/6","","","");
+        Private Private = rongCloud.message.msgPrivate;
+        String[] targetIds = {"100148"};
+        InviteMessage inviteMessage = new InviteMessage("这是一条测试消息","2019/6/6","","","");*/
 //        TxtMessage txtMessage=new TxtMessage("猜猜我是谁","");
-        List<Map<String,String>> list=new ArrayList<>();
+        /*List<Map<String,String>> list=new ArrayList<>();
         Map<String,String> map1=new HashMap<>();
         map1.put("title","名称更改为：");
         map1.put("content","士大夫打爱上帝");
@@ -212,23 +214,23 @@ public class TmbizApplicationTests {
         list.add(map9);
         list.add(map10);
         UpdateInviteMessage updateInviteMessage=new UpdateInviteMessage("1","测试数据",String.valueOf(list.size()),"2",list,"233","1");
-        Private Private = rongCloud.message.msgPrivate;
+
         MsgSystem system = rongCloud.message.system;
         Group group = rongCloud.message.group;
         Chatroom chatroom = rongCloud.message.chatroom;
         Discussion discussion = rongCloud.message.discussion;
-        History history = rongCloud.message.history;
-        *//**
+        History history = rongCloud.message.history;*/
+       /**
          * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/message/private.html#send
          *
          * 发送单聊消息
-         * *//*
+         * */
 
-        PrivateMessage privateMessage = new PrivateMessage()
+        /*PrivateMessage privateMessage = new PrivateMessage()
                 .setSenderId("100000")
                 .setTargetId(targetIds)
-                .setObjectName(updateInviteMessage.getType())
-                .setContent(updateInviteMessage)
+                .setObjectName(inviteMessage.getType())
+                .setContent(inviteMessage)
                 .setPushContent("")
                 .setPushData("{\"pushData\":\"hello\"}")
                 .setCount("4")

@@ -5,6 +5,7 @@ import com.modcreater.tmauth.service.ManageService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.ComplaintVo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,6 +42,13 @@ public class ManageController {
     @ApiOperation("投诉")
     public Dto complaint(@RequestBody ComplaintVo complaintVo, HttpServletRequest request){
         return manageService.complaint(complaintVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "changerealinfo")
+    @ApiOperation("更换实名信息")
+    public Dto changeRealInfo(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return manageService.changeRealInfo(receivedId,request.getHeader("token"));
     }
 
 }

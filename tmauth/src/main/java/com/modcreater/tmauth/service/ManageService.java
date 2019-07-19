@@ -3,6 +3,7 @@ package com.modcreater.tmauth.service;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.ComplaintVo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,4 +32,12 @@ public interface ManageService {
      * @return
      */
     Dto complaint(ComplaintVo complaintVo,String token);
+
+    /**
+     * 更换实名信息
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto changeRealInfo(ReceivedId receivedId, String token);
 }

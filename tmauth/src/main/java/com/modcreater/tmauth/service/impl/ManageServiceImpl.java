@@ -2,10 +2,12 @@ package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.ManageService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.AfterSale;
 import com.modcreater.tmbeans.pojo.UserRealInfo;
 import com.modcreater.tmbeans.vo.ComplaintVo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
-import com.modcreater.tmdao.mapper.AccountMapper;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmdao.mapper.AfterSaleMapper;
 import com.modcreater.tmdao.mapper.ComplaintMapper;
 import com.modcreater.tmdao.mapper.UserRealInfoMapper;
 import com.modcreater.tmutils.DtoUtil;
@@ -16,6 +18,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -36,6 +39,9 @@ public class ManageServiceImpl implements ManageService {
 
     @Resource
     private ComplaintMapper complaintMapper;
+
+    @Resource
+    private AfterSaleMapper afterSaleMapper;
 
     /**
      * 上传用户真实信息
@@ -108,5 +114,26 @@ public class ManageServiceImpl implements ManageService {
             return DtoUtil.getFalseDto("投诉上传失败",50010);
         }
         return DtoUtil.getSuccessDto("上传成功",100000);
+    }
+
+    /**
+     * 更换实名信息
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto changeRealInfo(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        AfterSale afterSale=new AfterSale();
+        afterSale.setUserId(Long.parseLong(receivedId.getUserId()));
+        afterSale.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        afterSale.setServiceType("更换实名信息");
+        if (afterSaleMapper.changeRealInfo(afterSale)==0){
+            return DtoUtil.getFalseDto("服务提交失败",50020);
+        }
+        return DtoUtil.getSuccessDto("提交成功",100000);
     }
 }

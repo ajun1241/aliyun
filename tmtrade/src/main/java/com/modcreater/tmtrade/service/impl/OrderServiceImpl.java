@@ -518,7 +518,7 @@ public class OrderServiceImpl implements OrderService {
                     return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务将在" + time + "到期", 100000);
                 }
             } else {
-                if (serviceRemainingTime.getStorageTime() == 0) {
+                if (serviceRemainingTime.getStorageTime() != 0) {
                     return DtoUtil.getSuccesWithDataDto("searchService", "您的查询历史服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡将在次卡消耗完后开始计算", 100000);
                 } else {
                     return DtoUtil.getSuccesWithDataDto("searchService", "您的查询历史服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次", 100000);
