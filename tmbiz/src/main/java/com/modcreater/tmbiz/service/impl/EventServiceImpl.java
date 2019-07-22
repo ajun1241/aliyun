@@ -1899,17 +1899,29 @@ public class EventServiceImpl implements EventService {
         if (singleEventList.size() == 0){
             return singleEventList;
         }
-        List<SingleEvent> ssevent = singleEventList;
-        Iterator iterator = ssevent.iterator();
+        List<SingleEvent> ssevent = new ArrayList<>(singleEventList);
+        SingleEvent singleEvent1 = new SingleEvent();
+        for (int i = 0; i <= singleEventList.size(); i++){
+            for (SingleEvent s : singleEventList){
+                if (s.getFlag() == 5){
+                    ssevent.remove(s);
+                    singleEvent1 = s;
+                }
+            }
+            if (!SingleEventUtil.eventTime(ssevent,Long.valueOf(singleEvent1.getStarttime()),Long.valueOf(singleEvent1.getEndtime()))){
+                singleEventList.remove(singleEvent1);
+            }
+        }
+        /*Iterator<SingleEvent> iterator = ssevent.iterator();
         while (iterator.hasNext()){
-            SingleEvent singleEvent1 = (SingleEvent) iterator.next();
+            SingleEvent singleEvent1 = iterator.next();
             if (singleEvent1.getFlag() == 5){
                 ssevent.remove(singleEvent1);
                 if (!SingleEventUtil.eventTime(ssevent,Long.valueOf(singleEvent1.getStarttime()),Long.valueOf(singleEvent1.getEndtime()))){
                     singleEventList.remove(singleEvent1);
                 }
             }
-        }
+        }*/
         return singleEventList;
     }
 
