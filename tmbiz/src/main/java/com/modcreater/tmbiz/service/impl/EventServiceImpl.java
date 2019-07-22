@@ -436,15 +436,16 @@ public class EventServiceImpl implements EventService {
         //拆分dayEventId并将查询条件逐一添加到对象中
         SingleEvent singleEvent = SingleEventUtil.getSingleEvent(searchEventVo.getUserId(), searchEventVo.getDayEventId());
         singleEvent.setIsOverdue(StringUtils.hasText(searchEventVo.getFriendId()) && searchEventVo.getFriendId().equals("seaPlans") ? null : 0L);
+        System.out.println(singleEvent.toString());
         //只根据level升序
-        List<SingleEvent> singleEventListOrderByLevel = eventMapper.queryByDayOrderByLevel(singleEvent);
+        List<SingleEvent> singleEventListOrderByLevel = completedLoopevent(eventMapper.queryByDayOrderByLevel(singleEvent));
         List<ShowSingleEvent> showSingleEventListOrderByLevel = new ArrayList<>();
         //根据level和开始时间升序
-        List<SingleEvent> singleEventListOrderByLevelAndDate = eventMapper.queryByDayOrderByLevelAndDate(singleEvent);
+        List<SingleEvent> singleEventListOrderByLevelAndDate = completedLoopevent(eventMapper.queryByDayOrderByLevelAndDate(singleEvent));
         List<ShowSingleEvent> showSingleEventListOrderByLevelAndDate = new ArrayList<>();
         //添加一个未排序的结果集到dayEvents中
         DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
-        ArrayList<SingleEvent> singleEventList = eventMapper.queryEvents(singleEvent);
+        ArrayList<SingleEvent> singleEventList = (ArrayList<SingleEvent>) completedLoopevent(eventMapper.queryEvents(singleEvent));
         ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
         if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0 && singleEventList.size() != 0) {
             showSingleEventListOrderByLevel = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevel);
@@ -1693,12 +1694,13 @@ public class EventServiceImpl implements EventService {
             singleEvent = SingleEventUtil.getSingleEvent(userId, dayEventId);
             List<SingleEvent> singleEventList;
             if ("all".equals(condition)) {
-                singleEventList = eventMapper.queryEvents(singleEvent);
+                singleEventList = completedLoopevent(eventMapper.queryEvents(singleEvent));
             } else if ("few".equals(condition)) {
-                singleEventList = eventMapper.queryEventsWithFewInfo(singleEvent);
+                singleEventList = completedLoopevent(eventMapper.queryEventsWithFewInfo(singleEvent));
             } else {
                 singleEventList = new ArrayList<>();
             }
+
             ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
             dayEvents.setMySingleEventList(showSingleEventList);
             dayEvents.setTotalNum((long) dayEvents.getMySingleEventList().size());
@@ -1886,6 +1888,29 @@ public class EventServiceImpl implements EventService {
             logger.error(e.getMessage(), e);
         }
         return DtoUtil.getSuccessDto("保存成功", 100000);
+    }
+
+    /**
+     * 将传进来的事件集合中的已完成的重复事件(冲突的)移除
+     * @param singleEventList
+     * @return
+     */
+    private List<SingleEvent> completedLoopevent(List<SingleEvent> singleEventList){
+        if (singleEventList.size() == 0){
+            return singleEventList;
+        }
+        List<SingleEvent> ssevent = singleEventList;
+        Iterator iterator = ssevent.iterator();
+        while (iterator.hasNext()){
+            SingleEvent singleEvent1 = (SingleEvent) iterator.next();
+            if (singleEvent1.getFlag() == 5){
+                ssevent.remove(singleEvent1);
+                if (!SingleEventUtil.eventTime(ssevent,Long.valueOf(singleEvent1.getStarttime()),Long.valueOf(singleEvent1.getEndtime()))){
+                    singleEventList.remove(singleEvent1);
+                }
+            }
+        }
+        return singleEventList;
     }
 
 }

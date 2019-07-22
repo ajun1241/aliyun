@@ -49,6 +49,14 @@ public interface UserInfoService {
     Dto weeklyReport(String userId, String token);
 
     /**
+     * 周报2
+     * @param userId
+     * @param token
+     * @return
+     */
+    Dto weeklyReport2(String userId, String token);
+
+    /**
      * 查询用户的成就
      * @param userId
      * @param token

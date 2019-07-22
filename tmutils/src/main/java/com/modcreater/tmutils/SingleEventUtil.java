@@ -351,6 +351,7 @@ public class SingleEventUtil {
                     || (Long.valueOf(singleEvent1.getEndtime()) > startTime && Long.valueOf(singleEvent1.getEndtime()) < endTime)
                     || (Long.valueOf(singleEvent1.getStarttime()) <= startTime && Long.valueOf(singleEvent1.getEndtime()) >= endTime));
             if (res) {
+                //冲突了,返回false
                 return false;
             }
         }

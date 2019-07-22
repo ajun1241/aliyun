@@ -51,6 +51,12 @@ public class UserInfoController {
         return userInfoService.weeklyReport(receivedId.getUserId(),request.getHeader("token"));
     }
 
+    @RequestMapping(value = "weeklyreport2",method = RequestMethod.POST)
+    @ApiOperation("周报2.0")
+    public Dto weeklyReport2(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return userInfoService.weeklyReport2(receivedId.getUserId(),request.getHeader("token"));
+    }
+
     @RequestMapping(value = "searchachievement",method = RequestMethod.POST)
     @ApiOperation("查询用户成就")
     public Dto searchAchievement(@RequestBody ReceivedId receivedId,HttpServletRequest request){

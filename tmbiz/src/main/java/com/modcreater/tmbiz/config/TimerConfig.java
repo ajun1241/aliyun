@@ -90,6 +90,7 @@ public class TimerConfig {
                         loopEvent.setDay(eventStatusScan.getToday());
                         loopEvent.setEventid(System.currentTimeMillis()/1000);
                         loopEvent.setIsOverdue(1L);
+                        loopEvent.setFlag(5L);
                         loopEvent.setIsLoop(0);
                         loopEvent.setRepeaTtime("[false,false,false,false,false,false,false]");
                         eventMapper.uploadingEvents(loopEvent);
