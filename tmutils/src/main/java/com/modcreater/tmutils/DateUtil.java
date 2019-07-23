@@ -124,4 +124,13 @@ public class DateUtil {
         }
         return naturalWeeks;
     }
+
+    /**
+     * 获取当前分钟数(00:00到当前时间所有分钟数的总和)
+     * @return
+     */
+    public static int getCurrentMinutes(){
+        return Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
+    }
+
 }

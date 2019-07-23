@@ -470,6 +470,9 @@ public class EventServiceImpl implements EventService {
                     showSingleEventListOrderByLevel.add(showSingleEvent);
                     showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
                     if (StringUtils.hasText(searchEventVo.getFriendId()) && searchEventVo.getFriendId().equals("seaPlans")) {
+                        if (Long.valueOf(showSingleEvent.getEndtime()) > DateUtil.getCurrentMinutes()){
+                            showSingleEvent.setIsOverdue(1L);
+                        }
                         dayEvents.getMySingleEventList().add(showSingleEvent);
                     }
                 }

@@ -67,7 +67,7 @@ public class TimerConfig {
         eventStatusScan.setLastYear(Long.valueOf(yesterday.substring(0, 4)));
         eventStatusScan.setLastMonth(Long.valueOf(yesterday.substring(4, 6)));
         eventStatusScan.setYesterday(Long.valueOf(yesterday.substring(6)));
-        Integer time = Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
+        Integer time = DateUtil.getCurrentMinutes();
         eventStatusScan.setTime((long) time);
         List<Long> userIds = eventMapper.queryExpiredEvents(eventStatusScan);
         logger.info("有" + userIds.size() + "条事件待修改");
