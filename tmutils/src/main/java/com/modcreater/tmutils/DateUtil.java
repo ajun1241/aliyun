@@ -38,6 +38,7 @@ public class DateUtil {
 
     /**
      * 20190620格式的时间转换为周几
+     *
      * @param day(20190620)
      * @return
      */
@@ -45,7 +46,7 @@ public class DateUtil {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Date date = new Date();
-        if (StringUtils.hasText(day)){
+        if (StringUtils.hasText(day)) {
             try {
                 date = simpleDateFormat.parse(day);
             } catch (ParseException e) {
@@ -81,15 +82,15 @@ public class DateUtil {
     /**
      * 获取当前日期的前或后的某一天的日期
      *
-     * @param fob 例:-1为返回前一天
+     * @param fob  例:-1为返回前一天
      * @param date 开始日期
      * @return
      */
-    public static String getDay(int fob,String date) {
+    public static String getDay(int fob, String date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         Calendar calendar = Calendar.getInstance();
         try {
-            if (date.length() != 8){
+            if (date.length() != 8) {
                 date = simpleDateFormat.format(new Date());
             }
             calendar.setTime((simpleDateFormat).parse(date));
@@ -127,9 +128,10 @@ public class DateUtil {
 
     /**
      * 获取当前分钟数(00:00到当前时间所有分钟数的总和)
+     *
      * @return
      */
-    public static int getCurrentMinutes(){
+    public static int getCurrentMinutes() {
         return Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
     }
 

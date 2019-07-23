@@ -565,6 +565,23 @@ public class EventServiceImpl implements EventService {
         if ((dayEventsList.size() + loopEventList.size()) == 0) {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
+        List<SingleEvent> singleEventList = dayEventsList.get(0).getMySingleEventList();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
+        calendar.get(Calendar.DAY_OF_WEEK);
+        week = week == 7 ? 0 : week;
+        for (SingleEvent singleEvent1 : singleEventList){
+            if (singleEvent1.getFlag() == 5){
+                for (Iterator<ShowSingleEvent> iterator = loopEventList.get(week).iterator(); iterator.hasNext(); ) {
+                    ShowSingleEvent showSingleEvent = iterator.next();
+                    if (Long.valueOf(singleEvent1.getStarttime()).equals(Long.valueOf(showSingleEvent.getStarttime()))
+                            && Long.valueOf(singleEvent1.getEndtime()).equals(Long.valueOf(showSingleEvent.getEndtime()))) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
         Map<String, Object> result = new HashMap<>(2);
         result.put("dayEventsList", dayEventsList);
         result.put("loopEventList", loopEventList);
