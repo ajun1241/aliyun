@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmdao.mapper.SynchronHistoryMapper">
+    <insert id="addSynchronHistory">
+        insert into synchronhistory (createrId, senderId, eventId, receiverId, createDate) values (#{createrId},#{senderId},#{eventId},#{receiverId},#{createDate});
+    </insert>
+
+    <update id="updSynchronHistory">
+        update synchronhistory
+        <if test="status >= 0 ">
+            <set>
+                status = #{status},
+            </set>
+        </if>
+        <if test="isSucceed >= 0 ">
+            <set>
+                isSucceed = #{isSucceed},
+            </set>
+        </if>
+        where createrId={createrId} and senderId={senderId} and eventId={eventId}
+        and createDate=(select Max(createDate) from synchronHistory where createrId={createrId} and senderId={senderId} and eventId={eventId} );
+    </update>
+</mapper>

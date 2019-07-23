@@ -13,6 +13,8 @@ public class SynchronHistory {
   private Long senderId;
   private Long eventId;
   private Long createDate;
-  private Long status;
+  private Integer status;
+  private Long receiverId;
+  private Integer isSucceed;
 
 }

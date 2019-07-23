@@ -78,6 +78,9 @@ public class EventServiceImpl implements EventService {
     @Resource
     private DeviceTokenMapper deviceTokenMapper;
 
+    @Resource
+    private SynchronHistoryMapper synchronHistoryMapper;
+
     private Logger logger = LoggerFactory.getLogger(EventServiceImpl.class);
     @Resource
     private EventUtil eventUtil;
@@ -953,6 +956,13 @@ public class EventServiceImpl implements EventService {
                         statisticsTable.setEventId(singleEvent.getEventid());
                         statisticsTable.setUserId(Long.parseLong(userId));
                         tables.add(statisticsTable);
+                        //生成同步历史
+                        SynchronHistory syh=new SynchronHistory();
+                        syh.setCreaterId(singleEventVice.getCreateBy());
+                        syh.setSenderId(Long.parseLong(addInviteEventVo.getUserId()));
+                        syh.setEventId(Long.parseLong(addInviteEventVo.getSingleEvent()));
+                        syh.setReceiverId(Long.parseLong(userId));
+                        syh.setCreateDate(System.currentTimeMillis());
                     }
                     statisticsMapper.createStatistics(tables);
                     //给除了创建者之外的其他参与者发送信息
