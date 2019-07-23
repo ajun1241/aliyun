@@ -3,6 +3,7 @@ package com.modcreater.tmdao.mapper;
 import com.modcreater.tmbeans.databaseparam.EventStatusScan;
 import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
 import com.modcreater.tmbeans.databaseparam.UserEventsGroupByInWeek;
+import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByPriority;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.utils.NaturalWeek;
@@ -339,4 +340,25 @@ public interface EventMapper {
      * @return
      */
     int updInviteEventPerson(String userId,String eventId,String person);
+
+    /**
+     * 根据优先级分组查询事件
+     * @param userEventsGroupByInWeek
+     * @return
+     */
+    List<GetUserEventsGroupByPriority> getUserEventsGroupByPriorityInWeek(UserEventsGroupByInWeek userEventsGroupByInWeek);
+
+    /**
+     * 根据开始日期,结束日期和普通事件查询事件数量
+     * @param naturalWeek
+     * @return
+     */
+    Long getEventsNumByCommon(NaturalWeek naturalWeek);
+
+    /**
+     * 根据开始日期,结束日期和普通事件查询事件数量
+     * @param naturalWeek
+     * @return
+     */
+    Long getEventsNumByUrgent(NaturalWeek naturalWeek);
 }

@@ -27,4 +27,16 @@
         </if>
         );
     </update>
+    <select id="countSucceedSynchronHistory" resultType="java.lang.Long">
+        select count(1) num from (select COUNT(id) num from synchronhistory where senderId = #{userId} and isSucceed = 1 GROUP BY createDate) as sss
+    </select>
+    <select id="countFailedSynchronHistory" resultType="java.lang.Long">
+        select count(1) num from (select COUNT(id) num from synchronhistory where senderId = #{userId} GROUP BY createDate) as sss
+    </select>
+    <select id="countRefusedSynchronHistory" resultType="java.lang.Long">
+        select COUNT(1) num from synchronhistory where receiverId = #{userId} and status &lt;&gt; 0
+    </select>
+    <select id="countAgreedSynchronHistory" resultType="java.lang.Long">
+        select COUNT(1) num from synchronhistory where receiverId = #{userId} and status = 0
+    </select>
 </mapper>

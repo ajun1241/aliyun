@@ -20,6 +20,14 @@ public class FinalValues {
      */
     public static final String[] TYPE = {"a", "b", "c", "d", "e", "f", "g", "h"};
     /**
+     * 2-5数字越大优先级越高(2：不紧迫也不重要；3：紧迫但不重要；4：重要又不紧迫；5：重要又紧迫)
+     */
+    public static final String[] PRIORITY = {"a","b","c","d"};
+    /**
+     * Mon Tue Wed Thur Fri Sat Sun(周一到周日)
+     */
+    public static final String[] WEEKDAY_NAME = {"mon","tue","wed","thur","fri","sat","sun"};
+    /**
      * 线形图板块显示的周的数量
      */
     public static final Integer SEARCH_WEEK_NUM = 6;

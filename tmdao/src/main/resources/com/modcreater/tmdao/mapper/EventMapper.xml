@@ -577,6 +577,28 @@
     <select id="countDrafts" resultType="java.lang.Long">
         select count(id) from draft where userId = #{id} and isOverdue = 0
     </select>
+    <select id="getUserEventsGroupByPriorityInWeek"
+            resultType="com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByPriority">
+        select level priority ,count(type) num from singleevent
+        where userId = #{userId}
+        and isOverdue = 1
+        and ((year = #{todayYear} and month = #{todayMonth} and day = #{todayDay})
+        or (year = #{yesterdayYear} and month = #{yesterdayMonth} and day = #{yesterdayDay})
+        or (year = #{thirdDayYear} and month = #{thirdDayMonth} and day = #{thirdDayDay})
+        or (year = #{fourthDayYear} and month = #{fourthDayMonth} and day = #{fourthDayDay})
+        or (year = #{fifthDayYear} and month = #{fifthDayMonth} and day = #{fifthDayDay})
+        or (year = #{sixthDayYear} and month = #{sixthDayMonth} and day = #{sixthDayDay})
+        or (year = #{seventhDayYear} and month = #{seventhDayMonth} and day = #{seventhDayDay}))
+        group by level
+    </select>
+    <select id="getEventsNumByCommon" resultType="java.lang.Long">
+        select count(id) from singleevent where userId = #{userId}
+        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1 and flag = 0
+    </select>
+    <select id="getEventsNumByUrgent" resultType="java.lang.Long">
+        select count(id) from singleevent where userId = #{userId}
+        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1 and flag = 1
+    </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent
     where isLoop = 0 and isOverdue = 0

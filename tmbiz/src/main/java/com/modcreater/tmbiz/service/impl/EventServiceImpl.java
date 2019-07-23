@@ -468,12 +468,15 @@ public class EventServiceImpl implements EventService {
         if (loopEventListInDataBase.size() != 0) {
             //遍历集合并将符合repeatTime = 星期 的对象分别添加到集合中
             for (SingleEvent singleEvent1 : loopEventListInDataBase) {
+                if (!SingleEventUtil.eventTime(singleEventListOrderByLevel,Long.valueOf(singleEvent1.getStarttime()),Long.valueOf(singleEvent1.getEndtime()))){
+                    continue;
+                }
                 ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
                 if (showSingleEvent.getRepeaTtime()[week]) {
                     showSingleEventListOrderByLevel.add(showSingleEvent);
                     showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
                     if (StringUtils.hasText(searchEventVo.getFriendId()) && searchEventVo.getFriendId().equals("seaPlans")) {
-                        if (Long.valueOf(showSingleEvent.getEndtime()) < DateUtil.getCurrentMinutes()){
+                        if (Long.valueOf(showSingleEvent.getEndtime()) < DateUtil.getCurrentMinutes()) {
                             showSingleEvent.setIsOverdue(1L);
                         }
                         dayEvents.getMySingleEventList().add(showSingleEvent);
@@ -1934,20 +1937,21 @@ public class EventServiceImpl implements EventService {
 
     /**
      * 将传进来的事件集合中的已完成的重复事件(冲突的)移除
+     *
      * @param singleEventList
      * @return
      */
-    private List<SingleEvent> completedLoopevent(List<SingleEvent> singleEventList){
-        if (singleEventList.size() == 0){
+    private List<SingleEvent> completedLoopevent(List<SingleEvent> singleEventList) {
+        if (singleEventList.size() == 0) {
             return singleEventList;
         }
         List<SingleEvent> ssevent = new ArrayList<>(singleEventList);
         Iterator<SingleEvent> iterator = ssevent.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             SingleEvent singleEvent1 = iterator.next();
-            if (singleEvent1.getFlag() == 5){
+            if (singleEvent1.getFlag() == 5) {
                 iterator.remove();
-                if (!SingleEventUtil.eventTime(ssevent,Long.valueOf(singleEvent1.getStarttime()),Long.valueOf(singleEvent1.getEndtime()))){
+                if (!SingleEventUtil.eventTime(ssevent, Long.valueOf(singleEvent1.getStarttime()), Long.valueOf(singleEvent1.getEndtime()))) {
                     singleEventList.remove(singleEvent1);
                 }
             }

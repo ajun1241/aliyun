@@ -5,6 +5,7 @@ import com.modcreater.tmauth.service.UserInfoService;
 import com.modcreater.tmauth.service.UserServiceJudgeService;
 import com.modcreater.tmbeans.databaseparam.QueryEventsCondition;
 import com.modcreater.tmbeans.databaseparam.UserEventsGroupByInWeek;
+import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByPriority;
 import com.modcreater.tmbeans.databaseresult.GetUserEventsGroupByType;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.dto.EventPersons;
@@ -63,6 +64,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Resource
     private UserServiceMapper userServiceMapper;
+
+    @Resource
+    private SynchronHistoryMapper synchronHistoryMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -475,69 +479,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         allStatistic.put("avgEventsNum", totalEventsNum / 7);
         allStatistic.put("maxTypes", maxTypes);
         allStatistic.put("minTypes", minTypes);
-        List<Map<String, String>> myBestFriends = new ArrayList<>();
-        List<String> persons = eventMapper.queryEventInBestFriends(userId);
-        Long maxEvents = 0L;
-        Long friendId = 100000L;
-
-        List<Long> friendIdsList = accountMapper.queryAllFriendList(userId);
-        Map<Long, Long> completeEventsTogether = new HashMap<>();
-        for (Long friend : friendIdsList) {
-            completeEventsTogether.put(friend, 0L);
-        }
-        for (String person : persons) {
-            EventPersons eventPersons = JSONObject.parseObject(person, EventPersons.class);
-            String[] friendIds;
-            try {
-                friendIds = eventPersons.getFriendsId().split(",");
-            } catch (NullPointerException e) {
-                continue;
-            }
-            for (String s : friendIds) {
-                if (s == null || s.equals("")) {
-                    continue;
-                }
-                Long key = Long.valueOf(s);
-                if (ObjectUtils.isEmpty(completeEventsTogether.get(key))) {
-                    continue;
-                }
-                completeEventsTogether.put(key, completeEventsTogether.get(key) + 1);
-            }
-        }
-        Set<Long> sets = completeEventsTogether.keySet();
-        List<Long> friends = new ArrayList<>();
-
-        /**
-         * 此处添加亲密度值集合
-         * List<Long> heats = new ArrayList<>();
-         */
-        for (int i = 1; i <= 3; i++) {
-            for (Long set : sets) {
-                Long num = completeEventsTogether.get(set);
-                if (num > maxEvents) {
-                    maxEvents = num;
-                    friendId = set;
-                }
-            }
-            completeEventsTogether.remove(friendId);
-            friends.add(friendId);
-            /**
-             * 查询
-             * heats.add(maxEvents*2);
-             */
-            maxEvents = 0L;
-            friendId = 100000L;
-        }
-        for (Long id : friends) {
-            Map<String, String> map = new HashMap<>();
-            if (id != 100000) {
-                Account accounts = accountMapper.queryNameAndHead(id);
-                map.put("userName", accounts.getUserName());
-                map.put("headImgUrl", accounts.getHeadImgUrl());
-            }
-            myBestFriends.add(map);
-        }
-        allStatistic.put("myBestFriends", myBestFriends);
+        allStatistic.put("myBestFriends", getMyBestFriendList(userId, 1));
         return DtoUtil.getSuccesWithDataDto("查询成功", allStatistic, 100000);
     }
 
@@ -577,9 +519,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         userEventsGroupByInWeek.setSeventhDayMonth(naturalWeeks.get(6).getMonth());
         userEventsGroupByInWeek.setSeventhDayYear(naturalWeeks.get(6).getYear());
         Long totalEvents = eventMapper.countEvents(userEventsGroupByInWeek);
+        if (totalEvents <= 5) {
+            DtoUtil.getFalseDto("数据量太小", 200000);
+        }
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
         Map<String, Object> mod1 = new HashMap<>();
-        Map<String,Long> typeAndNums = new HashMap<>();
+        Map<String, Long> typeAndNums = new HashMap<>();
         //定义小数精度
         NumberFormat nf2 = NumberFormat.getNumberInstance();
         Map<String, Object> mod1F = new HashMap<>();
@@ -597,12 +542,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             for (int i = 0; i < FinalValues.TYPE.length; i++) {
                 if (type.getType() == i) {
                     String percent = nf3.format((double) type.getNum() / totalEvents);
-                    if (percent.endsWith("5")){
-                        System.out.println("进入方法第"+errorNums+"次");
-                        if (errorNums % 2 == 1){
-                            System.out.println("第"+errorNums+"次补全");
-                            percent = nf2.format((double)type.getNum() / totalEvents -0.01 < 0 ? 0 :(double)type.getNum() / totalEvents -0.01);
-                        }else {
+                    if (percent.endsWith("5")) {
+                        if (errorNums % 2 == 1) {
+                            percent = nf2.format((double) type.getNum() / totalEvents - 0.01 < 0 ? 0 : (double) type.getNum() / totalEvents - 0.01);
+                        } else {
                             percent = nf2.format((double) type.getNum() / totalEvents);
                         }
                         errorNums += 1;
@@ -612,30 +555,102 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
             }
         }
-        mod1.put("mod1F",mod1F);
+        mod1.put("mod1F", mod1F);
         Map<String, Object> mod1S = new HashMap<>();
+        Map<String, String> mod1SF = new HashMap<>();
         Long maxNum = 0L;
         String maxNumKey = "a";
-        for (int i = 0; i <= 3; i++){
-            for (String key : typeAndNums.keySet()){
+        double countFour = 0.0;
+        for (int i = 0; i <= 3; i++) {
+            for (String key : typeAndNums.keySet()) {
                 Long currentNum = typeAndNums.get(key);
-                if (currentNum >= maxNum){
+                if (currentNum >= maxNum) {
                     maxNum = currentNum;
                     maxNumKey = key;
                 }
             }
-            mod1S.put(maxNumKey,maxNum);
+            String d = nf2.format((double) maxNum / totalEvents);
+            countFour += Double.parseDouble(d);
+            mod1S.put(maxNumKey, d);
             typeAndNums.remove(maxNumKey);
             maxNum = 0L;
             maxNumKey = "a";
         }
-        for (String s : typeAndNums.keySet()){
-            maxNum += typeAndNums.get(s);
+        mod1S.put("others", nf2.format(1 - countFour));
+        mod1.put("mod1S", mod1S);
+        result.put("mod1", mod1);
+        Map<String, Object> mod2 = new HashMap<>();
+        for (int i = 0; i < FinalValues.PRIORITY.length; i++) {
+            mod2.put(FinalValues.PRIORITY[i], "0");
         }
-        mod1S.put("others",maxNum);
-        mod1.put("mod1S",mod1S);
-        result.put("mod1",mod1);
-        return DtoUtil.getSuccesWithDataDto("周报已生成",result,100000);
+        errorNums = 0;
+        List<GetUserEventsGroupByPriority> getUserEventsGroupByPriority = eventMapper.getUserEventsGroupByPriorityInWeek(userEventsGroupByInWeek);
+        for (GetUserEventsGroupByPriority priority : getUserEventsGroupByPriority) {
+            for (int i = 2; i < FinalValues.PRIORITY.length + 2; i++) {
+                if (priority.getPriority() == i) {
+                    String percent = nf3.format((double) priority.getNum() / totalEvents);
+                    if (percent.endsWith("5")) {
+                        if (errorNums % 2 == 1) {
+                            percent = nf2.format((double) priority.getNum() / totalEvents - 0.01 < 0 ? 0 : (double) priority.getNum() / totalEvents - 0.01);
+                        } else {
+                            percent = nf2.format((double) priority.getNum() / totalEvents);
+                        }
+                        errorNums += 1;
+                    }
+                    mod2.put(FinalValues.PRIORITY[i - 2], percent);
+                }
+            }
+        }
+        result.put("mod2", mod2);
+        Map<String, Object> mod3 = new HashMap<>();
+        for (int n = 1; n <= 2; n++) {
+            for (int i = -6; i <= 0; i++) {
+                mod3.put(n == 1 ? "p" + (i + 7) : "e" + (i + 7), "0");
+            }
+        }
+        for (int n = 1; n <= 2; n++) {
+            for (int i = -6; i <= 0; i++) {
+                String day = DateUtil.getDay(i);
+                StringBuilder stringBuilder = new StringBuilder(day);
+                NaturalWeek naturalWeek = new NaturalWeek();
+                naturalWeek.setUserId(userId);
+                naturalWeek.setYear(stringBuilder.substring(0, 4));
+                naturalWeek.setMonth(stringBuilder.substring(4, 6));
+                naturalWeek.setDay(stringBuilder.substring(6));
+                Long num = n == 1 ? eventMapper.getEventsNumByCommon(naturalWeek) : eventMapper.getEventsNumByUrgent(naturalWeek);
+                mod3.put(n == 1 ? "p" + (i + 7) : "e" + (i + 7), num);
+            }
+        }
+        result.put("mod3", mod3);
+        Map<String, Object> mod4 = new HashMap<>();
+        mod4.put("support", mod2.get("d"));
+        Long succeed = synchronHistoryMapper.countSucceedSynchronHistory(userId);
+        Long failed = synchronHistoryMapper.countFailedSynchronHistory(userId);
+        Long refused = synchronHistoryMapper.countRefusedSynchronHistory(userId);
+        Long agreed = synchronHistoryMapper.countAgreedSynchronHistory(userId);
+        if (succeed + failed == 0) {
+            mod4.put("modify", "0");
+        } else {
+            try {
+                mod4.put("modify", nf2.format((double) succeed / (succeed + failed)));
+            } catch (Exception e) {
+                mod4.put("modify", "0");
+            }
+        }
+        if (refused + agreed == 0) {
+            mod4.put("refuse", "0");
+        } else {
+            try {
+                mod4.put("refuse", nf2.format((double) refused / (refused + agreed)));
+            } catch (Exception e) {
+                mod4.put("refuse", "0");
+            }
+        }
+        result.put("mod4", mod4);
+        Map<String, Object> mod5 = new HashMap<>();
+        mod5.put("friendList", getMyBestFriendList(userId, 2));
+        result.put("mod5", mod5);
+        return DtoUtil.getSuccesWithDataDto("周报已生成", result, 100000);
     }
 
     @Override
@@ -734,5 +749,68 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         userServiceMapper.updateServiceRemainingTime(time);
         return true;
+    }
+
+    private List<Map<String, String>> getMyBestFriendList(String userId, Integer version) {
+        List<Map<String, String>> myBestFriends = new ArrayList<>();
+        List<String> persons = eventMapper.queryEventInBestFriends(userId);
+        Long maxEvents = 0L;
+        Long friendId = 100000L;
+
+        List<Long> friendIdsList = accountMapper.queryAllFriendList(userId);
+        Map<Long, Long> completeEventsTogether = new HashMap<>();
+        for (Long friend : friendIdsList) {
+            completeEventsTogether.put(friend, 0L);
+        }
+        for (String person : persons) {
+            EventPersons eventPersons = JSONObject.parseObject(person, EventPersons.class);
+            String[] friendIds;
+            try {
+                friendIds = eventPersons.getFriendsId().split(",");
+            } catch (NullPointerException e) {
+                continue;
+            }
+            for (String s : friendIds) {
+                if (s == null || s.equals("")) {
+                    continue;
+                }
+                Long key = Long.valueOf(s);
+                if (ObjectUtils.isEmpty(completeEventsTogether.get(key))) {
+                    continue;
+                }
+                completeEventsTogether.put(key, completeEventsTogether.get(key) + 1);
+            }
+        }
+        Set<Long> sets = completeEventsTogether.keySet();
+        List<Long> friends = new ArrayList<>();
+        List<Long> heats = new ArrayList<>();
+        for (int i = 1; i <= 3; i++) {
+            for (Long set : sets) {
+                Long num = completeEventsTogether.get(set);
+                if (num > maxEvents) {
+                    maxEvents = num;
+                    friendId = set;
+                }
+            }
+            completeEventsTogether.remove(friendId);
+            friends.add(friendId);
+            heats.add(maxEvents * 2);
+            maxEvents = 0L;
+            friendId = 100000L;
+        }
+        for (int i = 0; i < friends.size(); i++) {
+            Long id = friends.get(i);
+            Map<String, String> map = new HashMap<>();
+            if (id != 100000) {
+                Account accounts = accountMapper.queryNameAndHead(id);
+                map.put("userName", accounts.getUserName());
+                map.put("headImgUrl", accounts.getHeadImgUrl());
+                if (version == 2) {
+                    map.put("value", heats.get(i).toString());
+                }
+            }
+            myBestFriends.add(map);
+        }
+        return myBestFriends;
     }
 }
