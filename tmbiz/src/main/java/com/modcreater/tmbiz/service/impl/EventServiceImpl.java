@@ -470,7 +470,7 @@ public class EventServiceImpl implements EventService {
                     showSingleEventListOrderByLevel.add(showSingleEvent);
                     showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
                     if (StringUtils.hasText(searchEventVo.getFriendId()) && searchEventVo.getFriendId().equals("seaPlans")) {
-                        if (Long.valueOf(showSingleEvent.getEndtime()) > DateUtil.getCurrentMinutes()){
+                        if (Long.valueOf(showSingleEvent.getEndtime()) < DateUtil.getCurrentMinutes()){
                             showSingleEvent.setIsOverdue(1L);
                         }
                         dayEvents.getMySingleEventList().add(showSingleEvent);
@@ -1149,8 +1149,8 @@ public class EventServiceImpl implements EventService {
                 if (map.get("refuse") / Double.valueOf(map.get("total")) > 0.5) {
                     //删除临时表的事件
                     tempEventMapper.deleteTempEvent(singleEvent.getEventid().toString(), vice.getCreateBy().toString());
-                    /*//删除统计表
-                    statisticsMapper.deleteStatistics(vice.getCreateBy().toString(), singleEvent.getEventid().toString());*/
+                    //删除统计表
+                    statisticsMapper.deleteStatistics(vice.getCreateBy().toString(), singleEvent.getEventid().toString());
                     //通知所有人事件修改失败
                     RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                     TxtMessage txtMessage = new TxtMessage("由于超过50%的人拒绝修改事件“" + singleEvent.getEventname() + "”，该事件修改失败", "");
@@ -1230,8 +1230,8 @@ public class EventServiceImpl implements EventService {
                 }
                 //删除临时表的事件
                 tempEventMapper.deleteTempEvent(singleEvent.getEventid().toString(), eventCreatorChooseVo.getUserId());
-                /*//删除统计表
-                statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());*/
+                //删除统计表
+                statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());
                 //通知所有人事件修改成功
                 RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                 TxtMessage txtMessage = new TxtMessage("事件“" + singleEvent.getEventname() + "”已经修改成功", "");
@@ -1253,8 +1253,8 @@ public class EventServiceImpl implements EventService {
                 //如果不同意修改
                 //删除临时表的事件
                 tempEventMapper.deleteTempEvent(singleEvent.getEventid().toString(), eventCreatorChooseVo.getUserId());
-                /*//删除统计表
-                statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());*/
+                //删除统计表
+                statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());
                 //通知所有人事件修改失败
                 RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                 TxtMessage txtMessage = new TxtMessage("事件“" + singleEvent.getEventname() + "”修改失败", "");

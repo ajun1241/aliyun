@@ -43,7 +43,7 @@ public interface StatisticsMapper {
     int queryStatisticsCount(StatisticsTable statisticsTable);
 
     /**
-     * 查询最终统计结果
+     * 查询最终统计结果（查询没有过期的）
      * @param creatorId
      * @param eventId
      * @return
