@@ -448,7 +448,7 @@ public class EventServiceImpl implements EventService {
         List<ShowSingleEvent> showSingleEventListOrderByLevelAndDate = new ArrayList<>();
         //添加一个未排序的结果集到dayEvents中
         DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
-        ArrayList<SingleEvent> singleEventList = (ArrayList<SingleEvent>) (eventMapper.queryEvents(singleEvent));
+        ArrayList<SingleEvent> singleEventList = (ArrayList<SingleEvent>) completedLoopevent(eventMapper.queryEvents(singleEvent));
         ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
         if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0 && singleEventList.size() != 0) {
             showSingleEventListOrderByLevel = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevel);
