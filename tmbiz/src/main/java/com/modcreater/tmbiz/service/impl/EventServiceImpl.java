@@ -960,9 +960,10 @@ public class EventServiceImpl implements EventService {
                         SynchronHistory syh=new SynchronHistory();
                         syh.setCreaterId(singleEventVice.getCreateBy());
                         syh.setSenderId(Long.parseLong(addInviteEventVo.getUserId()));
-                        syh.setEventId(Long.parseLong(addInviteEventVo.getSingleEvent()));
+                        syh.setEventId(singleEvent.getEventid());
                         syh.setReceiverId(Long.parseLong(userId));
                         syh.setCreateDate(System.currentTimeMillis());
+                        synchronHistoryMapper.addSynchronHistory(syh);
                     }
                     statisticsMapper.createStatistics(tables);
                     //给除了创建者之外的其他参与者发送信息
@@ -1025,6 +1026,14 @@ public class EventServiceImpl implements EventService {
                             statisticsTable.setEventId(singleEvent.getEventid());
                             statisticsTable.setUserId(Long.parseLong(userId));
                             tables.add(statisticsTable);
+                            //生成同步历史
+                            SynchronHistory syh=new SynchronHistory();
+                            syh.setCreaterId(singleEventVice.getCreateBy());
+                            syh.setSenderId(Long.parseLong(addInviteEventVo.getUserId()));
+                            syh.setEventId(singleEvent.getEventid());
+                            syh.setReceiverId(Long.parseLong(userId));
+                            syh.setCreateDate(System.currentTimeMillis());
+                            synchronHistoryMapper.addSynchronHistory(syh);
                         }
                     }
                     statisticsMapper.createStatistics(tables);
@@ -1104,6 +1113,13 @@ public class EventServiceImpl implements EventService {
                 statisticsTable.setModify(1L);
                 logger.info("回应邀请事件修改时输出的统计表内容：" + statisticsTable.toString());
                 statisticsMapper.updateStatistics(statisticsTable);
+                //修改同步历史
+                SynchronHistory syh=new SynchronHistory();
+                syh.setCreaterId(vice.getCreateBy());
+                syh.setEventId(Long.parseLong(feedbackEventInviteVo.getEventId()));
+                syh.setReceiverId(Long.parseLong(feedbackEventInviteVo.getUserId()));
+                syh.setStatus(1);
+                synchronHistoryMapper.updSynchronHistory(syh);
                 //查询统计表同意者是否达到50%（如果发起修改的人是创建者达到50%直接修改——修改后记得删除临时表和统计表）
                 Map<String, Long> map = statisticsMapper.queryFeedbackStatistics(vice.getCreateBy().toString(), singleEvent.getEventid().toString());
                 if (map.get("agree") / Double.valueOf(map.get("total")) >= 0.5) {
@@ -1154,6 +1170,13 @@ public class EventServiceImpl implements EventService {
                 statisticsTable.setModify(1L);
                 logger.info("回应邀请事件修改时输出的统计表内容：" + statisticsTable.toString());
                 statisticsMapper.updateStatistics(statisticsTable);
+                //修改同步历史
+                SynchronHistory syh=new SynchronHistory();
+                syh.setCreaterId(vice.getCreateBy());
+                syh.setEventId(Long.parseLong(feedbackEventInviteVo.getEventId()));
+                syh.setReceiverId(Long.parseLong(feedbackEventInviteVo.getUserId()));
+                syh.setStatus(0);
+                synchronHistoryMapper.updSynchronHistory(syh);
                 //查询统计表拒绝者是否超过50%，则修改失败
                 Map<String, Long> map = statisticsMapper.queryFeedbackStatistics(vice.getCreateBy().toString(), singleEvent.getEventid().toString());
                 if (map.get("refuse") / Double.valueOf(map.get("total")) > 0.5) {
@@ -1242,6 +1265,12 @@ public class EventServiceImpl implements EventService {
                 tempEventMapper.deleteTempEvent(singleEvent.getEventid().toString(), eventCreatorChooseVo.getUserId());
                 //删除统计表
                 statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());
+                //修改同步历史
+                SynchronHistory syh=new SynchronHistory();
+                syh.setCreaterId(Long.parseLong(eventCreatorChooseVo.getUserId()));
+                syh.setEventId(Long.parseLong(eventCreatorChooseVo.getEventId()));
+                syh.setIsSucceed(1);
+                synchronHistoryMapper.updSynchronHistory(syh);
                 //通知所有人事件修改成功
                 RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                 TxtMessage txtMessage = new TxtMessage("事件“" + singleEvent.getEventname() + "”已经修改成功", "");

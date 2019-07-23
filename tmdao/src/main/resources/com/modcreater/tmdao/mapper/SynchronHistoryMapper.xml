@@ -17,7 +17,14 @@
                 isSucceed = #{isSucceed},
             </set>
         </if>
-        where createrId={createrId} and senderId={senderId} and eventId={eventId}
-        and createDate=(select Max(createDate) from synchronHistory where createrId={createrId} and senderId={senderId} and eventId={eventId} );
+        where createrId={createrId}  and eventId={eventId}
+        <if test="receiverId>0">
+            and receiverId=#{receiverId}
+        </if>
+        and createDate=(select Max(createDate) from synchronHistory where createrId={createrId} and eventId={eventId}
+        <if test="receiverId>0">
+            and receiverId=#{receiverId}
+        </if>
+        );
     </update>
 </mapper>
