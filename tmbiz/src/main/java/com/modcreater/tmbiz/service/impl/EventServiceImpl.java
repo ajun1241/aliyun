@@ -445,7 +445,7 @@ public class EventServiceImpl implements EventService {
         List<ShowSingleEvent> showSingleEventListOrderByLevelAndDate = new ArrayList<>();
         //添加一个未排序的结果集到dayEvents中
         DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
-        ArrayList<SingleEvent> singleEventList = (ArrayList<SingleEvent>) completedLoopevent(eventMapper.queryEvents(singleEvent));
+        ArrayList<SingleEvent> singleEventList = (ArrayList<SingleEvent>) (eventMapper.queryEvents(singleEvent));
         ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
         if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0 && singleEventList.size() != 0) {
             showSingleEventListOrderByLevel = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevel);
@@ -1146,8 +1146,8 @@ public class EventServiceImpl implements EventService {
                 if (map.get("refuse") / Double.valueOf(map.get("total")) > 0.5) {
                     //删除临时表的事件
                     tempEventMapper.deleteTempEvent(singleEvent.getEventid().toString(), vice.getCreateBy().toString());
-                    //删除统计表
-                    statisticsMapper.deleteStatistics(vice.getCreateBy().toString(), singleEvent.getEventid().toString());
+                    /*//删除统计表
+                    statisticsMapper.deleteStatistics(vice.getCreateBy().toString(), singleEvent.getEventid().toString());*/
                     //通知所有人事件修改失败
                     RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                     TxtMessage txtMessage = new TxtMessage("由于超过50%的人拒绝修改事件“" + singleEvent.getEventname() + "”，该事件修改失败", "");
@@ -1227,8 +1227,8 @@ public class EventServiceImpl implements EventService {
                 }
                 //删除临时表的事件
                 tempEventMapper.deleteTempEvent(singleEvent.getEventid().toString(), eventCreatorChooseVo.getUserId());
-                //删除统计表
-                statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());
+                /*//删除统计表
+                statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());*/
                 //通知所有人事件修改成功
                 RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                 TxtMessage txtMessage = new TxtMessage("事件“" + singleEvent.getEventname() + "”已经修改成功", "");
@@ -1250,8 +1250,8 @@ public class EventServiceImpl implements EventService {
                 //如果不同意修改
                 //删除临时表的事件
                 tempEventMapper.deleteTempEvent(singleEvent.getEventid().toString(), eventCreatorChooseVo.getUserId());
-                //删除统计表
-                statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());
+                /*//删除统计表
+                statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());*/
                 //通知所有人事件修改失败
                 RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
                 TxtMessage txtMessage = new TxtMessage("事件“" + singleEvent.getEventname() + "”修改失败", "");
@@ -1900,28 +1900,16 @@ public class EventServiceImpl implements EventService {
             return singleEventList;
         }
         List<SingleEvent> ssevent = new ArrayList<>(singleEventList);
-        SingleEvent singleEvent1 = new SingleEvent();
-        for (int i = 0; i <= singleEventList.size(); i++){
-            for (SingleEvent s : singleEventList){
-                if (s.getFlag() == 5){
-                    ssevent.remove(s);
-                    singleEvent1 = s;
-                }
-            }
-            if (!SingleEventUtil.eventTime(ssevent,Long.valueOf(singleEvent1.getStarttime()),Long.valueOf(singleEvent1.getEndtime()))){
-                singleEventList.remove(singleEvent1);
-            }
-        }
-        /*Iterator<SingleEvent> iterator = ssevent.iterator();
+        Iterator<SingleEvent> iterator = ssevent.iterator();
         while (iterator.hasNext()){
             SingleEvent singleEvent1 = iterator.next();
             if (singleEvent1.getFlag() == 5){
-                ssevent.remove(singleEvent1);
+                iterator.remove();
                 if (!SingleEventUtil.eventTime(ssevent,Long.valueOf(singleEvent1.getStarttime()),Long.valueOf(singleEvent1.getEndtime()))){
                     singleEventList.remove(singleEvent1);
                 }
             }
-        }*/
+        }
         return singleEventList;
     }
 

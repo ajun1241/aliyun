@@ -204,12 +204,11 @@ public interface EventService {
      */
     Dto searchFriendEventOnce(ReceivedFriendEventOnce receivedFriendEventOnce, String token);
 
-
     /**
      * 查询今天的计划
-     * @param receivedId
-     * @param token
-     * @return
+     * @param receivedId 接收参数
+     * @param token token
+     * @return 工具类
      */
     Dto getTodayPlans(ReceivedId receivedId, String token);
 

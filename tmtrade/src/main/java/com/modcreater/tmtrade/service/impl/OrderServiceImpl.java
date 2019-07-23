@@ -222,7 +222,7 @@ public class OrderServiceImpl implements OrderService {
                 UserOrders userOrders = getUserOrderById(outTradeNo);
                 userOrders.setOrderStatus("1");
                 userOrders.setPayTime(String.valueOf(System.currentTimeMillis() / 1000));
-                userOrders.setPayChannel("AliPay");
+                userOrders.setPayChannel("支付宝支付");
                 userOrders.setOutTradeNo(tradeNo);
                 //更新交易表中状态
                 int returnResult = updateOrderStatusToPrepaid(userOrders);
@@ -444,7 +444,7 @@ public class OrderServiceImpl implements OrderService {
                         }
                         userOrders.setOrderStatus("1");
                         userOrders.setPayTime(String.valueOf(System.currentTimeMillis() / 1000));
-                        userOrders.setPayChannel("WxPay");
+                        userOrders.setPayChannel("微信支付");
                         userOrders.setOutTradeNo(transactionId);
                         //更新交易表中状态
                         int returnResult = updateOrderStatusToPrepaid(userOrders);
@@ -504,52 +504,52 @@ public class OrderServiceImpl implements OrderService {
         }
         ServiceRemainingTime serviceRemainingTime = userServiceMapper.getServiceRemainingTime(receivedServiceIdUserId.getUserId(), receivedServiceIdUserId.getServiceId());
         if (ObjectUtils.isEmpty(serviceRemainingTime)) {
-            return DtoUtil.getSuccesWithDataDto("查询成功", "您尚未开通此功能", 100000);
+            return DtoUtil.getSuccesWithDataDto("查询成功", "未开通", 100000);
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         if (serviceRemainingTime.getServiceId().equals("2")) {
             if (serviceRemainingTime.getResidueDegree() == 0) {
                 String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
                 if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
-                    return DtoUtil.getSuccesWithDataDto("查询成功", "您的查询服务将在" + time + "到期", 100000);
+                    return DtoUtil.getSuccesWithDataDto("查询成功", time + "到期", 100000);
                 } else if (serviceRemainingTime.getTimeRemaining() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务尚未开通", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "未开通", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询服务将在" + time + "到期", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", time + "到期", 100000);
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() != 0) {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询历史服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡将在次卡消耗完后开始计算", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡将在次卡消耗完后开始计算", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "您的查询历史服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次", 100000);
                 }
             }
         }
         if (serviceRemainingTime.getServiceId().equals("3")) {
             String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
             if (serviceRemainingTime.getTimeRemaining() == 0) {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "报表服务尚未开通", 100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", "未开通", 100000);
             } else if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "报表服务将在" + time + "过期", 100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", time + "过期", 100000);
             } else {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "报表服务已过期", 100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", "已过期", 100000);
             }
         }
         if (serviceRemainingTime.getServiceId().equals("4")) {
             if (serviceRemainingTime.getResidueDegree() == 0) {
                 String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
                 if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务将在" + time + "到期", 100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", time + "到期", 100000);
                 } else if (serviceRemainingTime.getTimeRemaining() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务尚未开通", 100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "未开通", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务已过期", 100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "已过期", 100000);
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + ",月/年卡将在次卡消耗完后开始计算", 100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString()/* + ",月/年卡将在次卡消耗完后开始计算"*/, 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "您的备份服务次卡剩余" + serviceRemainingTime.getResidueDegree().toString(), 100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString(), 100000);
                 }
             }
         }
