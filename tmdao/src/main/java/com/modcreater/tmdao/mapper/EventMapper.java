@@ -361,4 +361,11 @@ public interface EventMapper {
      * @return
      */
     Long getEventsNumByUrgent(NaturalWeek naturalWeek);
+
+    /**
+     * 查询重复事件(用于判断重复事件冲突)
+     * @param singleEvent
+     * @return
+     */
+    List<SingleEvent> queryClashLoopEventList(SingleEvent singleEvent);
 }

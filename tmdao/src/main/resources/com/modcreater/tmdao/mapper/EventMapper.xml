@@ -599,6 +599,9 @@
         select count(id) from singleevent where userId = #{userId}
         and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1 and flag = 1
     </select>
+    <select id="queryClashLoopEventList" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select repeatTime , startTime , endTime from singleevent where userId = #{userid} and isOverdue = 0 and isLoop = 1
+    </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent
     where isLoop = 0 and isOverdue = 0

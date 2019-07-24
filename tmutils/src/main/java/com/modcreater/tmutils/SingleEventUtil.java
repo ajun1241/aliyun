@@ -357,4 +357,27 @@ public class SingleEventUtil {
         }
         return true;
     }
+
+    public static boolean loopEventTime(List<SingleEvent> singleEventList, SingleEvent loopEvent){
+        if (singleEventList.size() == 0) {
+            return true;
+        }
+        for (SingleEvent singleEvent :  singleEventList){
+            Boolean[] rep = getRepeatTime(singleEvent);
+            Boolean[] repLoop = getRepeatTime(loopEvent);
+            for (int i = 0; i <= 6; i++){
+                if (rep[i] && repLoop[i]){
+                    boolean res = ((Long.valueOf(singleEvent.getStarttime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) < Long.valueOf(loopEvent.getEndtime()))
+                            || (Long.valueOf(singleEvent.getStarttime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getStarttime()) < Long.valueOf(loopEvent.getEndtime()))
+                            || (Long.valueOf(singleEvent.getEndtime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) < Long.valueOf(loopEvent.getEndtime()))
+                            || (Long.valueOf(singleEvent.getStarttime()) <= Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) >= Long.valueOf(loopEvent.getEndtime())));
+                    if (res) {
+                        //冲突了,返回false
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 }

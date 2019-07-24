@@ -106,7 +106,12 @@ public class EventServiceImpl implements EventService {
         singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
-        if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+        if (singleEvent.getIsLoop() == 1) {
+            List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+            if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
+            }
+        } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
             return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
         }
         //记录操作时间
@@ -441,14 +446,14 @@ public class EventServiceImpl implements EventService {
         singleEvent.setIsOverdue(StringUtils.hasText(searchEventVo.getFriendId()) && searchEventVo.getFriendId().equals("seaPlans") ? null : 0L);
         System.out.println(singleEvent.toString());
         //只根据level升序
-        List<SingleEvent> singleEventListOrderByLevel = completedLoopevent(eventMapper.queryByDayOrderByLevel(singleEvent));
+        List<SingleEvent> singleEventListOrderByLevel = completedLoopEvent(eventMapper.queryByDayOrderByLevel(singleEvent));
         List<ShowSingleEvent> showSingleEventListOrderByLevel = new ArrayList<>();
         //根据level和开始时间升序
-        List<SingleEvent> singleEventListOrderByLevelAndDate = completedLoopevent(eventMapper.queryByDayOrderByLevelAndDate(singleEvent));
+        List<SingleEvent> singleEventListOrderByLevelAndDate = completedLoopEvent(eventMapper.queryByDayOrderByLevelAndDate(singleEvent));
         List<ShowSingleEvent> showSingleEventListOrderByLevelAndDate = new ArrayList<>();
         //添加一个未排序的结果集到dayEvents中
         DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
-        ArrayList<SingleEvent> singleEventList = (ArrayList<SingleEvent>) completedLoopevent(eventMapper.queryEvents(singleEvent));
+        ArrayList<SingleEvent> singleEventList = (ArrayList<SingleEvent>) completedLoopEvent(eventMapper.queryEvents(singleEvent));
         ArrayList<ShowSingleEvent> showSingleEventList = new ArrayList<>();
         if (singleEventListOrderByLevel.size() != 0 && singleEventListOrderByLevelAndDate.size() != 0 && singleEventList.size() != 0) {
             showSingleEventListOrderByLevel = SingleEventUtil.getShowSingleEventList(singleEventListOrderByLevel);
@@ -468,7 +473,7 @@ public class EventServiceImpl implements EventService {
         if (loopEventListInDataBase.size() != 0) {
             //遍历集合并将符合repeatTime = 星期 的对象分别添加到集合中
             for (SingleEvent singleEvent1 : loopEventListInDataBase) {
-                if (!SingleEventUtil.eventTime(singleEventListOrderByLevel,Long.valueOf(singleEvent1.getStarttime()),Long.valueOf(singleEvent1.getEndtime()))){
+                if (!SingleEventUtil.eventTime(singleEventListOrderByLevel, Long.valueOf(singleEvent1.getStarttime()), Long.valueOf(singleEvent1.getEndtime()))) {
                     continue;
                 }
                 ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
@@ -571,8 +576,8 @@ public class EventServiceImpl implements EventService {
         int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
         calendar.get(Calendar.DAY_OF_WEEK);
         week = week == 7 ? 0 : week;
-        for (ShowSingleEvent singleEvent1 : singleEventList){
-            if (singleEvent1.getFlag() == 5){
+        for (ShowSingleEvent singleEvent1 : singleEventList) {
+            if (singleEvent1.getFlag() == 5) {
                 for (Iterator<ShowSingleEvent> iterator = loopEventList.get(week).iterator(); iterator.hasNext(); ) {
                     ShowSingleEvent showSingleEvent = iterator.next();
                     if (Long.valueOf(singleEvent1.getStarttime()).equals(Long.valueOf(showSingleEvent.getStarttime()))
@@ -977,7 +982,7 @@ public class EventServiceImpl implements EventService {
                         statisticsTable.setUserId(Long.parseLong(userId));
                         tables.add(statisticsTable);
                         //生成同步历史
-                        SynchronHistory syh=new SynchronHistory();
+                        SynchronHistory syh = new SynchronHistory();
                         syh.setCreaterId(singleEventVice.getCreateBy());
                         syh.setSenderId(Long.parseLong(addInviteEventVo.getUserId()));
                         syh.setEventId(singleEvent.getEventid());
@@ -1047,7 +1052,7 @@ public class EventServiceImpl implements EventService {
                             statisticsTable.setUserId(Long.parseLong(userId));
                             tables.add(statisticsTable);
                             //生成同步历史
-                            SynchronHistory syh=new SynchronHistory();
+                            SynchronHistory syh = new SynchronHistory();
                             syh.setCreaterId(singleEventVice.getCreateBy());
                             syh.setSenderId(Long.parseLong(addInviteEventVo.getUserId()));
                             syh.setEventId(singleEvent.getEventid());
@@ -1134,7 +1139,7 @@ public class EventServiceImpl implements EventService {
                 logger.info("回应邀请事件修改时输出的统计表内容：" + statisticsTable.toString());
                 statisticsMapper.updateStatistics(statisticsTable);
                 //修改同步历史
-                SynchronHistory syh=new SynchronHistory();
+                SynchronHistory syh = new SynchronHistory();
                 syh.setCreaterId(vice.getCreateBy());
                 syh.setEventId(Long.parseLong(feedbackEventInviteVo.getEventId()));
                 syh.setReceiverId(Long.parseLong(feedbackEventInviteVo.getUserId()));
@@ -1191,7 +1196,7 @@ public class EventServiceImpl implements EventService {
                 logger.info("回应邀请事件修改时输出的统计表内容：" + statisticsTable.toString());
                 statisticsMapper.updateStatistics(statisticsTable);
                 //修改同步历史
-                SynchronHistory syh=new SynchronHistory();
+                SynchronHistory syh = new SynchronHistory();
                 syh.setCreaterId(vice.getCreateBy());
                 syh.setEventId(Long.parseLong(feedbackEventInviteVo.getEventId()));
                 syh.setReceiverId(Long.parseLong(feedbackEventInviteVo.getUserId()));
@@ -1286,7 +1291,7 @@ public class EventServiceImpl implements EventService {
                 //删除统计表
                 statisticsMapper.deleteStatistics(eventCreatorChooseVo.getUserId(), singleEvent.getEventid().toString());
                 //修改同步历史
-                SynchronHistory syh=new SynchronHistory();
+                SynchronHistory syh = new SynchronHistory();
                 syh.setCreaterId(Long.parseLong(eventCreatorChooseVo.getUserId()));
                 syh.setEventId(Long.parseLong(eventCreatorChooseVo.getEventId()));
                 syh.setIsSucceed(1);
@@ -1702,48 +1707,19 @@ public class EventServiceImpl implements EventService {
 
     private List<List<ShowSingleEvent>> getShowSingleEventListList(List<SingleEvent> list) {
         List<List<ShowSingleEvent>> loopEventList = new ArrayList<>();
-        List<ShowSingleEvent> sunShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> monShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> tueShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> wedShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> thuShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> friShowLoopEventList = new ArrayList<>();
-        List<ShowSingleEvent> satShowLoopEventList = new ArrayList<>();
+        for (int i = 0; i <= 6; i++) {
+            loopEventList.add(new ArrayList<>());
+        }
         for (SingleEvent singleEvent1 : list) {
             ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
             Boolean[] booleans = showSingleEvent.getRepeaTtime();
             //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
             for (int i = 0; i <= 6; i++) {
-                if (i == 0 && booleans[i]) {
-                    sunShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 1 && booleans[i]) {
-                    monShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 2 && booleans[i]) {
-                    tueShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 3 && booleans[i]) {
-                    wedShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 4 && booleans[i]) {
-                    thuShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 5 && booleans[i]) {
-                    friShowLoopEventList.add(showSingleEvent);
-                }
-                if (i == 6 && booleans[i]) {
-                    satShowLoopEventList.add(showSingleEvent);
+                if (booleans[i]) {
+                    loopEventList.get(i).add(showSingleEvent);
                 }
             }
         }
-        loopEventList.add(sunShowLoopEventList);
-        loopEventList.add(monShowLoopEventList);
-        loopEventList.add(tueShowLoopEventList);
-        loopEventList.add(wedShowLoopEventList);
-        loopEventList.add(thuShowLoopEventList);
-        loopEventList.add(friShowLoopEventList);
-        loopEventList.add(satShowLoopEventList);
         return loopEventList;
     }
 
@@ -1756,9 +1732,9 @@ public class EventServiceImpl implements EventService {
             singleEvent = SingleEventUtil.getSingleEvent(userId, dayEventId);
             List<SingleEvent> singleEventList;
             if ("all".equals(condition)) {
-                singleEventList = completedLoopevent(eventMapper.queryEvents(singleEvent));
+                singleEventList = completedLoopEvent(eventMapper.queryEvents(singleEvent));
             } else if ("few".equals(condition)) {
-                singleEventList = completedLoopevent(eventMapper.queryEventsWithFewInfo(singleEvent));
+                singleEventList = completedLoopEvent(eventMapper.queryEventsWithFewInfo(singleEvent));
             } else {
                 singleEventList = new ArrayList<>();
             }
@@ -1958,7 +1934,7 @@ public class EventServiceImpl implements EventService {
      * @param singleEventList
      * @return
      */
-    private List<SingleEvent> completedLoopevent(List<SingleEvent> singleEventList) {
+    private List<SingleEvent> completedLoopEvent(List<SingleEvent> singleEventList) {
         if (singleEventList.size() == 0) {
             return singleEventList;
         }
@@ -1975,5 +1951,4 @@ public class EventServiceImpl implements EventService {
         }
         return singleEventList;
     }
-
 }
