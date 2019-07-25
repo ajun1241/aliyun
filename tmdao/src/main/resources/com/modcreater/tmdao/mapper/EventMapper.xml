@@ -4,7 +4,7 @@
 
     <sql id="Base_Column_List">
         eventId,userId,eventName,startTime,endTime,address,level,flag,
-        remarks,person,repeatTime,isOverdue,remindTime,day,month,year,type
+        remarks,person,repeatTime,isOverdue,remindTime,day,month,year,type,isloop
     </sql>
 
     <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
@@ -600,7 +600,7 @@
         and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1 and flag = 1
     </select>
     <select id="queryClashLoopEventList" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select repeatTime , startTime , endTime from singleevent where userId = #{userid} and isOverdue = 0 and isLoop = 1
+        select repeatTime , startTime , endTime,eventId from singleevent where userId = #{userid} and isOverdue = 0 and isLoop = 1
     </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent

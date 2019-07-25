@@ -86,7 +86,7 @@ public class EventServiceImpl implements EventService {
     private EventUtil eventUtil;
 
     @Override
-    public Dto addNewEvents(UploadingEventVo uploadingEventVo, String token) {
+    public synchronized Dto addNewEvents(UploadingEventVo uploadingEventVo, String token) {
         if (!StringUtils.hasText(uploadingEventVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
@@ -109,10 +109,10 @@ public class EventServiceImpl implements EventService {
         if (singleEvent.getIsLoop() == 1) {
             List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
             if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
-                return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
+                return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
             }
         } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
-            return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
+            return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
         }
         //记录操作时间
         if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
@@ -149,7 +149,7 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public Dto updateEvents(UpdateEventVo updateEventVo, String token) {
+    public synchronized Dto updateEvents(UpdateEventVo updateEventVo, String token) {
         if (!StringUtils.hasText(updateEventVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
@@ -164,9 +164,16 @@ public class EventServiceImpl implements EventService {
         }
         SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
         singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
+        //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+        singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
         SingleEvent result = eventMapper.querySingleEventTime(singleEvent);
         if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
-            if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+            if (singleEvent.getIsLoop() == 1) {
+                List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+                if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                    return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
+                }
+            } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
                 return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
             }
         }
@@ -246,7 +253,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto firstUplEvent(SynchronousUpdateVo synchronousUpdateVo, String token) {
+    public synchronized Dto firstUplEvent(SynchronousUpdateVo synchronousUpdateVo, String token) {
         if (ObjectUtils.isEmpty(synchronousUpdateVo)) {
             return DtoUtil.getFalseDto("同步数据未获取到", 26001);
         }
@@ -325,7 +332,7 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto uplDraft(DraftVo draftVo, String token) {
+    public synchronized Dto uplDraft(DraftVo draftVo, String token) {
         if (ObjectUtils.isEmpty(draftVo)) {
             return DtoUtil.getFalseDto("上传草稿未获取到", 27001);
         }
@@ -402,7 +409,7 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto updDraft(AddInviteEventVo addInviteEventVo, String token) {
+    public synchronized Dto updDraft(AddInviteEventVo addInviteEventVo, String token) {
         if (ObjectUtils.isEmpty(addInviteEventVo)) {
             return DtoUtil.getFalseDto("修改草稿未获取到", 27001);
         }
@@ -713,17 +720,22 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto addInviteEvent(AddInviteEventVo addInviteEventVo, String token) {
+    public synchronized Dto addInviteEvent(AddInviteEventVo addInviteEventVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
                 return DtoUtil.getFalseDto("请重新登录", 21014);
             }
             SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
             singleEvent.setUserid(Long.parseLong(addInviteEventVo.getUserId()));
-            List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleEvent);
-            //如果有冲突反馈给该用户
-            if (singleEvents.size() > 0) {
-                return DtoUtil.getFalseDto("当前时间段已有事件", 21016);
+            //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+            singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
+            if (singleEvent.getIsLoop() == 1) {
+                List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+                if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                    return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
+                }
+            } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+                return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
             }
             logger.info("参与人员：" + singleEvent.getPerson());
             EventPersons eventPersons = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
@@ -834,10 +846,14 @@ public class EventServiceImpl implements EventService {
             if (YES.equals(feedbackInviteVo.getChoose())) {
                 //修改事件userId
                 singleEvent.setUserid(Long.parseLong(feedbackInviteVo.getUserId()));
-                List<SingleEvent> list = eventUtil.eventClashUtil(singleEvent);
-                //判断时间冲突
-                if (list.size() > 0) {
-                    return DtoUtil.getFalseDto("当前时间段已有事件，不能加入", 21035);
+                //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+                if (singleEvent.getIsLoop() == 1) {
+                    List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+                    if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                        return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
+                    }
+                } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+                    return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
                 }
                 //修改其他参与者的该事件
                 eventUtil.updateInviterEvent(singleEvent2, feedbackInviteVo.getUserId());
@@ -904,7 +920,7 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto updInviteEvent(AddInviteEventVo addInviteEventVo, String token) {
+    public synchronized Dto updInviteEvent(AddInviteEventVo addInviteEventVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
                 return DtoUtil.getFalseDto("请重新登录", 21014);
@@ -912,10 +928,15 @@ public class EventServiceImpl implements EventService {
             logger.info("修改一条邀请事件时输出的接收数据" + addInviteEventVo.toString());
             //接收到的修改信息
             SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
-            List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleEvent);
-            //如果有冲突反馈给该用户
-            if (singleEvents.size() > 0) {
-                return DtoUtil.getFalseDto("当前时间段已有事件", 21016);
+            //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+            singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
+            if (singleEvent.getIsLoop() == 1) {
+                List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+                if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                    return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
+                }
+            } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+                return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
             }
             //找到事件创建者
             SingleEventVice singleEventVice = new SingleEventVice();
@@ -971,6 +992,8 @@ public class EventServiceImpl implements EventService {
                 }
                 if (different.size() > 0) {
                     //把要修改的事件放到临时表
+                    //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+                    singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
                     tempEventMapper.addTempEvent(singleEvent);
                     //生成统计表
                     List<StatisticsTable> tables = new ArrayList<>();
@@ -1019,6 +1042,8 @@ public class EventServiceImpl implements EventService {
                 singleEvent.setUserid(singleEventVice.getCreateBy());
                 SingleEvent singleEvent1 = eventMapper.queryEventOne(singleEventVice.getCreateBy().toString(), singleEvent.getEventid().toString());
                 singleEvent.setPerson(singleEvent1.getPerson());
+                //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+                singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
                 tempEventMapper.addTempEvent(singleEvent);
                 //如果只邀请了一个人,直接给创建者发消息
                 logger.info("修改一条邀请事件时的参与者：" + eventPersons.toString());
@@ -1099,7 +1124,7 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto feedbackEventInvite(FeedbackEventInviteVo feedbackEventInviteVo, String token) {
+    public synchronized Dto feedbackEventInvite(FeedbackEventInviteVo feedbackEventInviteVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(feedbackEventInviteVo.getUserId()))) {
                 return DtoUtil.getFalseDto("请重新登录", 21014);
@@ -1124,10 +1149,13 @@ public class EventServiceImpl implements EventService {
             if (YES.equals(feedbackEventInviteVo.getChoose())) {
                 //判断事件冲突
                 singleEvent.setUserid(Long.parseLong(feedbackEventInviteVo.getUserId()));
-                List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleEvent);
-                //如果有冲突反馈给该用户
-                if (singleEvents.size() > 0) {
-                    return DtoUtil.getFalseDto("当前时间段已有事件，不能被修改", 21016);
+                if (singleEvent.getIsLoop() == 1) {
+                    List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+                    if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                        return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
+                    }
+                } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+                    return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
                 }
                 //修改统计表
                 StatisticsTable statisticsTable = new StatisticsTable();
@@ -1144,6 +1172,7 @@ public class EventServiceImpl implements EventService {
                 syh.setEventId(Long.parseLong(feedbackEventInviteVo.getEventId()));
                 syh.setReceiverId(Long.parseLong(feedbackEventInviteVo.getUserId()));
                 syh.setStatus(1);
+                syh.setIsSucceed(-1);
                 synchronHistoryMapper.updSynchronHistory(syh);
                 //查询统计表同意者是否达到50%（如果发起修改的人是创建者达到50%直接修改——修改后记得删除临时表和统计表）
                 Map<String, Long> map = statisticsMapper.queryFeedbackStatistics(vice.getCreateBy().toString(), singleEvent.getEventid().toString());
@@ -1201,6 +1230,7 @@ public class EventServiceImpl implements EventService {
                 syh.setEventId(Long.parseLong(feedbackEventInviteVo.getEventId()));
                 syh.setReceiverId(Long.parseLong(feedbackEventInviteVo.getUserId()));
                 syh.setStatus(0);
+                syh.setIsSucceed(-1);
                 synchronHistoryMapper.updSynchronHistory(syh);
                 //查询统计表拒绝者是否超过50%，则修改失败
                 Map<String, Long> map = statisticsMapper.queryFeedbackStatistics(vice.getCreateBy().toString(), singleEvent.getEventid().toString());
@@ -1242,7 +1272,7 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto eventCreatorChoose(EventCreatorChooseVo eventCreatorChooseVo, String token) {
+    public synchronized Dto eventCreatorChoose(EventCreatorChooseVo eventCreatorChooseVo, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(eventCreatorChooseVo.getUserId()))) {
                 return DtoUtil.getFalseDto("请重新登录", 21014);
@@ -1267,14 +1297,28 @@ public class EventServiceImpl implements EventService {
             if (YES.equals(eventCreatorChooseVo.getChoose())) {
                 list.add(eventCreatorChooseVo.getUserId());
                 //查询创建者时间冲突
-                List<SingleEvent> singleEventList = eventUtil.eventClashUtil(singleEvent);
+                List<SingleEvent> singleEventList = new ArrayList<>();
+                if (singleEvent.getIsLoop() == 1) {
+                    List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+                    if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                        singleEventList.addAll(loopEventList);
+                    }
+                } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+                    singleEventList.addAll(new ArrayList<>());
+                }
                 EventPersons eventPersons = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
                 for (String inviterId : eventPersons.getFriendsId().split(",")) {
                     list.add(inviterId);
                     //查询参与者时间冲突
                     singleEvent.setUserid(Long.valueOf(inviterId));
-                    List<SingleEvent> singleEvents = eventUtil.eventClashUtil(singleEvent);
-                    singleEventList.addAll(singleEvents);
+                    if (singleEvent.getIsLoop() == 1) {
+                        List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+                        if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                            singleEventList.addAll(loopEventList);
+                        }
+                    } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+                        singleEventList.addAll(new ArrayList<>());
+                    }
                 }
                 if (singleEventList.size() > 0) {
                     return DtoUtil.getFalseDto("该事件与你的或者其他成员的事件时间段冲突，不能修改", 21016);
@@ -1295,6 +1339,7 @@ public class EventServiceImpl implements EventService {
                 syh.setCreaterId(Long.parseLong(eventCreatorChooseVo.getUserId()));
                 syh.setEventId(Long.parseLong(eventCreatorChooseVo.getEventId()));
                 syh.setIsSucceed(1);
+                syh.setStatus(-1);
                 synchronHistoryMapper.updSynchronHistory(syh);
                 //通知所有人事件修改成功
                 RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
@@ -1352,7 +1397,7 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto delInviteEvent(ReceivedSearchOnce receivedSearchOnce, String token) {
+    public synchronized Dto delInviteEvent(ReceivedSearchOnce receivedSearchOnce, String token) {
         try {
             if (!token.equals(stringRedisTemplate.opsForValue().get(receivedSearchOnce.getUserId()))) {
                 return DtoUtil.getFalseDto("请重新登录", 21014);
@@ -1810,12 +1855,22 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto draftToSingleEvent(DraftToEventVo draftToEventVo, String token) {
+    public synchronized Dto draftToSingleEvent(DraftToEventVo draftToEventVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(draftToEventVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //解析草稿数据
         SingleEvent singleEvent = JSONObject.parseObject(draftToEventVo.getDraft(), SingleEvent.class);
+        //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+        singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
+        if (singleEvent.getIsLoop() == 1) {
+            List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+            if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                return DtoUtil.getFalseDto("时间段冲突,无法上传", 21012);
+            }
+        } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+            return DtoUtil.getFalseDto("时间段冲突,无法上传", 21012);
+        }
         //添加至事件表
         if (eventMapper.uploadingEvents(singleEvent) <= 0) {
             return DtoUtil.getFalseDto("保存失败", 21111);
@@ -1838,12 +1893,22 @@ public class EventServiceImpl implements EventService {
      * @return
      */
     @Override
-    public Dto draftToInviteEvent(DraftToEventVo draftToEventVo, String token) {
+    public synchronized Dto draftToInviteEvent(DraftToEventVo draftToEventVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(draftToEventVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //解析草稿数据
         SingleEvent singleEvent = JSONObject.parseObject(draftToEventVo.getDraft(), SingleEvent.class);
+        //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+        singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
+        if (singleEvent.getIsLoop() == 1) {
+            List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+            if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                return DtoUtil.getFalseDto("时间段冲突,无法上传", 21012);
+            }
+        } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+            return DtoUtil.getFalseDto("时间段冲突,无法上传", 21012);
+        }
         EventPersons eventPersons = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
         String friendsId = eventPersons.getFriendsId();
         //添加至事件表

@@ -92,29 +92,6 @@ public class SingleEvent implements Serializable {
 
     }
 
-    @Override
-    public String toString() {
-        return "SingleEvent{" +
-                "userid=" + userid +
-                ", eventid=" + eventid +
-                ", eventname='" + eventname + '\'' +
-                ", starttime='" + starttime + '\'' +
-                ", endtime='" + endtime + '\'' +
-                ", address='" + address + '\'' +
-                ", level=" + level +
-                ", flag=" + flag +
-                ", person='" + person + '\'' +
-                ", remarks='" + remarks + '\'' +
-                ", repeaTtime='" + repeaTtime + '\'' +
-                ", isOverdue=" + isOverdue +
-                ", remindTime='" + remindTime + '\'' +
-                ", year=" + year +
-                ", month=" + month +
-                ", day=" + day +
-                ", type=" + type +
-                '}';
-    }
-
     //将对象中的属性存入集合作比较
     public static Map<String,String> toMap(SingleEvent singleEvent){
         Map<String,String> map=new TreeMap<>();

@@ -220,112 +220,112 @@ public class SingleEventUtil {
      *
      * @return
      */
-    public static List<Map<String,String>> eventDifferent(Map<String, String> newMap, Map<String, String> oldMap) {
+    public static List<Map<String, String>> eventDifferent(Map<String, String> newMap, Map<String, String> oldMap) {
         //比较差异
-        List<Map<String,String>> different = new ArrayList<>();
+        List<Map<String, String>> different = new ArrayList<>();
 
         for (String key : newMap.keySet()) {
-            Map<String,String> map=new HashMap<>();
+            Map<String, String> map = new HashMap<>();
             if (!newMap.get(key).equals(oldMap.get(key))) {
-                if (("a").equals(key)){
-                    map.put("title","名称更改为：");
-                    map.put("content",newMap.get(key));
-                }else if (("b").equals(key)) {
-                    map.put("title","开始时间更改为：");
-                    String h=Long.parseLong(newMap.get(key)) / 60+"";
-                    String m=Long.parseLong(newMap.get(key)) % 60+"";
-                    if (h.length()==1){
-                        h="0"+h;
+                if (("a").equals(key)) {
+                    map.put("title", "名称更改为：");
+                    map.put("content", newMap.get(key));
+                } else if (("b").equals(key)) {
+                    map.put("title", "开始时间更改为：");
+                    String h = Long.parseLong(newMap.get(key)) / 60 + "";
+                    String m = Long.parseLong(newMap.get(key)) % 60 + "";
+                    if (h.length() == 1) {
+                        h = "0" + h;
                     }
-                    if (m.length()==1){
-                        m="0"+m;
+                    if (m.length() == 1) {
+                        m = "0" + m;
                     }
-                    map.put("content",h +":"+ m);
+                    map.put("content", h + ":" + m);
                 } else if (("c").equals(key)) {
-                    map.put("title","结束时间更改为：");
-                    String h=Long.parseLong(newMap.get(key)) / 60+"";
-                    String m=Long.parseLong(newMap.get(key)) % 60+"";
-                    if (h.length()==1){
-                        h="0"+h;
+                    map.put("title", "结束时间更改为：");
+                    String h = Long.parseLong(newMap.get(key)) / 60 + "";
+                    String m = Long.parseLong(newMap.get(key)) % 60 + "";
+                    if (h.length() == 1) {
+                        h = "0" + h;
                     }
-                    if (m.length()==1){
-                        m="0"+m;
+                    if (m.length() == 1) {
+                        m = "0" + m;
                     }
-                    map.put("content",h +":"+ m);
+                    map.put("content", h + ":" + m);
                 } else if (("d").equals(key)) {
-                    map.put("title","优先级更改为：");
+                    map.put("title", "优先级更改为：");
                     //2：不紧迫也不重要；3：紧迫但不重要；4：重要又不紧迫；5：重要又紧迫
                     if ("2".equals(newMap.get(key))) {
-                        map.put("content","不紧迫也不重要");
+                        map.put("content", "不紧迫也不重要");
                     } else if ("3".equals(newMap.get(key))) {
-                        map.put("content","紧迫但不重要");
+                        map.put("content", "紧迫但不重要");
                     } else if ("4".equals(newMap.get(key))) {
-                        map.put("content","重要又不紧迫");
+                        map.put("content", "重要又不紧迫");
                     } else if ("5".equals(newMap.get(key))) {
-                        map.put("content","重要又紧迫");
+                        map.put("content", "重要又紧迫");
                     }
                 } else if (("e").equals(key)) {
-                    map.put("title","重复时间更改为：");
+                    map.put("title", "重复时间更改为：");
                     String[] arr = newMap.get(key).replace("[", "").replace("]", "").split(",");
                     StringBuffer stringBuffer = new StringBuffer();
-                    String week="";
+                    String week = "";
                     for (int i = 0; i < arr.length; i++) {
                         if ("true".equals(arr[i])) {
-                            if (i==0){
-                                week="日";
-                            }else if (i==1){
-                                week="一";
-                            }else if (i==2){
-                                week="二";
-                            }else if (i==3){
-                                week="三";
-                            }else if (i==4){
-                                week="四";
-                            }else if (i==5){
-                                week="五";
-                            }else if (i==6){
-                                week="六";
+                            if (i == 0) {
+                                week = "日";
+                            } else if (i == 1) {
+                                week = "一";
+                            } else if (i == 2) {
+                                week = "二";
+                            } else if (i == 3) {
+                                week = "三";
+                            } else if (i == 4) {
+                                week = "四";
+                            } else if (i == 5) {
+                                week = "五";
+                            } else if (i == 6) {
+                                week = "六";
                             }
                             stringBuffer.append(week + "、");
                         }
                     }
                     if (ObjectUtils.isEmpty(stringBuffer)) {
-                        map.put("content","不重复事件");
+                        map.put("content", "不重复事件");
                     } else {
-                        map.put("content","每周" + stringBuffer.replace(stringBuffer.length() - 1, stringBuffer.length(), "") + "重复");
+                        map.put("content", "每周" + stringBuffer.replace(stringBuffer.length() - 1, stringBuffer.length(), "") + "重复");
                     }
                 } else if (("f").equals(key)) {
-                    map.put("title","提醒时间更改为：");
-                    map.put("content","事件开始前" + newMap.get(key) + "分钟");
+                    map.put("title", "提醒时间更改为：");
+                    map.put("content", "事件开始前" + newMap.get(key) + "分钟");
                 } else if (("g").equals(key) || ("h").equals(key) || ("i").equals(key)) {
-                    map.put("title","日期更改为：");
-                    map.put("content",newMap.get("年") + "年"+newMap.get("月") + "月"+newMap.get("日") + "日");
-                }  else if (("j").equals(key)) {
-                    map.put("title","类型更改为：");
+                    map.put("title", "日期更改为：");
+                    map.put("content", newMap.get("年") + "年" + newMap.get("月") + "月" + newMap.get("日") + "日");
+                } else if (("j").equals(key)) {
+                    map.put("title", "类型更改为：");
                     //0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他
                     if ("0".equals(newMap.get(key))) {
-                        map.put("content","学习");
+                        map.put("content", "学习");
                     } else if ("1".equals(newMap.get(key))) {
-                        map.put("content","工作");
+                        map.put("content", "工作");
                     } else if ("2".equals(newMap.get(key))) {
-                        map.put("content","商务");
+                        map.put("content", "商务");
                     } else if ("3".equals(newMap.get(key))) {
-                        map.put("content","休闲");
+                        map.put("content", "休闲");
                     } else if ("4".equals(newMap.get(key))) {
-                        map.put("content","家庭");
+                        map.put("content", "家庭");
                     } else if ("5".equals(newMap.get(key))) {
-                        map.put("content","节日");
+                        map.put("content", "节日");
                     } else if ("6".equals(newMap.get(key))) {
-                        map.put("content","假期");
+                        map.put("content", "假期");
                     } else if ("7".equals(newMap.get(key))) {
-                        map.put("content","其他");
+                        map.put("content", "其他");
                     }
-                }else if (("k").equals(key)){
-                    map.put("title","地址更改为：");
-                    map.put("content",newMap.get(key));
-                }else if (("l").equals(key)){
+                } else if (("k").equals(key)) {
+                    map.put("title", "地址更改为：");
+                    map.put("content", newMap.get(key));
+                } else if (("l").equals(key)) {
                     map.put("title", "备注更改为：");
-                    map.put("content",newMap.get(key));
+                    map.put("content", newMap.get(key));
                 }
                 different.add(map);
             }
@@ -358,22 +358,24 @@ public class SingleEventUtil {
         return true;
     }
 
-    public static boolean loopEventTime(List<SingleEvent> singleEventList, SingleEvent loopEvent){
+    public static boolean loopEventTime(List<SingleEvent> singleEventList, SingleEvent loopEvent) {
         if (singleEventList.size() == 0) {
             return true;
         }
-        for (SingleEvent singleEvent :  singleEventList){
-            Boolean[] rep = getRepeatTime(singleEvent);
-            Boolean[] repLoop = getRepeatTime(loopEvent);
-            for (int i = 0; i <= 6; i++){
-                if (rep[i] && repLoop[i]){
-                    boolean res = ((Long.valueOf(singleEvent.getStarttime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) < Long.valueOf(loopEvent.getEndtime()))
-                            || (Long.valueOf(singleEvent.getStarttime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getStarttime()) < Long.valueOf(loopEvent.getEndtime()))
-                            || (Long.valueOf(singleEvent.getEndtime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) < Long.valueOf(loopEvent.getEndtime()))
-                            || (Long.valueOf(singleEvent.getStarttime()) <= Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) >= Long.valueOf(loopEvent.getEndtime())));
-                    if (res) {
-                        //冲突了,返回false
-                        return false;
+        for (SingleEvent singleEvent : singleEventList) {
+            if (singleEvent.getEventid() != null && singleEvent.getEventid().equals(loopEvent.getUserid())) {
+                Boolean[] rep = getRepeatTime(singleEvent);
+                Boolean[] repLoop = getRepeatTime(loopEvent);
+                for (int i = 0; i <= 6; i++) {
+                    if (rep[i] && repLoop[i]) {
+                        boolean res = ((Long.valueOf(singleEvent.getStarttime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) < Long.valueOf(loopEvent.getEndtime()))
+                                || (Long.valueOf(singleEvent.getStarttime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getStarttime()) < Long.valueOf(loopEvent.getEndtime()))
+                                || (Long.valueOf(singleEvent.getEndtime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) < Long.valueOf(loopEvent.getEndtime()))
+                                || (Long.valueOf(singleEvent.getStarttime()) <= Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) >= Long.valueOf(loopEvent.getEndtime())));
+                        if (res) {
+                            //冲突了,返回false
+                            return false;
+                        }
                     }
                 }
             }

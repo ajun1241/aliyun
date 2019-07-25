@@ -7,25 +7,23 @@
 
     <update id="updSynchronHistory">
         update synchronhistory
-        <if test="status >= 0 ">
-            <set>
+        <set>
+            <if test="status >= 0 ">
                 status = #{status},
-            </set>
-        </if>
-        <if test="isSucceed >= 0 ">
-            <set>
+            </if>
+            <if test="isSucceed >= 0 ">
                 isSucceed = #{isSucceed},
-            </set>
-        </if>
-        where createrId={createrId}  and eventId={eventId}
+            </if>
+        </set>
+        where createrId=#{createrId}  and eventId=#{eventId}
         <if test="receiverId>0">
             and receiverId=#{receiverId}
         </if>
-        and createDate=(select Max(createDate) from synchronHistory where createrId={createrId} and eventId={eventId}
+        and createDate=(select a.* from (select Max(createDate) from synchronHistory where createrId=#{createrId} and eventId=#{eventId}
         <if test="receiverId>0">
             and receiverId=#{receiverId}
         </if>
-        );
+        ) as a);
     </update>
     <select id="countSucceedSynchronHistory" resultType="java.lang.Long">
         select count(1) num from (select COUNT(id) num from synchronhistory where senderId = #{userId} and isSucceed = 1 GROUP BY createDate) as sss
