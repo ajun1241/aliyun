@@ -368,11 +368,7 @@ public class SingleEventUtil {
                 Boolean[] repLoop = getRepeatTime(loopEvent);
                 for (int i = 0; i <= 6; i++) {
                     if (rep[i] && repLoop[i]) {
-                        boolean res = ((Long.valueOf(singleEvent.getStarttime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) < Long.valueOf(loopEvent.getEndtime()))
-                                || (Long.valueOf(singleEvent.getStarttime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getStarttime()) < Long.valueOf(loopEvent.getEndtime()))
-                                || (Long.valueOf(singleEvent.getEndtime()) > Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) < Long.valueOf(loopEvent.getEndtime()))
-                                || (Long.valueOf(singleEvent.getStarttime()) <= Long.valueOf(loopEvent.getStarttime()) && Long.valueOf(singleEvent.getEndtime()) >= Long.valueOf(loopEvent.getEndtime())));
-                        if (res) {
+                        if (getClashTime(singleEvent.getStarttime(),singleEvent.getEndtime(),loopEvent.getStarttime(),loopEvent.getEndtime())) {
                             //冲突了,返回false
                             return false;
                         }
@@ -381,5 +377,20 @@ public class SingleEventUtil {
             }
         }
         return true;
+    }
+
+    /**
+     * 返回true是冲突
+     * @param foreachEventS
+     * @param foreachEventE
+     * @param singleEventS
+     * @param singleEventE
+     * @return
+     */
+    public static boolean getClashTime(String foreachEventS,String foreachEventE, String singleEventS, String singleEventE){
+        return ((Long.valueOf(foreachEventS) > Long.valueOf(singleEventS) && Long.valueOf(foreachEventE) < Long.valueOf(singleEventE))
+                || (Long.valueOf(foreachEventS) > Long.valueOf(singleEventS) && Long.valueOf(foreachEventS) < Long.valueOf(singleEventE))
+                || (Long.valueOf(foreachEventE) > Long.valueOf(singleEventS) && Long.valueOf(foreachEventE) < Long.valueOf(singleEventE))
+                || (Long.valueOf(foreachEventS) <= Long.valueOf(singleEventS) && Long.valueOf(foreachEventE) >= Long.valueOf(singleEventE)));
     }
 }

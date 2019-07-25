@@ -587,8 +587,7 @@ public class EventServiceImpl implements EventService {
             if (singleEvent1.getFlag() == 5) {
                 for (Iterator<ShowSingleEvent> iterator = loopEventList.get(week).iterator(); iterator.hasNext(); ) {
                     ShowSingleEvent showSingleEvent = iterator.next();
-                    if (Long.valueOf(singleEvent1.getStarttime()).equals(Long.valueOf(showSingleEvent.getStarttime()))
-                            && Long.valueOf(singleEvent1.getEndtime()).equals(Long.valueOf(showSingleEvent.getEndtime()))) {
+                    if (SingleEventUtil.getClashTime(singleEvent1.getStarttime(),singleEvent1.getEndtime(),showSingleEvent.getStarttime(),showSingleEvent.getEndtime())) {
                         iterator.remove();
                     }
                 }
