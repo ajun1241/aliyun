@@ -658,18 +658,13 @@ public class EventServiceImpl implements EventService {
                 }
             }
         }
-        List<DayEvents> dayEventsList1 = new ArrayList<>();
-        for (int i = 0; i <= 6; i++){
-            dayEventsList1.add(null);
-        }
         for (DayEvents dayEvents : dayEventsList){
             int week = DateUtil.stringToWeek(dayEvents.getDayEventId().toString());
             week = week == 7 ? 0 : week;
-            dayEventsList1.add(week,dayEvents);
+            dayEventsList.set(week,dayEvents);
         }
-
         result.put("loopEventList", loopEventList);
-        result.put("dayEventsList", dayEventsList1);
+        result.put("dayEventsList", dayEventsList);
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 
