@@ -584,23 +584,7 @@ public class EventServiceImpl implements EventService {
         if ((dayEventsList.size() + loopEventList.size()) == 0) {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
-        ArrayList<ShowSingleEvent> singleEventList = dayEventsList.get(0).getMySingleEventList();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
-        calendar.get(Calendar.DAY_OF_WEEK);
-        week = week == 7 ? 0 : week;
-
-        for (Iterator<ShowSingleEvent> iterator = singleEventList.iterator(); iterator.hasNext();){
-            ShowSingleEvent singleEvent1 = iterator.next();
-            for (ShowSingleEvent showSingleEvent : loopEventList.get(week)){
-                if (singleEvent1.getFlag() == 5){
-                    if (SingleEventUtil.getClashTime(singleEvent1.getStarttime(),singleEvent1.getEndtime(),showSingleEvent.getStarttime(),showSingleEvent.getEndtime())) {
-                        iterator.remove();
-                    }
-                }
-            }
-        }
+        removeFlag5ClashSingleEvent(dayEventsList,loopEventList,searchEventVo.getDayEventId());
         Map<String, Object> result = new HashMap<>(2);
         result.put("dayEventsList", dayEventsList);
         result.put("loopEventList", loopEventList);
@@ -657,6 +641,9 @@ public class EventServiceImpl implements EventService {
         if ((dayEventsList.size() + loopEventList.size()) == 0) {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
+
+        removeFlag5ClashSingleEvent(dayEventsList,loopEventList,searchEventVo.getDayEventId());
+
         result.put("loopEventList", loopEventList);
         result.put("dayEventsList", dayEventsList);
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
@@ -2025,5 +2012,32 @@ public class EventServiceImpl implements EventService {
             }
         }
         return singleEventList;
+    }
+
+    /**
+     * 如果普通事件集合中有flag为5的事件,
+     * 并且该事件与该事件的父事件(重复事件)产生时间冲突,
+     * 则将该子事件从普通事件集合中移除
+     * @param dayEventsList
+     * @param loopEventList
+     * @param dayEventId
+     */
+    private void removeFlag5ClashSingleEvent(List<DayEvents> dayEventsList,List<List<ShowSingleEvent>> loopEventList,String dayEventId){
+        ArrayList<ShowSingleEvent> singleEventList = dayEventsList.get(0).getMySingleEventList();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        int week = DateUtil.stringToWeek(dayEventId);
+        calendar.get(Calendar.DAY_OF_WEEK);
+        week = week == 7 ? 0 : week;
+        for (Iterator<ShowSingleEvent> iterator = singleEventList.iterator(); iterator.hasNext();){
+            ShowSingleEvent singleEvent1 = iterator.next();
+            for (ShowSingleEvent showSingleEvent : loopEventList.get(week)){
+                if (singleEvent1.getFlag() == 5){
+                    if (SingleEventUtil.getClashTime(singleEvent1.getStarttime(),singleEvent1.getEndtime(),showSingleEvent.getStarttime(),showSingleEvent.getEndtime())) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
     }
 }
