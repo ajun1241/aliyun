@@ -534,7 +534,14 @@ public class EventServiceImpl implements EventService {
             if (singleEventList.size() == 0) {
                 continue;
             }
-            ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(singleEventList);
+            ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(completedLoopEvent(singleEventList));
+            Iterator<ShowSingleEvent> iterator = showSingleEventList.iterator();
+            while (iterator.hasNext()){
+                ShowSingleEvent showSingleEvent  = iterator.next();
+                if (showSingleEvent.getFlag() == 5){
+                    iterator.remove();
+                }
+            }
             DayEvents<ShowSingleEvent> dayEvents = new DayEvents<>();
             dayEvents.setUserId(singleEvent.getUserid());
             dayEvents.setTotalNum((long) singleEventList.size());
@@ -833,6 +840,9 @@ public class EventServiceImpl implements EventService {
                 msgStatusMapper.updateMsgStatus("3", feedbackInviteVo.getMsgId());
                 return DtoUtil.getFalseDto("该事件已过期或者已被删除", 21034);
             }
+            if (singleEvent.getPerson().indexOf(feedbackInviteVo.getUserId())>=0){
+                return DtoUtil.getFalseDto("已经加入了",20199);
+            }
             if (!ObjectUtils.isEmpty(tempEventMapper.queryTempEvent(singleEvent.getEventid().toString(), singleEvent.getUserid().toString()))) {
                 return DtoUtil.getFalseDto("该事件正在修改中，不能加入", 2333);
             }
@@ -1025,7 +1035,7 @@ public class EventServiceImpl implements EventService {
                         }
                         UpdateInviteMessage updateInviteMessage = new UpdateInviteMessage(singleEvent.getEventid().toString(), singleEventOld.getEventname(), String.valueOf(different.size()), singleEventOld.getType().toString(), different, msgStatus.getId().toString(), "1");
 //                        logger.info(updateInviteMessage.toString());
-                        ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), new String[]{friendId}, 0, updateInviteMessage);
+                        ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(SYSTEMID, new String[]{friendId}, 0, updateInviteMessage);
                         if (result.getCode() != 200) {
                             logger.info("修改一条邀请事件时融云消息异常" + result.toString());
                             return DtoUtil.getFalseDto("消息发送失败", 21040);
@@ -1099,7 +1109,7 @@ public class EventServiceImpl implements EventService {
                             }
                             UpdateInviteMessage updateInviteMessage = new UpdateInviteMessage(singleEvent.getEventid().toString(), singleEventOld.getEventname(), String.valueOf(different.size()), singleEventOld.getType().toString(), different, msgStatus.getId().toString(), "1");
                             logger.info(updateInviteMessage.toString());
-                            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), new String[]{friendId}, 0, updateInviteMessage);
+                            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(SYSTEMID, new String[]{friendId}, 0, updateInviteMessage);
                             if (result.getCode() != 200) {
                                 logger.info("修改一条邀请事件时融云消息异常" + result.toString());
                                 return DtoUtil.getFalseDto("消息发送失败", 21040);
