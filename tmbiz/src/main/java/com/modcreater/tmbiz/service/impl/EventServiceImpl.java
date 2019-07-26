@@ -645,8 +645,8 @@ public class EventServiceImpl implements EventService {
         removeFlag5ClashSingleEvent(dayEventsList,loopEventList,searchEventVo.getDayEventId());
 
         for (int i = 0; i <= 6; i++){
-            ArrayList<ShowSingleEvent> showSingleEvents = dayEventsList.get(0).getMySingleEventList();
-            int week = DateUtil.stringToWeek(dayEventsList.get(0).getDayEventId().toString());
+            ArrayList<ShowSingleEvent> showSingleEvents = dayEventsList.get(i).getMySingleEventList();
+            int week = DateUtil.stringToWeek(dayEventsList.get(i).getDayEventId().toString());
             week = week == 7 ? 0 : week;
             for (ShowSingleEvent singleEvent : showSingleEvents){
                 Iterator<ShowSingleEvent> iterator = loopEventList.get(week).iterator();
@@ -658,11 +658,15 @@ public class EventServiceImpl implements EventService {
                 }
             }
         }
-
-
+        List<DayEvents> dayEventsList1 = new ArrayList<>(7);
+        for (DayEvents dayEvents : dayEventsList){
+            int week = DateUtil.stringToWeek(dayEvents.getDayEventId().toString());
+            week = week == 7 ? 0 : week;
+            dayEventsList1.add(week,dayEvents);
+        }
 
         result.put("loopEventList", loopEventList);
-        result.put("dayEventsList", dayEventsList);
+        result.put("dayEventsList", dayEventsList1);
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 
@@ -2058,3 +2062,4 @@ public class EventServiceImpl implements EventService {
         }
     }
 }
+
