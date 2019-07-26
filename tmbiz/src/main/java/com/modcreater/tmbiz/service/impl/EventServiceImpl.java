@@ -644,6 +644,23 @@ public class EventServiceImpl implements EventService {
 
         removeFlag5ClashSingleEvent(dayEventsList,loopEventList,searchEventVo.getDayEventId());
 
+        for (int i = 0; i <= 6; i++){
+            ArrayList<ShowSingleEvent> showSingleEvents = dayEventsList.get(0).getMySingleEventList();
+            int week = DateUtil.stringToWeek(dayEventsList.get(0).getDayEventId().toString());
+            week = week == 7 ? 0 : week;
+            for (ShowSingleEvent singleEvent : showSingleEvents){
+                Iterator<ShowSingleEvent> iterator = loopEventList.get(week).iterator();
+                while (iterator.hasNext()){
+                    ShowSingleEvent loopEvent = iterator.next();
+                    if (SingleEventUtil.getClashTime(singleEvent.getStarttime(),singleEvent.getEndtime(),loopEvent.getStarttime(),loopEvent.getEndtime())){
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+
+
+
         result.put("loopEventList", loopEventList);
         result.put("dayEventsList", dayEventsList);
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
