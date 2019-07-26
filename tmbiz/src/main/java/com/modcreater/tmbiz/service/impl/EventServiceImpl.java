@@ -108,7 +108,7 @@ public class EventServiceImpl implements EventService {
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
         if (singleEvent.getIsLoop() == 1) {
             List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-            if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+            if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                 return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
             }
         } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -170,7 +170,7 @@ public class EventServiceImpl implements EventService {
         if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
             if (singleEvent.getIsLoop() == 1) {
                 List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-                if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                     return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
                 }
             } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -536,9 +536,9 @@ public class EventServiceImpl implements EventService {
             }
             ArrayList<ShowSingleEvent> showSingleEventList = (ArrayList<ShowSingleEvent>) SingleEventUtil.getShowSingleEventList(completedLoopEvent(singleEventList));
             Iterator<ShowSingleEvent> iterator = showSingleEventList.iterator();
-            while (iterator.hasNext()){
-                ShowSingleEvent showSingleEvent  = iterator.next();
-                if (showSingleEvent.getFlag() == 5){
+            while (iterator.hasNext()) {
+                ShowSingleEvent showSingleEvent = iterator.next();
+                if (showSingleEvent.getFlag() == 5) {
                     iterator.remove();
                 }
             }
@@ -584,7 +584,7 @@ public class EventServiceImpl implements EventService {
         if ((dayEventsList.size() + loopEventList.size()) == 0) {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
-        removeFlag5ClashSingleEvent(dayEventsList,loopEventList,searchEventVo.getDayEventId());
+        removeFlag5ClashSingleEvent(dayEventsList, loopEventList, searchEventVo.getDayEventId());
         Map<String, Object> result = new HashMap<>(2);
         result.put("dayEventsList", dayEventsList);
         result.put("loopEventList", loopEventList);
@@ -642,26 +642,27 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
 
-        removeFlag5ClashSingleEvent(dayEventsList,loopEventList,searchEventVo.getDayEventId());
+        removeFlag5ClashSingleEvent(dayEventsList, loopEventList, searchEventVo.getDayEventId());
 
-        for (int i = 0; i <= 6; i++){
+        for (int i = 0; i <= 6; i++) {
             ArrayList<ShowSingleEvent> showSingleEvents = dayEventsList.get(i).getMySingleEventList();
             int week = DateUtil.stringToWeek(dayEventsList.get(i).getDayEventId().toString());
             week = week == 7 ? 0 : week;
-            for (ShowSingleEvent singleEvent : showSingleEvents){
+            for (ShowSingleEvent singleEvent : showSingleEvents) {
                 Iterator<ShowSingleEvent> iterator = loopEventList.get(week).iterator();
-                while (iterator.hasNext()){
+                while (iterator.hasNext()) {
                     ShowSingleEvent loopEvent = iterator.next();
-                    if (SingleEventUtil.getClashTime(singleEvent.getStarttime(),singleEvent.getEndtime(),loopEvent.getStarttime(),loopEvent.getEndtime())){
+                    if (SingleEventUtil.getClashTime(singleEvent.getStarttime(), singleEvent.getEndtime(), loopEvent.getStarttime(), loopEvent.getEndtime())) {
                         iterator.remove();
                     }
                 }
             }
         }
-        for (DayEvents dayEvents : dayEventsList){
+        List<List<ShowSingleEvent>> loopEventList1 = new ArrayList<>();
+        for (DayEvents dayEvents : dayEventsList) {
             int week = DateUtil.stringToWeek(dayEvents.getDayEventId().toString());
             week = week == 7 ? 0 : week;
-            dayEventsList.set(week,dayEvents);
+            loopEventList1.add(loopEventList.get(week));
         }
         result.put("loopEventList", loopEventList);
         result.put("dayEventsList", dayEventsList);
@@ -744,7 +745,7 @@ public class EventServiceImpl implements EventService {
             singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
             if (singleEvent.getIsLoop() == 1) {
                 List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-                if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                     return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
                 }
             } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -847,8 +848,8 @@ public class EventServiceImpl implements EventService {
                 msgStatusMapper.updateMsgStatus("3", feedbackInviteVo.getMsgId());
                 return DtoUtil.getFalseDto("该事件已过期或者已被删除", 21034);
             }
-            if (singleEvent.getPerson().indexOf(feedbackInviteVo.getUserId())>=0){
-                return DtoUtil.getFalseDto("已经加入了",20199);
+            if (singleEvent.getPerson().indexOf(feedbackInviteVo.getUserId()) >= 0) {
+                return DtoUtil.getFalseDto("已经加入了", 20199);
             }
             if (!ObjectUtils.isEmpty(tempEventMapper.queryTempEvent(singleEvent.getEventid().toString(), singleEvent.getUserid().toString()))) {
                 return DtoUtil.getFalseDto("该事件正在修改中，不能加入", 2333);
@@ -865,7 +866,7 @@ public class EventServiceImpl implements EventService {
                 //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
                 if (singleEvent.getIsLoop() == 1) {
                     List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-                    if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                    if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                         return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
                     }
                 } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -948,7 +949,7 @@ public class EventServiceImpl implements EventService {
             singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
             if (singleEvent.getIsLoop() == 1) {
                 List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-                if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                     return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
                 }
             } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -1167,7 +1168,7 @@ public class EventServiceImpl implements EventService {
                 singleEvent.setUserid(Long.parseLong(feedbackEventInviteVo.getUserId()));
                 if (singleEvent.getIsLoop() == 1) {
                     List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-                    if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                    if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                         return DtoUtil.getFalseDto("时间段冲突,无法修改", 21012);
                     }
                 } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -1316,7 +1317,7 @@ public class EventServiceImpl implements EventService {
                 List<SingleEvent> singleEventList = new ArrayList<>();
                 if (singleEvent.getIsLoop() == 1) {
                     List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-                    if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                    if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                         singleEventList.addAll(loopEventList);
                     }
                 } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -1329,7 +1330,7 @@ public class EventServiceImpl implements EventService {
                     singleEvent.setUserid(Long.valueOf(inviterId));
                     if (singleEvent.getIsLoop() == 1) {
                         List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-                        if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+                        if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                             singleEventList.addAll(loopEventList);
                         }
                     } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -1881,7 +1882,7 @@ public class EventServiceImpl implements EventService {
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
         if (singleEvent.getIsLoop() == 1) {
             List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-            if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+            if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                 return DtoUtil.getFalseDto("时间段冲突,无法上传", 21012);
             }
         } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -1919,7 +1920,7 @@ public class EventServiceImpl implements EventService {
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
         if (singleEvent.getIsLoop() == 1) {
             List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
-            if (!SingleEventUtil.loopEventTime(loopEventList,singleEvent)){
+            if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
                 return DtoUtil.getFalseDto("时间段冲突,无法上传", 21012);
             }
         } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
@@ -2037,22 +2038,23 @@ public class EventServiceImpl implements EventService {
      * 如果普通事件集合中有flag为5的事件,
      * 并且该事件与该事件的父事件(重复事件)产生时间冲突,
      * 则将该子事件从普通事件集合中移除
+     *
      * @param dayEventsList
      * @param loopEventList
      * @param dayEventId
      */
-    private void removeFlag5ClashSingleEvent(List<DayEvents> dayEventsList,List<List<ShowSingleEvent>> loopEventList,String dayEventId){
+    private void removeFlag5ClashSingleEvent(List<DayEvents> dayEventsList, List<List<ShowSingleEvent>> loopEventList, String dayEventId) {
         ArrayList<ShowSingleEvent> singleEventList = dayEventsList.get(0).getMySingleEventList();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         int week = DateUtil.stringToWeek(dayEventId);
         calendar.get(Calendar.DAY_OF_WEEK);
         week = week == 7 ? 0 : week;
-        for (Iterator<ShowSingleEvent> iterator = singleEventList.iterator(); iterator.hasNext();){
+        for (Iterator<ShowSingleEvent> iterator = singleEventList.iterator(); iterator.hasNext(); ) {
             ShowSingleEvent singleEvent1 = iterator.next();
-            for (ShowSingleEvent showSingleEvent : loopEventList.get(week)){
-                if (singleEvent1.getFlag() == 5){
-                    if (SingleEventUtil.getClashTime(singleEvent1.getStarttime(),singleEvent1.getEndtime(),showSingleEvent.getStarttime(),showSingleEvent.getEndtime())) {
+            for (ShowSingleEvent showSingleEvent : loopEventList.get(week)) {
+                if (singleEvent1.getFlag() == 5) {
+                    if (SingleEventUtil.getClashTime(singleEvent1.getStarttime(), singleEvent1.getEndtime(), showSingleEvent.getStarttime(), showSingleEvent.getEndtime())) {
                         iterator.remove();
                     }
                 }
