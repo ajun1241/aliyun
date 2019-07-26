@@ -590,10 +590,11 @@ public class EventServiceImpl implements EventService {
         int week = DateUtil.stringToWeek(searchEventVo.getDayEventId());
         calendar.get(Calendar.DAY_OF_WEEK);
         week = week == 7 ? 0 : week;
-        for (ShowSingleEvent singleEvent1 : singleEventList) {
-            if (singleEvent1.getFlag() == 5) {
-                for (Iterator<ShowSingleEvent> iterator = loopEventList.get(week).iterator(); iterator.hasNext(); ) {
-                    ShowSingleEvent showSingleEvent = iterator.next();
+
+        for (Iterator<ShowSingleEvent> iterator = singleEventList.iterator(); iterator.hasNext();){
+            ShowSingleEvent singleEvent1 = iterator.next();
+            for (ShowSingleEvent showSingleEvent : loopEventList.get(week)){
+                if (iterator.next().getFlag() == 5){
                     if (SingleEventUtil.getClashTime(singleEvent1.getStarttime(),singleEvent1.getEndtime(),showSingleEvent.getStarttime(),showSingleEvent.getEndtime())) {
                         iterator.remove();
                     }
