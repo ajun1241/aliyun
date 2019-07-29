@@ -46,7 +46,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Override
     public Dto updateUserSettings(int status, String userId, String type, String token) {
-        if (StringUtils.isEmpty(userId)){
+        if (!StringUtils.hasText(userId)){
             return DtoUtil.getFalseDto("请先登录",21011);
         }
         if (!StringUtils.hasText(token)){
@@ -65,7 +65,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
     @SuppressWarnings("AlibabaUndefineMagicConstant")
     @Override
     public Dto updateNotAllowed(ReceivedShowFriendList receivedShowFriendList, String token) {
-        if (StringUtils.isEmpty(receivedShowFriendList.getId())){
+        if (!StringUtils.hasText(receivedShowFriendList.getId())){
             return DtoUtil.getFalseDto("请先登录",21011);
         }
         if (!StringUtils.hasText(token)){
@@ -125,7 +125,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Override
     public Dto getUserSettings(String userId, String token) {
-        if (StringUtils.isEmpty(userId)){
+        if (!StringUtils.hasText(userId)){
             return DtoUtil.getFalseDto("请先登录",21011);
         }
         if (!StringUtils.hasText(token)){
