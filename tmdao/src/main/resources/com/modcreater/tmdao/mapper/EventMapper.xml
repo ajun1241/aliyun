@@ -21,7 +21,7 @@
             #{person},
             #{remarks},
             #{repeaTtime},
-            #{isOverdue},
+            0,
             #{remindTime},
             #{day},
             #{month},
@@ -210,7 +210,7 @@
             #{person},
             #{remarks},
             #{repeaTtime},
-            #{isOverdue},
+            0,
             #{remindTime},
             #{day},
             #{month},
@@ -237,7 +237,7 @@
         group by day
     </select>
     <select id="querySingleEventTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select startTime,endTime from singleevent where
+        select startTime,endTime,isOverdue from singleevent where
         userid=#{userid} and eventid = #{eventid}
     </select>
     <!--<where>

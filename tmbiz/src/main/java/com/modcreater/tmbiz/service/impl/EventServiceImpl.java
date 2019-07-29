@@ -167,6 +167,9 @@ public class EventServiceImpl implements EventService {
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
         SingleEvent result = eventMapper.querySingleEventTime(singleEvent);
+        if (result.getIsOverdue() != 0){
+            return DtoUtil.getFalseDto("事件已过期",21023);
+        }
         if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
             if (singleEvent.getIsLoop() == 1) {
                 List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
@@ -664,7 +667,7 @@ public class EventServiceImpl implements EventService {
             week = week == 7 ? 0 : week;
             loopEventList1.add(loopEventList.get(week));
         }
-        result.put("loopEventList", loopEventList);
+        result.put("loopEventList", loopEventList1);
         result.put("dayEventsList", dayEventsList);
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
@@ -843,7 +846,7 @@ public class EventServiceImpl implements EventService {
             }
             //判断事件状态
             SingleEvent singleEvent = eventMapper.queryEventOne(feedbackInviteVo.getFromId(), feedbackInviteVo.getEventId());
-            if (ObjectUtils.isEmpty(singleEvent)) {
+            if (ObjectUtils.isEmpty(singleEvent) && singleEvent.getIsOverdue() != 0) {
                 //更改邀请消息状态
                 msgStatusMapper.updateMsgStatus("3", feedbackInviteVo.getMsgId());
                 return DtoUtil.getFalseDto("该事件已过期或者已被删除", 21034);
@@ -967,6 +970,9 @@ public class EventServiceImpl implements EventService {
             Map<String, String> newMap = SingleEvent.toMap(singleEvent);
             //原来的信息
             SingleEvent singleEventOld = eventMapper.queryEventOne(singleEvent.getUserid().toString(), singleEvent.getEventid().toString());
+            if (singleEventOld.getIsOverdue() != 0){
+                return DtoUtil.getFalseDto("事件已过期",21023);
+            }
             Map<String, String> oldMap = SingleEvent.toMap(singleEventOld);
             //比较差异
             List<Map<String, String>> different = SingleEventUtil.eventDifferent(newMap, oldMap);

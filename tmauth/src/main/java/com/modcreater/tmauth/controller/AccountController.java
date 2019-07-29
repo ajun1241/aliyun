@@ -128,4 +128,16 @@ public class AccountController {
     public Dto replaceDeviceToken(@RequestBody DeviceTokenVo deviceTokenVo, HttpServletRequest request){
         return deviceTokenService.replaceDeviceToken(deviceTokenVo ,request.getHeader("token"));
     }
+
+    @PostMapping("judgefriendship")
+    @ApiOperation("查询是否是好友")
+    public Dto judgeFriendship(@RequestBody FriendshipVo friendshipVo, HttpServletRequest request){
+        return userService.judgeFriendship(friendshipVo ,request.getHeader("token"));
+    }
+
+    @PostMapping("sendverifyfriendmsg")
+    @ApiOperation("发送验证好友消息")
+    public Dto sendVerifyFriendMsg(@RequestBody SendFriendRequestVo requestVo, HttpServletRequest request){
+        return userService.sendVerifyFriendMsg(requestVo ,request.getHeader("token"));
+    }
 }

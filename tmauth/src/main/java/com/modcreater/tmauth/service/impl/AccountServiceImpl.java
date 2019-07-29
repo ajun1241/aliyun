@@ -314,7 +314,7 @@ public class AccountServiceImpl implements AccountService {
      * @return
      */
     @Override
-    public Dto sendFriendRequest(SendFriendRequestVo sendFriendRequestVo, String token) {
+    public synchronized Dto sendFriendRequest(SendFriendRequestVo sendFriendRequestVo, String token) {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -463,7 +463,7 @@ public class AccountServiceImpl implements AccountService {
      * @return
      */
     @Override
-    public Dto sendFriendResponse(FriendshipVo sendFriendResponseVo, String token) {
+    public synchronized Dto sendFriendResponse(FriendshipVo sendFriendResponseVo, String token) {
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -931,4 +931,53 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
         }
     }
+
+    /**
+     * 判断是否是好友
+     * @param friendshipVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto judgeFriendship(FriendshipVo friendshipVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(friendshipVo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        //判断这俩人是不是已经是好友
+        int i=accountMapper.queryFriendRel(friendshipVo.getUserId(),friendshipVo.getFriendId());
+        int j=accountMapper.queryFriendRel(friendshipVo.getFriendId(),friendshipVo.getUserId());
+        Map<String,String> map=new HashMap<>(1);
+        map.put("friendshipStatus","0");
+        if (i>0 && j>0){
+            map.put("friendshipStatus","1");
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
+    }
+
+    /**
+     * 发送验证好友消息
+     * @param requestVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto sendVerifyFriendMsg(SendFriendRequestVo requestVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(requestVo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        try {
+            String[] friendId={requestVo.getFriendId()};
+            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("1","1",requestVo.getUserId(),requestVo.getFriendId(),requestVo.getContent());
+            ResponseResult result=rongCloudMethodUtil.sendSystemMessage(requestVo.getUserId(),friendId, contactNtfMessage, "","");
+            if (result.getCode()!=200){
+                logger.info("融云消息异常"+result.toString());
+                return DtoUtil.getFalseDto("发送请求失败",17002);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return DtoUtil.getFalseDto("发送失败",11996);
+        }
+        return DtoUtil.getSuccessDto("发送成功",100000);
+    }
+
 }

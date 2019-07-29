@@ -139,4 +139,20 @@ public interface AccountService {
      * @return
      */
     Dto querySessionListDetail(FriendshipVo friendshipVo,String token);
+
+    /**
+     * 判断是否是好友
+     * @param friendshipVo
+     * @param token
+     * @return
+     */
+    Dto judgeFriendship(FriendshipVo friendshipVo,String token);
+
+    /**
+     * 发送验证好友消息
+     * @param requestVo
+     * @param token
+     * @return
+     */
+    Dto sendVerifyFriendMsg(SendFriendRequestVo requestVo,String token);
 }

@@ -363,7 +363,7 @@ public class SingleEventUtil {
             return true;
         }
         for (SingleEvent singleEvent : singleEventList) {
-            if (singleEvent.getEventid() != null && singleEvent.getEventid().equals(loopEvent.getUserid())) {
+            if (singleEvent.getEventid() != null && !singleEvent.getEventid().equals(loopEvent.getEventid())) {
                 Boolean[] rep = getRepeatTime(singleEvent);
                 Boolean[] repLoop = getRepeatTime(loopEvent);
                 for (int i = 0; i <= 6; i++) {
