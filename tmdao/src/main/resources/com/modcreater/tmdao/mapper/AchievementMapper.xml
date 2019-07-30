@@ -7,7 +7,7 @@
     </sql>
 
     <sql id="Base_Column_List_Achievement">
-        id,name,imgUrl,loggedDaysCondition,finishedEventsCondition
+        id,name,imgUrl,`condition`,type
     </sql>
     <insert id="addNewAchievement">
         insert into userachievement values (null,#{userId},#{id},#{createDate} )
@@ -72,7 +72,8 @@
         where id in
         (SELECT achievementId
         from userachievement
-        where userId = #{userId})
+        where userId = #{userId}
+        order by createDate desc)
     </select>
     <select id="queryUserStatistics" resultType="com.modcreater.tmbeans.pojo.UserStatistics">
         select <include refid="Base_Column_List_UserStatistics"/> from userstatistics where userId = #{userId}

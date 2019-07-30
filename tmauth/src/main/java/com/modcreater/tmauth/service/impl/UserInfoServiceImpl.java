@@ -119,7 +119,13 @@ public class UserInfoServiceImpl implements UserInfoService {
             for (Achievement achievement : achievementList) {
                 List<UserAchievement> userAchievementList = achievementMapper.queryUserAchievement(userId, achievement.getId());
                 if (userAchievementList.size() == 0) {
-                    if (userStatistics.getLoggedDays() >= (achievement.getLoggedDaysCondition()).longValue()) {
+                    if (achievement.getType() == 1 && userStatistics.getLoggedDays() >= (achievement.getCondition()).longValue()) {
+                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
+                    }else if (achievement.getType() == 2 && eventMapper.getUserAllEvent(userId) >= (achievement.getCondition()).longValue()){
+                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
+                    }else if (achievement.getType() == 3 && eventMapper.countCompletedEvents(Long.valueOf(userId)) >= (achievement.getCondition()).longValue()){
+                        achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
+                    }else if (achievement.getType() == 4 && accountMapper.countAllMyFriends(userId) >= (achievement.getCondition()).longValue()){
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                     }
                 }

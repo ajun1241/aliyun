@@ -368,4 +368,11 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> queryClashLoopEventList(SingleEvent singleEvent);
+
+    /**
+     * 查询用户创建的所有事件(不包含草稿箱)
+     * @param userId
+     * @return
+     */
+    Long getUserAllEvent(String userId);
 }

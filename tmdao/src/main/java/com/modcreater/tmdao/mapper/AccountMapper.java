@@ -205,4 +205,10 @@ public interface AccountMapper {
      */
     int alterUserInfo(@Param("userId") String userId,@Param("userSign") String userSign,@Param("userName") String userName,@Param("headImgUrl") String headImgUrl);
 
+    /**
+     * 查询好友数量
+     * @param userId
+     * @return
+     */
+    Long countAllMyFriends(String userId);
 }

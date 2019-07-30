@@ -51,6 +51,7 @@ public interface AchievementMapper {
      * 为用户添加一个新的成就
      * @param id
      * @param userId
+     * @param createDate
      * @return
      */
     int addNewAchievement(@Param("id") Long id, @Param("userId") String userId,@Param("createDate") String createDate);

@@ -602,6 +602,9 @@
     <select id="queryClashLoopEventList" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select repeatTime , startTime , endTime,eventId from singleevent where userId = #{userid} and isOverdue = 0 and isLoop = 1
     </select>
+    <select id="getUserAllEvent" resultType="java.lang.Long">
+        select count(id) from singleevent where userId = #{userId} and isOverdue in (0,1)
+    </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent
     where isLoop = 0 and isOverdue = 0

@@ -25,12 +25,12 @@ public class Achievement {
      */
     private String imgUrl;
     /**
-     * 登录天数条件(与完成事件数量条件冲突)
+     * 达成条件
      */
-    private Integer loggedDaysCondition;
+    private Integer condition;
     /**
-     * 完成事件数条件(与登录天数条件冲突)
+     * 成就类型
      */
-    private Integer finishedEventsCondition;
+    private Integer type;
 
 }
