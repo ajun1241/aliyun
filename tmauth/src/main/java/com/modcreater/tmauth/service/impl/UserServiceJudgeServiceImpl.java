@@ -164,7 +164,9 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
             //无剩余,判断剩余年/月卡时间
             Long timeRemaining = time.getTimeRemaining();
             if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis() / 1000) {
-                return DtoUtil.getSuccessDto("该用户尚未开通备份功能", 20000);
+                time.setResidueDegree(-1L);
+                userServiceMapper.updateServiceRemainingTime(time);
+                return DtoUtil.getSuccesWithDataDto("该用户尚未开通备份功能","2", 20000);
             }
         }
         return DtoUtil.getSuccessDto("备份功能已开通", 100000);
@@ -236,8 +238,11 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
                     result.put("annualReportingService", "1");
                 }
             } else if (serviceRemainingTime.getServiceId().equals("4")) {
-                if (backupServiceJudge(receivedId.getUserId(), token).getResCode() == 100000) {
+                Dto dto = backupServiceJudge(receivedId.getUserId(), token);
+                if (dto.getResCode() == 100000) {
                     result.put("backupService", "1");
+                }else if (dto.getResCode() == 20000 && !ObjectUtils.isEmpty(dto.getData()) && dto.getData().equals("2")){
+                    result.put("backupService", "2");
                 }
             }
         }
