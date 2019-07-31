@@ -87,4 +87,10 @@ public class UserInfoController {
     public Dto getCompletedInThisMonth(@RequestBody ReceivedCompletedInThisMonth receivedId ,HttpServletRequest request){
         return userInfoService.getCompletedInThisMonth(receivedId,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getusertimecard")
+    @ApiOperation("获取用户次卡剩余数量")
+    public Dto getUserTimeCard(@RequestBody ReceivedGetUserTimeCard receivedGetUserTimeCard, HttpServletRequest request){
+        return userInfoService.getUserTimeCard(receivedGetUserTimeCard,request.getHeader("token"));
+    }
 }

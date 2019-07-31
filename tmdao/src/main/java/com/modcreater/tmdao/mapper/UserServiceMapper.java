@@ -73,4 +73,12 @@ public interface UserServiceMapper {
      * @return
      */
     int countAMonthEvents(@Param("userId") String userId,@Param("thisMonth") int thisMonth,@Param("thisYear") int thisYear,@Param("isOverdue") String isOverdue);
+
+    /**
+     * 根据serviceId查询用户次卡剩余
+     * @param userId
+     * @param serviceId
+     * @return
+     */
+    Long getTimeCard(@Param("userId")String userId, @Param("serviceId")String serviceId);
 }

@@ -57,4 +57,7 @@
             and isLoop = 0
         </where>
     </select>
+    <select id="getTimeCard" resultType="java.lang.Long">
+        select residueDegree from serviceremainingtime where userId = #{userId} and serviceId = #{serviceId}
+    </select>
 </mapper>

@@ -102,4 +102,12 @@ public interface UserInfoService {
      * @return
      */
     Dto getCompletedInThisMonth(ReceivedCompletedInThisMonth receivedId, String token);
+
+    /**
+     * 获取用户次卡剩余
+     * @param receivedGetUserTimeCard
+     * @param token
+     * @return
+     */
+    Dto getUserTimeCard(ReceivedGetUserTimeCard receivedGetUserTimeCard, String token);
 }

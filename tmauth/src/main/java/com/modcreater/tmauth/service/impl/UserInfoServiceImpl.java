@@ -16,10 +16,7 @@ import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import com.modcreater.tmbeans.show.userinfo.ShowUserStatistics;
 import com.modcreater.tmbeans.utils.NaturalWeek;
 import com.modcreater.tmbeans.values.FinalValues;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedAlterUserInfo;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedCompletedInThisMonth;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedEventConditions;
-import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmbeans.vo.userinfovo.*;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
@@ -550,9 +547,9 @@ public class UserInfoServiceImpl implements UserInfoService {
                     String percent = nf3.format((double) type.getNum() / totalEvents);
                     if (percent.endsWith("5")) {
                         if (errorNums % 2 == 1) {
-                            percent = nf2.format((double) type.getNum() / totalEvents - 0.01 < 0 ? 0 : (double) type.getNum() / totalEvents - 0.01);
+                            percent = nf2.format((double) type.getNum() / totalEvents - 0.01 < 0 ? 0 : ((double) type.getNum() / totalEvents - 0.01) * 100);
                         } else {
-                            percent = nf2.format((double) type.getNum() / totalEvents);
+                            percent = nf2.format(((double) type.getNum() / totalEvents) * 100);
                         }
                         errorNums += 1;
                     }
@@ -563,7 +560,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         mod1.put("mod1F", mod1F);
         Map<String, Object> mod1S = new HashMap<>();
-        Map<String, String> mod1SF = new HashMap<>();
         Long maxNum = 0L;
         String maxNumKey = "a";
         double countFour = 0.0;
@@ -575,14 +571,14 @@ public class UserInfoServiceImpl implements UserInfoService {
                     maxNumKey = key;
                 }
             }
-            String d = nf2.format((double) maxNum / totalEvents);
+            String d = nf2.format(((double) maxNum / totalEvents) * 100);
             countFour += Double.parseDouble(d);
             mod1S.put(maxNumKey, d);
             typeAndNums.remove(maxNumKey);
             maxNum = 0L;
             maxNumKey = "a";
         }
-        mod1S.put("others", nf2.format(1 - countFour));
+        mod1S.put("others", nf2.format(100 - countFour));
         mod1.put("mod1S", mod1S);
         result.put("mod1", mod1);
         Map<String, Object> mod2 = new HashMap<>();
@@ -597,9 +593,9 @@ public class UserInfoServiceImpl implements UserInfoService {
                     String percent = nf3.format((double) priority.getNum() / totalEvents);
                     if (percent.endsWith("5")) {
                         if (errorNums % 2 == 1) {
-                            percent = nf2.format((double) priority.getNum() / totalEvents - 0.01 < 0 ? 0 : (double) priority.getNum() / totalEvents - 0.01);
+                            percent = nf2.format((double) priority.getNum() / totalEvents - 0.01 < 0 ? 0 : ((double) priority.getNum() / totalEvents - 0.01) * 100);
                         } else {
-                            percent = nf2.format((double) priority.getNum() / totalEvents);
+                            percent = nf2.format(((double) priority.getNum() / totalEvents) * 100);
                         }
                         errorNums += 1;
                     }
@@ -638,7 +634,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             mod4.put("modify", "0");
         } else {
             try {
-                mod4.put("modify", nf2.format((double) succeed / (succeed + failed)));
+                mod4.put("modify", nf2.format(((double) succeed / (succeed + failed)) * 100));
             } catch (Exception e) {
                 mod4.put("modify", "0");
             }
@@ -647,7 +643,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             mod4.put("refuse", "0");
         } else {
             try {
-                mod4.put("refuse", nf2.format((double) refused / (refused + agreed)));
+                mod4.put("refuse", nf2.format(((double) refused / (refused + agreed)) * 100));
             } catch (Exception e) {
                 mod4.put("refuse", "0");
             }
@@ -727,6 +723,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         result.put("completedNum", completedNum);
         result.put("unfinishedNum", unfinishedNum);
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+    }
+
+    @Override
+    public Dto getUserTimeCard(ReceivedGetUserTimeCard receivedGetUserTimeCard, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGetUserTimeCard.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询剩余次数成功",userServiceMapper.getTimeCard(receivedGetUserTimeCard.getUserId(),receivedGetUserTimeCard.getServiceId()),100000);
     }
 
     public boolean isSearchServiceNice(ReceivedEventConditions receivedEventConditions) {
