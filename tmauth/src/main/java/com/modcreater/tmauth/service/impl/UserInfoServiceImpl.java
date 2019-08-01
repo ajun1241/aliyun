@@ -78,19 +78,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         showUserStatistics.setUnfinished(eventMapper.countUnfinishedEvents(Long.valueOf(userId)));
         //如果用户开通了备份服务且可以正常使用,显示用户草稿箱数量,否则显示0
         showUserStatistics.setDrafts(userServiceJudgeService.backupServiceJudge(userId, token).getResCode() == 100000 ? eventMapper.countDrafts(Long.valueOf(userId)) : 0);
-        List<Achievement> imgUrlList = queryUserAchievementInBase(userId);
         Map<String, Object> result = new HashMap<>(3);
-        Account account = accountMapper.queryAccount(userId);
-        //用户部分信息
-        Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("userName", account.getUserName());
-        userInfo.put("userSign", account.getUserSign());
-        userInfo.put("headImgURL", account.getHeadImgUrl());
-        result.put("userInfo", userInfo);
         //用户事件状态
         result.put("userStatistics", showUserStatistics);
         //用户所有成就
-        result.put("imgUrlList", imgUrlList);
         return DtoUtil.getSuccesWithDataDto("查询用户详情成功", result, 100000);
     }
 
