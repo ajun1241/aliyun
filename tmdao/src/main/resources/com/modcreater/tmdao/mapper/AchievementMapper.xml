@@ -66,8 +66,8 @@
         update userstatistics set lastOperatedTime = #{time} where userId = #{userId}
     </update>
 
-    <select id="searchAllAchievement" resultType="String">
-        SELECT imgurl
+    <select id="searchAllAchievement" resultType="com.modcreater.tmbeans.pojo.Achievement">
+        SELECT *
         from achievement
         where id in
         (SELECT achievementId

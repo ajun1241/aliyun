@@ -25,7 +25,7 @@ public interface AchievementMapper {
      * @param userId
      * @return
      */
-    List<String> searchAllAchievement(String userId);
+    List<Achievement> searchAllAchievement(String userId);
 
     /**
      * 根据用户ID查询该用户的统计数据

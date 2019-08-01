@@ -78,7 +78,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         showUserStatistics.setUnfinished(eventMapper.countUnfinishedEvents(Long.valueOf(userId)));
         //如果用户开通了备份服务且可以正常使用,显示用户草稿箱数量,否则显示0
         showUserStatistics.setDrafts(userServiceJudgeService.backupServiceJudge(userId, token).getResCode() == 100000 ? eventMapper.countDrafts(Long.valueOf(userId)) : 0);
-        List<String> imgUrlList = queryUserAchievementInBase(userId);
+        List<Achievement> imgUrlList = queryUserAchievementInBase(userId);
         Map<String, Object> result = new HashMap<>(3);
         Account account = accountMapper.queryAccount(userId);
         //用户部分信息
@@ -100,17 +100,17 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //查询用户所有成就
-        List<String> result = queryUserAchievementInBase(userId);
+        List<Achievement> result = queryUserAchievementInBase(userId);
         if (result.size() == 0) {
             return DtoUtil.getSuccessDto("该用户还没有任何成就", 100000);
         }
-        Map<String, List<String>> imgUrlList = new HashMap<>();
+        Map<String, List<Achievement>> imgUrlList = new HashMap<>();
         imgUrlList.put("imgUrlList", result);
         return DtoUtil.getSuccesWithDataDto("查询用户成就成功", imgUrlList, 100000);
     }
 
     @Override
-    public List<String> queryUserAchievementInBase(String userId) {
+    public List<Achievement> queryUserAchievementInBase(String userId) {
         //在此查询用户统计表,并判断该用户是否完成某个成就
         UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
         //查询已存在的所有成就用于判断
@@ -122,13 +122,13 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if (userAchievementList.size() == 0) {
                     if (achievement.getType() == 1 && userStatistics.getLoggedDays() >= (achievement.getCondition()).longValue()) {
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                    }else if (achievement.getType() == 2 && eventMapper.getUserAllEvent(userId) >= (achievement.getCondition()).longValue()){
+                    }/*else if (achievement.getType() == 2 && eventMapper.getUserAllEvent(userId) >= (achievement.getCondition()).longValue()){
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                     }else if (achievement.getType() == 3 && eventMapper.countCompletedEvents(Long.valueOf(userId)) >= (achievement.getCondition()).longValue()){
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                     }else if (achievement.getType() == 4 && accountMapper.countAllMyFriends(userId) >= (achievement.getCondition()).longValue()){
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                    }
+                    }*/
                 }
             }
         }

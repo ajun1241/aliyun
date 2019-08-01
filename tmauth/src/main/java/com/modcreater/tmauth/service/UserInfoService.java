@@ -1,6 +1,7 @@
 package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.Achievement;
 import com.modcreater.tmbeans.pojo.UserAchievement;
 import com.modcreater.tmbeans.vo.userinfovo.*;
 
@@ -69,7 +70,7 @@ public interface UserInfoService {
      * @param userId
      * @return
      */
-    List<String> queryUserAchievementInBase(String userId);
+    List<Achievement> queryUserAchievementInBase(String userId);
 
     /**
      * 获取我的(前)一周的数据
