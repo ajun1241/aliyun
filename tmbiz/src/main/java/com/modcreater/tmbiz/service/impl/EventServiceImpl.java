@@ -2016,6 +2016,18 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccessDto("保存成功", 100000);
     }
 
+    @Override
+    public Dto getAllDrafts(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        List<SingleEvent> singleEventList = eventMapper.queryAllDrafts(receivedId.getUserId());
+        if (singleEventList.size() != 0){
+            return DtoUtil.getSuccesWithDataDto("查询成功",SingleEventUtil.getShowSingleEventList(singleEventList),100000);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",null,100000);
+    }
+
     /**
      * 将传进来的事件集合中的已完成的重复事件(冲突的)移除
      *

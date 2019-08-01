@@ -262,4 +262,10 @@ public class EventController {
         return eventService.draftToInviteEvent(draftToEventVo,request.getHeader("token"));
     }
 
+    @PostMapping(value = "getalldrafts")
+    @ApiOperation("获取用户草稿箱所有数据")
+    public Dto getAllDrafts(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return eventService.getAllDrafts(receivedId,request.getHeader("token"));
+    }
+
 }

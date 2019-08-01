@@ -605,6 +605,9 @@
     <select id="getUserAllEvent" resultType="java.lang.Long">
         select count(id) from singleevent where userId = #{userId} and isOverdue in (0,1)
     </select>
+    <select id="queryAllDrafts" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from draft where userId = #{userId}
+    </select>
     <!--以下为每天凌晨4点查询一次
     select count(id) from singleevent
     where isLoop = 0 and isOverdue = 0

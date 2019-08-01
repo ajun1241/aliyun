@@ -375,4 +375,11 @@ public interface EventMapper {
      * @return
      */
     Long getUserAllEvent(String userId);
+
+    /**
+     * 查询用户所有草稿箱
+     * @param userId
+     * @return
+     */
+    List<SingleEvent> queryAllDrafts(@Param("userId") String userId);
 }

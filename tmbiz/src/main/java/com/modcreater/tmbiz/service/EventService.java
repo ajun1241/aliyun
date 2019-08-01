@@ -235,4 +235,12 @@ public interface EventService {
      * @return
      */
     Dto draftToInviteEvent(DraftToEventVo draftToEventVo,String token);
+
+    /**
+     * 查询用户草稿箱所有草稿
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto getAllDrafts(ReceivedId receivedId, String token);
 }
