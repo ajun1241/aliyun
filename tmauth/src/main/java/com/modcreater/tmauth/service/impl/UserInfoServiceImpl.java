@@ -76,6 +76,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         ShowUserStatistics showUserStatistics = new ShowUserStatistics();
         showUserStatistics.setCompleted(eventMapper.countCompletedEvents(Long.valueOf(userId)));
         showUserStatistics.setUnfinished(eventMapper.countUnfinishedEvents(Long.valueOf(userId)));
+        //如果用户开通了备份服务且可以正常使用,显示用户草稿箱数量,否则显示0
         showUserStatistics.setDrafts(userServiceJudgeService.backupServiceJudge(userId, token).getResCode() == 100000 ? eventMapper.countDrafts(Long.valueOf(userId)) : 0);
         List<String> imgUrlList = queryUserAchievementInBase(userId);
         Map<String, Object> result = new HashMap<>(3);
@@ -98,6 +99,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(userId))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
+        //查询用户所有成就
         List<String> result = queryUserAchievementInBase(userId);
         if (result.size() == 0) {
             return DtoUtil.getSuccessDto("该用户还没有任何成就", 100000);
@@ -111,9 +113,11 @@ public class UserInfoServiceImpl implements UserInfoService {
     public List<String> queryUserAchievementInBase(String userId) {
         //在此查询用户统计表,并判断该用户是否完成某个成就
         UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
+        //查询已存在的所有成就用于判断
         List<Achievement> achievementList = achievementMapper.queryAchievement();
         if (!ObjectUtils.isEmpty(userStatistics) && !ObjectUtils.isEmpty(achievementList)) {
             for (Achievement achievement : achievementList) {
+                //查询用户对应本次遍历的成就是否存在,不存在就判断是否满足条件
                 List<UserAchievement> userAchievementList = achievementMapper.queryUserAchievement(userId, achievement.getId());
                 if (userAchievementList.size() == 0) {
                     if (achievement.getType() == 1 && userStatistics.getLoggedDays() >= (achievement.getCondition()).longValue()) {
@@ -128,6 +132,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
             }
         }
+        //返回该用户所有成就对应图片地址的集合
         return achievementMapper.searchAllAchievement(userId);
     }
 
@@ -139,6 +144,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (ObjectUtils.isEmpty(receivedEventConditions)) {
             return DtoUtil.getFalseDto("筛选条件接收失败", 40002);
         }
+        //判断必要条件是否存在
         QueryEventsCondition singleEventCondition = new QueryEventsCondition();
         if (receivedEventConditions.getUserId() == null || "".equals(receivedEventConditions.getUserId())) {
             return DtoUtil.getFalseDto("条件缺失", 40006);
@@ -153,6 +159,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!StringUtils.hasText(receivedEventConditions.getIsOverdue())) {
             return DtoUtil.getFalseDto("条件缺失", 40006);
         }
+        //将符合规则的条件一一放入新对象等待查询
         singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         if (receivedEventConditions.getEventName() != null && !"".equals(receivedEventConditions.getEventName())) {
             singleEventCondition.setEventname(receivedEventConditions.getEventName());
@@ -172,6 +179,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (receivedEventConditions.getIsOverdue() != null && !"".equals(receivedEventConditions.getIsOverdue())) {
             singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         }
+        //如果传入的时间不符合规则,将使用当前时间代替
         if (!StringUtils.hasText(receivedEventConditions.getStartDate()) || receivedEventConditions.getStartDate().length() != 8) {
             singleEventCondition.setEventid(System.currentTimeMillis() / 1000);
         } else {
@@ -180,6 +188,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             singleEventCondition.setMonth(Long.valueOf(startDate.substring(4, 6)));
             singleEventCondition.setDay(Long.valueOf(startDate.substring(6, 8)));
         }
+        //将不符合规则的页码和显示数量改为默认第一页显示7行
         if (!StringUtils.hasText(receivedEventConditions.getPageNum()) || receivedEventConditions.getPageNum().equals("0")) {
             receivedEventConditions.setPageNum("1");
         }
@@ -198,6 +207,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         singleEventCondition.setPageSize(Long.valueOf(receivedEventConditions.getPageSize()));
         List<SingleEvent> singleEventList = new ArrayList<>();
         List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
+        //searchType为0时查看普通事件,1为查看草稿箱
         if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("0")) {
             singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
         } else if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("1")) {
@@ -206,9 +216,12 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (singleEventList.size() == 0) {
             return DtoUtil.getSuccessDto("没有查询到事件", 200000);
         }
+        //以下是对person字段的特殊筛选处理
         for (SingleEvent singleEvent : singleEventList) {
             if (receivedEventConditions.getPerson() != null && !"".equals(receivedEventConditions.getPerson())) {
+                //该person为传入的条件
                 String[] persons;
+                //该person为查询结果
                 String[] personsInResult;
                 try {
                     EventPersons eventPersons1 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
@@ -219,9 +232,11 @@ public class UserInfoServiceImpl implements UserInfoService {
                     continue;
                 }
                 int i = 0;
+                //如果条件人数多于查询结果人数,则不符合查询结果
                 if (persons.length > personsInResult.length) {
                     continue;
                 }
+                //此处将i作为person字段条件与结果的匹配成功次数
                 for (String sOut : persons) {
                     for (String sInside : personsInResult) {
                         if (sOut.equals(sInside)) {
@@ -229,10 +244,12 @@ public class UserInfoServiceImpl implements UserInfoService {
                         }
                     }
                 }
+                //如果成功次数和传入条件人数相等则本次查询成功
                 if (i == persons.length) {
                     showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
                 }
             } else {
+                //如果person没有值则默认查询所有
                 showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
             }
         }
@@ -246,22 +263,28 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         ShowUserAnalysis showUserAnalysis = new ShowUserAnalysis();
         showUserAnalysis.setUserId(userId);
-        //记录的总和
         UserEventsGroupByInWeek userEventsGroupByInWeek = new UserEventsGroupByInWeek();
         userEventsGroupByInWeek.setUserId(userId);
+        //查询已完成事件的总数
         Long totalEvents = eventMapper.countEvents(userEventsGroupByInWeek);
         //记录事件的总用时分钟数
         Long totalMinutes = 0L;
+        //类型:结果百分比
         Map<String, Double> percentResult = new HashMap<>();
+        //类型:总用时
         Map<String, Long> totalMinutesResult = new HashMap<>();
+        //将type分组
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByType(userId);
+        //格式化运算结果
         NumberFormat nf = NumberFormat.getNumberInstance();
         nf.setRoundingMode(RoundingMode.HALF_UP);
         nf.setMaximumFractionDigits(2);
+        //将作为结果传出的map给予默认值
         for (int i = 0; i <= 7; i++) {
             percentResult.put(FinalValues.TYPE[i], null);
             totalMinutesResult.put(FinalValues.TYPE[i], null);
         }
+        //运算
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i <= 7; i++) {
                 if (type.getType() == i) {
@@ -271,6 +294,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             totalMinutes += type.getTotalMinutes();
         }
+        //赋值
         showUserAnalysis.setMaxType(eventMapper.getMaxSingleEventType(userId));
         showUserAnalysis.setMinType(eventMapper.getMinSingleEventType(userId));
         showUserAnalysis.setPercentResult(percentResult);
@@ -312,6 +336,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         UserEventsGroupByInWeek userEventsGroupByInWeek = new UserEventsGroupByInWeek();
         userEventsGroupByInWeek.setUserId(userId);
         for (int i = 0; i >= -6; i--) {
+            //获取当前下标日期
             String date = DateUtil.getDay(i);
             if (i == 0) {
                 userEventsGroupByInWeek.setTodayYear(date.substring(0, 4));
@@ -345,6 +370,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         //已完成的事件的总和
         Long totalEvents = eventMapper.countEvents(userEventsGroupByInWeek);
+        //根据type分组查询
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i < FinalValues.TYPE.length; i++) {
@@ -356,6 +382,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             //将每个类型的事件所占时长统计到总时长中
             totalMinutes += type.getTotalMinutes();
         }
+        //将多出来的大于等于30分钟的时间变为小时+1
         if (totalMinutes % 60 >= 30) {
             totalMinutes = totalMinutes / 60 + 1;
         }
@@ -365,7 +392,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         allStatistic.put("typeDuration", typeDuration);
         //线形图板块
         List<Map<String, Object>> showWeekEventsNumList = new ArrayList<>();
+        //上周
         Long lastWeek = 0L;
+        //上上周
         Long lastLastWeek = 0L;
         List<Map<String, String>> maxTypes = new ArrayList<>();
         List<Map<String, String>> minTypes = new ArrayList<>();

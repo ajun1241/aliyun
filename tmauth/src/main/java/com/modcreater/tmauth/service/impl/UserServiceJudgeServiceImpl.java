@@ -168,6 +168,8 @@ public class UserServiceJudgeServiceImpl implements UserServiceJudgeService {
                 userServiceMapper.updateServiceRemainingTime(time);
                 return DtoUtil.getSuccesWithDataDto("该用户尚未开通备份功能","2", 20000);
             }
+        }else if (time.getResidueDegree() == -1){
+            return DtoUtil.getSuccesWithDataDto("该用户尚未开通备份功能","2", 20000);
         }
         return DtoUtil.getSuccessDto("备份功能已开通", 100000);
     }
