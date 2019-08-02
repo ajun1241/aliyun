@@ -24,6 +24,8 @@ public class ShowFriendList {
     private String gender;
 
     private String userSign;
+
+    private String userCode;
     /**
      * 是否是本次操作用户所选中的支持者,0为是,1为默认不是
      */
