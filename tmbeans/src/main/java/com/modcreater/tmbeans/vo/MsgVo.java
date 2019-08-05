@@ -19,6 +19,7 @@ public class MsgVo implements Serializable {
     private String gender;
     private String status;
     private String friendId;
+    private String userCode;
     //日计划
     private String dayPlan;
     //月计划

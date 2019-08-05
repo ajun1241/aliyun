@@ -29,7 +29,7 @@ public interface AchievementMapper {
 
     /**
      * 根据用户ID查询该用户的统计数据
-     * @param userId
+     * @param userId王先生
      * @return
      */
     UserStatistics queryUserStatistics(String userId);

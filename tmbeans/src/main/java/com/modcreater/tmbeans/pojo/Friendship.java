@@ -27,7 +27,9 @@ public class Friendship implements Serializable {
   private Long invite;
   private Long sustain;
   private Long hide;
+  private Long diary;
   private Long status;
+  private Long flag;
   private Date cerateDate;
   private String remark;
 

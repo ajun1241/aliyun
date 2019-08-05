@@ -354,21 +354,29 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(time)) {
             return DtoUtil.getSuccessDto("该用户尚未开通备份功能", 20000);
         }
-        //开通了,查询次卡是否有剩余
-        if (time.getResidueDegree() == 0) {
-            //无剩余,判断剩余年/月卡时间
-            Long timeRemaining = time.getTimeRemaining();
-            if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis() / 1000) {
-                return DtoUtil.getSuccessDto("该用户尚未开通备份功能", 20000);
-            }
-        } else {
-            //有剩余,判断此次查询完毕后是否剩余为0次
-            time.setResidueDegree(time.getResidueDegree() - 1);
-            //判断剩余次数-1后是否为0,如果为0...
-            if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
-                //如果有库存时间,将这个时间加入用户有效的剩余时间中
-                time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
-                time.setStorageTime(0L);
+        boolean flag=false;
+        //判断是否最后一次
+        if (time.getResidueDegree()==-1){
+            //删除服务
+            userServiceMapper.deleteService(time.getId());
+            flag=true;
+        }else {
+            //开通了,查询次卡是否有剩余
+            if (time.getResidueDegree() == 0) {
+                //无剩余,判断剩余年/月卡时间
+                Long timeRemaining = time.getTimeRemaining();
+                if (timeRemaining == 0 || timeRemaining < System.currentTimeMillis() / 1000) {
+                    return DtoUtil.getSuccessDto("该用户尚未开通备份功能", 20000);
+                }
+            } else {
+                //有剩余,判断此次查询完毕后是否剩余为0次
+                time.setResidueDegree(time.getResidueDegree() - 1);
+                //判断剩余次数-1后是否为0,如果为0...
+                if (time.getResidueDegree() == 0 && time.getStorageTime() != 0) {
+                    //如果有库存时间,将这个时间加入用户有效的剩余时间中
+                    time.setTimeRemaining(System.currentTimeMillis() / 1000 + time.getStorageTime());
+                    time.setStorageTime(0L);
+                }
             }
         }
         ArrayList<Object> drafts = JSONObject.parseObject(draftVo.getSingleEvents(), ArrayList.class);
@@ -391,15 +399,15 @@ public class EventServiceImpl implements EventService {
                 if (eventMapper.uplDraft(draft1) == 0) {
                     return DtoUtil.getFalseDto("上传草稿失败", 27002);
                 }
-            } else {
-                return DtoUtil.getFalseDto("该草稿已存在", 27003);
             }
         }
-        //修改用户服务剩余时间
-        if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
-            //回滚
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return DtoUtil.getFalseDto("修改用户服务剩余时间失败", 27004);
+        if (!flag){
+            //修改用户服务剩余时间
+            if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
+                //回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("修改用户服务剩余时间失败", 27004);
+            }
         }
         return DtoUtil.getSuccessDto("上传草稿成功", 100000);
     }

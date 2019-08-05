@@ -10,6 +10,8 @@ import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.*;
+import com.modcreater.tmutils.messageutil.FriendCardMessage;
+import com.modcreater.tmutils.messageutil.UpdPortraitMessage;
 import io.rong.messages.ContactNtfMessage;
 import io.rong.messages.InfoNtfMessage;
 import io.rong.messages.TxtMessage;
@@ -272,7 +274,7 @@ public class AccountServiceImpl implements AccountService {
         if (i>0 && j>0){
             //已经是好友时
             //成就
-            List<String> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
+            List<Achievement> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
             if (achievement.size()==0){
                 return DtoUtil.getSuccesWithDataDto("查询成就失败",null,200000);
             }
@@ -288,7 +290,7 @@ public class AccountServiceImpl implements AccountService {
             map.put("finish",completedEvents.toString());
             map.put("achievement",achievement);
             map.put("isFriend",1);
-            return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
+            return DtoUtil.getSuccesWithDataDto("搜索成功",map,100000);
         }
         //其他表信息
         //日规划
@@ -304,7 +306,7 @@ public class AccountServiceImpl implements AccountService {
         map.put("monthPlan",result.getMonth());
         map.put("finish",completedEvents.toString());
         map.put("isFriend",0);
-        return DtoUtil.getSuccesWithDataDto("搜索好友成功",map,100000);
+        return DtoUtil.getSuccesWithDataDto("搜索成功",map,100000);
     }
 
     /**
@@ -353,6 +355,7 @@ public class AccountServiceImpl implements AccountService {
             updateFriendJurisdictionVo.setUserId(sendFriendRequestVo.getUserId());
             updateFriendJurisdictionVo.setFriendId(sendFriendRequestVo.getFriendId());
             updateFriendJurisdictionVo.setHide(sendFriendRequestVo.getHide());
+            updateFriendJurisdictionVo.setDiary(sendFriendRequestVo.getDiary());
             accountMapper.updateFriendJurisdiction(updateFriendJurisdictionVo);
             //发送添加信息
             ResponseResult result;
@@ -410,6 +413,7 @@ public class AccountServiceImpl implements AccountService {
             updateFriendJurisdictionVo.setUserId(sendFriendRequestVo.getUserId());
             updateFriendJurisdictionVo.setFriendId(sendFriendRequestVo.getFriendId());
             updateFriendJurisdictionVo.setHide(sendFriendRequestVo.getHide());
+            updateFriendJurisdictionVo.setDiary(sendFriendRequestVo.getDiary());
             accountMapper.updateFriendJurisdiction(updateFriendJurisdictionVo);
             //发送添加信息
             ResponseResult result;
@@ -482,6 +486,13 @@ public class AccountServiceImpl implements AccountService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DtoUtil.getFalseDto("添加好友失败",16003);
         }
+        //权限设置
+        UpdateFriendJurisdictionVo updateFriendJurisdictionVo=new UpdateFriendJurisdictionVo();
+        updateFriendJurisdictionVo.setUserId(sendFriendResponseVo.getUserId());
+        updateFriendJurisdictionVo.setFriendId(sendFriendResponseVo.getFriendId());
+        updateFriendJurisdictionVo.setHide(sendFriendResponseVo.getHide());
+        updateFriendJurisdictionVo.setDiary(sendFriendResponseVo.getDiary());
+        accountMapper.updateFriendJurisdiction(updateFriendJurisdictionVo);
         //给请求者 发一条消息说，我同意你的请求了
         Account user = accountMapper.queryAccount(sendFriendResponseVo.getUserId());
         Account friend = accountMapper.queryAccount(sendFriendResponseVo.getFriendId());
@@ -608,7 +619,15 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getSuccesWithDataDto("好友其他信息失败",null,200000);
         }
         //成就
-        List<String> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
+        List<Achievement> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
+        //查询好友关系天数
+        Friendship friendship=accountMapper.queryFriendshipDetail(queFridenVo.getUserId(),queFridenVo.getFriendId());
+        Date createDate=friendship.getCerateDate();
+        String days=""+((System.currentTimeMillis()-createDate.getTime())/1000/3600/24 == 0 ? 1 : (System.currentTimeMillis()-createDate.getTime())/1000/3600/24);
+        //获取设置的好友权限
+        map.put("hide",friendship.getHide().toString());
+        map.put("diary",friendship.getDiary().toString());
+        map.put("friendshipDays",days);
         map.put("userId",account.getId().toString());
         map.put("userCode",account.getUserCode());
         map.put("userName",account.getUserName());
@@ -769,6 +788,7 @@ public class AccountServiceImpl implements AccountService {
             msgVo.setUserName(account.getUserName());
             msgVo.setMsgContent(systemMsgRecord.getMsgContent());
             msgVo.setGender(account.getGender().toString());
+            msgVo.setUserCode(account.getUserCode());
             if (ObjectUtils.isEmpty(friendship)){
                 //如果一个好友都没有
                 msgVo.setStatus("0");
@@ -838,6 +858,22 @@ public class AccountServiceImpl implements AccountService {
         account.setHeadImgUrl(headImgVo.getHeadImgUrl());
         if (accountMapper.updateAccount(account)<=0){
             return DtoUtil.getFalseDto("上传头像失败",14006);
+        }
+        //给所有好友发送消息
+        try {
+            RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+            UpdPortraitMessage updPortraitMessage=new UpdPortraitMessage(account.getId().toString(),account.getUserName(),headImgVo.getHeadImgUrl());
+            List<Long> friendsId=accountMapper.queryAllFriendList(account.getId().toString());
+            List<String> list=new ArrayList<>();
+            for (Long friendId:friendsId) {
+                list.add(friendId.toString());
+            }
+            ResponseResult result=rongCloudMethodUtil.sendSystemMessage(headImgVo.getUserId(),list.toArray(new String[0]),updPortraitMessage,"","");
+            if (result.getCode()!=200){
+                logger.error("更换头像消息发送失败");
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
         }
         return DtoUtil.getSuccessDto("头像上传成功",100000);
     }
@@ -976,6 +1012,32 @@ public class AccountServiceImpl implements AccountService {
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             return DtoUtil.getFalseDto("发送失败",11996);
+        }
+        return DtoUtil.getSuccessDto("发送成功",100000);
+    }
+
+    /**
+     * 发送好友名片
+     * @param friendCardVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto sendFriendCard(FriendCardVo friendCardVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(friendCardVo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        try {
+            Account account=accountMapper.queryAccount(friendCardVo.getTargetId());
+            RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+            FriendCardMessage friendCardMessage=new FriendCardMessage(account.getHeadImgUrl(),account.getUserName(),account.getUserCode());
+            ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(friendCardVo.getUserId(),new String[]{friendCardVo.getFriendId()},1,friendCardMessage);
+            if (result.getCode()!=200){
+                return DtoUtil.getFalseDto("发送失败",17002);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return DtoUtil.getFalseDto("发送失败",17003);
         }
         return DtoUtil.getSuccessDto("发送成功",100000);
     }

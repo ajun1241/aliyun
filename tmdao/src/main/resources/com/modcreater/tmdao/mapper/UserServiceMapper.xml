@@ -27,9 +27,9 @@
         </set>
         where userId = #{userId} and serviceId = #{serviceId}
     </update>
-
-
-
+    <delete id="deleteService">
+        delete from serviceremainingtime where id=#{id}
+    </delete>
     <select id="getTimeRemaining" resultType="java.lang.Long">
         select timeRemaining from serviceremainingtime where userId = #{userId} and serviceId = #{serviceId}
     </select>

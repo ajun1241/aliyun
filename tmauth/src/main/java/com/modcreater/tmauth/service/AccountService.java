@@ -30,7 +30,7 @@ public interface AccountService {
     Dto updateAccount(UpdAccountInfo updAccountInfo,String token);
 
     /**
-     * 查看用户详情
+     * 查看用户详情()
      * @param queryUserVo
      * @param token
      * @return
@@ -155,4 +155,12 @@ public interface AccountService {
      * @return
      */
     Dto sendVerifyFriendMsg(SendFriendRequestVo requestVo,String token);
+
+    /**
+     * 发送好友名片
+     * @param friendCardVo
+     * @param token
+     * @return
+     */
+    Dto sendFriendCard(FriendCardVo friendCardVo,String token);
 }

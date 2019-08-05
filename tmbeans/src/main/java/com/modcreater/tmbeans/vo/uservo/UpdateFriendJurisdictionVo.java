@@ -17,5 +17,6 @@ public class UpdateFriendJurisdictionVo implements Serializable {
     private String invite;
     private String sustain;
     private String hide;
+    private String diary;
     private String appType;
 }

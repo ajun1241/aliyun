@@ -140,4 +140,11 @@ public class AccountController {
     public Dto sendVerifyFriendMsg(@RequestBody SendFriendRequestVo requestVo, HttpServletRequest request){
         return userService.sendVerifyFriendMsg(requestVo ,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping("sendfriendcard")
+    @ApiOperation("发送好友名片消息")
+    public Dto sendFriendCard(@RequestBody FriendCardVo friendCardVo, HttpServletRequest request){
+        return userService.sendFriendCard(friendCardVo ,request.getHeader("token"));
+    }
 }

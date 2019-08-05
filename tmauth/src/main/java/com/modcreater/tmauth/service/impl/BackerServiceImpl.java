@@ -238,6 +238,7 @@ public class BackerServiceImpl implements BackerService {
                 result.put("userName", account.getUserName());
                 result.put("headImgUrl", account.getHeadImgUrl());
                 result.put("gender", account.getGender().toString());
+                result.put("userCode", account.getUserCode());
                 if (!StringUtils.hasText(account.getUserSign())) {
                     account.setUserSign("");
                 }

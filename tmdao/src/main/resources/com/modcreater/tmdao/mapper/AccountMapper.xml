@@ -111,11 +111,14 @@
             <if test="invite != null and invite != ''">
                 invite=#{invite},
             </if>
-             <if test="sustain != null and sustain != '' ">
+            <if test="sustain != null and sustain != '' ">
                  sustain=#{sustain},
             </if>
-              <if test="hide != null and hide != '' ">
+            <if test="hide != null and hide != '' ">
                  hide=#{hide},
+            </if>
+            <if test="diary != null and diary != '' ">
+                diary=#{diary},
             </if>
         </set>
         where userId=#{userId} and friendId=#{friendId}

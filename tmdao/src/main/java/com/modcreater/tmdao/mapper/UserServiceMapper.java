@@ -81,4 +81,11 @@ public interface UserServiceMapper {
      * @return
      */
     Long getTimeCard(@Param("userId")String userId, @Param("serviceId")String serviceId);
+
+    /**
+     * 删除服务
+     * @param id
+     * @return
+     */
+    int deleteService(@Param("id")String id);
 }

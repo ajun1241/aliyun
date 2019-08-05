@@ -1,7 +1,9 @@
 package com.modcreater.tmauth;
 
+import com.modcreater.tmbeans.pojo.Friendship;
 import com.modcreater.tmbeans.pojo.MsgStatus;
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmdao.mapper.MsgStatusMapper;
 import com.modcreater.tmutils.DtoUtil;
@@ -20,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -31,13 +34,9 @@ public class TmauthApplicationTests {
     @Resource
     MsgStatusMapper msgStatusMapper;
     @Resource
-    private EventMapper eventMapper;
+    private AccountMapper accountMapper;
     @Test
     public void contextLoads() {
-       /* String code="100000adv00";
-        String pattern = "^1[\\d]{10}";
-        System.out.println(Pattern.matches(pattern,code));*/
-
     }
     @Test
     public void test(){
