@@ -595,14 +595,14 @@ public class UserInfoServiceImpl implements UserInfoService {
                     maxNumKey = key;
                 }
             }
-            String d = nf2.format(((double) maxNum / totalEvents) * 100);
+            String d = nf.format(((double) maxNum / totalEvents) * 100);
             countFour += Double.parseDouble(d);
             mod1S.put(maxNumKey, d);
             typeAndNums.remove(maxNumKey);
             maxNum = 0L;
             maxNumKey = "a";
         }
-        mod1S.put("others", nf2.format(100 - countFour));
+        mod1S.put("others", nf.format(100 - countFour));
         mod1.put("mod1S", mod1S);
         result.put("mod1", mod1);
         Map<String, Object> mod2 = new HashMap<>();
@@ -614,15 +614,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         for (GetUserEventsGroupByPriority priority : getUserEventsGroupByPriority) {
             for (int i = 2; i < FinalValues.PRIORITY.length + 2; i++) {
                 if (priority.getPriority() == i) {
-                    String percent = nf3.format((double) priority.getNum() / totalEvents * 100);
-                    if (percent.endsWith("5")) {
+                    String percent = nf.format((double) priority.getNum() / totalEvents * 100);
+                    /*if (percent.endsWith("5")) {
                         if (errorNums % 2 == 1) {
                             percent = nf2.format((double) priority.getNum() / totalEvents - 0.01 < 0 ? 0 : ((double) priority.getNum() / totalEvents - 0.01) * 100);
                         } else {
                             percent = nf2.format(((double) priority.getNum() / totalEvents) * 100);
                         }
                         errorNums += 1;
-                    }
+                    }*/
                     mod2.put(FinalValues.PRIORITY[i - 2], percent);
                 }
             }
