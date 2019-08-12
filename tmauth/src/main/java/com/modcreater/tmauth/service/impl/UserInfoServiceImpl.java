@@ -564,7 +564,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i < FinalValues.TYPE.length; i++) {
                 if (type.getType() == i) {
-                    String percent = nf3.format((double) type.getNum() / totalEvents);
+                    String percent = nf3.format((double) type.getNum() / totalEvents * 100);
                     if (percent.endsWith("5")) {
                         if (errorNums % 2 == 1) {
                             percent = nf2.format((double) type.getNum() / totalEvents - 0.01 < 0 ? 0 : ((double) type.getNum() / totalEvents - 0.01) * 100);
