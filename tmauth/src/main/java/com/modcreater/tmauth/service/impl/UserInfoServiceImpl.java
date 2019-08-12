@@ -598,17 +598,17 @@ public class UserInfoServiceImpl implements UserInfoService {
             String d = nf.format(((double) maxNum / totalEvents) * 100);
             countFour += Double.parseDouble(d);
             Map<String, Object> typeMod = new HashMap<>();
-            typeMod.put("typeName", SingleEventUtil.getTypeValues(maxNumKey));
+            typeMod.put("typeName", maxNumKey.toUpperCase());
             typeMod.put("typeValue", d);
             mod1S.put(FinalValues.TYPE[i], typeMod);
             typeAndNums.remove(maxNumKey);
             if (i == 0){
-                mod1.put("max", maxNum);
+                mod1.put("max", d);
             }
             maxNum = 0L;
             maxNumKey = "a";
         }
-        mod1S.put("others", nf.format(100 - countFour));
+        mod1S.put("e", nf.format(100 - countFour));
         mod1.put("mod1S", mod1S);
         result.put("mod1", mod1);
         Map<String, Object> mod2 = new HashMap<>();
