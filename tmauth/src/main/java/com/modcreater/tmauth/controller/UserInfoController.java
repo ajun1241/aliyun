@@ -7,9 +7,11 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.userinfovo.*;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,10 +53,11 @@ public class UserInfoController {
         return userInfoService.weeklyReport(receivedId.getUserId(),request.getHeader("token"));
     }
 
+    @CrossOrigin(origins = {"*", "null"})
     @RequestMapping(value = "weeklyreport2",method = RequestMethod.POST)
     @ApiOperation("周报2.0")
-    public Dto weeklyReport2(@RequestBody ReceivedId receivedId,HttpServletRequest request){
-        return userInfoService.weeklyReport2(receivedId.getUserId(),request.getHeader("token"));
+    public Dto weeklyReport2(String userId,String appType, HttpServletRequest request){
+        return userInfoService.weeklyReport2(userId,request.getHeader("token"));
     }
 
     @RequestMapping(value = "searchachievement",method = RequestMethod.POST)
