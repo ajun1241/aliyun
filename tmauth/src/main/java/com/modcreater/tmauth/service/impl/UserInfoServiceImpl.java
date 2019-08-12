@@ -548,7 +548,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
         Map<String, Object> mod1 = new HashMap<>();
-        mod1.put("max","");
+        mod1.put("max", "");
         Map<String, Long> typeAndNums = new HashMap<>();
         //定义小数精度
         NumberFormat nf2 = NumberFormat.getNumberInstance();
@@ -587,6 +587,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         Long maxNum = 0L;
         String maxNumKey = "a";
         double countFour = 0.0;
+        Map<String, Object> typeMod = new HashMap<>();
         for (int i = 0; i <= 3; i++) {
             for (String key : typeAndNums.keySet()) {
                 Long currentNum = typeAndNums.get(key);
@@ -597,16 +598,16 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             String d = nf.format(((double) maxNum / totalEvents) * 100);
             countFour += Double.parseDouble(d);
-            Map<String,Object> typeMod = new HashMap<>();
-            typeMod.put(SingleEventUtil.getTypeValues(maxNumKey), d);
+            typeMod.put("typeName", SingleEventUtil.getTypeValues(maxNumKey));
+            typeMod.put("typeValue", d);
             mod1S.put(FinalValues.TYPE[i], typeMod);
             typeAndNums.remove(maxNumKey);
-            if (i != 3){
-                maxNum = 0L;
-                maxNumKey = "a";
+            if (i == 0){
+                mod1.put("max", maxNum);
             }
+            maxNum = 0L;
+            maxNumKey = "a";
         }
-        mod1.put("max",maxNum);
         mod1S.put("others", nf.format(100 - countFour));
         mod1.put("mod1S", mod1S);
         result.put("mod1", mod1);
@@ -758,7 +759,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGetUserTimeCard.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        return DtoUtil.getSuccesWithDataDto("查询剩余次数成功",userServiceMapper.getTimeCard(receivedGetUserTimeCard.getUserId(),receivedGetUserTimeCard.getServiceId()),100000);
+        return DtoUtil.getSuccesWithDataDto("查询剩余次数成功", userServiceMapper.getTimeCard(receivedGetUserTimeCard.getUserId(), receivedGetUserTimeCard.getServiceId()), 100000);
     }
 
     public boolean isSearchServiceNice(ReceivedEventConditions receivedEventConditions) {
