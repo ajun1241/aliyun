@@ -393,4 +393,17 @@ public class SingleEventUtil {
                 || (Long.valueOf(foreachEventE) > Long.valueOf(singleEventS) && Long.valueOf(foreachEventE) < Long.valueOf(singleEventE))
                 || (Long.valueOf(foreachEventS) <= Long.valueOf(singleEventS) && Long.valueOf(foreachEventE) >= Long.valueOf(singleEventE)));
     }
+
+    public static String getTypeValues(String type){
+        Map<String,String> map = new HashMap<>();
+        map.put("a","学习");
+        map.put("b","工作");
+        map.put("c","商务");
+        map.put("d","休闲");
+        map.put("e","家庭");
+        map.put("f","节日");
+        map.put("g","假期");
+        map.put("h","其他");
+        return map.get(type);
+    }
 }

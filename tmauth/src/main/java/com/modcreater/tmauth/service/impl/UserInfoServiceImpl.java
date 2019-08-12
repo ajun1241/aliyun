@@ -548,6 +548,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
         Map<String, Object> mod1 = new HashMap<>();
+        mod1.put("max","");
         Map<String, Long> typeAndNums = new HashMap<>();
         //定义小数精度
         NumberFormat nf2 = NumberFormat.getNumberInstance();
@@ -564,7 +565,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             mod1F.put(s, "0");
             typeAndNums.put(s, 0L);
         }
-        int errorNums = 0;
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i < FinalValues.TYPE.length; i++) {
                 if (type.getType() == i) {
@@ -597,11 +597,16 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             String d = nf.format(((double) maxNum / totalEvents) * 100);
             countFour += Double.parseDouble(d);
-            mod1S.put(maxNumKey, d);
+            Map<String,Object> typeMod = new HashMap<>();
+            typeMod.put(SingleEventUtil.getTypeValues(maxNumKey), d);
+            mod1S.put(FinalValues.TYPE[i], typeMod);
             typeAndNums.remove(maxNumKey);
-            maxNum = 0L;
-            maxNumKey = "a";
+            if (i != 3){
+                maxNum = 0L;
+                maxNumKey = "a";
+            }
         }
+        mod1.put("max",maxNum);
         mod1S.put("others", nf.format(100 - countFour));
         mod1.put("mod1S", mod1S);
         result.put("mod1", mod1);
@@ -609,7 +614,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         for (int i = 0; i < FinalValues.PRIORITY.length; i++) {
             mod2.put(FinalValues.PRIORITY[i], "0");
         }
-        errorNums = 0;
         List<GetUserEventsGroupByPriority> getUserEventsGroupByPriority = eventMapper.getUserEventsGroupByPriorityInWeek(userEventsGroupByInWeek);
         for (GetUserEventsGroupByPriority priority : getUserEventsGroupByPriority) {
             for (int i = 2; i < FinalValues.PRIORITY.length + 2; i++) {
