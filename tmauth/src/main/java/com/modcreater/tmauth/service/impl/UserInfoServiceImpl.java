@@ -557,6 +557,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         NumberFormat nf3 = NumberFormat.getNumberInstance();
         nf3.setRoundingMode(RoundingMode.HALF_UP);
         nf3.setMaximumFractionDigits(3);
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setRoundingMode(RoundingMode.HALF_UP);
+        nf.setMaximumFractionDigits(1);
         for (String s : FinalValues.TYPE) {
             mod1F.put(s, "0");
             typeAndNums.put(s, 0L);
@@ -565,15 +568,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         for (GetUserEventsGroupByType type : typeList) {
             for (int i = 0; i < FinalValues.TYPE.length; i++) {
                 if (type.getType() == i) {
-                    String percent = nf3.format((double) type.getNum() / totalEvents * 100);
-                    if (percent.endsWith("5")) {
+                    String percent = nf.format((double) type.getNum() / totalEvents * 100);
+                    /*if (percent.endsWith("5")) {
                         if (errorNums % 2 == 1) {
                             percent = nf2.format((double) type.getNum() / totalEvents - 0.01 < 0 ? 0 : ((double) type.getNum() / totalEvents - 0.01) * 100);
                         } else {
                             percent = nf2.format(((double) type.getNum() / totalEvents) * 100);
                         }
                         errorNums += 1;
-                    }
+                    }*/
                     mod1F.put(FinalValues.TYPE[i], percent);
                     typeAndNums.put(FinalValues.TYPE[i], type.getNum());
                 }
@@ -611,7 +614,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         for (GetUserEventsGroupByPriority priority : getUserEventsGroupByPriority) {
             for (int i = 2; i < FinalValues.PRIORITY.length + 2; i++) {
                 if (priority.getPriority() == i) {
-                    String percent = nf3.format((double) priority.getNum() / totalEvents);
+                    String percent = nf3.format((double) priority.getNum() / totalEvents * 100);
                     if (percent.endsWith("5")) {
                         if (errorNums % 2 == 1) {
                             percent = nf2.format((double) priority.getNum() / totalEvents - 0.01 < 0 ? 0 : ((double) priority.getNum() / totalEvents - 0.01) * 100);
