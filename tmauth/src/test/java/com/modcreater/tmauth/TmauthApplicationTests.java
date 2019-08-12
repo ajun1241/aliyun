@@ -1,11 +1,15 @@
 package com.modcreater.tmauth;
 
+import com.alibaba.fastjson.JSONObject;
+import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.Friendship;
 import com.modcreater.tmbeans.pojo.MsgStatus;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmdao.mapper.MsgStatusMapper;
+import com.modcreater.tmdao.mapper.SensitiveWordsMapper;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.MD5Util;
 import org.junit.Test;
@@ -35,28 +39,46 @@ public class TmauthApplicationTests {
     MsgStatusMapper msgStatusMapper;
     @Resource
     private AccountMapper accountMapper;
+    @Resource
+    private static SensitiveWordsMapper sensitiveWordsMapper;
     @Test
     public void contextLoads() {
+
     }
     @Test
     public void test(){
-        /*Map<String, String> map = new TreeMap<>(
-                new Comparator<String>() {
-                    public int compare(String obj1, String obj2) {
-                        // 降序排序
-                        return obj1.compareTo(obj2);
-                    }
-                });
-        map.put("c", "ccccc");
-        map.put("a", "aaaaa");
-        map.put("b", "bbbbb");
-        map.put("d", "ddddd");
-
-        Set<String> keySet = map.keySet();
-        Iterator<String> iter = keySet.iterator();
-        while (iter.hasNext()) {
-            String key = iter.next();
-            System.out.println(key + ":" + map.get(key));
-        }*/
+        Set<String> set=sensitiveWordsMapper.sensitiveWords();
+        System.out.println(set);
     }
 }
+
+/*
+class Ad<T>{
+    private int resCode;
+    private String resMsg;
+    private T data;
+
+    public int getResCode() {
+        return resCode;
+    }
+
+    public void setResCode(int resCode) {
+        this.resCode = resCode;
+    }
+
+    public String getResMsg() {
+        return resMsg;
+    }
+
+    public void setResMsg(String resMsg) {
+        this.resMsg = resMsg;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+}*/

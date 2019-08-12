@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.DiaryMapper">
     <insert id="addNewDiary" parameterType="com.modcreater.tmbeans.pojo.Diary">
-        insert into diary(userId, content, diaryImage, moodType,createDate, status) values (#{userId},#{content},#{diaryImage},#{moodType},#{createDate},#{status})
+        insert into diary(userId, content, moodType, status, cover, weather) values (#{userId},#{content},#{moodType},#{status},#{cover},#{weather})
     </insert>
 
     <update id="updateDiary">
@@ -11,32 +11,35 @@
             <if test="content != null and content != ''">
                 content=#{content},
             </if>
-            <if test="diaryImage != null and diaryImage != ''">
-                diaryImage=#{diaryImage},
-            </if>
             <if test="moodType != -1 ">
                 moodType=#{moodType},
             </if>
             <if test="status != -1 ">
                 status=#{status},
             </if>
+            <if test="cover != null and cover != ''">
+                cover=#{cover},
+            </if>
+            <if test="weather != null and weather != ''">
+                weather=#{weather},
+            </if>
         </set>
-          where diaryId=#{diaryId}
+          where id=#{id}
     </update>
 
     <delete id="deleteDiary">
-        delete from diary where diaryId=#{diaryId}
+        update diary set isDelete=1 where id=#{id}
     </delete>
 
     <select id="queryDiaryList" resultType="com.modcreater.tmbeans.pojo.Diary">
-        select * from diary where userId=#{userId}
+        select * from diary where userId=#{userId} and isDelete=0
         <if test=" pageIndex >= 0 and pageSize > 0">
             limit #{pageIndex},#{pageSize}
         </if>
     </select>
 
     <select id="queryDiaryDetail" resultType="com.modcreater.tmbeans.pojo.Diary">
-        select * from diary where diaryId=#{diaryId}
+        select * from diary where id=#{id}
     </select>
 
     <select id="queryDiaryByDate" resultType="com.modcreater.tmbeans.pojo.Diary">
@@ -44,10 +47,17 @@
     </select>
 
     <select id="queryFriendsDiaryList" resultType="com.modcreater.tmbeans.pojo.Diary">
-        select * from diary where userId=#{friendId} and status=1
+        select * from diary where userId=#{friendId} and status=1 and isDelete=0
         <if test=" pageIndex >= 0 and pageSize > 0">
             limit #{pageIndex},#{pageSize}
         </if>
     </select>
 
+    <insert id="addComment">
+        insert into diarycomment (diaryId, userId, commentContent) values (#{diaryId},#{userId},#{commentContent})
+    </insert>
+
+    <insert id="addCommentReply">
+        insert into commentreply (commentId, userId, replyContent, diaryId)values (#{commentId},#{userId},#{replyContent},#{diaryId})
+    </insert>
 </mapper>

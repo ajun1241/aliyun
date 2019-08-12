@@ -1,7 +1,8 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.CommentReply;
 import com.modcreater.tmbeans.pojo.Diary;
-import com.modcreater.tmbeans.vo.DiaryVo;
+import com.modcreater.tmbeans.pojo.DiaryComment;
 import java.util.List;
 
 /**
@@ -28,10 +29,10 @@ public interface DiaryMapper {
 
     /**
      * 删除日记（只能删当天的）
-     * @param diaryId
+     * @param id
      * @return
      */
-    int deleteDiary(String diaryId);
+    int deleteDiary(String id);
 
     /**
      * 查询历史日记
@@ -44,13 +45,13 @@ public interface DiaryMapper {
 
     /**
      * 查询日记详情
-     * @param diaryId
+     * @param id
      * @return
      */
-    Diary queryDiaryDetail(String diaryId);
+    Diary queryDiaryDetail(String id);
 
     /**
-     * 根据日记查日记
+     * 根据日期查日记
      * @param userId
      * @param date
      * @return
@@ -65,4 +66,18 @@ public interface DiaryMapper {
      * @return
      */
     List<Diary> queryFriendsDiaryList(String friendId, int pageIndex, int pageSize);
+
+    /**
+     * 评论日记
+     * @param diaryComment
+     * @return
+     */
+    int addComment(DiaryComment diaryComment);
+
+    /**
+     * 回复评论
+     * @param commentReply
+     * @return
+     */
+    int addCommentReply(CommentReply commentReply);
 }

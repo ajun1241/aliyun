@@ -15,7 +15,8 @@ public class DiaryResultVo implements Serializable {
     private Long diaryId;
     private Long userId;
     private String content;
-    private String[] diaryImage;
+    private String cover;
+    private String weather;
     private String createDate;
     private Long moodType;
     private Long status;

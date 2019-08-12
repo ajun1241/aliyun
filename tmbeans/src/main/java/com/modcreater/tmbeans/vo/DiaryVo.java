@@ -18,7 +18,8 @@ public class DiaryVo implements Serializable {
     private String appType;
     private String diaryId;
     private String content;
-    private String diaryImage;
+    private String cover;
     private String moodType;
     private String status;
+    private String weather;
 }

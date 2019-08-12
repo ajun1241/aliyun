@@ -1,8 +1,7 @@
 package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.vo.DiaryVo;
-import com.modcreater.tmbeans.vo.QueryDiaryVo;
+import com.modcreater.tmbeans.vo.*;
 
 /**
  * Description:
@@ -37,7 +36,7 @@ public interface DiaryService {
     Dto deleteDiary(DiaryVo diaryVo,String token);
 
     /**
-     * 查询历史日记
+     * 查询所有日记
      * @param queryDiaryVo
      * @param token
      * @return
@@ -61,5 +60,27 @@ public interface DiaryService {
      */
     Dto queryFriendDiaryList(QueryDiaryVo queryDiaryVo, String token);
 
+    /**
+     * 评论一条日记
+     * @param commentVo
+     * @param token
+     * @return
+     */
+    Dto commentDiary(CommentVo commentVo, String token);
 
+    /**
+     * 回复一条评论
+     * @param commentReplyVo
+     * @param token
+     * @return
+     */
+    Dto replyComment(CommentReplyVo commentReplyVo, String token);
+
+    /**
+     * 转发分享日记
+     * @param transmitVo
+     * @param token
+     * @return
+     */
+    Dto transmitDiary(TransmitVo transmitVo, String token);
 }

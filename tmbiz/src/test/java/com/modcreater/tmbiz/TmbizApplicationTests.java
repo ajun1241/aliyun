@@ -9,8 +9,10 @@ import com.modcreater.tmbiz.config.EventUtil;
 import com.modcreater.tmbiz.config.aop.InfoSafety;
 import com.modcreater.tmdao.mapper.BackerMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
+import com.modcreater.tmutils.RongCloudMethodUtil;
 import com.modcreater.tmutils.RongCloudUtil;
 import com.modcreater.tmutils.SingleEventUtil;
+import com.modcreater.tmutils.messageutil.FriendCardMessage;
 import com.modcreater.tmutils.messageutil.InviteMessage;
 import com.modcreater.tmutils.messageutil.UpdateInviteMessage;
 import io.rong.RongCloud;
@@ -135,13 +137,11 @@ public class TmbizApplicationTests {
         System.out.println(different.replace(different.length()-1,different.length(),"."));*/
     }
     @Test
-    public void test4() {
-        /*String o="{\"address\":\"湖州\",\"day\":18,\"endtime\":1440,\"eventid\":1560855712,\"eventname\":\"就算不上班\",\"flag\":1,\"isOverdue\":0,\"level\":2,\"month\":6,\"person\":\"{\\\"friendsId\\\":\\\"100089\\\",\\\"others\\\":\\\"\\\"}\",\"remarks\":\"\",\"remindTime\":30,\"repeaTtime\":[false,false,false,false,false,false,false],\"starttime\":1146,\"type\":0,\"userid\":0,\"year\":2019}";
-        String n="{\"address\":\"解开了\",\"day\":2,\"endtime\":1480,\"eventid\":1560855712,\"eventname\":\"就班\",\"flag\":1,\"isOverdue\":0,\"level\":5,\"month\":6,\"person\":\"{\\\"friendsId\\\":\\\"100089,100030\\\",\\\"others\\\":\\\"\\\"}\",\"remarks\":\"\",\"remindTime\":30,\"repeaTtime\":[false,false,false,false,false,false,false],\"starttime\":1146,\"type\":0,\"userid\":0,\"year\":2219}";
-        SingleEvent singleEvent1=JSONObject.parseObject(o,SingleEvent.class);
-        SingleEvent singleEvent2=JSONObject.parseObject(n,SingleEvent.class);
-        List list=SingleEventUtil.eventDifferent(SingleEvent.toMap(singleEvent2),SingleEvent.toMap(singleEvent1));
-        logger.info("差异数据"+list);*/
+    public void test4() throws Exception {
+//        RongCloud rongCloud = RongCloud.getInstance("0vnjpoad0314z", "0uoZVUDt8lROGb");
+        /*RongCloudMethodUtil rongCloudUtil=new RongCloudMethodUtil();
+        FriendCardMessage friendCardMessage=new FriendCardMessage("http://mdxc2019-1258779334.cos.ap-chengdu.myqcloud.com/headImage/1561444623100030head.jpg","阿三","15067212257");
+        rongCloudUtil.sendSystemMessage("100033",new String[]{"100148"},friendCardMessage,"","");*/
     }
 
     @Test

@@ -33,9 +33,10 @@ import java.util.Map;
  */
 
 public class RongCloudMethodUtil {
-
-    public final static String appKey = "0vnjpoad0314z";// 申请的融云key
-    public final static String appSecret = "0uoZVUDt8lROGb";// 申请的的云secret
+    // 申请的融云key
+    public final static String appKey = "0vnjpoad0314z";
+    // 申请的的云secret
+    public final static String appSecret = "0uoZVUDt8lROGb";
 
     VoiceMessage voiceMessage = new VoiceMessage("hello", "helloExtra", 20L);
 
@@ -116,7 +117,7 @@ public class RongCloudMethodUtil {
                 .setPushContent("")
                 .setPushData("")
                 .setCount("")
-                .setVerifyBlacklist(0)
+                .setVerifyBlacklist(1)
                 .setIsPersisted(1)
                 .setIsCounted(0)
                 .setIsIncludeSender(isIncludeSender);

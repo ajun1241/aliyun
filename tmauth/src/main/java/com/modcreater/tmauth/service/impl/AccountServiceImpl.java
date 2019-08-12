@@ -12,8 +12,9 @@ import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.*;
 import com.modcreater.tmutils.messageutil.FriendCardMessage;
 import com.modcreater.tmutils.messageutil.UpdPortraitMessage;
+import com.modcreater.tmutils.messageutil.VerifyFriendMsg;
+import io.rong.messages.BaseMessage;
 import io.rong.messages.ContactNtfMessage;
-import io.rong.messages.InfoNtfMessage;
 import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
 import org.slf4j.Logger;
@@ -40,6 +41,8 @@ public class AccountServiceImpl implements AccountService {
     private AccountMapper accountMapper;
 
     private static Pattern pattern = Pattern.compile("[0-9]*");
+
+    private static final String SYSTEMID = "100000";
 
     @Resource
     private AchievementMapper achievementMapper;
@@ -278,6 +281,11 @@ public class AccountServiceImpl implements AccountService {
             if (achievement.size()==0){
                 return DtoUtil.getSuccesWithDataDto("查询成就失败",null,200000);
             }
+            //查询好友关系天数
+            Friendship friendship=accountMapper.queryFriendshipDetail(queFridenVo.getUserId(),account.getId().toString());
+            Date createDate=friendship.getCerateDate();
+            String days=""+((System.currentTimeMillis()-createDate.getTime())/1000/3600/24 == 0 ? 1 : (System.currentTimeMillis()-createDate.getTime())/1000/3600/24);
+            map.put("friendshipDays",days);
             map.put("userId",account.getId().toString());
             map.put("userCode",account.getUserCode());
             map.put("userName",account.getUserName());
@@ -338,8 +346,12 @@ public class AccountServiceImpl implements AccountService {
         }
         //不是第一次添加
         if (!ObjectUtils.isEmpty(friendship)|| !ObjectUtils.isEmpty(friendship1)){
+            //判断有没有被对方拉黑
+            if (friendship1.getFlag()==1L){
+                return DtoUtil.getFalseDto("发送失败，对方可能对你设置了权限",10220);
+            }
             //这时不能添加
-            if (friendship.getStatus()==20 && friendship1.getStatus()==20){
+            if (friendship.getStatus()==20L && friendship1.getStatus()==20L){
                 return DtoUtil.getFalseDto("你们已经是好友了不能添加",17006);
             }
             //修改好友状态
@@ -589,7 +601,6 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Dto queryFriendDetails(FriendshipVo queFridenVo, String token) {
-        System.out.println("{}{}{{{}++"+queFridenVo.toString());
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -603,9 +614,9 @@ public class AccountServiceImpl implements AccountService {
         Date date=new Date();
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
         String[] myDate=sdf.format(date).split("-");
-        for (int i = 0; i < myDate.length; i++) {
+        /*for (int i = 0; i < myDate.length; i++) {
             System.out.println("今天的日期"+myDate[i]);
-        }
+        }*/
         //好友表信息
         Account account=accountMapper.queryAccount(queFridenVo.getFriendId());
         if (ObjectUtils.isEmpty(account)){
@@ -614,19 +625,19 @@ public class AccountServiceImpl implements AccountService {
         //日规划,月规划
         MyDetail result=accountMapper.queryPlanByDayAndMonth(account.getId().toString(),myDate[2],myDate[0],myDate[1]);
         //已完成
-        UserStatistics userStatistics=achievementMapper.queryUserStatistics(account.getId().toString());
-        if (ObjectUtils.isEmpty(userStatistics)|| ObjectUtils.isEmpty(result)){
-            return DtoUtil.getSuccesWithDataDto("好友其他信息失败",null,200000);
-        }
+        Long completedEvents = eventMapper.countCompletedEvents(account.getId());
         //成就
         List<Achievement> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
+        String days="";
+        //如果是小助手
+        if (SYSTEMID.equals(queFridenVo.getFriendId())){
+            days="\"很多\"";
+        }else {
+            Friendship friendship=accountMapper.queryFriendshipDetail(queFridenVo.getUserId(),queFridenVo.getFriendId());
+            Date createDate=friendship.getCerateDate();
+            days=String.valueOf((System.currentTimeMillis()-createDate.getTime())/1000/3600/24 == 0 ? 1 : (System.currentTimeMillis()-createDate.getTime())/1000/3600/24);
+        }
         //查询好友关系天数
-        Friendship friendship=accountMapper.queryFriendshipDetail(queFridenVo.getUserId(),queFridenVo.getFriendId());
-        Date createDate=friendship.getCerateDate();
-        String days=""+((System.currentTimeMillis()-createDate.getTime())/1000/3600/24 == 0 ? 1 : (System.currentTimeMillis()-createDate.getTime())/1000/3600/24);
-        //获取设置的好友权限
-        map.put("hide",friendship.getHide().toString());
-        map.put("diary",friendship.getDiary().toString());
         map.put("friendshipDays",days);
         map.put("userId",account.getId().toString());
         map.put("userCode",account.getUserCode());
@@ -637,7 +648,7 @@ public class AccountServiceImpl implements AccountService {
         map.put("userSign",account.getUserSign());
         map.put("dayPlan",result.getDay());
         map.put("monthPlan",result.getMonth());
-        map.put("finish",userStatistics.getCompleted().toString());
+        map.put("finish",completedEvents.toString());
         map.put("achievement",achievement);
         return DtoUtil.getSuccesWithDataDto("查询好友详情成功",map,100000);
     }
@@ -908,6 +919,32 @@ public class AccountServiceImpl implements AccountService {
         return DtoUtil.getSuccesWithDataDto("查询用户信息成功",showUserInfo,100000);
     }
 
+    /**
+     * 新查看用户详情(userId)
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto newQueryAccount(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        Account account= accountMapper.queryAccount(receivedId.getUserId());
+        if (ObjectUtils.isEmpty(account)){
+            return DtoUtil.getSuccesWithDataDto("查询用户信息失败",null,200000);
+        }
+        account.setUserPassword(null);
+        ShowUserInfo showUserInfo = new ShowUserInfo();
+        showUserInfo.setDND(userSettingsMapper.getDND(receivedId.getUserId()).toString());
+        try {
+            FatherToChild.change(account,showUserInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DtoUtil.getSuccesWithDataDto("查询用户信息成功",showUserInfo,100000);
+    }
+
     @Override
     public Dto updateAccount(UpdAccountInfo updAccountInfo,String token) {
         if (ObjectUtils.isEmpty(updAccountInfo)){
@@ -1003,8 +1040,8 @@ public class AccountServiceImpl implements AccountService {
         }
         try {
             String[] friendId={requestVo.getFriendId()};
-            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("1","1",requestVo.getUserId(),requestVo.getFriendId(),requestVo.getContent());
-            ResponseResult result=rongCloudMethodUtil.sendSystemMessage(requestVo.getUserId(),friendId, contactNtfMessage, "","");
+            BaseMessage verifyFriendMsg=new VerifyFriendMsg(requestVo.getContent(),"1");
+            ResponseResult result=rongCloudMethodUtil.sendSystemMessage(requestVo.getUserId(),friendId, verifyFriendMsg, "","");
             if (result.getCode()!=200){
                 logger.info("融云消息异常"+result.toString());
                 return DtoUtil.getFalseDto("发送请求失败",17002);
@@ -1040,6 +1077,94 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("发送失败",17003);
         }
         return DtoUtil.getSuccessDto("发送成功",100000);
+    }
+
+    /**
+     * 添加黑名单
+     * @param friendshipVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto addBlackList(FriendshipVo friendshipVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(friendshipVo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        //判断两人好友关系
+        Friendship friendship=accountMapper.queryFriendshipDetail(friendshipVo.getUserId(),friendshipVo.getFriendId());
+        if (ObjectUtils.isEmpty(friendship)){
+            accountMapper.buildFriendship(friendshipVo.getUserId(),friendshipVo.getFriendId(),"11");
+            accountMapper.buildFriendship(friendshipVo.getFriendId(),friendshipVo.getUserId(),"10");
+        }
+        //加入融云的黑名单
+        try {
+            rongCloudMethodUtil.addBlackList(friendship.getUserId().toString(),friendship.getFriendId().toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //修改权限
+        UpdateFriendJurisdictionVo jurisdictionVo=new UpdateFriendJurisdictionVo();
+        jurisdictionVo.setUserId(friendshipVo.getUserId());
+        jurisdictionVo.setFriendId(friendshipVo.getFriendId());
+        jurisdictionVo.setFlag("1");
+        if (accountMapper.updateFriendJurisdiction(jurisdictionVo)<1){
+            return DtoUtil.getFalseDto("加入黑名单失败",10291);
+        }
+        return DtoUtil.getSuccessDto("添加黑名单成功",100000);
+    }
+
+    /**
+     * 查看黑名单列表
+     * @param userIdVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto queryBlackList(UserIdVo userIdVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userIdVo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        List<String> list=accountMapper.queryBlackList(userIdVo.getUserId());
+        List<Map<String,String>> maps=new ArrayList<>();
+        for (String userId:list) {
+            Account account=accountMapper.queryAccount(userId);
+            Map<String,String> map=new HashMap<>();
+            map.put("userId",account.getId().toString());
+            map.put("headImgUrl",account.getHeadImgUrl());
+            map.put("userCode",account.getUserCode());
+            map.put("userName",account.getUserName());
+            map.put("gender",account.getGender().toString());
+            maps.add(map);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",maps,100000);
+    }
+
+    /**
+     * 移出黑名单
+     * @param friendshipVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto removeBlackList(FriendshipVo friendshipVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(friendshipVo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        //移出融云黑名单
+        try {
+            rongCloudMethodUtil.removeBlackList(friendshipVo.getUserId(),friendshipVo.getFriendId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //修改权限
+        UpdateFriendJurisdictionVo jurisdictionVo=new UpdateFriendJurisdictionVo();
+        jurisdictionVo.setUserId(friendshipVo.getUserId());
+        jurisdictionVo.setFriendId(friendshipVo.getFriendId());
+        jurisdictionVo.setFlag("0");
+        if (accountMapper.updateFriendJurisdiction(jurisdictionVo)<1){
+            return DtoUtil.getFalseDto("移出黑名单失败",10291);
+        }
+        return DtoUtil.getSuccessDto("移出黑名单成功",100000);
     }
 
 }

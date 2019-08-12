@@ -3,6 +3,8 @@ package com.modcreater.tmauth.controller;
 import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.DiaryService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.CommentReplyVo;
+import com.modcreater.tmbeans.vo.CommentVo;
 import com.modcreater.tmbeans.vo.DiaryVo;
 import com.modcreater.tmbeans.vo.QueryDiaryVo;
 import io.swagger.annotations.ApiOperation;
@@ -67,6 +69,20 @@ public class DiaryController {
     @ApiOperation("查询好友的日记历史日记")
     public Dto queryFriendDiaryList(@RequestBody QueryDiaryVo queryDiaryVo, HttpServletRequest request){
         return diaryService.queryFriendDiaryList(queryDiaryVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping("commentdiary")
+    @ApiOperation("评论一篇日记")
+    public Dto commentDiary(@RequestBody CommentVo commentVo, HttpServletRequest request){
+        return diaryService.commentDiary(commentVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping("replycomment")
+    @ApiOperation("回复评论")
+    public Dto replyComment(@RequestBody CommentReplyVo commentReplyVo, HttpServletRequest request){
+        return diaryService.replyComment(commentReplyVo,request.getHeader("token"));
     }
 
 

@@ -163,6 +163,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("修改条件接收失败", 21008);
         }
         SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
+        logger.info("233:  "+singleEvent.toString());
         singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
@@ -812,10 +813,6 @@ public class EventServiceImpl implements EventService {
                     return DtoUtil.getFalseDto("消息发送失败", 21040);
                 }
                 //如果是ios发送推送信息
-                UserDeviceToken userDeviceToken = deviceTokenMapper.queryDeviceToken(personList1.get(i));
-                if (!ObjectUtils.isEmpty(userDeviceToken) && userDeviceToken.getAppType() == 1L && !StringUtils.isEmpty(userDeviceToken.getDeviceToken())) {
-                    PushUtil.APNSPush(userDeviceToken.getDeviceToken(), "你的好友邀请你参与他的事件", 1);
-                }
                 msgStatusMapper.addNewEventMsg(personList1.get(i), singleEvent.getEventid(), addInviteEventVo.getUserId(), "邀请你参与事件", System.currentTimeMillis() / 1000);
             }
             //list2给创建者发送拒绝信息

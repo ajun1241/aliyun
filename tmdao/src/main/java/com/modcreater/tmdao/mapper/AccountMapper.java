@@ -211,4 +211,11 @@ public interface AccountMapper {
      * @return
      */
     Long countAllMyFriends(String userId);
+
+    /**
+     * 查询黑名单列表
+     * @param userId
+     * @return
+     */
+    List<String> queryBlackList(String userId);
 }

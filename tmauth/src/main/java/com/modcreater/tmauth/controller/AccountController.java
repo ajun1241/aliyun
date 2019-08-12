@@ -40,8 +40,13 @@ public class AccountController {
     @PostMapping("queryaccount")
     @ApiOperation("查询账户信息")
     public Dto queryAccount(@RequestBody QueryUserVo queryUserVo, HttpServletRequest request){
-        System.out.println("token===>>>"+request.getHeader("token"));
         return userService.queryAccount(queryUserVo,request.getHeader("token"));
+    }
+
+    @PostMapping("newqueryaccount")
+    @ApiOperation("新查询账户信息")
+    public Dto newQueryAccount(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return userService.newQueryAccount(receivedId,request.getHeader("token"));
     }
 
     @Safety
@@ -146,5 +151,26 @@ public class AccountController {
     @ApiOperation("发送好友名片消息")
     public Dto sendFriendCard(@RequestBody FriendCardVo friendCardVo, HttpServletRequest request){
         return userService.sendFriendCard(friendCardVo ,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping("addblacklist")
+    @ApiOperation("添加黑名单")
+    public Dto addBlackList(@RequestBody FriendshipVo friendshipVo, HttpServletRequest request){
+        return userService.addBlackList(friendshipVo ,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping("queryblacklist")
+    @ApiOperation("查看黑名单列表")
+    public Dto queryBlackList(@RequestBody UserIdVo userIdVo, HttpServletRequest request){
+        return userService.queryBlackList(userIdVo ,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping("removeblacklist")
+    @ApiOperation("移出黑名单")
+    public Dto removeBlackList(@RequestBody FriendshipVo friendshipVo, HttpServletRequest request){
+        return userService.removeBlackList(friendshipVo ,request.getHeader("token"));
     }
 }

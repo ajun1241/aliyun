@@ -12,12 +12,13 @@ import java.util.Date;
 @Data
 public class Diary {
 
-  private Long diaryId;
+  private Long id;
   private Long userId;
   private String content;
-  private String diaryImage;
-  private String createDate;
+  private Date createDate;
   private Long moodType;
   private Long status;
+  private String cover;
+  private String weather;
 
 }

@@ -120,6 +120,9 @@
             <if test="diary != null and diary != '' ">
                 diary=#{diary},
             </if>
+            <if test="flag != null and flag != '' ">
+                flag=#{flag},
+            </if>
         </set>
         where userId=#{userId} and friendId=#{friendId}
     </update>
@@ -189,6 +192,9 @@
     </select>
     <select id="countAllMyFriends" resultType="java.lang.Long">
         select count(userId) from friendship where userId = #{userId} and status = 20
+    </select>
+    <select id="queryBlackList" resultType="java.lang.String">
+        select friendId from friendship where userId=#{userId} and flag=1
     </select>
 
 </mapper>

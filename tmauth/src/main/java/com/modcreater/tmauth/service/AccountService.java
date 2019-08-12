@@ -38,6 +38,13 @@ public interface AccountService {
     Dto queryAccount(QueryUserVo queryUserVo,String token);
 
     /**
+     * 新查看用户详情(userId)
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto newQueryAccount(ReceivedId receivedId, String token);
+    /**
      *添加二级密码
      * @param addPwdVo
      * @return
@@ -163,4 +170,29 @@ public interface AccountService {
      * @return
      */
     Dto sendFriendCard(FriendCardVo friendCardVo,String token);
+
+    /**
+     * 添加黑名单
+     * @param friendshipVo
+     * @param token
+     * @return
+     */
+    Dto addBlackList(FriendshipVo friendshipVo,String token);
+
+    /**
+     * 查看黑名单列表
+     * @param userIdVo
+     * @param token
+     * @return
+     */
+    Dto queryBlackList(UserIdVo userIdVo,String token);
+
+    /**
+     * 移出黑名单
+     * @param friendshipVo
+     * @param token
+     * @return
+     */
+    Dto removeBlackList(FriendshipVo friendshipVo,String token);
+
 }
