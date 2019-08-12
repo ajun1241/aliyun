@@ -512,6 +512,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(userId))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
+        Account account = accountMapper.queryAccount(userId);
+        if (System.currentTimeMillis() - account.getCreateDate().getTime() <= 24*60*60*1000*7){
+            return DtoUtil.getSuccesWithDataDto("使用时间不够,暂时无法生成报表",null,13045);
+        }
         Map<String, Object> result = new HashMap<>();
         //title
         List<NaturalWeek> naturalWeeks = DateUtil.getLastWeekOfNatural(1);
