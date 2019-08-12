@@ -516,7 +516,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<NaturalWeek> naturalWeeks = DateUtil.getLastWeekOfNatural(1);
         NaturalWeek firstDay = naturalWeeks.get(0);
         NaturalWeek lastDay = naturalWeeks.get(6);
-        result.put("title", firstDay.getYear() + "." + firstDay.getMonth() + "." + firstDay.getDay() + "-" + lastDay.getYear() + "." + lastDay.getMonth() + "." + lastDay.getDay());
+        result.put("title", firstDay.getYear() + "." + firstDay.getMonth() + "." + firstDay.getDay() + "-" + lastDay.getMonth() + "." + lastDay.getDay());
         //mod1
         UserEventsGroupByInWeek userEventsGroupByInWeek = new UserEventsGroupByInWeek();
         userEventsGroupByInWeek.setUserId(userId);
