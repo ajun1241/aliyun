@@ -587,7 +587,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         Long maxNum = 0L;
         String maxNumKey = "a";
         double countFour = 0.0;
-        Map<String, Object> typeMod = new HashMap<>();
         for (int i = 0; i <= 3; i++) {
             for (String key : typeAndNums.keySet()) {
                 Long currentNum = typeAndNums.get(key);
@@ -598,6 +597,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
             String d = nf.format(((double) maxNum / totalEvents) * 100);
             countFour += Double.parseDouble(d);
+            Map<String, Object> typeMod = new HashMap<>();
             typeMod.put("typeName", SingleEventUtil.getTypeValues(maxNumKey));
             typeMod.put("typeValue", d);
             mod1S.put(FinalValues.TYPE[i], typeMod);
