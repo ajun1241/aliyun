@@ -10,6 +10,8 @@ import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -368,7 +370,7 @@ public class SingleEventUtil {
                 Boolean[] repLoop = getRepeatTime(loopEvent);
                 for (int i = 0; i <= 6; i++) {
                     if (rep[i] && repLoop[i]) {
-                        if (getClashTime(singleEvent.getStarttime(),singleEvent.getEndtime(),loopEvent.getStarttime(),loopEvent.getEndtime())) {
+                        if (getClashTime(singleEvent.getStarttime(), singleEvent.getEndtime(), loopEvent.getStarttime(), loopEvent.getEndtime())) {
                             //冲突了,返回false
                             return false;
                         }
@@ -381,29 +383,39 @@ public class SingleEventUtil {
 
     /**
      * 返回true是冲突
+     *
      * @param foreachEventS
      * @param foreachEventE
      * @param singleEventS
      * @param singleEventE
      * @return
      */
-    public static boolean getClashTime(String foreachEventS,String foreachEventE, String singleEventS, String singleEventE){
+    public static boolean getClashTime(String foreachEventS, String foreachEventE, String singleEventS, String singleEventE) {
         return ((Long.valueOf(foreachEventS) > Long.valueOf(singleEventS) && Long.valueOf(foreachEventE) < Long.valueOf(singleEventE))
                 || (Long.valueOf(foreachEventS) > Long.valueOf(singleEventS) && Long.valueOf(foreachEventS) < Long.valueOf(singleEventE))
                 || (Long.valueOf(foreachEventE) > Long.valueOf(singleEventS) && Long.valueOf(foreachEventE) < Long.valueOf(singleEventE))
                 || (Long.valueOf(foreachEventS) <= Long.valueOf(singleEventS) && Long.valueOf(foreachEventE) >= Long.valueOf(singleEventE)));
     }
 
-    public static String getTypeValues(String type){
-        Map<String,String> map = new HashMap<>();
-        map.put("a","学习");
-        map.put("b","工作");
-        map.put("c","商务");
-        map.put("d","休闲");
-        map.put("e","家庭");
-        map.put("f","节日");
-        map.put("g","假期");
-        map.put("h","其他");
+    public static String getTypeValues(String type) {
+        Map<String, String> map = new HashMap<>();
+        map.put("a", "学习");
+        map.put("b", "工作");
+        map.put("c", "商务");
+        map.put("d", "休闲");
+        map.put("e", "家庭");
+        map.put("f", "节日");
+        map.put("g", "假期");
+        map.put("h", "其他");
         return map.get(type);
+    }
+
+    public static Long isCommon(Long year, Long month, Long day) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        try {
+            return simpleDateFormat.parse("" + year + month + day).equals(simpleDateFormat.parse(simpleDateFormat.format(new Date()))) ? 1L : 0L;
+        } catch (ParseException e) {
+            return 1L;
+        }
     }
 }

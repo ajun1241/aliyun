@@ -593,7 +593,7 @@
     </select>
     <select id="getEventsNumByCommon" resultType="java.lang.Long">
         select count(id) from singleevent where userId = #{userId}
-        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1 and flag = 0
+        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1 and flag in (0,5)
     </select>
     <select id="getEventsNumByUrgent" resultType="java.lang.Long">
         select count(id) from singleevent where userId = #{userId}

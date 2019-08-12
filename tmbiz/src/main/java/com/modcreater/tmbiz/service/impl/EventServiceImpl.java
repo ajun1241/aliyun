@@ -106,6 +106,7 @@ public class EventServiceImpl implements EventService {
         singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
+        singleEvent.setFlag(SingleEventUtil.isCommon(singleEvent.getYear(),singleEvent.getMonth(),singleEvent.getDay()));
         if (singleEvent.getIsLoop() == 1) {
             List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
             if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
