@@ -631,7 +631,25 @@ public class AccountServiceImpl implements AccountService {
         String days="";
         //如果是小助手
         if (SYSTEMID.equals(queFridenVo.getFriendId())){
-            days="\"很多\"";
+            Date createDate=account.getCreateDate();
+            days=String.valueOf((System.currentTimeMillis()-createDate.getTime())/1000/3600/24 == 0 ? 1 : (System.currentTimeMillis()-createDate.getTime())/1000/3600/24);
+        }else if(queFridenVo.getUserId().equals(queFridenVo.getFriendId())){
+            //如果自己查看自己
+            Date createDate=account.getCreateDate();
+            days=String.valueOf((System.currentTimeMillis()-createDate.getTime())/1000/3600/24 == 0 ? 1 : (System.currentTimeMillis()-createDate.getTime())/1000/3600/24);
+            map.put("friendshipDays",days);
+            map.put("userId",account.getId().toString());
+            map.put("userCode",account.getUserCode());
+            map.put("userName",account.getUserName());
+            map.put("gender",account.getGender().toString());
+            map.put("birthday",account.getBirthday());
+            map.put("headImgUrl",account.getHeadImgUrl());
+            map.put("userSign",account.getUserSign());
+            map.put("dayPlan",result.getDay());
+            map.put("monthPlan",result.getMonth());
+            map.put("finish",completedEvents.toString());
+            map.put("achievement",achievement);
+            return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
         }else {
             Friendship friendship=accountMapper.queryFriendshipDetail(queFridenVo.getUserId(),queFridenVo.getFriendId());
             Date createDate=friendship.getCerateDate();
