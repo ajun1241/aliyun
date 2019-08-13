@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.EventExtra;
 import com.modcreater.tmbeans.pojo.SingleEventVice;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -40,4 +41,25 @@ public interface EventViceMapper {
      * @return
      */
     int deleteEventVice(String eventId,String userId);
+
+    /**
+     * 添加事件标识
+     * @param eventExtra
+     * @return
+     */
+    int addEventExtra(EventExtra eventExtra);
+
+    /**
+     * 修改事件标识
+     * @param eventExtra
+     * @return
+     */
+    int updEventExtra(EventExtra eventExtra);
+
+    /**
+     * 查询事件标识表
+     * @param eventId
+     * @return
+     */
+    EventExtra queryEventExtra(String eventId);
 }

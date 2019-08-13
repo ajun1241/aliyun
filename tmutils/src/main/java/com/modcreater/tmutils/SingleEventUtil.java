@@ -415,7 +415,8 @@ public class SingleEventUtil {
         try {
             return simpleDateFormat.parse("" + year + month + day).equals(simpleDateFormat.parse(simpleDateFormat.format(new Date()))) ? 1L : 0L;
         } catch (ParseException e) {
-            return 1L;
+            e.printStackTrace();
         }
+        return 1L;
     }
 }

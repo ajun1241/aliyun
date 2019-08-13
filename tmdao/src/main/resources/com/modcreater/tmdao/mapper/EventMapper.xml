@@ -3,7 +3,7 @@
 <mapper namespace="com.modcreater.tmdao.mapper.EventMapper">
 
     <sql id="Base_Column_List">
-        eventId,userId,eventName,startTime,endTime,address,level,flag,
+        id,eventId,userId,eventName,startTime,endTime,address,level,flag,
         remarks,person,repeatTime,isOverdue,remindTime,day,month,year,type,isloop
     </sql>
 

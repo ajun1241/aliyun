@@ -11,6 +11,7 @@ import java.util.TreeMap;
 @Data
 public class SingleEvent implements Serializable {
 
+    private Long id;
     /**
      * 关联的用户id
      */

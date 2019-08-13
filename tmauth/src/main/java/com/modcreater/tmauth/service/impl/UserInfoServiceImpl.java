@@ -34,6 +34,7 @@ import javax.annotation.Resource;
 import java.lang.reflect.Array;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -643,9 +644,10 @@ public class UserInfoServiceImpl implements UserInfoService {
                 mod3.put(n == 1 ? "p" + (i + 7) : "e" + (i + 7), "0");
             }
         }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         for (int n = 1; n <= 2; n++) {
             for (int i = -6; i <= 0; i++) {
-                String day = DateUtil.getDay(i);
+                String day = DateUtil.getDay(i-DateUtil.stringToWeek(simpleDateFormat.format(new Date())));
                 StringBuilder stringBuilder = new StringBuilder(day);
                 NaturalWeek naturalWeek = new NaturalWeek();
                 naturalWeek.setUserId(userId);

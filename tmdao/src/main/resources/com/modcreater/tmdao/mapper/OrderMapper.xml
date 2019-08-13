@@ -62,7 +62,7 @@
         createDate ,
         payTime ,
         payChannel
-        from userorders where userId = #{userId} and orderStatus = 2
+        from userorders where userId = #{userId} and orderStatus = 2 order by createDate desc
     </select>
     <update id="updateExpiredOrders">
         update userorders set orderStatus = 3 where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800

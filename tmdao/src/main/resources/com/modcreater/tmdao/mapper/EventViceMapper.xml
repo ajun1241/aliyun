@@ -8,6 +8,9 @@
           values
           (#{eventId},#{userId},#{createBy})
     </insert>
+    <insert id="addEventExtra">
+        insert into eventextra (eventId, common) values (#{eventId},#{common})
+    </insert>
 
     <update id="updateEventVice">
         update singleeventvice
@@ -19,6 +22,9 @@
         where eventId=#{eventId}
         and createBy=#{createBy}
     </update>
+    <update id="updEventExtra">
+        update eventextra set common=#{common} where eventId=#{eventId}
+    </update>
 
     <delete id="deleteEventVice" >
         delete from  singleeventvice where eventId=#{eventId} and userId=#{userId}
@@ -26,6 +32,9 @@
 
     <select id="queryEventVice" resultType="com.modcreater.tmbeans.pojo.SingleEventVice">
         select * from singleeventvice where eventId=#{eventId} and userId=#{userId} limit 1
+    </select>
+    <select id="queryEventExtra" resultType="com.modcreater.tmbeans.pojo.EventExtra">
+        select * from eventextra where eventId=#{eventId}
     </select>
 
 </mapper>
