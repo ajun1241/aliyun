@@ -514,9 +514,13 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         Account account = accountMapper.queryAccount(userId);
-        if (System.currentTimeMillis() - account.getCreateDate().getTime() <= 24*60*60*1000*7){
-            return DtoUtil.getSuccesWithDataDto("使用时间不够,暂时无法生成报表",null,13045);
+        if (System.currentTimeMillis() - account.getCreateDate().getTime() <= 24 * 60 * 60 * 1000 * 7) {
+            return DtoUtil.getSuccesWithDataDto("使用时间不够,暂时无法生成报表", null, 13045);
         }
+        //定义小数精度
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setRoundingMode(RoundingMode.HALF_UP);
+        nf.setMaximumFractionDigits(1);
         Map<String, Object> result = new HashMap<>();
         //title
         List<NaturalWeek> naturalWeeks = DateUtil.getLastWeekOfNatural(1);
@@ -553,19 +557,61 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         List<GetUserEventsGroupByType> typeList = eventMapper.getUserEventsGroupByTypeInWeek(userEventsGroupByInWeek);
         Map<String, Object> mod1 = new HashMap<>();
-        mod1.put("max", "");
+        List<Map<String, Object>> mod1F = new ArrayList<>();
+        List<Long> types = new ArrayList<>();
+        for (GetUserEventsGroupByType type : typeList) {
+            for (int i = 0; i < 8; i++) {
+                if (type.getType() == i) {
+                    Double percent = Double.valueOf(nf.format((double) type.getNum() / totalEvents * 100));
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("type", i);
+                    map.put("typeName", SingleEventUtil.getTypeValues(FinalValues.TYPE[i]));
+                    map.put("typeValue", percent);
+                    mod1F.add(map);
+                    types.add(type.getType());
+                }
+            }
+        }
+        List<Long> dingchang = new ArrayList<>();
+        for (long i = 0; i < 8; i++){
+            dingchang.add(i);
+        }
+        for (Long d : dingchang){
+            int dex = 0;
+            for (Long l : types){
+                if (!d.equals(l)){
+                    dex += 1;
+                }
+            }
+            if (dex == types.size()){
+                Map<String,Object> map = new HashMap<>();
+                map.put("type",d);
+                map.put("typeName",SingleEventUtil.getTypeValues(FinalValues.TYPE[d.intValue()]));
+                map.put("typeValue",0);
+                mod1F.add(map);
+            }
+        }
+        mod1.put("mod1F",mod1F);
+        List<Map<String,Object>> mod1S = new ArrayList<>();
+        Double four = 100.0;
+        for (int i = 0; i <= 3; i++){
+            Map<String,Object> map = new HashMap<>();
+            Integer typeIndex = Integer.valueOf(mod1F.get(i).get("type").toString());
+            map.put("typeName",FinalValues.TYPE[typeIndex].toUpperCase());
+            Double value = Double.valueOf(mod1F.get(i).get("typeValue").toString());
+            map.put("typeValue",value);
+            mod1S.add(map);
+            four -= value;
+        }
+        Map<String ,Object> others = new HashMap<>();
+        others.put("typeName","E");
+        others.put("typeValue",four);
+        mod1S.add(others);
+        mod1.put("mod1S",mod1S);
+        result.put("mod1",mod1);
+        /*mod1.put("max", "");
         Map<String, Long> typeAndNums = new HashMap<>();
-        //定义小数精度
-        NumberFormat nf2 = NumberFormat.getNumberInstance();
         Map<String, Object> mod1F = new HashMap<>();
-        nf2.setRoundingMode(RoundingMode.HALF_UP);
-        nf2.setMaximumFractionDigits(2);
-        NumberFormat nf3 = NumberFormat.getNumberInstance();
-        nf3.setRoundingMode(RoundingMode.HALF_UP);
-        nf3.setMaximumFractionDigits(3);
-        NumberFormat nf = NumberFormat.getNumberInstance();
-        nf.setRoundingMode(RoundingMode.HALF_UP);
-        nf.setMaximumFractionDigits(1);
         for (String s : FinalValues.TYPE) {
             mod1F.put(s, "0");
             typeAndNums.put(s, 0L);
@@ -574,14 +620,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             for (int i = 0; i < FinalValues.TYPE.length; i++) {
                 if (type.getType() == i) {
                     String percent = nf.format((double) type.getNum() / totalEvents * 100);
-                    /*if (percent.endsWith("5")) {
-                        if (errorNums % 2 == 1) {
-                            percent = nf2.format((double) type.getNum() / totalEvents - 0.01 < 0 ? 0 : ((double) type.getNum() / totalEvents - 0.01) * 100);
-                        } else {
-                            percent = nf2.format(((double) type.getNum() / totalEvents) * 100);
-                        }
-                        errorNums += 1;
-                    }*/
                     mod1F.put(FinalValues.TYPE[i], percent);
                     typeAndNums.put(FinalValues.TYPE[i], type.getNum());
                 }
@@ -615,7 +653,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         mod1S.put("e", nf.format(100 - countFour));
         mod1.put("mod1S", mod1S);
-        result.put("mod1", mod1);
+        result.put("mod1", mod1);*/
         Map<String, Object> mod2 = new HashMap<>();
         for (int i = 0; i < FinalValues.PRIORITY.length; i++) {
             mod2.put(FinalValues.PRIORITY[i], "0");
@@ -625,14 +663,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             for (int i = 2; i < FinalValues.PRIORITY.length + 2; i++) {
                 if (priority.getPriority() == i) {
                     String percent = nf.format((double) priority.getNum() / totalEvents * 100);
-                    /*if (percent.endsWith("5")) {
-                        if (errorNums % 2 == 1) {
-                            percent = nf2.format((double) priority.getNum() / totalEvents - 0.01 < 0 ? 0 : ((double) priority.getNum() / totalEvents - 0.01) * 100);
-                        } else {
-                            percent = nf2.format(((double) priority.getNum() / totalEvents) * 100);
-                        }
-                        errorNums += 1;
-                    }*/
                     mod2.put(FinalValues.PRIORITY[i - 2], percent);
                 }
             }
@@ -647,7 +677,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         for (int n = 1; n <= 2; n++) {
             for (int i = -6; i <= 0; i++) {
-                String day = DateUtil.getDay(i-DateUtil.stringToWeek(simpleDateFormat.format(new Date())));
+                String day = DateUtil.getDay(i - DateUtil.stringToWeek(simpleDateFormat.format(new Date())));
                 StringBuilder stringBuilder = new StringBuilder(day);
                 NaturalWeek naturalWeek = new NaturalWeek();
                 naturalWeek.setUserId(userId);
@@ -669,7 +699,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             mod4.put("modify", "0");
         } else {
             try {
-                mod4.put("modify", nf2.format(((double) succeed / (succeed + failed)) * 100));
+                mod4.put("modify", nf.format(((double) succeed / (succeed + failed)) * 100));
             } catch (Exception e) {
                 mod4.put("modify", "0");
             }
@@ -678,7 +708,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             mod4.put("refuse", "0");
         } else {
             try {
-                mod4.put("refuse", nf2.format(((double) refused / (refused + agreed)) * 100));
+                mod4.put("refuse", nf.format(((double) refused / (refused + agreed)) * 100));
             } catch (Exception e) {
                 mod4.put("refuse", "0");
             }
@@ -687,6 +717,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         Map<String, Object> mod5 = new HashMap<>();
         mod5.put("friendList", getMyBestFriendList(userId, 2));
         result.put("mod5", mod5);
+        System.out.println(result.toString());
         return DtoUtil.getSuccesWithDataDto("周报已生成", result, 100000);
     }
 

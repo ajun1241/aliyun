@@ -495,7 +495,7 @@
         or (year = #{fifthDayYear} and month = #{fifthDayMonth} and day = #{fifthDayDay})
         or (year = #{sixthDayYear} and month = #{sixthDayMonth} and day = #{sixthDayDay})
         or (year = #{seventhDayYear} and month = #{seventhDayMonth} and day = #{seventhDayDay}))
-        group by type
+        group by type order by num desc
     </select>
     <select id="queryEventInBestFriends" resultType="java.lang.String">
         select person from singleevent where userId = #{userId} and isOverdue = 1 and (person != null or person != '')

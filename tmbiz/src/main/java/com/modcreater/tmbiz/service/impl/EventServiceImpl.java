@@ -293,7 +293,6 @@ public class EventServiceImpl implements EventService {
                 for (Object singleEvent : singleEventList) {
                     //把遍历出的元素转换成对象
                     SingleEvent singleEvent1 = JSONObject.parseObject(singleEvent.toString(), SingleEvent.class);
-                    singleEvent1.setFlag(SingleEventUtil.isCommon(singleEvent1.getYear(),singleEvent1.getMonth(),singleEvent1.getDay()));
                     //插入用户id
                     singleEvent1.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
                     singleEvent1.setIsLoop(0);
@@ -316,7 +315,6 @@ public class EventServiceImpl implements EventService {
                     for (Object loopEvent : singleEventList) {
                         //第三层转换
                         SingleEvent singleEvent = JSONObject.parseObject(loopEvent.toString(), SingleEvent.class);
-                        singleEvent.setFlag(SingleEventUtil.isCommon(singleEvent.getYear(),singleEvent.getMonth(),singleEvent.getDay()));
                         singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
                         singleEvent.setIsLoop(1);
                         if (eventMapper.uploadingEvents(singleEvent) <= 0) {
@@ -761,7 +759,6 @@ public class EventServiceImpl implements EventService {
             singleEvent.setUserid(Long.parseLong(addInviteEventVo.getUserId()));
             //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
             singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
-            singleEvent.setFlag(SingleEventUtil.isCommon(singleEvent.getYear(),singleEvent.getMonth(),singleEvent.getDay()));
             if (singleEvent.getIsLoop() == 1) {
                 List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
                 if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
@@ -960,7 +957,6 @@ public class EventServiceImpl implements EventService {
             logger.info("修改一条邀请事件时输出的接收数据" + addInviteEventVo.toString());
             //接收到的修改信息
             SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
-            singleEvent.setFlag(SingleEventUtil.isCommon(singleEvent.getYear(),singleEvent.getMonth(),singleEvent.getDay()));
             //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
             singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
             if (singleEvent.getIsLoop() == 1) {
@@ -1899,7 +1895,6 @@ public class EventServiceImpl implements EventService {
         SingleEvent singleEvent = JSONObject.parseObject(draftToEventVo.getDraft(), SingleEvent.class);
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
-        singleEvent.setFlag(SingleEventUtil.isCommon(singleEvent.getYear(),singleEvent.getMonth(),singleEvent.getDay()));
         if (singleEvent.getIsLoop() == 1) {
             List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
             if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
@@ -1938,7 +1933,6 @@ public class EventServiceImpl implements EventService {
         SingleEvent singleEvent = JSONObject.parseObject(draftToEventVo.getDraft(), SingleEvent.class);
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
-        singleEvent.setFlag(SingleEventUtil.isCommon(singleEvent.getYear(),singleEvent.getMonth(),singleEvent.getDay()));
         if (singleEvent.getIsLoop() == 1) {
             List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
             if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
