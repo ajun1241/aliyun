@@ -8,7 +8,6 @@ import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -419,4 +418,5 @@ public class SingleEventUtil {
         }
         return 1L;
     }
+
 }
