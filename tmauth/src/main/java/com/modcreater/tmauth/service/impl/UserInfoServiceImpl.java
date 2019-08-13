@@ -594,7 +594,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         mod1.put("mod1F",mod1F);
         List<Map<String,Object>> mod1S = new ArrayList<>();
         Double four = 100.0;
-        for (int i = 0; i <= 3; i++){
+        for (int i = 0; i <= 4; i++){
             Map<String,Object> map = new HashMap<>();
             Integer typeIndex = Integer.valueOf(mod1F.get(i).get("type").toString());
             map.put("typeName",FinalValues.TYPE[typeIndex].toUpperCase());
@@ -603,10 +603,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             mod1S.add(map);
             four -= value;
         }
-        Map<String ,Object> others = new HashMap<>();
+        /*Map<String ,Object> others = new HashMap<>();
         others.put("typeName","E");
         others.put("typeValue",four);
-        mod1S.add(others);
+        mod1S.add(others);*/
         mod1.put("mod1S",mod1S);
         result.put("mod1",mod1);
         /*mod1.put("max", "");
