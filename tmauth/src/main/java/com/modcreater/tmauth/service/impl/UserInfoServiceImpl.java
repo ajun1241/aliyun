@@ -597,7 +597,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         for (int i = 0; i <= 4; i++){
             Map<String,Object> map = new HashMap<>();
             Integer typeIndex = Integer.valueOf(mod1F.get(i).get("type").toString());
-            map.put("typeName",FinalValues.TYPE[typeIndex].toUpperCase());
+            map.put("typeName",FinalValues.TYPE[i].toUpperCase());
             Double value = Double.valueOf(mod1F.get(i).get("typeValue").toString());
             map.put("typeValue",value);
             mod1S.add(map);
