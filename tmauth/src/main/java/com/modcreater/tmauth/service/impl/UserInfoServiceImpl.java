@@ -573,33 +573,33 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
         }
         List<Long> dingchang = new ArrayList<>();
-        for (long i = 0; i < 8; i++){
+        for (long i = 0; i < 8; i++) {
             dingchang.add(i);
         }
-        for (Long d : dingchang){
+        for (Long d : dingchang) {
             int dex = 0;
-            for (Long l : types){
-                if (!d.equals(l)){
+            for (Long l : types) {
+                if (!d.equals(l)) {
                     dex += 1;
                 }
             }
-            if (dex == types.size()){
-                Map<String,Object> map = new HashMap<>();
-                map.put("type",d);
-                map.put("typeName",SingleEventUtil.getTypeValues(FinalValues.TYPE[d.intValue()]));
-                map.put("typeValue",0);
+            if (dex == types.size()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("type", d);
+                map.put("typeName", SingleEventUtil.getTypeValues(FinalValues.TYPE[d.intValue()]));
+                map.put("typeValue", 0);
                 mod1F.add(map);
             }
         }
-        mod1.put("mod1F",mod1F);
-        List<Map<String,Object>> mod1S = new ArrayList<>();
+        mod1.put("mod1F", mod1F);
+        List<Map<String, Object>> mod1S = new ArrayList<>();
         Double four = 100.0;
-        for (int i = 0; i <= 4; i++){
-            Map<String,Object> map = new HashMap<>();
+        for (int i = 0; i <= 4; i++) {
+            Map<String, Object> map = new HashMap<>();
             Integer typeIndex = Integer.valueOf(mod1F.get(i).get("type").toString());
-            map.put("typeName",FinalValues.TYPE[i].toUpperCase());
+            map.put("typeName", FinalValues.TYPE[i].toUpperCase());
             Double value = Double.valueOf(mod1F.get(i).get("typeValue").toString());
-            map.put("typeValue",value);
+            map.put("typeValue", value);
             mod1S.add(map);
             four -= value;
         }
@@ -607,8 +607,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         others.put("typeName","E");
         others.put("typeValue",four);
         mod1S.add(others);*/
-        mod1.put("mod1S",mod1S);
-        result.put("mod1",mod1);
+        mod1.put("mod1S", mod1S);
+        result.put("mod1", mod1);
         /*mod1.put("max", "");
         Map<String, Long> typeAndNums = new HashMap<>();
         Map<String, Object> mod1F = new HashMap<>();
@@ -675,18 +675,30 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-        for (int n = 1; n <= 2; n++) {
-            for (int i = -6; i <= 0; i++) {
-                String day = DateUtil.getDay(i - DateUtil.stringToWeek(simpleDateFormat.format(new Date())));
-                StringBuilder stringBuilder = new StringBuilder(day);
-                NaturalWeek naturalWeek = new NaturalWeek();
-                naturalWeek.setUserId(userId);
-                naturalWeek.setYear(stringBuilder.substring(0, 4));
-                naturalWeek.setMonth(stringBuilder.substring(4, 6));
-                naturalWeek.setDay(stringBuilder.substring(6));
-                Long num = n == 1 ? eventMapper.getEventsNumByCommon(naturalWeek) : eventMapper.getEventsNumByUrgent(naturalWeek);
-                mod3.put(n == 1 ? "p" + (i + 7) : "e" + (i + 7), num);
+        for (int i = -6; i <= 0; i++) {
+            String day = DateUtil.getDay(i - DateUtil.stringToWeek(simpleDateFormat.format(new Date())));
+            StringBuilder stringBuilder = new StringBuilder(day);
+            NaturalWeek naturalWeek = new NaturalWeek();
+            naturalWeek.setUserId(userId);
+            naturalWeek.setYear(stringBuilder.substring(0, 4));
+            naturalWeek.setMonth(stringBuilder.substring(4, 6));
+            naturalWeek.setDay(stringBuilder.substring(6));
+            Long pNum = 0L;
+            Long eNum = 0L;
+            List<SingleEvent> singleEventList = eventMapper.getEventsNumByCommon(naturalWeek);
+            for (SingleEvent singleEvent : singleEventList) {
+                StringBuffer stringBuffer = new StringBuffer(simpleDateFormat.format(DateUtil.stampToDate(singleEvent.getEventid().toString())));
+                Long year = Long.valueOf(stringBuffer.substring(0, 4));
+                Long month = Long.valueOf(stringBuffer.substring(4, 6));
+                Long daily = Long.valueOf(stringBuffer.substring(6));
+                if (year.equals(singleEvent.getYear()) && month.equals(singleEvent.getMonth()) && daily.equals(singleEvent.getDay())) {
+                    eNum += 1;
+                } else {
+                    pNum += 1;
+                }
             }
+            mod3.put("p" + (i + 7), pNum);
+            mod3.put("e" + (i + 7), eNum);
         }
         result.put("mod3", mod3);
         Map<String, Object> mod4 = new HashMap<>();
