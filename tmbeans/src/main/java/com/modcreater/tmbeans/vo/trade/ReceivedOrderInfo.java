@@ -21,6 +21,10 @@ public class ReceivedOrderInfo {
      */
     private String serviceId;
     /**
+     * 用户优惠券ID
+     */
+    private String discountUserId;
+    /**
      * 订单标题
      */
     private String orderTitle;

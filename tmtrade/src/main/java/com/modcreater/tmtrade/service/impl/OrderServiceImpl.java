@@ -10,6 +10,8 @@ import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.DiscountCoupon;
+import com.modcreater.tmbeans.pojo.DiscountUser;
 import com.modcreater.tmbeans.pojo.ServiceRemainingTime;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.show.order.ShowUserOrders;
@@ -32,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -41,6 +45,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -58,6 +64,7 @@ import static com.modcreater.tmtrade.config.AliPayConfig.*;
  * Time: 14:04
  */
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class OrderServiceImpl implements OrderService {
 
     @Resource
@@ -116,13 +123,31 @@ public class OrderServiceImpl implements OrderService {
         userOrder.setNumber(receivedOrderInfo.getNumber());
         userOrder.setServiceType(receivedOrderInfo.getServiceType());
         double unitPrice = orderMapper.getUnitPrice(receivedOrderInfo.getServiceId(), receivedOrderInfo.getServiceType());
-        if (unitPrice != 0 && receivedOrderInfo.getPaymentAmount() / userOrder.getNumber() - (unitPrice) != 0) {
+        /*if (unitPrice != 0 && receivedOrderInfo.getPaymentAmount() / userOrder.getNumber() - (unitPrice) != 0) {
             return DtoUtil.getFalseDto("订单金额错误", 60001);
+        }*/
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setRoundingMode(RoundingMode.HALF_UP);
+        nf.setMaximumFractionDigits(2);
+        if (!receivedOrderInfo.getDiscountUserId().equals("0")) {
+            DiscountUser discountUser = orderMapper.getDiscountUser(receivedOrderInfo.getDiscountUserId());
+            if (ObjectUtils.isEmpty(discountUser)){
+                return DtoUtil.getFalseDto("优惠券已过期", 61002);
+            }
+            DiscountCoupon discountCoupon = orderMapper.getDiscountCoupon(discountUser.getDiscountId().toString());
+            if ((!ObjectUtils.isEmpty(discountCoupon)) && discountCoupon.getCouponType().toString().equals(receivedOrderInfo.getServiceId())) {
+                userOrder.setPaymentAmount(Double.valueOf(nf.format(unitPrice * userOrder.getNumber() - discountCoupon.getCouponMoney())));
+                orderMapper.setDiscountCouponOrderId(discountUser.getId(),userOrder.getId());
+            } else {
+                return DtoUtil.getFalseDto("优惠券使用失败", 61001);
+            }
+        } else {
+            userOrder.setPaymentAmount(receivedOrderInfo.getPaymentAmount());
         }
-        userOrder.setPaymentAmount(receivedOrderInfo.getPaymentAmount());
         userOrder.setCreateDate(System.currentTimeMillis() / 1000);
         userOrder.setRemark(receivedOrderInfo.getUserRemark());
         if (orderMapper.addNewOrder(userOrder) == 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DtoUtil.getFalseDto("订单生成失败", 60002);
         }
         return DtoUtil.getSuccesWithDataDto("success", userOrder, 100000);
@@ -264,6 +289,7 @@ public class OrderServiceImpl implements OrderService {
             return dto;
         }
         UserOrders userOrder = (UserOrders) dto.getData();
+        System.out.println(userOrder.toString());
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         model.setOutTradeNo(userOrder.getId());
         model.setSubject("手机端" + userOrder.getOrderTitle() + "移动支付");
@@ -599,24 +625,24 @@ public class OrderServiceImpl implements OrderService {
         }
         ReceivedServiceIdUserId receivedServiceIdUserId = new ReceivedServiceIdUserId();
         receivedServiceIdUserId.setUserId(receivedId.getUserId());
-        Map<String ,String> result = new HashMap<>();
-        result.put("searchService","");
-        result.put("annualReportingService","");
-        result.put("backupService","");
+        Map<String, String> result = new HashMap<>();
+        result.put("searchService", "");
+        result.put("annualReportingService", "");
+        result.put("backupService", "");
         String key;
         for (int i = 2; i <= 4; i++) {
-            if (i == 2){
+            if (i == 2) {
                 key = "searchService";
-            }else if (i == 3){
+            } else if (i == 3) {
                 key = "annualReportingService";
-            }else {
+            } else {
                 key = "backupService";
             }
-            receivedServiceIdUserId.setServiceId(i+"");
-            Dto dto = searchUserService(receivedServiceIdUserId,token);
-            result.put(key,dto.getResCode() == 100000 ? dto.getData().toString() : "");
+            receivedServiceIdUserId.setServiceId(i + "");
+            Dto dto = searchUserService(receivedServiceIdUserId, token);
+            result.put(key, dto.getResCode() == 100000 ? dto.getData().toString() : "");
         }
-        return DtoUtil.getSuccesWithDataDto("获取成功",result,100000);
+        return DtoUtil.getSuccesWithDataDto("获取成功", result, 100000);
     }
 
     /**

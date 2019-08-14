@@ -64,10 +64,19 @@
         payChannel
         from userorders where userId = #{userId} and orderStatus = 2 order by createDate desc
     </select>
+    <select id="getDiscountCoupon" resultType="com.modcreater.tmbeans.pojo.DiscountCoupon">
+        select * from discountcoupon where id = #{discountId} and couponStatus = 0
+    </select>
+    <select id="getDiscountUser" resultType="com.modcreater.tmbeans.pojo.DiscountUser">
+        select * from discountuser where id = #{discountUserId} and status = 0
+    </select>
     <update id="updateExpiredOrders">
         update userorders set orderStatus = 3 where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800
     </update>
     <update id="updateOrderStatus">
         update userorders set orderStatus = #{status} where id = #{outTradeNo}
+    </update>
+    <update id="setDiscountCouponOrderId">
+        update discountuser set orderId = #{orderId},status = 1 where id = #{discountUserId}
     </update>
 </mapper>
