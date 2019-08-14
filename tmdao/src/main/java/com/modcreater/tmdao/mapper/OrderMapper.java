@@ -1,5 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.pojo.DiscountCoupon;
+import com.modcreater.tmbeans.pojo.DiscountUser;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.show.order.ShowUserOrders;
 import org.apache.ibatis.annotations.Mapper;
@@ -75,4 +77,26 @@ public interface OrderMapper {
      * @return
      */
     int updateOrderStatus(@Param("outTradeNo") String outTradeNo,@Param("status") int status);
+
+    /**
+     * 根据优惠券ID查询优惠券
+     * @param discountId
+     * @return
+     */
+    DiscountCoupon getDiscountCoupon(String discountId);
+
+    /**
+     * 根据优惠券ID查询优惠券
+     * @param discountUserId
+     * @return
+     */
+    DiscountUser getDiscountUser(String discountUserId);
+
+    /**
+     * 设置用户使用优惠券后生成的订单号并将优惠券状态改为已使用
+     * @param discountUserId
+     * @param orderId
+     * @return
+     */
+    int setDiscountCouponOrderId(@Param("discountUserId")Long discountUserId, @Param("orderId")String orderId);
 }

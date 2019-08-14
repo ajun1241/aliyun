@@ -591,13 +591,9 @@
         or (year = #{seventhDayYear} and month = #{seventhDayMonth} and day = #{seventhDayDay}))
         group by level
     </select>
-    <select id="getEventsNumByCommon" resultType="java.lang.Long">
-        select count(id) from singleevent where userId = #{userId}
-        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1 and flag in (0,5)
-    </select>
-    <select id="getEventsNumByUrgent" resultType="java.lang.Long">
-        select count(id) from singleevent where userId = #{userId}
-        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1 and flag = 1
+    <select id="getEventsNumByCommon" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from singleevent where userId = #{userId}
+        and year = #{year} and month = #{month} and day = #{day} and isOverdue = 1
     </select>
     <select id="queryClashLoopEventList" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select repeatTime , startTime , endTime,eventId from singleevent where userId = #{userid} and isOverdue = 0 and isLoop = 1

@@ -349,18 +349,11 @@ public interface EventMapper {
     List<GetUserEventsGroupByPriority> getUserEventsGroupByPriorityInWeek(UserEventsGroupByInWeek userEventsGroupByInWeek);
 
     /**
-     * 根据开始日期,结束日期和普通事件查询事件数量
+     * 根据开始日期,结束日期查询事件
      * @param naturalWeek
      * @return
      */
-    Long getEventsNumByCommon(NaturalWeek naturalWeek);
-
-    /**
-     * 根据开始日期,结束日期和普通事件查询事件数量
-     * @param naturalWeek
-     * @return
-     */
-    Long getEventsNumByUrgent(NaturalWeek naturalWeek);
+    List<SingleEvent> getEventsNumByCommon(NaturalWeek naturalWeek);
 
     /**
      * 查询重复事件(用于判断重复事件冲突)
