@@ -1,7 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
-import com.modcreater.tmbeans.pojo.AppVersion;
-import com.modcreater.tmbeans.pojo.UserNotice;
+import com.modcreater.tmbeans.pojo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -69,4 +68,47 @@ public interface AppMapper {
      * @return
      */
     String getAppUrl(String appver);
+
+    /**
+     * 获取活动公告
+     * @return
+     */
+    List<ActivityTable> queryActivityTable();
+
+    /**
+     * 领取优惠券
+     * @param discountUser
+     * @return
+     */
+    int getDiscountCoupon(DiscountUser discountUser);
+
+    /**
+     * 查询优惠券详情
+     * @param discountId
+     * @return
+     */
+    DiscountCoupon queryDiscountCoupon(String discountId);
+
+    /**
+     * 查询用户优惠券详情
+     * @param userId
+     * @param discountId
+     * @return
+     */
+    DiscountUser queryDiscountUser(String userId, String discountId);
+
+    /**
+     * 查询用户优惠券列表
+     * @param userId
+     * @return
+     */
+    List<DiscountUser> queryDiscountUserList(String userId);
+
+    /**
+     * 查询用户优惠券列表
+     * @param userId
+     * @param couponType
+     * @return
+     */
+    List<DiscountUser> queryDiscountUserListByType(String userId,String couponType);
 }

@@ -135,4 +135,8 @@ public class DateUtil {
         return Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
     }
 
+    public static void main(String[] args) {
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(format.format(DateUtil.stampToDate("1565747228")));
+    }
 }

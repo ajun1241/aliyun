@@ -5,6 +5,8 @@ import com.modcreater.tmauth.service.AppService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.app.ReceivedAppInfo;
 import com.modcreater.tmbeans.vo.app.ReceivedNotice;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedIdExtra;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,10 +46,25 @@ public class AppController {
         return appService.updateApp(appInfo, request);
     }
 
-    @PostMapping(value = "authenticationactivitynotice")
+    @Safety
+    @PostMapping(value = "getactivityinform")
     @ApiOperation("获取公告")
-    public Dto authenticationActivityNotice(@RequestBody ReceivedNotice receivedNotice, HttpServletRequest request) {
-        return appService.getAuthenticationActivityNotice(receivedNotice, request.getHeader("token"));
+    public Dto getActivityInform(@RequestBody ReceivedId receivedId, HttpServletRequest request) {
+        return appService.getActivityInform(receivedId, request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "getuserdiscountcount")
+    @ApiOperation("获取用户优惠券数量")
+    public Dto getUserDiscountCount(@RequestBody ReceivedId receivedId, HttpServletRequest request) {
+        return appService.getUserDiscountCount(receivedId, request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "getuserdiscountlist")
+    @ApiOperation("获取用户优惠券列表")
+    public Dto getUserDiscountList(@RequestBody ReceivedIdExtra receivedId, HttpServletRequest request) {
+        return appService.getUserDiscountList(receivedId, request.getHeader("token"));
     }
 
 }

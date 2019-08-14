@@ -13,10 +13,11 @@ public class DiscountCoupon {
   private Long id;
   private String couponName;
   private Long couponType;
-  private Long couponMoney;
+  private Double couponMoney;
   private Long starTime;
-  private Long entTime;
+  private Long endTime;
   private Date createDate;
   private Long couponStatus;
+  private String describe;
 
 }

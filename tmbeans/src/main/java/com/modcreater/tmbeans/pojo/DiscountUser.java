@@ -12,6 +12,7 @@ public class DiscountUser {
 
   private Long id;
   private Long userId;
+  private Long orderId;
   private Long discountId;
   private Date createDate;
   private Long starTime;

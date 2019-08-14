@@ -27,4 +27,24 @@
     <select id="getAppUrl" resultType="java.lang.String">
         select apkUrl from appversion where appVersion = #{appver}
     </select>
+
+    <select id="queryActivityTable" resultType="com.modcreater.tmbeans.pojo.ActivityTable">
+        select * from activitytable where isOverdue=0
+    </select>
+    <insert id="getDiscountCoupon">
+        insert into discountuser ( userId, discountId, starTime, endTime) values (#{userId},#{discountId},#{starTime},#{endTime})
+    </insert>
+    <select id="queryDiscountCoupon" resultType="com.modcreater.tmbeans.pojo.DiscountCoupon">
+        select * from discountcoupon where id=#{discountId}
+    </select>
+    <select id="queryDiscountUser" resultType="com.modcreater.tmbeans.pojo.DiscountUser">
+        select * from discountuser where userId=#{userId} and discountId=#{discountId}
+    </select>
+    <select id="queryDiscountUserList" resultType="com.modcreater.tmbeans.pojo.DiscountUser">
+        select * from discountuser where userId=#{userId} and status=0
+    </select>
+    <select id="queryDiscountUserListByType" resultType="com.modcreater.tmbeans.pojo.DiscountUser">
+        select * from discountuser where userId=#{userId} and status=0
+        and discountId in (select discountId from discountcoupon where couponType=#{couponType} and couponStatus=0)
+    </select>
 </mapper>
