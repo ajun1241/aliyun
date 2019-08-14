@@ -70,6 +70,9 @@
     <select id="getDiscountUser" resultType="com.modcreater.tmbeans.pojo.DiscountUser">
         select * from discountuser where id = #{discountUserId} and status = 0
     </select>
+    <select id="getBindingDiscountCoupons" resultType="com.modcreater.tmbeans.pojo.DiscountUser">
+        select * from discountuser where status = 3
+    </select>
     <update id="updateExpiredOrders">
         update userorders set orderStatus = 3 where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800
     </update>
@@ -77,6 +80,9 @@
         update userorders set orderStatus = #{status} where id = #{outTradeNo}
     </update>
     <update id="setDiscountCouponOrderId">
-        update discountuser set orderId = #{orderId},status = 1 where id = #{discountUserId}
+        update discountuser set orderId = #{orderId},status = #{status} where id = #{discountUserId}
+    </update>
+    <update id="updateDiscountStatus">
+        update discountuser set status = 1 where orderId = #{orderId}
     </update>
 </mapper>

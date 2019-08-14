@@ -96,7 +96,21 @@ public interface OrderMapper {
      * 设置用户使用优惠券后生成的订单号并将优惠券状态改为已使用
      * @param discountUserId
      * @param orderId
+     * @param status
      * @return
      */
-    int setDiscountCouponOrderId(@Param("discountUserId")Long discountUserId, @Param("orderId")String orderId);
+    int setDiscountCouponOrderId(@Param("discountUserId")Long discountUserId, @Param("orderId")String orderId, @Param("status")String status);
+
+    /**
+     * 用户支付成功后修改优惠券状态
+     * @param orderId
+     * @return
+     */
+    int updateDiscountStatus(String orderId);
+
+    /**
+     * 查询正在与订单绑定的优惠券
+     * @return
+     */
+    List<DiscountUser> getBindingDiscountCoupons();
 }

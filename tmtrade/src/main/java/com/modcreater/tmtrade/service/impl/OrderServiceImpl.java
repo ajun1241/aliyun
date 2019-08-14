@@ -137,7 +137,7 @@ public class OrderServiceImpl implements OrderService {
             DiscountCoupon discountCoupon = orderMapper.getDiscountCoupon(discountUser.getDiscountId().toString());
             if ((!ObjectUtils.isEmpty(discountCoupon)) && discountCoupon.getCouponType().toString().equals(receivedOrderInfo.getServiceId())) {
                 userOrder.setPaymentAmount(Double.valueOf(nf.format(unitPrice * userOrder.getNumber() - discountCoupon.getCouponMoney())));
-                orderMapper.setDiscountCouponOrderId(discountUser.getId(),userOrder.getId());
+                orderMapper.setDiscountCouponOrderId(discountUser.getId(),userOrder.getId(),"1");
             } else {
                 return DtoUtil.getFalseDto("优惠券使用失败", 61001);
             }
@@ -255,6 +255,8 @@ public class OrderServiceImpl implements OrderService {
                     if (!makeOrderSuccess(outTradeNo)) {
                         orderMapper.updateOrderStatus(outTradeNo, 4);
                     }
+                    //将用户优惠券状态改为已使用
+                    orderMapper.updateDiscountStatus(outTradeNo);
                     return "success";
                 } else {
                     System.out.println("订单状态修改失败");

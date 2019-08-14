@@ -1,6 +1,7 @@
 package com.modcreater.tmbiz.config;
 
 import com.modcreater.tmbeans.databaseparam.EventStatusScan;
+import com.modcreater.tmbeans.pojo.DiscountUser;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.TimedTask;
 import com.modcreater.tmdao.mapper.AchievementMapper;
@@ -88,7 +89,7 @@ public class TimerConfig {
                         loopEvent.setYear(eventStatusScan.getThisYear());
                         loopEvent.setMonth(eventStatusScan.getThisMonth());
                         loopEvent.setDay(eventStatusScan.getToday());
-                        loopEvent.setEventid(System.currentTimeMillis()/1000);
+                        loopEvent.setEventid(System.currentTimeMillis() / 1000);
                         loopEvent.setIsOverdue(1L);
                         loopEvent.setFlag(5L);
                         loopEvent.setIsLoop(0);
@@ -107,6 +108,18 @@ public class TimerConfig {
         logger.info("有" + orders + "个订单待修改");
         if (orders != 0) {
             logger.info("修改了" + orderMapper.updateExpiredOrders(timestamp) + "个订单");
+        }
+    }
+
+
+    @Scheduled(cron = "32 * * * * ?")
+    public void discountCouponStatusScan() {
+        List<DiscountUser> discountUsers = orderMapper.getBindingDiscountCoupons();
+        for (DiscountUser discountUser : discountUsers) {
+            String status = orderMapper.getUserOrder(discountUser.getOrderId().toString()).getOrderStatus();
+            if (status.equals("3") || status.equals("4")) {
+                logger.info("已将" + orderMapper.setDiscountCouponOrderId(discountUser.getId(), "0", "0") + "个优惠券状态改为未使用");
+            }
         }
     }
 }
