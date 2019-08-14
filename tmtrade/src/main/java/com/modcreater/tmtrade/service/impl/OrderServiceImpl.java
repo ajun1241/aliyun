@@ -476,6 +476,8 @@ public class OrderServiceImpl implements OrderService {
                         userOrders.setOutTradeNo(transactionId);
                         //更新交易表中状态
                         int returnResult = updateOrderStatusToPrepaid(userOrders);
+                        //将用户优惠券状态改为已使用
+                        orderMapper.updateDiscountStatus(tradeNo);
                         if (returnResult == 0) {
                             return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
                         }
