@@ -96,5 +96,11 @@
     <select id="isUserAchievementExists" resultType="com.modcreater.tmbeans.pojo.UserAchievement">
         select * from userachievement where userId = #{userId}
     </select>
+    <select id="getAchievedNum" resultType="java.lang.Long">
+        select count(id) from userachievement where userId = #{userId}
+    </select>
+    <select id="getTotalNum" resultType="java.lang.Long">
+        select count(id) from achievement
+    </select>
 
 </mapper>

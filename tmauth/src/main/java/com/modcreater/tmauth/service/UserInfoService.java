@@ -111,4 +111,12 @@ public interface UserInfoService {
      * @return
      */
     Dto getUserTimeCard(ReceivedGetUserTimeCard receivedGetUserTimeCard, String token);
+
+    /**
+     * 获取用户成就已完成数量和总数量
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto getAchievementNum(ReceivedId receivedId, String token);
 }

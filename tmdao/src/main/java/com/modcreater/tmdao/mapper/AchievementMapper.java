@@ -113,4 +113,18 @@ public interface AchievementMapper {
      * @return
      */
     UserAchievement isUserAchievementExists(String userId);
+
+    /**
+     * 获取已完成成就数量
+     * @param userId
+     * @return
+     */
+    Long getAchievedNum(String userId);
+
+    /**
+     * 获取成就总数量
+     * @param userId
+     * @return
+     */
+    Long getTotalNum(String userId);
 }

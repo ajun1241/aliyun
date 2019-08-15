@@ -96,4 +96,10 @@ public class UserInfoController {
     public Dto getUserTimeCard(@RequestBody ReceivedGetUserTimeCard receivedGetUserTimeCard, HttpServletRequest request){
         return userInfoService.getUserTimeCard(receivedGetUserTimeCard,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getachievementnum")
+    @ApiOperation("获取成就总数/已完成")
+    public Dto getAchievementNum(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return userInfoService.getAchievementNum(receivedId,request.getHeader("token"));
+    }
 }

@@ -103,6 +103,17 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
+    public Dto getAchievementNum(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        Map<String,Long> result = new HashMap<>(2);
+        result.put("achievedNum",achievementMapper.getAchievedNum(receivedId.getUserId()));
+        result.put("totalNum",achievementMapper.getTotalNum(receivedId.getUserId()));
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
+    @Override
     public List<Achievement> queryUserAchievementInBase(String userId) {
         //在此查询用户统计表,并判断该用户是否完成某个成就
         UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
@@ -115,13 +126,13 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if (userAchievementList.size() == 0) {
                     if (achievement.getType() == 1 && userStatistics.getLoggedDays() >= (achievement.getCondition()).longValue()) {
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                    }/*else if (achievement.getType() == 2 && eventMapper.getUserAllEvent(userId) >= (achievement.getCondition()).longValue()){
+                    }else if (achievement.getType() == 2 && eventMapper.getUserAllEvent(userId) >= (achievement.getCondition()).longValue()){
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                    }else if (achievement.getType() == 3 && eventMapper.countCompletedEvents(Long.valueOf(userId)) >= (achievement.getCondition()).longValue()){
+                    }/*else if (achievement.getType() == 3 && eventMapper.countCompletedEvents(Long.valueOf(userId)) >= (achievement.getCondition()).longValue()){
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                    }else if (achievement.getType() == 4 && accountMapper.countAllMyFriends(userId) >= (achievement.getCondition()).longValue()){
+                    }*/else if (achievement.getType() == 4 && accountMapper.countAllMyFriends(userId) >= (achievement.getCondition()).longValue()){
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                    }*/
+                    }
                 }
             }
         }
