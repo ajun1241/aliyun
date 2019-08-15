@@ -71,9 +71,10 @@ public interface AppMapper {
 
     /**
      * 获取活动公告
+     * @param now
      * @return
      */
-    List<ActivityTable> queryActivityTable();
+    List<ActivityTable> queryActivityTable(Long now);
 
     /**
      * 领取优惠券
@@ -102,7 +103,7 @@ public interface AppMapper {
      * @param userId
      * @return
      */
-    List<DiscountUser> queryDiscountUserList(String userId);
+    List<DiscountUser> queryDiscountUserList(String userId,String couponType,Long now);
 
     /**
      * 查询用户优惠券列表
@@ -110,5 +111,5 @@ public interface AppMapper {
      * @param couponType
      * @return
      */
-    List<DiscountUser> queryDiscountUserListByType(String userId,String couponType);
+    List<DiscountUser> queryDiscountUserListByType(String userId,String couponType,Long now);
 }

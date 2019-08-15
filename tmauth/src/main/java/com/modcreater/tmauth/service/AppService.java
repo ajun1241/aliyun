@@ -59,7 +59,7 @@ public interface AppService {
      * @param token
      * @return
      */
-    Dto getUserDiscountCount(ReceivedId receivedId,String token);
+    Dto getUserDiscountCount(ReceivedIdExtra receivedId,String token);
 
 
 }

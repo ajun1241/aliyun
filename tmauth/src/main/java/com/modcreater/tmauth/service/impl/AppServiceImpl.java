@@ -20,8 +20,6 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -84,7 +82,7 @@ public class AppServiceImpl implements AppService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        List<ActivityTable> tableList=appMapper.queryActivityTable();
+        List<ActivityTable> tableList=appMapper.queryActivityTable(System.currentTimeMillis()/1000);
         List<Map<String,String>> result=new ArrayList<>();
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
         for (ActivityTable activityTable:tableList) {
@@ -103,13 +101,13 @@ public class AppServiceImpl implements AppService {
             //查询未领取的用户
             if (ObjectUtils.isEmpty(appMapper.queryDiscountUser(receivedId.getUserId(),activityTable.getDiscountId().toString()))){
                 result.add(map);
-                /*//领取优惠券
+                //领取优惠券
                 DiscountUser discountUser=new DiscountUser();
                 discountUser.setUserId(Long.valueOf(receivedId.getUserId()));
                 discountUser.setDiscountId(Long.valueOf(activityTable.getDiscountId()));
                 discountUser.setStarTime(activityTable.getStarTime());
                 discountUser.setEndTime(activityTable.getEndTime());
-                int i=appMapper.getDiscountCoupon(discountUser);*/
+                int i=appMapper.getDiscountCoupon(discountUser);
             }
         }
         if (result.size()>0){
@@ -163,14 +161,14 @@ public class AppServiceImpl implements AppService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-        List<DiscountUser> discountUsers=appMapper.queryDiscountUserListByType(receivedId.getUserId(),receivedId.getCouponType());
+        List<DiscountUser> discountUsers=appMapper.queryDiscountUserListByType(receivedId.getUserId(),receivedId.getCouponType(),System.currentTimeMillis()/1000);
         List<Map<String,String>> result=new ArrayList<>();
         for (DiscountUser discountUser:discountUsers) {
             Map<String,String> map=new HashMap<>(5);
             DiscountCoupon discountCoupon=appMapper.queryDiscountCoupon(discountUser.getDiscountId().toString());
             String money=new BigDecimal(discountCoupon.getCouponMoney()).stripTrailingZeros().toPlainString();
             map.put("discountUserId",discountUser.getId().toString());
-            map.put("couponMoney",money+"元");
+            map.put("couponMoney",money);
             map.put("couponName",discountCoupon.getCouponName());
             map.put("starTime",sdf.format(DateUtil.stampToDate(discountUser.getStarTime().toString())));
             map.put("entTime",sdf.format(DateUtil.stampToDate(discountUser.getEndTime().toString())));
@@ -187,11 +185,12 @@ public class AppServiceImpl implements AppService {
      * @return
      */
     @Override
-    public Dto getUserDiscountCount(ReceivedId receivedId, String token) {
+    public Dto getUserDiscountCount(ReceivedIdExtra receivedId, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        List<DiscountUser> discountUsers=appMapper.queryDiscountUserList(receivedId.getUserId());
+        List<DiscountUser> discountUsers=appMapper.queryDiscountUserListByType(receivedId.getUserId(),receivedId.getCouponType(),System.currentTimeMillis()/1000);
         return DtoUtil.getSuccesWithDataDto("查询成功",discountUsers.size(),100000);
     }
+
 }

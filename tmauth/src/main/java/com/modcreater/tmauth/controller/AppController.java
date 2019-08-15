@@ -56,7 +56,7 @@ public class AppController {
     @Safety
     @PostMapping(value = "getuserdiscountcount")
     @ApiOperation("获取用户优惠券数量")
-    public Dto getUserDiscountCount(@RequestBody ReceivedId receivedId, HttpServletRequest request) {
+    public Dto getUserDiscountCount(@RequestBody ReceivedIdExtra receivedId, HttpServletRequest request) {
         return appService.getUserDiscountCount(receivedId, request.getHeader("token"));
     }
 
