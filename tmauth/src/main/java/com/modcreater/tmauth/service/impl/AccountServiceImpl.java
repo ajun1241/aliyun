@@ -652,6 +652,9 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
         }else {
             Friendship friendship=accountMapper.queryFriendshipDetail(queFridenVo.getUserId(),queFridenVo.getFriendId());
+            if(ObjectUtils.isEmpty(friendship)){
+                return DtoUtil.getFalseDto("你们可能已不是好友",81314);
+            }
             Date createDate=friendship.getCerateDate();
             days=String.valueOf((System.currentTimeMillis()-createDate.getTime())/1000/3600/24 == 0 ? 1 : (System.currentTimeMillis()-createDate.getTime())/1000/3600/24);
         }
@@ -1183,6 +1186,23 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("移出黑名单失败",10291);
         }
         return DtoUtil.getSuccessDto("移出黑名单成功",100000);
+    }
+
+    /**
+     * 查询好友成就
+     * @param userFriendVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto queryFriendAchievement(UserFriendVo userFriendVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userFriendVo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        Map<String,Long> result = new HashMap<>(2);
+        result.put("achievedNum",achievementMapper.getAchievedNum(userFriendVo.getFriendId()));
+        result.put("totalNum",achievementMapper.getTotalNum(userFriendVo.getFriendId()));
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
 }

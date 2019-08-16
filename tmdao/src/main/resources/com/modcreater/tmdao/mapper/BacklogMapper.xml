@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmdao.mapper.BacklogMapper">
+    <insert id="insertBacklog">
+        insert into backloglist (eventId, userId, backlogName,finishTime)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.eventId},#{item.userId},#{item.backlogName},#{item.finishTime})
+        </foreach>
+    </insert>
+    <update id="updateBacklog">
+        update backloglist
+            <set>
+                <if test="backlogName != null and backlogName!=''">
+                    backlogName = #{backlogName},
+                </if>
+                <if test="backlogStatus != null and backlogStatus!=''">
+                    backlogStatus = #{backlogStatus},
+                </if>
+            </set>
+        where id=#{id}
+    </update>
+    <select id="queryBacklogList" resultType="com.modcreater.tmbeans.pojo.BacklogList">
+        select * from backloglist where userId=#{userId} and eventId=#{eventId}
+    </select>
+    <delete id="deleteBacklog">
+        delete from backloglist where id=#{id}
+    </delete>
+</mapper>

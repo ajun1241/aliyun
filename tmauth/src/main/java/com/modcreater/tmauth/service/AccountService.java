@@ -195,4 +195,12 @@ public interface AccountService {
      */
     Dto removeBlackList(FriendshipVo friendshipVo,String token);
 
+    /**
+     * 查询好友成就
+     * @param userFriendVo
+     * @param token
+     * @return
+     */
+    Dto queryFriendAchievement(UserFriendVo userFriendVo,String token);
+
 }

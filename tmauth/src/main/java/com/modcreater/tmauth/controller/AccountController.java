@@ -173,4 +173,11 @@ public class AccountController {
     public Dto removeBlackList(@RequestBody FriendshipVo friendshipVo, HttpServletRequest request){
         return userService.removeBlackList(friendshipVo ,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping("queryfriendachievement")
+    @ApiOperation("查询好友成就")
+    public Dto queryFriendAchievement(@RequestBody UserFriendVo userFriendVo, HttpServletRequest request){
+        return userService.queryFriendAchievement(userFriendVo ,request.getHeader("token"));
+    }
 }

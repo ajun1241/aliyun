@@ -19,10 +19,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.ArrayList;
 import java.util.List;
 
-@Configuration // applicationContext.xml    springboot
+/*@Configuration // applicationContext.xml    springboot
 @EnableSwagger2
 @ComponentScan("com.modcreater.tmauth.controller")
-@Component
+@Component*/
 public class SwaggerConfig {
     @Bean
     public Docket createRestApi() {
