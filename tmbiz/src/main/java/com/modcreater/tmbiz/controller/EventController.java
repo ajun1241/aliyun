@@ -92,6 +92,14 @@ public class EventController {
         return eventService.searchByDayEventIdsInWeek(searchEventVo,request.getHeader("token"));
     }
 
+    @Safety
+    @GLOT
+    @PostMapping(value = "searchbyweekforios")
+    @ApiOperation("查询我的一周")
+    public Dto searchByWeekForIos(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return eventService.searchByWeekForIos(receivedId,request.getHeader("token"));
+    }
+
     @GLOT
     @PostMapping(value = "seabyweekwithprivatepermission")
     @ApiOperation("查看好友的周")

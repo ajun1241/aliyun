@@ -73,7 +73,7 @@
         (SELECT achievementId
         from userachievement
         where userId = #{userId}
-        order by createDate desc)
+        order by createDate asc)
     </select>
     <select id="queryUserStatistics" resultType="com.modcreater.tmbeans.pojo.UserStatistics">
         select <include refid="Base_Column_List_UserStatistics"/> from userstatistics where userId = #{userId}

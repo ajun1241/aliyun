@@ -604,11 +604,16 @@
     <select id="queryAllDrafts" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select * from draft where userId = #{userId}
     </select>
-    <!--以下为每天凌晨4点查询一次
-    select count(id) from singleevent
-    where isLoop = 0 and isOverdue = 0
-    and (year &lt;= #{year} and month &lt;= #{month} and day &lt; #{day})
-    or (year = #{thisYear} and month = #{thisMonth} and day = #{today} and endTime &lt;= #{time})-->
+    <select id="getTodayEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from singleevent where userId = #{userId}
+        and isOverdue in (0,1) and day = #{day} and month = #{month} and year = #{year}
+    </select>
+    <select id="getEventsByEventIds" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from singleevent where eventId in (#{eventIds}) order by startTime asc
+    </select>
+    <select id="getAllLoopEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from singleevent where userId = #{userId} and isLoop = 1
+    </select>
 
     <update id="updateExpiredEvents">
         update singleevent set isOverdue = 1
@@ -616,12 +621,6 @@
         and ((year &lt;= #{thisYear} and month &lt;= #{thisMonth} and day &lt;= #{today} and endTime &lt;= #{time})
         or (year &lt;= #{lastYear} and month &lt;= #{lastMonth} and day &lt;= #{yesterday} and endTime &lt;= 1440))
     </update>
-
-    <!--以下为每天凌晨4点操作一次
-    update singleevent set isOverdue = 1
-    where isLoop = 0 and isOverdue = 0
-    and (year &lt;= #{year} and month &lt;= #{month} and day &lt; #{day})
-    or (year = #{thisYear} and month = #{thisMonth} and day = #{today} and endTime &lt;= #{time})-->
 
     <update id="updInviteEventPerson">
         update singleevent set person=#{person} where userid=#{userId} and eventid=#{eventId}

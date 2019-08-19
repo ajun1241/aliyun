@@ -243,4 +243,12 @@ public interface EventService {
      * @return
      */
     Dto getAllDrafts(ReceivedId receivedId, String token);
+
+    /**
+     * 获取今天计划(IOS)
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto searchByWeekForIos(ReceivedId receivedId, String token);
 }

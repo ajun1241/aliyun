@@ -375,4 +375,25 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> queryAllDrafts(@Param("userId") String userId);
+
+    /**
+     * 获取今天的所有事件()
+     * @param naturalWeek
+     * @return
+     */
+    List<SingleEvent> getTodayEvents(NaturalWeek naturalWeek);
+
+    /**
+     * 根据事件ID字符串查询所有事件
+     * @param eventIds
+     * @return
+     */
+    List<SingleEvent> getEventsByEventIds(String eventIds);
+
+    /**
+     * 根据userId查询所有重复事件
+     * @param userId
+     * @return
+     */
+    List<SingleEvent> getAllLoopEvents(String userId);
 }

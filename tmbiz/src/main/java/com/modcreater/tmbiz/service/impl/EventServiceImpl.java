@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
+import com.modcreater.tmbeans.utils.NaturalWeek;
 import com.modcreater.tmbeans.vo.QueryMsgStatusVo;
 import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
@@ -167,13 +168,13 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("修改条件接收失败", 21008);
         }
         SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
-        logger.info("233:  "+singleEvent.toString());
+        logger.info("233:  " + singleEvent.toString());
         singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
         SingleEvent result = eventMapper.querySingleEventTime(singleEvent);
-        if (result.getIsOverdue() != 0){
-            return DtoUtil.getFalseDto("事件已过期",21023);
+        if (result.getIsOverdue() != 0) {
+            return DtoUtil.getFalseDto("事件已过期", 21023);
         }
         if (!(singleEvent.getStarttime().equals(result.getStarttime()) && singleEvent.getEndtime().equals(result.getEndtime()))) {
             if (singleEvent.getIsLoop() == 1) {
@@ -359,13 +360,13 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(time)) {
             return DtoUtil.getSuccessDto("该用户尚未开通备份功能", 20000);
         }
-        boolean flag=false;
+        boolean flag = false;
         //判断是否最后一次
-        if (time.getResidueDegree()==-1){
+        if (time.getResidueDegree() == -1) {
             //删除服务
             userServiceMapper.deleteService(time.getId());
-            flag=true;
-        }else {
+            flag = true;
+        } else {
             //开通了,查询次卡是否有剩余
             if (time.getResidueDegree() == 0) {
                 //无剩余,判断剩余年/月卡时间
@@ -406,7 +407,7 @@ public class EventServiceImpl implements EventService {
                 }
             }
         }
-        if (!flag){
+        if (!flag) {
             //修改用户服务剩余时间
             if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
                 //回滚
@@ -979,8 +980,8 @@ public class EventServiceImpl implements EventService {
             Map<String, String> newMap = SingleEvent.toMap(singleEvent);
             //原来的信息
             SingleEvent singleEventOld = eventMapper.queryEventOne(singleEvent.getUserid().toString(), singleEvent.getEventid().toString());
-            if (singleEventOld.getIsOverdue() != 0){
-                return DtoUtil.getFalseDto("事件已过期",21023);
+            if (singleEventOld.getIsOverdue() != 0) {
+                return DtoUtil.getFalseDto("事件已过期", 21023);
             }
             Map<String, String> oldMap = SingleEvent.toMap(singleEventOld);
             //比较差异
@@ -2031,10 +2032,49 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         List<SingleEvent> singleEventList = eventMapper.queryAllDrafts(receivedId.getUserId());
-        if (singleEventList.size() != 0){
-            return DtoUtil.getSuccesWithDataDto("查询成功",SingleEventUtil.getShowSingleEventList(singleEventList),100000);
+        if (singleEventList.size() != 0) {
+            return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEventList(singleEventList), 100000);
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",null,100000);
+        return DtoUtil.getSuccesWithDataDto("查询成功", null, 100000);
+    }
+
+    @Override
+    public Dto searchByWeekForIos(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        List<String> eventIdsList = new ArrayList<>();
+        for (int i = 0; i <= 6; i++) {
+            String currentDay = DateUtil.getDay(i);
+            StringBuffer stringBuffer = new StringBuffer(currentDay);
+            StringBuffer eventIds = new StringBuffer("1");
+            int currentWeek = DateUtil.stringToWeek(currentDay);
+            currentWeek = currentWeek == 7 ? 0 : currentWeek;
+                    NaturalWeek naturalWeek = new NaturalWeek();
+            naturalWeek.setUserId(receivedId.getUserId());
+            naturalWeek.setYear(stringBuffer.substring(0, 4));
+            naturalWeek.setMonth(stringBuffer.substring(4, 6));
+            naturalWeek.setDay(stringBuffer.substring(6));
+            List<SingleEvent> singleList = eventMapper.getTodayEvents(naturalWeek);
+            List<SingleEvent> loopList = eventMapper.getAllLoopEvents(receivedId.getUserId());
+            for (SingleEvent loop : loopList) {
+                Boolean[] repeatTime = SingleEventUtil.getRepeatTime(loop);
+                if (repeatTime[currentWeek]) {
+                    if (!SingleEventUtil.eventTime(singleList,Long.valueOf(loop.getStarttime()), Long.valueOf(loop.getEndtime()))){
+                        eventIds.append(loop.getEventid());
+                    }
+                }
+            }
+            for (SingleEvent singleEvent : singleList){
+                eventIds.append(singleEvent.getEventid());
+            }
+            eventIdsList.add(eventIds.toString());
+        }
+        List<List<SingleEvent>> result = new ArrayList<>();
+        for (String s : eventIdsList){
+            result.add(eventMapper.getEventsByEventIds(s));
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
     /**
