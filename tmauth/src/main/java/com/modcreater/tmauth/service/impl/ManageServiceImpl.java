@@ -67,12 +67,16 @@ public class ManageServiceImpl implements ManageService {
             return DtoUtil.getFalseDto("身份证号码有误",50003);
         }
         //第一次上传认证
-        if (ObjectUtils.isEmpty(userRealInfoMapper.queryDetail(receivedUserRealInfo.getUserId()))){
+        UserRealInfo userRealInfo1=userRealInfoMapper.queryDetail(receivedUserRealInfo.getUserId());
+        if (ObjectUtils.isEmpty(userRealInfo1)){
             //上传信息
             if (userRealInfoMapper.addNewRealInfo(receivedUserRealInfo)==0){
                 return DtoUtil.getFalseDto("上传数据失败",50001);
             }
         }else {
+            if (userRealInfo1.getRealStatus()==0){
+                return DtoUtil.getFalseDto("实名正在认证中，请耐心等待",50006);
+            }
             //多次更改认证
             //更改信息
             UserRealInfo userRealInfo=new UserRealInfo();
