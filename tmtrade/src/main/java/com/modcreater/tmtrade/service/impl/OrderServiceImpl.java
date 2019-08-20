@@ -82,13 +82,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto createNewOrder(ReceivedOrderInfo receivedOrderInfo) {
-        if (receivedOrderInfo.getServiceId().equals("1") && !ObjectUtils.isEmpty(userServiceMapper.getServiceRemainingTime(receivedOrderInfo.getUserId(), receivedOrderInfo.getServiceId()))) {
+        if ("1".equals(receivedOrderInfo.getServiceId()) && !ObjectUtils.isEmpty(userServiceMapper.getServiceRemainingTime(receivedOrderInfo.getUserId(), receivedOrderInfo.getServiceId()))) {
             System.out.println("该用户已经开通了好友服务");
             return DtoUtil.getFalseDto("该用户已经开通了好友服务", 60017);
         }
-        if (receivedOrderInfo.getServiceType().equals("perpetual")) {
-            if (!receivedOrderInfo.getServiceId().equals("1")) {
-                System.out.println("只有好友功能才能开通永久");
+        if ("perpetual".equals(receivedOrderInfo.getServiceType())) {
+            if (!"1".equals(receivedOrderInfo.getServiceId())) {
+                logger.info("只有好友功能才能开通永久");
                 return DtoUtil.getFalseDto("服务类型错误", 60015);
             }
             if (receivedOrderInfo.getNumber() == null || receivedOrderInfo.getNumber() == 0) {
@@ -97,21 +97,26 @@ public class OrderServiceImpl implements OrderService {
                 return DtoUtil.getFalseDto("数量错误", 60018);
             }
         }
-        if (receivedOrderInfo.getServiceType().equals("month") || receivedOrderInfo.getServiceType().equals("year")) {
-            if (receivedOrderInfo.getServiceId().equals("1")) {
-                System.out.println("好友功能不能开通月/年卡");
+        if ("month".equals(receivedOrderInfo.getServiceType()) || receivedOrderInfo.getServiceType().equals("year")) {
+            if ("1".equals(receivedOrderInfo.getServiceId())) {
+                logger.info("好友功能不能开通月/年卡");
+                return DtoUtil.getFalseDto("服务类型错误", 600015);
+            }
+        }
+        if ("quarter".equals(receivedOrderInfo.getServiceType())) {
+            if (!"5".equals(receivedOrderInfo.getServiceId())) {
                 return DtoUtil.getFalseDto("服务类型错误", 600015);
             }
         }
         Long remainingTime = userServiceMapper.getTimeRemaining(receivedOrderInfo.getUserId(), receivedOrderInfo.getServiceId());
         if (remainingTime != null) {
             if (receivedOrderInfo.getServiceType().equals("time")) {
-                if (receivedOrderInfo.getServiceId().equals("1") || receivedOrderInfo.getServiceId().equals("3")) {
-                    System.out.println("好友/年报功能没有次卡");
+                if (receivedOrderInfo.getServiceId().equals("1") || receivedOrderInfo.getServiceId().equals("3") || receivedOrderInfo.getServiceId().equals("5")) {
+                    logger.info("好友/数据反馈/商铺服务功能没有次卡");
                     return DtoUtil.getFalseDto("服务类型错误", 600015);
                 }
                 if (remainingTime != 0 && remainingTime > System.currentTimeMillis() / 1000) {
-                    return DtoUtil.getFalseDto("当前年/月卡尚未用完", 60014);
+                    return DtoUtil.getFalseDto("请于年/季/月卡过期后再开通", 60014);
                 }
             }
         }
@@ -131,13 +136,13 @@ public class OrderServiceImpl implements OrderService {
         nf.setMaximumFractionDigits(2);
         if (!receivedOrderInfo.getDiscountUserId().equals("0")) {
             DiscountUser discountUser = orderMapper.getDiscountUser(receivedOrderInfo.getDiscountUserId());
-            if (ObjectUtils.isEmpty(discountUser)){
+            if (ObjectUtils.isEmpty(discountUser)) {
                 return DtoUtil.getFalseDto("优惠券已过期", 61002);
             }
             DiscountCoupon discountCoupon = orderMapper.getDiscountCoupon(discountUser.getDiscountId().toString());
             if ((!ObjectUtils.isEmpty(discountCoupon)) && discountCoupon.getCouponType().toString().equals(receivedOrderInfo.getServiceId())) {
                 userOrder.setPaymentAmount(Double.valueOf(nf.format(unitPrice * userOrder.getNumber() - discountCoupon.getCouponMoney())));
-                orderMapper.setDiscountCouponOrderId(discountUser.getId(),userOrder.getId(),"1");
+                orderMapper.setDiscountCouponOrderId(discountUser.getId(), userOrder.getId(), "1");
             } else {
                 return DtoUtil.getFalseDto("优惠券使用失败", 61001);
             }
@@ -202,7 +207,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String alipayNotify(HttpServletRequest request) {
-        System.out.println("支付宝异步回调");
+        logger.info("支付宝异步回调");
         Map<String, String> params = new HashMap<String, String>();
         Map<String, String[]> requestParams = request.getParameterMap();
         //1.从支付宝回调的request域中取值
@@ -577,10 +582,18 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString()/* + ",月/年卡将在次卡消耗完后开始计算"*/, 100000);
-                } else {
                     return DtoUtil.getSuccesWithDataDto("backupService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString(), 100000);
                 }
+            }
+        }
+        if (serviceRemainingTime.getServiceId().equals("5")) {
+            String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
+            if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
+                return DtoUtil.getSuccesWithDataDto("storeService", time + "到期", 100000);
+            } else if (serviceRemainingTime.getTimeRemaining() == 0) {
+                return DtoUtil.getSuccesWithDataDto("storeService", "未开通", 100000);
+            } else {
+                return DtoUtil.getSuccesWithDataDto("storeService", "已过期", 100000);
             }
         }
         return DtoUtil.getFalseDto("参数有误", 60020);
@@ -633,14 +646,17 @@ public class OrderServiceImpl implements OrderService {
         result.put("searchService", "");
         result.put("annualReportingService", "");
         result.put("backupService", "");
+        result.put("storeService", "");
         String key;
-        for (int i = 2; i <= 4; i++) {
+        for (int i = 2; i <= 5; i++) {
             if (i == 2) {
                 key = "searchService";
             } else if (i == 3) {
                 key = "annualReportingService";
-            } else {
+            } else if (i == 4) {
                 key = "backupService";
+            }else {
+                key = "storeService";
             }
             receivedServiceIdUserId.setServiceId(i + "");
             Dto dto = searchUserService(receivedServiceIdUserId, token);
@@ -669,6 +685,12 @@ public class OrderServiceImpl implements OrderService {
         return serviceRemainingTime;
     }
 
+    /**
+     * 返回false则为成功
+     *
+     * @param orderNo
+     * @return
+     */
     public boolean makeOrderSuccess(String orderNo) {
         UserOrders userOrders = orderMapper.getUserOrder(orderNo);
         if (userOrders.getOrderStatus().equals("1")) {
@@ -696,6 +718,23 @@ public class OrderServiceImpl implements OrderService {
                         time.setTimeRemaining(timeRemaining);
                     } else {
                         Long storageTime = time.getStorageTime() + FinalValues.MONTH * userOrders.getNumber();
+                        time.setStorageTime(storageTime);
+                    }
+                    if (userServiceMapper.updateServiceRemainingTime(time) == 0) {
+                        return false;
+                    }
+                }
+            } else if (userOrders.getServiceType().equals("quarter")) {
+                if (ObjectUtils.isEmpty(time)) {
+                    if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, userOrders.getNumber() * FinalValues.QUARTER + System.currentTimeMillis() / 1000, 0L, 0L)) == 0) {
+                        return false;
+                    }
+                } else {
+                    if (time.getResidueDegree() == 0) {
+                        Long timeRemaining = time.getTimeRemaining() + FinalValues.QUARTER * userOrders.getNumber();
+                        time.setTimeRemaining(timeRemaining);
+                    } else {
+                        Long storageTime = time.getStorageTime() + FinalValues.QUARTER * userOrders.getNumber();
                         time.setStorageTime(storageTime);
                     }
                     if (userServiceMapper.updateServiceRemainingTime(time) == 0) {

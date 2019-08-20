@@ -48,6 +48,10 @@ public class FinalValues {
      */
     public static Long MONTH = getPayTime(1);
     /**
+     * 一个季度(单位:秒,计算用户支付用)
+     */
+    public static Long QUARTER = getPayTime(3);
+    /**
      * 一年(单位:秒,计算用户支付用)
      */
     public static Long YEAR = getPayTime(12);
@@ -58,11 +62,7 @@ public class FinalValues {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         long today = calendar.getTimeInMillis()/1000;
-        if (monthNum == 1){
-            calendar.add(Calendar.MONTH,1);
-        }else {
-            calendar.add(Calendar.YEAR,1);
-        }
+        calendar.add(Calendar.MONTH,monthNum);
 
         long nextDay = calendar.getTimeInMillis()/1000;
         int day = (int)(nextDay - today)/86400;

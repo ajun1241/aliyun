@@ -44,6 +44,9 @@
         <if test="serviceType == 'perpetual'">
             yearCardPrice
         </if>
+        <if test="serviceType == 'quarter'">
+            quarterCardPrice
+        </if>
         from servicefunction where id = #{serviceId}
     </select>
     <select id="getUserOrder" resultType="com.modcreater.tmbeans.pojo.UserOrders">

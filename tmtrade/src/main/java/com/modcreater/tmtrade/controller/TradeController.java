@@ -91,7 +91,7 @@ public class TradeController {
     }
 
     @PostMapping(value = "getserviceprice")
-    @ApiOperation("查询订单价格")
+    @ApiOperation("查询商品价格")
     public Dto getServicePrice(@RequestBody ReceivedGoodsInfo receivedGoodsInfo , HttpServletRequest request){
         return orderService.getServicePrice(receivedGoodsInfo,request.getHeader("token"));
     }
