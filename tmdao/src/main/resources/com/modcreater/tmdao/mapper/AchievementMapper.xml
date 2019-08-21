@@ -67,13 +67,8 @@
     </update>
 
     <select id="searchAllAchievement" resultType="com.modcreater.tmbeans.pojo.Achievement">
-        SELECT *
-        from achievement
-        where id in
-        (SELECT achievementId
-        from userachievement
-        where userId = #{userId})
-        order by id desc
+        SELECT a.* FROM userachievement u INNER JOIN achievement a ON u.achievementId = a.id
+        WHERE u.userId = #{userId} ORDER BY u.id desc
     </select>
     <select id="queryUserStatistics" resultType="com.modcreater.tmbeans.pojo.UserStatistics">
         select <include refid="Base_Column_List_UserStatistics"/> from userstatistics where userId = #{userId}

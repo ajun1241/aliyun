@@ -2077,6 +2077,61 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
+    /*@Override
+    public Dto test() {
+        SingleEvent singleEvent = new SingleEvent();
+        singleEvent.setAddress("家");
+        singleEvent.setLevel(5L);
+        singleEvent.setUserid(100126L);
+        singleEvent.setIsLoop(1);
+        singleEvent.setYear(2019L);
+        singleEvent.setMonth(8L);
+        singleEvent.setDay(21L);
+        singleEvent.setIsOverdue(0L);
+        singleEvent.setFlag(1L);
+        singleEvent.setRemindTime("10");
+        singleEvent.setPerson("123321");
+        singleEvent.setRemarks("测试");
+        for (int j = 0; j <= 6; j++) {
+            if (j == 0) {
+                singleEvent.setRepeaTtime("[true,false,false,false,false,false,false]");
+            } else if (j == 1) {
+                singleEvent.setRepeaTtime("[false,true,false,false,false,false,false]");
+            } else if (j == 2) {
+                singleEvent.setRepeaTtime("[false,false,true,false,false,false,false]");
+            } else if (j == 3) {
+                singleEvent.setRepeaTtime("[false,false,false,true,false,false,false]");
+            } else if (j == 4) {
+                singleEvent.setRepeaTtime("[false,false,false,false,true,false,false]");
+            } else if (j == 5) {
+                singleEvent.setRepeaTtime("[false,false,false,false,false,true,false]");
+            } else {
+                singleEvent.setRepeaTtime("[false,false,false,false,false,false,true]");
+            }
+            int a = 0;
+            for (int i = 0; i <= 1440; i += 15) {
+                int startTime = i + a;
+                int endTime = i + 15 + a;
+                if (endTime >= 1440){
+                    break;
+                }
+                singleEvent.setType((long) (Math.random() * 8));
+                singleEvent.setEventname(i + a + "-" + (i + 15 + a));
+                singleEvent.setStarttime(startTime+"");
+                singleEvent.setEndtime(endTime+"");
+                singleEvent.setEventid(System.currentTimeMillis() / 1000);
+                a += 1;
+                System.out.println(eventMapper.uploadingEvents(singleEvent));
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return DtoUtil.getSuccesWithDataDto("","success",100000);
+    }*/
+
     /**
      * 将传进来的事件集合中的已完成的重复事件(冲突的)移除
      *

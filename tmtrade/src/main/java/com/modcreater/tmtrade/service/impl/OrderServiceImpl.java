@@ -10,10 +10,7 @@ import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.pojo.DiscountCoupon;
-import com.modcreater.tmbeans.pojo.DiscountUser;
-import com.modcreater.tmbeans.pojo.ServiceRemainingTime;
-import com.modcreater.tmbeans.pojo.UserOrders;
+import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.order.ShowUserOrders;
 import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.trade.ReceivedGoodsInfo;
@@ -539,7 +536,7 @@ public class OrderServiceImpl implements OrderService {
         }
         ServiceRemainingTime serviceRemainingTime = userServiceMapper.getServiceRemainingTime(receivedServiceIdUserId.getUserId(), receivedServiceIdUserId.getServiceId());
         if (ObjectUtils.isEmpty(serviceRemainingTime)) {
-            return DtoUtil.getSuccesWithDataDto("查询成功", "未开通", 100000);
+            return DtoUtil.getSuccesWithDataDto("查询成功", "小主暂未开通该服务", 100000);
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         if (serviceRemainingTime.getServiceId().equals("2")) {
@@ -548,7 +545,7 @@ public class OrderServiceImpl implements OrderService {
                 if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
                     return DtoUtil.getSuccesWithDataDto("查询成功", time + "到期", 100000);
                 } else if (serviceRemainingTime.getTimeRemaining() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "未开通", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "小主暂未开通该服务", 100000);
                 } else {
                     return DtoUtil.getSuccesWithDataDto("searchService", time + "到期", 100000);
                 }
@@ -563,9 +560,9 @@ public class OrderServiceImpl implements OrderService {
         if (serviceRemainingTime.getServiceId().equals("3")) {
             String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
             if (serviceRemainingTime.getTimeRemaining() == 0) {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", "未开通", 100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", "小主暂未开通该服务", 100000);
             } else if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
-                return DtoUtil.getSuccesWithDataDto("annualReportingService", time + "过期", 100000);
+                return DtoUtil.getSuccesWithDataDto("annualReportingService", time + "到期", 100000);
             } else {
                 return DtoUtil.getSuccesWithDataDto("annualReportingService", "已过期", 100000);
             }
@@ -576,7 +573,7 @@ public class OrderServiceImpl implements OrderService {
                 if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
                     return DtoUtil.getSuccesWithDataDto("backupService", time + "到期", 100000);
                 } else if (serviceRemainingTime.getTimeRemaining() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "未开通", 100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "小主暂未开通该服务", 100000);
                 } else {
                     return DtoUtil.getSuccesWithDataDto("backupService", "已过期", 100000);
                 }
@@ -591,7 +588,7 @@ public class OrderServiceImpl implements OrderService {
             if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
                 return DtoUtil.getSuccesWithDataDto("storeService", time + "到期", 100000);
             } else if (serviceRemainingTime.getTimeRemaining() == 0) {
-                return DtoUtil.getSuccesWithDataDto("storeService", "未开通", 100000);
+                return DtoUtil.getSuccesWithDataDto("storeService", "小主暂未开通该服务", 100000);
             } else {
                 return DtoUtil.getSuccesWithDataDto("storeService", "已过期", 100000);
             }
@@ -655,7 +652,7 @@ public class OrderServiceImpl implements OrderService {
                 key = "annualReportingService";
             } else if (i == 4) {
                 key = "backupService";
-            }else {
+            } else {
                 key = "storeService";
             }
             receivedServiceIdUserId.setServiceId(i + "");
