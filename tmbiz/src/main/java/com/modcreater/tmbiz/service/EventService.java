@@ -7,6 +7,8 @@ import com.modcreater.tmbeans.vo.eventvo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedDeleteEventIds;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -251,4 +253,12 @@ public interface EventService {
      * @return
      */
     Dto searchByWeekForIos(ReceivedId receivedId, String token);
+
+    /**
+     * 提前完成事件
+     * @param earlyEventTermination
+     * @param token
+     * @return
+     */
+    Dto earlyEventTermination(EarlyEventTermination earlyEventTermination, String token);
 }

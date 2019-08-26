@@ -276,4 +276,9 @@ public class EventController {
         return eventService.getAllDrafts(receivedId,request.getHeader("token"));
     }
 
+    @PostMapping(value = "earlyeventtermination")
+    @ApiOperation("提前完成事件")
+    public Dto earlyEventTermination(@RequestBody EarlyEventTermination earlyEventTermination,HttpServletRequest request){
+        return eventService.earlyEventTermination(earlyEventTermination,request.getHeader("token"));
+    }
 }

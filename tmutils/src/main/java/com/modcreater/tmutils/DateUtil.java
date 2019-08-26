@@ -135,8 +135,30 @@ public class DateUtil {
         return Integer.valueOf(new SimpleDateFormat("HH").format(new Date())) * 60 + Integer.valueOf(new SimpleDateFormat("mm").format(new Date()));
     }
 
-    public static void main(String[] args) {
-        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        System.out.println(format.format(DateUtil.stampToDate("1565747228")));
+    /**
+     * 获取当前年
+     * @return "2019"
+     */
+    public static String getCurrentYear(){
+        StringBuffer stringBuffer = new StringBuffer(getDay(0));
+        return stringBuffer.substring(0,4);
+    }
+
+    /**
+     * 获取当前月
+     * @return "01"
+     */
+    public static String getCurrentMonth(){
+        StringBuffer stringBuffer = new StringBuffer(getDay(0));
+        return stringBuffer.substring(4,6);
+    }
+
+    /**
+     * 获取当前日
+     * @return "01"
+     */
+    public static String getCurrentDay(){
+        StringBuffer stringBuffer = new StringBuffer(getDay(0));
+        return stringBuffer.substring(6);
     }
 }

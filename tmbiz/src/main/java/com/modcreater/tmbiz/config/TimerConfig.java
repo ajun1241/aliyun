@@ -96,7 +96,7 @@ public class TimerConfig {
                         loopEvent.setFlag(5L);
                         loopEvent.setIsLoop(0);
                         loopEvent.setRepeaTtime("[false,false,false,false,false,false,false]");
-                        eventMapper.uploadingEvents(loopEvent);
+                        eventMapper.uploadingEvents1(loopEvent);
                     }
                 }
             }

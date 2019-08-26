@@ -2077,6 +2077,40 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
+    @Override
+    public Dto earlyEventTermination(EarlyEventTermination earlyEventTermination, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(earlyEventTermination.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        SingleEvent event = eventMapper.getEarlyEventTermination(earlyEventTermination.getEventId(),earlyEventTermination.getUserId());
+        if (ObjectUtils.isEmpty(event)){
+            return DtoUtil.getFalseDto("当前事件无法提前完成",22001);
+        }
+        if (event.getIsLoop() == 0){
+            if (eventMapper.earlySingleEventTermination(earlyEventTermination.getEventId(),earlyEventTermination.getUserId(),DateUtil.getCurrentMinutes()) <= 0){
+                return DtoUtil.getFalseDto("提前完成失败",22002);
+            }
+        }else {
+            int week = DateUtil.stringToWeek(null);
+            week = week == 7 ? 0 : week;
+            if (!SingleEventUtil.getRepeatTime(event)[week]){
+                return DtoUtil.getFalseDto("当前事件未开始,无法提前完成",22003);
+            }
+            event.setYear(Long.valueOf(DateUtil.getCurrentYear()));
+            event.setMonth(Long.valueOf(DateUtil.getCurrentMonth()));
+            event.setDay(Long.valueOf(DateUtil.getCurrentDay()));
+            event.setEventid(System.currentTimeMillis() / 1000);
+            event.setIsOverdue(1L);
+            event.setFlag(5L);
+            event.setIsLoop(0);
+            event.setRepeaTtime("[false,false,false,false,false,false,false]");
+            if (eventMapper.uploadingEvents1(event) <= 0){
+                return DtoUtil.getFalseDto("提前完成失败",22002);
+            }
+        }
+        return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
     /*@Override
     public Dto test() {
         SingleEvent singleEvent = new SingleEvent();

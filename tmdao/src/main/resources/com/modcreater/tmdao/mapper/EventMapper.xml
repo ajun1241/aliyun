@@ -30,6 +30,29 @@
             #{isLoop})
     </insert>
 
+    <insert id="uploadingEvents1" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
+            insert into singleevent values
+            (null ,
+            #{eventid},
+            #{userid},
+            #{eventname},
+            #{starttime},
+            #{endtime},
+            #{address},
+            #{level},
+            #{flag},
+            #{person},
+            #{remarks},
+            #{repeaTtime},
+            #{isOverdue},
+            #{remindTime},
+            #{day},
+            #{month},
+            #{year},
+            #{type},
+            #{isLoop})
+    </insert>
+
     <update id="deleteByDeleteType">
         update
          <if test="deleteType == 'singleevent'">
@@ -625,6 +648,9 @@
     <update id="updInviteEventPerson">
         update singleevent set person=#{person} where userid=#{userId} and eventid=#{eventId}
     </update>
+    <update id="earlySingleEventTermination">
+        update singleevent set isOverdue = 1,endTime = #{currentMinutes} where userId = #{userId} and eventId = #{eventId} and isOverdue = 0
+    </update>
     <select id="querySingleEventByTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select * from singleevent
         where year=#{year}
@@ -636,5 +662,8 @@
     </select>
     <select id="queryLoopEventByTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select * from singleevent where isOverdue=0 and isLoop=1 and level=5
+    </select>
+    <select id="getEarlyEventTermination" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from singleevent where userId  = #{userId} and eventId = #{eventId} and isOverdue = 0
     </select>
 </mapper>

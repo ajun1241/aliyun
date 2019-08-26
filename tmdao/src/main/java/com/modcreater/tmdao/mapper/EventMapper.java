@@ -32,6 +32,7 @@ public interface EventMapper {
      * @return
      */
     int uploadingEvents(SingleEvent singleEvent);
+    int uploadingEvents1(SingleEvent singleEvent);
 
     /**
      * 根据用户ID,年月日以及时间开始结束时间判断数据库是否存在时间冲突的事件
@@ -411,4 +412,21 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> queryLoopEventByTime();
+
+    /**
+     * 查询要提前完成的事件
+     * @param eventId
+     * @param userId
+     * @return
+     */
+    SingleEvent getEarlyEventTermination(@Param("eventId") String eventId,@Param("userId") String userId);
+
+    /**
+     * 提前完成普通事件
+     * @param eventId
+     * @param userId
+     * @param currentMinutes
+     * @return
+     */
+    int earlySingleEventTermination(@Param("eventId")String eventId,@Param("userId") String userId,@Param("currentMinutes") int currentMinutes);
 }
