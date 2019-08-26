@@ -107,10 +107,25 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        Map<String,Long> result = new HashMap<>(2);
-        result.put("achievedNum",achievementMapper.getAchievedNum(receivedId.getUserId()));
-        result.put("totalNum",achievementMapper.getTotalNum(receivedId.getUserId()));
-        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+        Map<String, Long> result = new HashMap<>(2);
+        result.put("achievedNum", achievementMapper.getAchievedNum(receivedId.getUserId()));
+        result.put("totalNum", achievementMapper.getTotalNum(receivedId.getUserId()));
+        return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+    }
+
+    @Override
+    public Dto getMineForIOS(String userId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userId))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        Map<String,Object> result = new HashMap<>();
+        result.put("completed",eventMapper.countCompletedEvents(Long.valueOf(userId)));
+        result.put("unfinished",eventMapper.countUnfinishedEvents(Long.valueOf(userId)));
+        result.put("drafts",userServiceJudgeService.backupServiceJudge(userId, token).getResCode() == 100000 ? eventMapper.countDrafts(Long.valueOf(userId)) : 0);
+        Account account = accountMapper.queryAccount(userId);
+        result.put("headImgUrl", account.getHeadImgUrl());
+        result.put("userName", account.getUserName());
+        return DtoUtil.getSuccesWithDataDto("查询用户详情成功", result, 100000);
     }
 
     @Override
@@ -126,11 +141,11 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if (userAchievementList.size() == 0) {
                     if (achievement.getType() == 1 && userStatistics.getLoggedDays() >= (achievement.getCondition()).longValue()) {
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                    }else if (achievement.getType() == 2 && eventMapper.getUserAllEvent(userId) >= (achievement.getCondition()).longValue()){
+                    } else if (achievement.getType() == 2 && eventMapper.getUserAllEvent(userId) >= (achievement.getCondition()).longValue()) {
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                     }/*else if (achievement.getType() == 3 && eventMapper.countCompletedEvents(Long.valueOf(userId)) >= (achievement.getCondition()).longValue()){
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
-                    }*/else if (achievement.getType() == 4 && accountMapper.countAllMyFriends(userId) >= (achievement.getCondition()).longValue()){
+                    }*/ else if (achievement.getType() == 4 && accountMapper.countAllMyFriends(userId) >= (achievement.getCondition()).longValue()) {
                         achievementMapper.addNewAchievement(achievement.getId(), userId, DateUtil.dateToStamp(new Date()));
                     }
                 }

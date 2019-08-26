@@ -35,6 +35,13 @@ public class UserInfoController {
         return userInfoService.showUserDetails(receivedId.getUserId(),request.getHeader("token"));
     }
 
+    @GLOT
+    @RequestMapping(value = "getmineforios",method = RequestMethod.POST)
+    @ApiOperation("显示用户详情(IOS)")
+    public Dto getMineForIOS(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return userInfoService.getMineForIOS(receivedId.getUserId(),request.getHeader("token"));
+    }
+
     @RequestMapping(value = "filtrateuserevents",method = RequestMethod.POST)
     @ApiOperation("筛选事件")
     public Dto filtrateUserEvents(@RequestBody ReceivedEventConditions receivedEventConditions,HttpServletRequest request){

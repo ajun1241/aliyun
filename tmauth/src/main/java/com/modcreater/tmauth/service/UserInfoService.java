@@ -119,4 +119,12 @@ public interface UserInfoService {
      * @return
      */
     Dto getAchievementNum(ReceivedId receivedId, String token);
+
+    /**
+     * 获取个人信息(IOS)
+     * @param userId
+     * @param token
+     * @return
+     */
+    Dto getMineForIOS(String userId, String token);
 }
