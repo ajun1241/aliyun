@@ -4,6 +4,7 @@ import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.ManageService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.ComplaintVo;
+import com.modcreater.tmbeans.vo.realname.ReceivedStudentRealInfo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import io.swagger.annotations.ApiOperation;
@@ -32,9 +33,16 @@ public class ManageController {
 
     @Safety
     @PostMapping(value = "uploadrn")
-    @ApiOperation("实名认证")
+    @ApiOperation("实名认证（普通用户）")
     public Dto verify(@RequestBody ReceivedUserRealInfo receivedUserRealInfo, HttpServletRequest request){
         return manageService.uploadUserRealInfo(receivedUserRealInfo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "studentuploadrn")
+    @ApiOperation("实名认证（学生）")
+    public Dto studentVerify(@RequestBody ReceivedStudentRealInfo receivedStudentRealInfo, HttpServletRequest request){
+        return manageService.uploadStudentRealInfo(receivedStudentRealInfo,request.getHeader("token"));
     }
 
     @Safety

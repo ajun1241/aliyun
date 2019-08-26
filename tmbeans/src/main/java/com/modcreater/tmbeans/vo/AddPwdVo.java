@@ -19,4 +19,5 @@ public class AddPwdVo implements Serializable {
     private String userAddress;
 
     private String appType;
+    private String deviceToken;;
 }

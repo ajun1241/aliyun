@@ -625,4 +625,16 @@
     <update id="updInviteEventPerson">
         update singleevent set person=#{person} where userid=#{userId} and eventid=#{eventId}
     </update>
+    <select id="querySingleEventByTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from singleevent
+        where year=#{year}
+        and month=#{month}
+        and day=#{day}
+        and isOverdue=0
+        and isLoop=0
+        and level=5
+    </select>
+    <select id="queryLoopEventByTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
+        select * from singleevent where isOverdue=0 and isLoop=1 and level=5
+    </select>
 </mapper>

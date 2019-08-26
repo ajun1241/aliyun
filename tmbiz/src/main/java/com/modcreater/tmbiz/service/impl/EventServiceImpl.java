@@ -912,8 +912,8 @@ public class EventServiceImpl implements EventService {
                 if (result.getCode() != 200) {
                     logger.info("新增邀请事件回应邀请时融云消息异常：" + result.toString());
                 }
-                //提醒用户事件添加成功
-                TxtMessage txtMessage1 = new TxtMessage("“" + accountMapper.queryAccount(feedbackInviteVo.getFromId()).getUserName() + "”发起的事件“" + singleEvent.getEventname() + "”已经加入了你的时间轴", "");
+                //提醒用户事件添加成功   第一种事件同意之后智袖小助手会提示“xx”发起的事件已经加入你的时间轴，如计划有变可在首页选中待办事件进行调整
+                TxtMessage txtMessage1 = new TxtMessage("“" + accountMapper.queryAccount(feedbackInviteVo.getFromId()).getUserName() + "”发起的事件“" + singleEvent.getEventname() + "”已经加入了你的时间轴，如计划有变可在首页选中待办事件进行调整", "");
                 ResponseResult result1 = rongCloudMethodUtil.sendPrivateMsg(SYSTEMID, new String[]{feedbackInviteVo.getUserId()}, 0, txtMessage1);
                 if (result1.getCode() != 200) {
                     logger.info("新增邀请事件回应邀请时融云消息异常：" + result.toString());
