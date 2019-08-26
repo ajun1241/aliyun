@@ -43,6 +43,8 @@ public class AccountServiceImpl implements AccountService {
     private static Pattern pattern = Pattern.compile("[0-9]*");
 
     private static final String SYSTEMID = "100000";
+    private static final String ANDROID = "android";
+    private static final String IOS = "ios";
 
     @Resource
     private AchievementMapper achievementMapper;
@@ -56,6 +58,8 @@ public class AccountServiceImpl implements AccountService {
     private BackerMapper backerMapper;
     @Resource
     private SystemMsgMapper systemMsgMapper;
+    @Resource
+    private AppTypeMapper appTypeMapper;
 
     RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
 
@@ -98,7 +102,7 @@ public class AccountServiceImpl implements AccountService {
                 return DtoUtil.getSuccesWithDataDto("注册成功，但是没有设置密码",map,100000);
             }
             if (StringUtils.isEmpty(result.getHeadImgUrl())){
-                result.setHeadImgUrl("2333");
+                result.setHeadImgUrl("233");
             }
             //登录
             //生成token
@@ -110,7 +114,6 @@ public class AccountServiceImpl implements AccountService {
             if (StringUtils.isEmpty(token)){
                 return DtoUtil.getFalseDto("生成token失败",14005);
             }
-            System.out.println("这是我要的token*****************************>"+token);
             //把token保存在数据库
             account.setId(result.getId());
             account.setToken(token);
@@ -119,8 +122,15 @@ public class AccountServiceImpl implements AccountService {
             if (accountMapper.updateAccount(account)<=0){
                 return DtoUtil.getFalseDto("生成token失败",14006);
             }
-            //把deviceToken保存在redis中
-            //把appType保存在redis中
+            //更换客户端
+            int i=updateAppType(result.getId().toString(), loginVo.getAppType(),loginVo.getDeviceToken());
+            /*if (i==1){
+                return DtoUtil.getFalseDto("客户端类型不能为空",14021);
+            }else if (i==2){
+                return DtoUtil.getFalseDto("客户端类型格式不正确",14022);
+            }else if (i==4){
+                return DtoUtil.getFalseDto("客户端类型格式不正确",14022);
+            }*/
             map.put("id",result.getId());
             map.put("userCode",result.getUserCode());
             map.put("isFirst",result.getIsFirst());
@@ -222,6 +232,15 @@ public class AccountServiceImpl implements AccountService {
             e.printStackTrace();
             return DtoUtil.getFalseDto("请勿重复操作",15007);
         }
+        //更换客户端
+        int i=updateAppType(addPwdVo.getUserId(), addPwdVo.getAppType(),addPwdVo.getDeviceToken());
+        /*if (i==1){
+            return DtoUtil.getFalseDto("客户端类型不能为空",14021);
+        }else if (i==2){
+            return DtoUtil.getFalseDto("客户端类型格式不正确",14022);
+        }else if (i==4){
+            return DtoUtil.getFalseDto("客户端类型格式不正确",14022);
+        }*/
         account=accountMapper.queryAccount(addPwdVo.getUserId());
         Map map=new HashMap();
         map.put("id",account.getId());
@@ -278,9 +297,6 @@ public class AccountServiceImpl implements AccountService {
             //已经是好友时
             //成就
             List<Achievement> achievement=achievementMapper.searchAllAchievement(account.getId().toString());
-            if (achievement.size()==0){
-                return DtoUtil.getSuccesWithDataDto("查询成就失败",null,200000);
-            }
             //查询好友关系天数
             Friendship friendship=accountMapper.queryFriendshipDetail(queFridenVo.getUserId(),account.getId().toString());
             Date createDate=friendship.getCerateDate();
@@ -1205,4 +1221,129 @@ public class AccountServiceImpl implements AccountService {
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
+    /**
+     * 账号密码登录
+     * @param loginByCPVo
+     * @return
+     */
+    @Override
+    public Dto loginByCP(LoginByCPVo loginByCPVo) {
+        if (StringUtils.isEmpty(loginByCPVo.getUserCode())){
+            return DtoUtil.getFalseDto("账号不能为空",14009);
+        }
+        System.out.println("登录"+loginByCPVo.toString());
+        String token=null;
+        Map map=new HashMap();
+        Account account=new Account();
+        String code=loginByCPVo.getUserCode();
+        String pattern = "^1[\\d]{10}";
+        if (!Pattern.matches(pattern,code)){
+            return DtoUtil.getFalseDto("账号格式不正确",14010);
+        }
+        //登录
+        Account result=accountMapper.checkCode(code);
+        if (ObjectUtils.isEmpty(result)){
+            return DtoUtil.getFalseDto("该账号尚未注册",200000);
+        }
+        if (StringUtils.isEmpty(result.getUserPassword())){
+            map.put("id",result.getId());
+            map.put("userCode",result.getUserCode());
+            map.put("isFirst",result.getIsFirst());
+            map.put("userName",result.getUserName());
+            map.put("gender",result.getGender());
+            map.put("birthday",result.getBirthday());
+            map.put("headImgUrl",result.getHeadImgUrl());
+            map.put("dnd","1");
+            map.put("userSign",result.getUserSign());
+            return DtoUtil.getSuccesWithDataDto("该账号没有设置密码",map,100000);
+        }
+        int res=accountMapper.queryUserByCp(loginByCPVo.getUserCode(),MD5Util.createMD5(loginByCPVo.getUserPassword()));
+        if (res<1){
+            return DtoUtil.getFalseDto("账号或密码错误",14233);
+        }
+        //生成token
+        if (StringUtils.isEmpty(result.getHeadImgUrl())){
+            result.setHeadImgUrl("233");
+        }
+        try {
+            token= rongCloudMethodUtil.createToken(result.getId().toString(),result.getUserName(),result.getHeadImgUrl());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (StringUtils.isEmpty(token)){
+            return DtoUtil.getFalseDto("生成token失败",14005);
+        }
+        //把token保存在数据库
+        account.setId(result.getId());
+        account.setToken(token);
+        //把token保存在redis
+        stringRedisTemplate.opsForValue().set(result.getId().toString(),token);
+        if (accountMapper.updateAccount(account)<=0){
+            return DtoUtil.getFalseDto("生成token失败",14006);
+        }
+        //更换客户端
+        int i=updateAppType(result.getId().toString(), loginByCPVo.getAppType(),loginByCPVo.getDeviceToken());
+        /*if (i==1){
+            return DtoUtil.getFalseDto("客户端类型不能为空",14021);
+        }else if (i==2){
+            return DtoUtil.getFalseDto("客户端类型格式不正确",14022);
+        }else if (i==4){
+            return DtoUtil.getFalseDto("客户端类型格式不正确",14022);
+        }*/
+        map.put("id",result.getId());
+        map.put("userCode",result.getUserCode());
+        map.put("isFirst",result.getIsFirst());
+        map.put("userName",result.getUserName());
+        map.put("gender",result.getGender());
+        map.put("birthday",result.getBirthday());
+        map.put("headImgUrl",result.getHeadImgUrl());
+        map.put("userSign",result.getUserSign());
+        map.put("token",token);
+        //查询用户是否开启了勿扰模式
+        map.put("dnd",userSettingsMapper.getDND(result.getId().toString())!=null?userSettingsMapper.getDND(result.getId().toString()).toString():"");
+        return DtoUtil.getSuccesWithDataDto("登录成功",map,100000);
+    }
+
+    /**
+     * 更换客户端
+     * @param userId
+     * @param apType
+     * @return
+     */
+    private int updateAppType(String userId,String apType,String deviceToken){
+        AppType appType=appTypeMapper.queryAppType(userId);
+        String aType;
+        try {
+            if (StringUtils.isEmpty(apType)){
+                return 1;
+            } else if (ANDROID.equalsIgnoreCase(apType.substring(0, apType.indexOf(",")))) {
+                aType = "1";
+            } else if (IOS.equalsIgnoreCase(apType.substring(0, apType.indexOf(",")))){
+                aType = "2";
+            }else {
+                return 2;
+            }
+        } catch (StringIndexOutOfBoundsException e) {
+            logger.error(e.getMessage(),e);
+            return 4;
+        }
+        //第一次绑定
+        if (ObjectUtils.isEmpty(appType)){
+            appTypeMapper.insertAppType(userId,aType,deviceToken);
+        }else {
+            //更换绑定
+            appTypeMapper.updateAppType(aType,userId,deviceToken);
+        }
+        return 3;
+    }
+
+    /**
+     * 重置密码
+     * @param loginByCPVo
+     * @return
+     */
+    @Override
+    public Dto resetPassword(LoginByCPVo loginByCPVo) {
+        return null;
+    }
 }

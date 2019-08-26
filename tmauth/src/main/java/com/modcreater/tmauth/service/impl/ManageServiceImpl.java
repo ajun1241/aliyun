@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.AfterSale;
 import com.modcreater.tmbeans.pojo.UserRealInfo;
 import com.modcreater.tmbeans.vo.ComplaintVo;
+import com.modcreater.tmbeans.vo.realname.ReceivedStudentRealInfo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AfterSaleMapper;
@@ -51,6 +52,7 @@ public class ManageServiceImpl implements ManageService {
      */
     @Override
     public Dto uploadUserRealInfo(ReceivedUserRealInfo receivedUserRealInfo, String token) {
+        receivedUserRealInfo.setCategory("1");
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
         }
@@ -63,9 +65,9 @@ public class ManageServiceImpl implements ManageService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedUserRealInfo.getUserId()))){
             return DtoUtil.getFalseDto("请重新登录",21014);
         }
-        if (receivedUserRealInfo.getUserIDNo().length()>18){
+        /*if (receivedUserRealInfo.getUserIDNo().length()>18){
             return DtoUtil.getFalseDto("身份证号码有误",50003);
-        }
+        }*/
         //第一次上传认证
         UserRealInfo userRealInfo1=userRealInfoMapper.queryDetail(receivedUserRealInfo.getUserId());
         if (ObjectUtils.isEmpty(userRealInfo1)){
@@ -139,5 +141,52 @@ public class ManageServiceImpl implements ManageService {
             return DtoUtil.getFalseDto("服务提交失败",50020);
         }
         return DtoUtil.getSuccessDto("提交成功",100000);
+    }
+
+    /**
+     * 学生实名认证
+     * @param receivedStudentRealInfo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto uploadStudentRealInfo(ReceivedStudentRealInfo receivedStudentRealInfo, String token) {
+        ReceivedUserRealInfo receivedUserRealInfo=new ReceivedUserRealInfo();
+        receivedUserRealInfo.setUserId(receivedStudentRealInfo.getUserId());
+        receivedUserRealInfo.setAppType(receivedStudentRealInfo.getAppType());
+        receivedUserRealInfo.setUserIDCardFront(receivedStudentRealInfo.getStudentIDCardFront());
+        receivedUserRealInfo.setUserIDCardVerso(receivedStudentRealInfo.getStudentIDCardVerso());
+        receivedUserRealInfo.setUserIDNo(receivedStudentRealInfo.getStudentIDNo());
+        receivedUserRealInfo.setUserRealName(receivedStudentRealInfo.getUserRealName());
+        receivedUserRealInfo.setCategory("2");
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedUserRealInfo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        //第一次上传认证
+        UserRealInfo userRealInfo1=userRealInfoMapper.queryDetail(receivedUserRealInfo.getUserId());
+        if (ObjectUtils.isEmpty(userRealInfo1)){
+            //上传信息
+            if (userRealInfoMapper.addNewRealInfo(receivedUserRealInfo)==0){
+                return DtoUtil.getFalseDto("上传数据失败",50001);
+            }
+        }else {
+            if (userRealInfo1.getRealStatus()==0){
+                return DtoUtil.getFalseDto("实名正在认证中，请耐心等待",50006);
+            }
+            //多次更改认证
+            //更改信息
+            UserRealInfo userRealInfo=new UserRealInfo();
+            userRealInfo.setUserId(Long.parseLong(receivedUserRealInfo.getUserId()));
+            userRealInfo.setUserRealName(receivedUserRealInfo.getUserRealName());
+            userRealInfo.setUserIdNo(receivedUserRealInfo.getUserIDNo());
+            userRealInfo.setUserIdCardFront(receivedUserRealInfo.getUserIDCardFront());
+            userRealInfo.setUserIdCardVerso(receivedUserRealInfo.getUserIDCardVerso());
+            userRealInfo.setRealStatus(0L);
+            userRealInfo.setCreateDate(new Date());
+            if (userRealInfoMapper.updateRealInfo(userRealInfo)==0){
+                return DtoUtil.getFalseDto("上传数据失败",50001);
+            }
+        }
+        return DtoUtil.getSuccessDto("上传成功",100000);
     }
 }

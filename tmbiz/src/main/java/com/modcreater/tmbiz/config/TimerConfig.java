@@ -1,16 +1,15 @@
 package com.modcreater.tmbiz.config;
 
 import com.modcreater.tmbeans.databaseparam.EventStatusScan;
+import com.modcreater.tmbeans.pojo.AppType;
 import com.modcreater.tmbeans.pojo.DiscountUser;
 import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.TimedTask;
-import com.modcreater.tmdao.mapper.AchievementMapper;
-import com.modcreater.tmdao.mapper.EventMapper;
-import com.modcreater.tmdao.mapper.OrderMapper;
-import com.modcreater.tmdao.mapper.TimedTaskMapper;
+import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
 import com.modcreater.tmutils.SingleEventUtil;
+import com.modcreater.tmutils.mobserver.MobPushUtils;
 import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
 import org.slf4j.Logger;
@@ -48,11 +47,14 @@ public class TimerConfig {
 
     @Resource
     private OrderMapper orderMapper;
-
+    @Resource
+    private AppTypeMapper appTypeMapper;
+    @Resource
+    private UserSettingsMapper userSettingsMapper;
     @Resource
     private AchievementMapper achievementMapper;
 
-    private Logger logger = LoggerFactory.getLogger(TimerConfig.class);
+    private static Logger logger = LoggerFactory.getLogger(TimerConfig.class);
 
     /**
      * 以下为每分钟的第0s进行过期事件过滤修改
@@ -121,5 +123,117 @@ public class TimerConfig {
                 logger.info("已将" + orderMapper.setDiscountCouponOrderId(discountUser.getId(), "0", "0") + "个优惠券状态改为未使用");
             }
         }
+    }
+
+    @Scheduled(cron = "0 * * * * ?")
+    public void pushTask() {
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+        //今天
+        String[] time1=simpleDateFormat.format(new Date()).split("-");
+        Calendar cal1 = new GregorianCalendar();
+        cal1.setTime(new Date());
+        cal1.add(Calendar.DATE,1);
+        //明天
+        String[] time2= simpleDateFormat.format(cal1.getTime()).split("-");
+        //不重复事件
+        List<SingleEvent> singleEventList=eventMapper.querySingleEventByTime(time1[0],time1[1],time1[2]);
+        List<SingleEvent> singleEventList1=eventMapper.querySingleEventByTime(time2[0],time2[1],time2[2]);
+        long now=(Long.valueOf(time1[3])*60+Long.valueOf(time1[4]));
+        logger.info("今天事件列表："+singleEventList);
+        logger.info("明天事件列表："+singleEventList);
+        for (SingleEvent singleEvent : singleEventList) {
+            String startTime=singleEvent.getStarttime();
+            String remindTime=singleEvent.getRemindTime();
+            long remind=(Long.valueOf(startTime)-Long.valueOf(remindTime)) < 0 ? 1440-Long.valueOf(remindTime) : (Long.valueOf(startTime)-Long.valueOf(remindTime));
+            if (now == remind){
+                //符合时间开始推送
+                AppType appType=appTypeMapper.queryAppType(singleEvent.getUserid().toString());
+                //判断勿扰模式
+                if (userSettingsMapper.getDND(singleEvent.getUserid().toString()) == 1L){
+                    //安卓
+                    if (appType.getAppType()==1L){
+                        logger.info("开始要推送事件"+singleEvent.toString());
+                        MobPushUtils.pushTask("您的事件"+singleEvent.getEventname()+"就要开始啦",new String[]{appType.getDeviceToken()});
+                    }
+                }
+            }
+        }
+        for (SingleEvent singleEvent:singleEventList1) {
+            //如果明天的事件提醒事件是今天
+            long remind=(Long.valueOf(singleEvent.getStarttime())-Long.valueOf(singleEvent.getRemindTime()));
+            if ( remind< 0){
+                remind=1440-Long.valueOf(singleEvent.getRemindTime());
+                if (now == remind){
+                    //符合时间开始推送
+                    AppType appType=appTypeMapper.queryAppType(singleEvent.getUserid().toString());
+                    //判断勿扰模式
+                    if (userSettingsMapper.getDND(singleEvent.getUserid().toString()) == 1L){
+                        //安卓
+                        if (appType.getAppType()==1L){
+                            logger.info("开始要推送事件"+singleEvent.toString());
+                            MobPushUtils.pushTask("您的事件"+singleEvent.getEventname()+"就要开始啦",new String[]{appType.getDeviceToken()});
+                        }
+                    }
+                }
+            }
+        }
+        //重复事件
+        List<SingleEvent> loopEventList=eventMapper.queryLoopEventByTime();
+        //今天的星期
+        int week1=DateUtil.stringToWeek(time1[0]+time1[1]+time1[2]) == 7 ? 0 : DateUtil.stringToWeek(time1[0]+time1[1]+time1[2]);
+        int week2=DateUtil.stringToWeek(time2[0]+time2[1]+time2[2]) == 7 ? 0 : DateUtil.stringToWeek(time2[0]+time2[1]+time2[2]);
+        for (SingleEvent loopEvent:loopEventList) {
+            String[] le=loopEvent.getRepeaTtime().substring(1,loopEvent.getRepeaTtime().length()-1).split(",");
+            //如果今天有重复事件
+            String startTime=loopEvent.getStarttime();
+            String remindTime=loopEvent.getRemindTime();
+            if ("true".equals(le[week1])){
+                logger.info("今天的重复事件："+loopEvent.toString());
+                long remind=(Long.valueOf(startTime)-Long.valueOf(remindTime));
+                if (now == remind){
+                    //符合时间开始推送
+                    AppType appType=appTypeMapper.queryAppType(loopEvent.getUserid().toString());
+                    //判断勿扰模式
+                    if (userSettingsMapper.getDND(loopEvent.getUserid().toString()) == 1L){
+                        //安卓
+                        if (appType.getAppType()==1L){
+                            logger.info("开始要推送事件"+loopEvent.toString());
+                            MobPushUtils.pushTask("您的事件"+loopEvent.getEventname()+"就要开始啦",new String[]{appType.getDeviceToken()});
+                        }
+                    }
+                }
+            }
+            //如果明天有重复事件
+            if ("true".equals(le[week2])){
+                logger.info("明天的重复事件："+loopEvent.toString());
+                long remind=(Long.valueOf(startTime)-Long.valueOf(remindTime));
+                //如果明天的事件提醒时间是今天
+                if (remind<0){
+                    remind=1440-Long.valueOf(remindTime);
+                    if (now == remind){
+                        //符合时间开始推送
+                        AppType appType=appTypeMapper.queryAppType(loopEvent.getUserid().toString());
+                        //判断勿扰模式
+                        if (userSettingsMapper.getDND(loopEvent.getUserid().toString()) == 1L){
+                            //安卓
+                            if (appType.getAppType()==1L){
+                                logger.info("开始要推送事件"+loopEvent.toString());
+                                MobPushUtils.pushTask("您的事件"+loopEvent.getEventname()+"就要开始啦",new String[]{appType.getDeviceToken()});
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Date date = new Date(Calendar.DAY_OF_WEEK);
+        System.out.println(date);
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        int week=cal.get(Calendar.DAY_OF_WEEK)-1;
+        TimerConfig.logger.info("星期："+week);
     }
 }

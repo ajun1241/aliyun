@@ -2,6 +2,7 @@ package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.ComplaintVo;
+import com.modcreater.tmbeans.vo.realname.ReceivedStudentRealInfo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
@@ -40,4 +41,12 @@ public interface ManageService {
      * @return
      */
     Dto changeRealInfo(ReceivedId receivedId, String token);
+
+    /**
+     * 学生实名认证
+     * @param receivedStudentRealInfo
+     * @param token
+     * @return
+     */
+    Dto uploadStudentRealInfo(ReceivedStudentRealInfo receivedStudentRealInfo, String token);
 }

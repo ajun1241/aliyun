@@ -396,4 +396,19 @@ public interface EventMapper {
      * @return
      */
     List<SingleEvent> getAllLoopEvents(String userId);
+
+    /**
+     * 查询今天所有用户的事件(不重复)
+     * @param year
+     * @param month
+     * @param day
+     * @return
+     */
+    List<SingleEvent> querySingleEventByTime(String year,String month,String day);
+
+    /**
+     * 查询今天所有用户的事件(重复)
+     * @return
+     */
+    List<SingleEvent> queryLoopEventByTime();
 }

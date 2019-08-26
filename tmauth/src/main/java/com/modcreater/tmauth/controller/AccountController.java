@@ -180,4 +180,11 @@ public class AccountController {
     public Dto queryFriendAchievement(@RequestBody UserFriendVo userFriendVo, HttpServletRequest request){
         return userService.queryFriendAchievement(userFriendVo ,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping("loginbycp")
+    @ApiOperation("账号密码登录")
+    public Dto loginByCP(@RequestBody LoginByCPVo loginByCPVo){
+        return userService.loginByCP(loginByCPVo );
+    }
 }

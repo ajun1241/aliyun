@@ -2,10 +2,7 @@ package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Friendship;
-import com.modcreater.tmbeans.vo.AccountVo;
-import com.modcreater.tmbeans.vo.AddPwdVo;
-import com.modcreater.tmbeans.vo.LoginVo;
-import com.modcreater.tmbeans.vo.QueryUserVo;
+import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.uservo.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -203,4 +200,17 @@ public interface AccountService {
      */
     Dto queryFriendAchievement(UserFriendVo userFriendVo,String token);
 
+    /**
+     * 账号密码登录
+     * @param loginByCPVo
+     * @return
+     */
+    Dto loginByCP(LoginByCPVo loginByCPVo);
+
+    /**
+     * 重置密码
+     * @param loginByCPVo
+     * @return
+     */
+    Dto resetPassword(LoginByCPVo loginByCPVo);
 }

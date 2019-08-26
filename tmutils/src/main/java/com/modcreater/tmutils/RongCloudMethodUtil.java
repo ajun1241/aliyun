@@ -21,10 +21,12 @@ import io.rong.models.response.ResponseResult;
 import io.rong.models.response.TokenResult;
 import io.rong.models.user.UserModel;
 import io.rong.util.GsonUtil;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
 
 
 /**
@@ -37,6 +39,8 @@ public class RongCloudMethodUtil {
     public final static String appKey = "0vnjpoad0314z";
     // 申请的的云secret
     public final static String appSecret = "0uoZVUDt8lROGb";
+
+    private Logger logger= LoggerFactory.getLogger(RongCloudMethodUtil.class);
 
     VoiceMessage voiceMessage = new VoiceMessage("hello", "helloExtra", 20L);
 
@@ -57,7 +61,7 @@ public class RongCloudMethodUtil {
      * 注册用户，生成用户在融云的唯一身份标识 Token
      */
     public String createToken(String userId,String userName,String headImgUrl) throws Exception {
-
+        logger.info("用户详情:id"+userId+";昵称："+userName+";头像："+headImgUrl);
         User User = rongCloud.user;
 
         UserModel user = new UserModel()
@@ -69,7 +73,7 @@ public class RongCloudMethodUtil {
             return null;
         }
         MyToken myToken= JSONObject.parseObject(result.toString(),MyToken.class);
-        System.out.println("getToken:  " + result.toString());
+        logger.info("getToken:  " + result.toString());
 
         /**
          *
@@ -78,7 +82,7 @@ public class RongCloudMethodUtil {
          * 刷新用户信息方法
          */
         Result refreshResult = User.update(user);
-        System.out.println("refresh:  " + refreshResult.toString());
+        logger.info("refresh:  " + refreshResult.toString());
         return myToken.getToken();
     }
 
@@ -101,7 +105,7 @@ public class RongCloudMethodUtil {
                 .setContentAvailable(0);
 
         ResponseResult result = system.send(systemMessage);
-        System.out.println("send system message:  " + result.toString());
+        logger.info("send system message:  " + result.toString());
         return result;
     }
 
@@ -123,7 +127,7 @@ public class RongCloudMethodUtil {
                 .setIsIncludeSender(isIncludeSender);
         //发送单聊方法
         ResponseResult privateResult = Private.send(privateMessage);
-        System.out.println("send private message:  " + privateResult.toString());
+        logger.info("send private message:  " + privateResult.toString());
         return privateResult;
     }
 
@@ -201,7 +205,7 @@ public class RongCloudMethodUtil {
          * 刷新用户信息方法
          */
         Result refreshResult = User.update(user);
-        System.out.println("refresh:  " + refreshResult.toString());
+        logger.info("refresh:  " + refreshResult.toString());
         return refreshResult.toString();
     }
 }

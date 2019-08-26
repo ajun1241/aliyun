@@ -3,11 +3,10 @@
   <component name="Encoding" addBOMForNewFiles="with NO BOM">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tmauth" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/tmauth2" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/tmauth2" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tmbeans" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tmbiz" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tmdao" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tmtest" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tmtrade" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tmutils" charset="UTF-8" />
   </component>

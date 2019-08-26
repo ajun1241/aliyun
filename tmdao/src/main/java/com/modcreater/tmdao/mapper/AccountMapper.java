@@ -218,4 +218,12 @@ public interface AccountMapper {
      * @return
      */
     List<String> queryBlackList(String userId);
+
+    /**
+     * 账号密码登录
+     * @param userCode
+     * @param password
+     * @return
+     */
+    int queryUserByCp(String userCode,String password);
 }

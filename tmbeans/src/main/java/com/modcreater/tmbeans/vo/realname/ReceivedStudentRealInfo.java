@@ -13,19 +13,17 @@ import java.io.Serializable;
  * Time: 13:53
  */
 @Data
-public class ReceivedUserRealInfo implements Serializable {
+public class ReceivedStudentRealInfo implements Serializable {
 
     private String userId;
 
     private String userRealName;
 
-    private String userIDNo;
+    private String studentIDNo;
 
-    private String userIDCardFront;
+    private String studentIDCardFront;
 
-    private String userIDCardVerso;
-
-    private String category;
+    private String studentIDCardVerso;
 
     private String appType;
 }

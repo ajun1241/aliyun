@@ -4,8 +4,8 @@
 
     <insert id="addNewRealInfo">
         insert into userrealinfo
-        (userId, userRealName, userIDNo, userIDCardFront, userIDCardVerso)
-        values (#{userId},#{userRealName},#{userIDNo},#{userIDCardFront},#{userIDCardVerso})
+        (userId, userRealName, userIDNo, userIDCardFront, userIDCardVerso,category)
+        values (#{userId},#{userRealName},#{userIDNo},#{userIDCardFront},#{userIDCardVerso},#{category})
     </insert>
 
     <update id="updateRealInfo">

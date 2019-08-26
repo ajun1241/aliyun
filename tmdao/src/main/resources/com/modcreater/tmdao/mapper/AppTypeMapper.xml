@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.modcreater.tmdao.mapper.AppTypeMapper">
+    <insert id="insertAppType">
+        insert into apptype (userId, appType,deviceToken) values (#{userId},#{appType},#{deviceToken})
+    </insert>
+
+    <update id="updateAppType">
+        update apptype set appType=#{appType},deviceToken=#{deviceToken} where userId=#{userId}
+    </update>
+
+    <select id="queryAppType" resultType="com.modcreater.tmbeans.pojo.AppType">
+        select * from apptype where userId=#{userId}
+    </select>
+</mapper>

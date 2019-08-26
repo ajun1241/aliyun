@@ -10,6 +10,7 @@
         <module name="tmbeans" />
         <module name="tmbiz" />
         <module name="tmdao" />
+        <module name="tmtest" />
         <module name="tmtrade" />
         <module name="tmutils" />
       </profile>
@@ -28,6 +29,7 @@
       <module name="tmbiz" options="-parameters" />
       <module name="tmchat" options="-parameters" />
       <module name="tmdao" options="-parameters" />
+      <module name="tmtest" options="-parameters" />
       <module name="tmtrade" options="-parameters" />
       <module name="tmutils" options="-parameters" />
     </option>

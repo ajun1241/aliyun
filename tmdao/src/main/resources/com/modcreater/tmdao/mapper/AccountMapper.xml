@@ -196,5 +196,8 @@
     <select id="queryBlackList" resultType="java.lang.String">
         select friendId from friendship where userId=#{userId} and flag=1
     </select>
+    <select id="queryUserByCp" resultType="java.lang.Integer">
+        select count(id) from account where userCode=#{userCode} and userPassword=#{password}
+    </select>
 
 </mapper>
