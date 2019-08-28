@@ -554,7 +554,7 @@
         select isOverdue,isLoop from singleevent where userId = #{userId} and eventId = #{eventId} and isOverdue = #{eventStatus}
     </select>
     <select id="queryEventsWithFewInfo" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select eventId,userId,eventName,startTime,endTime from singleevent
+        select eventId,userId,eventName,startTime,endTime,flag from singleevent
         <where>
             <if test="userid != null">
                 userid = #{userid}
@@ -568,7 +568,6 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            and isOverdue = 0 and isLoop = 0
         </where>
         order by day asc ,startTime asc
     </select>
