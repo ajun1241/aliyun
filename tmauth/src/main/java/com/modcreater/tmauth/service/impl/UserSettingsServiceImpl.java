@@ -111,7 +111,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
                 ShowFriendList showFriendListForHide = JSONObject.parseObject(o.toString(),ShowFriendList.class);
                 if (showFriendListForHide.getStatus().equals("0")){
                     showFriendListForHide.setStatus("1");
-                }else {
+                }else if (showFriendListForHide.getStatus().equals("1")){
                     showFriendListForHide.setStatus("0");
                 }
                 result = (userSettingsMapper.updateUserSettingsToFriends("hide",showFriendListForHide.getUserId(),Integer.valueOf(showFriendListForHide.getStatus()),receivedShowFriendList.getId())) > 0;
@@ -179,7 +179,12 @@ public class UserSettingsServiceImpl implements UserSettingsService {
             List<ShowFriendList> showFriendListForHideList = userSettingsMapper.getHideFriendList(getFriendListInSettings.getUserId());
             if (showFriendListForHideList.size() != 0){
                 for (ShowFriendList showFriendList : showFriendListForHideList){
-                    showFriendList.setStatus("1".equals(showFriendList.getStatus())?"0":"1");
+                    if ("1".equals(showFriendList.getStatus())){
+                        showFriendList.setStatus("0");
+                    }else if ("0".equals(showFriendList.getStatus())){
+                        showFriendList.setStatus("1");
+                    }
+//                    showFriendList.setStatus("1".equals(showFriendList.getStatus())?"0":"1");
                     showFriendList.setUpdateType("hide");
                 }
                 result.put("friendList",showFriendListForHideList);
