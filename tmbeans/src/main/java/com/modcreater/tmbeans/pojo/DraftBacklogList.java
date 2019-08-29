@@ -2,18 +2,8 @@ package com.modcreater.tmbeans.pojo;
 
 import lombok.Data;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-/**
- * @Author: AJun
- * Created with IntelliJ IDEA.
- * Description: 事件清单
- */
 @Data
-public class BacklogList {
-
+public class DraftBacklogList {
   private Long id; //主键
   private Long singleEventId; //事件id
   private String backlogName; // 清单名称

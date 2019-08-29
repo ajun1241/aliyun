@@ -1,6 +1,9 @@
 package com.modcreater.tmbeans.show;
 
+import com.modcreater.tmbeans.pojo.BacklogList;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,4 +37,5 @@ public class ShowSingleEvent {
     private Long day;        //日
     private Long type;    //事件分类
 
+    private List<BacklogList> backlogList;
 }

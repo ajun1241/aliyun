@@ -82,6 +82,9 @@ public class EventServiceImpl implements EventService {
     @Resource
     private SynchronHistoryMapper synchronHistoryMapper;
 
+    @Resource
+    private BacklogMapper backlogMapper;
+
     private Logger logger = LoggerFactory.getLogger(EventServiceImpl.class);
     @Resource
     private EventUtil eventUtil;
@@ -100,17 +103,13 @@ public class EventServiceImpl implements EventService {
         if (!StringUtils.hasText(uploadingEventVo.getSingleEvent())) {
             return DtoUtil.getFalseDto("没有可上传的事件", 21002);
         }
-        SingleEvent singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEvent.class);
+        SingleEventAndBacklog singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEventAndBacklog.class);
         if (singleEvent.getEventname().length() > 10) {
             return DtoUtil.getFalseDto("标题太长", 20130);
         }
         singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
-        /*EventExtra eventExtra=new EventExtra();
-        eventExtra.setCommon(SingleEventUtil.isCommon(singleEvent.getYear(),singleEvent.getMonth(),singleEvent.getDay()));
-        eventExtra.setEventId(singleEvent.getId());
-        eventViceMapper.addEventExtra(eventExtra);*/
         if (singleEvent.getIsLoop() == 1) {
             List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
             if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
@@ -121,6 +120,15 @@ public class EventServiceImpl implements EventService {
         }
         //记录操作时间
         if (!ObjectUtils.isEmpty(singleEvent) && eventMapper.uploadingEvents(singleEvent) > 0) {
+            //加入事件清单
+            if (!ObjectUtils.isEmpty(singleEvent.getBacklogList()) && singleEvent.getBacklogList().size()>0){
+                List<BacklogList> backlogLists=new ArrayList<>();
+                for (BacklogList backlogList:singleEvent.getBacklogList()) {
+                    backlogList.setSingleEventId(singleEvent.getId());
+                    backlogLists.add(backlogList);
+                }
+                backlogMapper.insertBacklog(backlogLists);
+            }
             return DtoUtil.getSuccessDto("事件上传成功", 100000);
         }
         return DtoUtil.getFalseDto("事件上传失败", 21001);
@@ -152,9 +160,15 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getFalseDto("修改事件状态失败", 21005);
     }
 
-
+    /**
+     * 修改事件
+     *
+     * @param updateEventVo
+     * @param token
+     * @return
+     */
     @Override
-    public synchronized Dto updateEvents(UpdateEventVo updateEventVo, String token) {
+    public synchronized Dto updateEvents(UploadingEventVo updateEventVo, String token) {
         if (!StringUtils.hasText(updateEventVo.getUserId())) {
             return DtoUtil.getFalseDto("请先登录", 21011);
         }
@@ -167,8 +181,7 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(updateEventVo)) {
             return DtoUtil.getFalseDto("修改条件接收失败", 21008);
         }
-        SingleEvent singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEvent.class);
-        logger.info("233:  " + singleEvent.toString());
+        SingleEventAndBacklog singleEvent = JSONObject.parseObject(updateEventVo.getSingleEvent(), SingleEventAndBacklog.class);
         singleEvent.setUserid(Long.valueOf(updateEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
@@ -256,6 +269,23 @@ public class EventServiceImpl implements EventService {
         eventPersons.setFriendsId("");
         singleEvent.setPerson(JSON.toJSONString(eventPersons));
         if (eventMapper.alterEventsByUserId(singleEvent) > 0) {
+            //修改清单内容
+            /*List<BacklogList> backlogLists1=singleEvent.getBacklogList();
+            if (!ObjectUtils.isEmpty(backlogLists1)){
+                System.out.println(backlogLists1);
+                SingleEvent singleEvent1=eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
+                List<BacklogList> backlogLists2=backlogMapper.queryBacklogList(singleEvent1.getId());
+                System.out.println(backlogLists2);
+                for (BacklogList backlogList:backlogLists2) {
+                    //删除旧的清单
+                    backlogMapper.deleteBacklog(backlogList.getId());
+                }
+                //新增清单
+                for (BacklogList backlogList:backlogLists1) {
+                    backlogList.setSingleEventId(singleEvent1.getId());
+                }
+                backlogMapper.insertBacklog(backlogLists1);
+            }*/
             return DtoUtil.getSuccessDto("修改成功", 100000);
         }
         return DtoUtil.getFalseDto("修改事件失败", 21007);
@@ -293,13 +323,22 @@ public class EventServiceImpl implements EventService {
                 ArrayList<SingleEvent> singleEventList = JSONObject.parseObject(dayEvents1.getMySingleEventList().toString(), ArrayList.class);
                 for (Object singleEvent : singleEventList) {
                     //把遍历出的元素转换成对象
-                    SingleEvent singleEvent1 = JSONObject.parseObject(singleEvent.toString(), SingleEvent.class);
+                    SingleEventAndBacklog singleEvent1 = JSONObject.parseObject(singleEvent.toString(), SingleEventAndBacklog.class);
                     //插入用户id
                     singleEvent1.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
                     singleEvent1.setIsLoop(0);
                     //上传
                     if (eventMapper.uploadingEvents(singleEvent1) <= 0) {
                         return DtoUtil.getFalseDto("上传事件" + singleEvent1.getEventid() + "失败", 25005);
+                    }
+                    //上传事件清单
+                    if (!ObjectUtils.isEmpty(singleEvent1.getBacklogList()) && singleEvent1.getBacklogList().size()>0){
+                        List<BacklogList> backlogLists=new ArrayList<>();
+                        for (BacklogList backlogList:singleEvent1.getBacklogList()) {
+                            backlogList.setSingleEventId(singleEvent1.getId());
+                            backlogLists.add(backlogList);
+                        }
+                        backlogMapper.insertBacklog(backlogLists);
                     }
                 }
             }
@@ -315,11 +354,19 @@ public class EventServiceImpl implements EventService {
                     List<SingleEvent> singleEventList = JSONObject.parseObject(singleEvents.toString(), ArrayList.class);
                     for (Object loopEvent : singleEventList) {
                         //第三层转换
-                        SingleEvent singleEvent = JSONObject.parseObject(loopEvent.toString(), SingleEvent.class);
+                        SingleEventAndBacklog singleEvent = JSONObject.parseObject(loopEvent.toString(), SingleEventAndBacklog.class);
                         singleEvent.setUserid(Long.parseLong(synchronousUpdateVo.getUserId()));
                         singleEvent.setIsLoop(1);
                         if (eventMapper.uploadingEvents(singleEvent) <= 0) {
                             return DtoUtil.getFalseDto("上传重复事件" + singleEvent.getEventid() + "失败", 25006);
+                        }
+                        if (!ObjectUtils.isEmpty(singleEvent.getBacklogList()) && singleEvent.getBacklogList().size()>0){
+                            List<BacklogList> backlogLists=new ArrayList<>();
+                            for (BacklogList backlogList:singleEvent.getBacklogList()) {
+                                backlogList.setSingleEventId(singleEvent.getId());
+                                backlogLists.add(backlogList);
+                            }
+                            backlogMapper.insertBacklog(backlogLists);
                         }
                     }
                 }
@@ -388,7 +435,7 @@ public class EventServiceImpl implements EventService {
         ArrayList<Object> drafts = JSONObject.parseObject(draftVo.getSingleEvents(), ArrayList.class);
         for (Object draft : drafts) {
             System.out.println(draft);
-            SingleEvent draft1 = JSONObject.parseObject(draft.toString(), SingleEvent.class);
+            SingleEventAndBacklog draft1 = JSONObject.parseObject(draft.toString(), SingleEventAndBacklog.class);
             try {
                 draft1.setPerson(JSON.toJSONString(JSONObject.parseObject(draft1.getPerson(), EventPersons.class)));
             } catch (Exception e) {
@@ -404,6 +451,15 @@ public class EventServiceImpl implements EventService {
                 draft1.setDay(draft1.getDay());
                 if (eventMapper.uplDraft(draft1) == 0) {
                     return DtoUtil.getFalseDto("上传草稿失败", 27002);
+                }
+                //草稿添加事件清单
+                if (!ObjectUtils.isEmpty(draft1.getBacklogList()) && draft1.getBacklogList().size()>0){
+                    List<BacklogList> backlogLists=new ArrayList<>();
+                    for (BacklogList backlogList:draft1.getBacklogList()) {
+                        backlogList.setSingleEventId(draft1.getId());
+                        backlogLists.add(backlogList);
+                    }
+                    backlogMapper.insertDraftBacklog(backlogLists);
                 }
             }
         }
@@ -731,11 +787,19 @@ public class EventServiceImpl implements EventService {
                 maps.put("others", eventPersons.getOthers());
                 singleEvent.setPerson(JSON.toJSONString(maps));
                 System.out.println("显示一个事件详情时输出的" + singleEvent.getPerson());
-                return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEvent), 100000);
+                SingleEventAndBacklog singleEventAndBacklog=JSONObject.parseObject(JSON.toJSONString(singleEvent),SingleEventAndBacklog.class);
+                //查询该事件的清单
+                List<BacklogList> backlogLists=backlogMapper.queryBacklogList(singleEvent.getId());
+                singleEventAndBacklog.setBacklogList(backlogLists);
+                return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEventAndBacklog), 100000);
             } else {
                 singleEvent.setPerson(JSON.toJSONString(new EventPersons()));
                 System.out.println("显示一个事件详情时输出的" + singleEvent.getPerson());
-                return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEvent), 100000);
+                SingleEventAndBacklog singleEventAndBacklog=JSONObject.parseObject(JSON.toJSONString(singleEvent),SingleEventAndBacklog.class);
+                //查询该事件的清单
+                List<BacklogList> backlogLists=backlogMapper.queryBacklogList(singleEvent.getId());
+                singleEventAndBacklog.setBacklogList(backlogLists);
+                return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEventAndBacklog), 100000);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -756,7 +820,7 @@ public class EventServiceImpl implements EventService {
             if (!token.equals(stringRedisTemplate.opsForValue().get(addInviteEventVo.getUserId()))) {
                 return DtoUtil.getFalseDto("请重新登录", 21014);
             }
-            SingleEvent singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEvent.class);
+            SingleEventAndBacklog singleEvent = JSONObject.parseObject(addInviteEventVo.getSingleEvent(), SingleEventAndBacklog.class);
             singleEvent.setUserid(Long.parseLong(addInviteEventVo.getUserId()));
             //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
             singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
@@ -776,6 +840,15 @@ public class EventServiceImpl implements EventService {
             singleEvent.setPerson(JSON.toJSONString(eventPersons));
             //事件保存在自己的时间轴里
             eventMapper.uploadingEvents(singleEvent);
+            //添加事件清单
+            if (!ObjectUtils.isEmpty(singleEvent.getBacklogList()) && singleEvent.getBacklogList().size()>0){
+                List<BacklogList> backlogLists=new ArrayList<>();
+                for (BacklogList backlogList:singleEvent.getBacklogList()) {
+                    backlogList.setSingleEventId(singleEvent.getId());
+                    backlogLists.add(backlogList);
+                }
+                backlogMapper.insertBacklog(backlogLists);
+            }
             //在事件副表插入创建者
             SingleEventVice singleEventVice = new SingleEventVice();
             singleEventVice.setCreateBy(Long.parseLong(addInviteEventVo.getUserId()));
@@ -897,7 +970,20 @@ public class EventServiceImpl implements EventService {
                 }
                 eventPersons.setFriendsId(person);
                 singleEvent.setPerson(JSON.toJSONString(eventPersons));
+                //查询该事件的清单
+                List<BacklogList> backlogLists=backlogMapper.queryBacklogList(singleEvent.getId());
+                logger.info("加入前事件id:===>"+singleEvent.getId());
                 eventMapper.uploadingEvents(singleEvent);
+                logger.info("加入后事件id:===>"+singleEvent.getId());
+                //添加事件清单
+                if (!ObjectUtils.isEmpty(backlogLists) && backlogLists.size()>0){
+                    List<BacklogList> backlogLists1=new ArrayList<>();
+                    for (BacklogList backlogList:backlogLists) {
+                        backlogList.setSingleEventId(singleEvent.getId());
+                        backlogLists1.add(backlogList);
+                    }
+                    backlogMapper.insertBacklog(backlogLists);
+                }
                 //事件副表中加入自己
                 SingleEventVice singleEventVice = new SingleEventVice();
                 singleEventVice.setCreateBy(Long.parseLong(feedbackInviteVo.getFromId()));
@@ -906,7 +992,7 @@ public class EventServiceImpl implements EventService {
                 eventViceMapper.createEventVice(singleEventVice);
                 //提醒其他参与者新成员加入
                 RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
-                TxtMessage txtMessage = new TxtMessage("用户“" + accountMapper.queryAccount(feedbackInviteVo.getUserId()).getUserName() + "”加入了事件“" + singleEvent.getEventname() + "”", "");
+                TxtMessage txtMessage = new TxtMessage("用户“" + accountMapper.queryAccount(feedbackInviteVo.getUserId()).getUserName() + "”加入了事件“" + singleEvent.getEventname() + "”，如计划有变可在首页选中待办事件进行调整", "");
                 String[] persons = person.split(",");
                 ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(SYSTEMID, persons, 0, txtMessage);
                 if (result.getCode() != 200) {
@@ -1003,6 +1089,7 @@ public class EventServiceImpl implements EventService {
                 }
             }
             if (different.size() == 0 && newFriends.size() == 0) {
+
                 return DtoUtil.getFalseDto("没有任何更改", 29102);
             }
             logger.info("修改一条邀请事件时输出的修改的内容" + different);
@@ -1630,7 +1717,6 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         SingleEvent singleEvent = eventMapper.queryDraftOne(receivedSearchOnce.getUserId(), receivedSearchOnce.getEventId());
-
         Map<String, Object> maps = new HashMap<>();
         ArrayList<Map> list = new ArrayList<>();
         if (!StringUtils.isEmpty(singleEvent.getPerson())) {
@@ -1652,11 +1738,19 @@ public class EventServiceImpl implements EventService {
             maps.put("others", eventPersons.getOthers());
             singleEvent.setPerson(JSON.toJSONString(maps));
             System.out.println("显示一个事件详情时输出的" + singleEvent.getPerson());
-            return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEvent), 100000);
+            SingleEventAndBacklog singleEventAndBacklog=JSONObject.parseObject(JSON.toJSONString(singleEvent),SingleEventAndBacklog.class);
+            //查询该事件的清单
+            List<BacklogList> backlogLists=backlogMapper.queryDraftBacklogList(singleEvent.getId());
+            singleEventAndBacklog.setBacklogList(backlogLists);
+            return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEventAndBacklog), 100000);
         } else {
             singleEvent.setPerson(JSON.toJSONString(new EventPersons()));
             System.out.println("显示一个事件详情时输出的" + singleEvent.getPerson());
-            return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEvent), 100000);
+            SingleEventAndBacklog singleEventAndBacklog=JSONObject.parseObject(JSON.toJSONString(singleEvent),SingleEventAndBacklog.class);
+            //查询该事件的清单
+            List<BacklogList> backlogLists=backlogMapper.queryDraftBacklogList(singleEvent.getId());
+            singleEventAndBacklog.setBacklogList(backlogLists);
+            return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEventAndBacklog), 100000);
         }
     }
 
@@ -1745,8 +1839,11 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(singleEvent)) {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
-
-        result.put("event", SingleEventUtil.getShowSingleEvent(singleEvent));
+        SingleEventAndBacklog singleEventAndBacklog=JSONObject.parseObject(JSON.toJSONString(singleEvent),SingleEventAndBacklog.class);
+        //查询该事件的清单
+        List<BacklogList> backlogLists=backlogMapper.queryBacklogList(singleEvent.getId());
+        singleEventAndBacklog.setBacklogList(backlogLists);
+        result.put("event", SingleEventUtil.getShowSingleEvent(singleEventAndBacklog));
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 
@@ -1893,7 +1990,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //解析草稿数据
-        SingleEvent singleEvent = JSONObject.parseObject(draftToEventVo.getDraft(), SingleEvent.class);
+        SingleEventAndBacklog singleEvent = JSONObject.parseObject(draftToEventVo.getDraft(), SingleEventAndBacklog.class);
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
         if (singleEvent.getIsLoop() == 1) {
@@ -1908,12 +2005,24 @@ public class EventServiceImpl implements EventService {
         if (eventMapper.uploadingEvents(singleEvent) <= 0) {
             return DtoUtil.getFalseDto("保存失败", 21111);
         }
+        //加入事件清单
+        if (!ObjectUtils.isEmpty(singleEvent.getBacklogList()) && singleEvent.getBacklogList().size()>0){
+            List<BacklogList> backlogLists=new ArrayList<>();
+            for (BacklogList backlogList:singleEvent.getBacklogList()) {
+                backlogList.setSingleEventId(singleEvent.getId());
+                backlogLists.add(backlogList);
+            }
+            backlogMapper.insertBacklog(backlogLists);
+        }
         //查询数据库是否有该草稿
-        if (!ObjectUtils.isEmpty(eventMapper.queryDraftOne(draftToEventVo.getUserId(), singleEvent.getEventid().toString()))) {
+        SingleEvent draft=eventMapper.queryDraftOne(draftToEventVo.getUserId(), singleEvent.getEventid().toString());
+        if (!ObjectUtils.isEmpty(draft)) {
             //删除草稿箱事件
             if (eventMapper.deleteDraft(draftToEventVo.getUserId(), singleEvent.getEventid().toString()) <= 0) {
                 return DtoUtil.getFalseDto("保存失败", 21112);
             }
+            //删除草稿清单
+            backlogMapper.deleteDraftBacklogList(draft.getId());
         }
         return DtoUtil.getSuccessDto("保存成功", 100000);
     }
@@ -1931,7 +2040,7 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //解析草稿数据
-        SingleEvent singleEvent = JSONObject.parseObject(draftToEventVo.getDraft(), SingleEvent.class);
+        SingleEventAndBacklog singleEvent = JSONObject.parseObject(draftToEventVo.getDraft(), SingleEventAndBacklog.class);
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
         if (singleEvent.getIsLoop() == 1) {
@@ -1950,6 +2059,15 @@ public class EventServiceImpl implements EventService {
         if (eventMapper.uploadingEvents(singleEvent) <= 0) {
             return DtoUtil.getFalseDto("保存失败", 21111);
         }
+        //加入事件清单
+        if (!ObjectUtils.isEmpty(singleEvent.getBacklogList()) && singleEvent.getBacklogList().size()>0){
+            List<BacklogList> backlogLists=new ArrayList<>();
+            for (BacklogList backlogList:singleEvent.getBacklogList()) {
+                backlogList.setSingleEventId(singleEvent.getId());
+                backlogLists.add(backlogList);
+            }
+            backlogMapper.insertBacklog(backlogLists);
+        }
         //在事件副表插入创建者
         SingleEventVice singleEventVice = new SingleEventVice();
         singleEventVice.setCreateBy(Long.parseLong(draftToEventVo.getUserId()));
@@ -1957,11 +2075,14 @@ public class EventServiceImpl implements EventService {
         singleEventVice.setEventId(singleEvent.getEventid());
         eventViceMapper.createEventVice(singleEventVice);
         //查询数据库是否有该草稿
-        if (!ObjectUtils.isEmpty(eventMapper.queryDraftOne(draftToEventVo.getUserId(), singleEvent.getEventid().toString()))) {
+        SingleEvent draft=eventMapper.queryDraftOne(draftToEventVo.getUserId(), singleEvent.getEventid().toString());
+        if (!ObjectUtils.isEmpty(draft)) {
             //删除草稿箱事件
             if (eventMapper.deleteDraft(draftToEventVo.getUserId(), singleEvent.getEventid().toString()) <= 0) {
                 return DtoUtil.getFalseDto("保存失败", 21112);
             }
+            //删除草稿清单
+            backlogMapper.deleteDraftBacklogList(draft.getId());
         }
         //发送邀请信息
         try {
@@ -2001,11 +2122,6 @@ public class EventServiceImpl implements EventService {
                     if (result.getCode() != 200) {
                         return DtoUtil.getFalseDto("消息发送失败", 21040);
                     }
-                    //如果是ios发送推送信息
-                    /*UserDeviceToken userDeviceToken=deviceTokenMapper.queryDeviceToken(personList1.get(i));
-                    if (!ObjectUtils.isEmpty(userDeviceToken) && userDeviceToken.getAppType() == 1L && !StringUtils.isEmpty(userDeviceToken.getDeviceToken())){
-                        PushUtil.APNSPush(userDeviceToken.getDeviceToken(),"你的好友邀请你参与他的事件",1);
-                    }*/
                     msgStatusMapper.addNewEventMsg(personList1.get(i), singleEvent.getEventid(), draftToEventVo.getUserId(), "邀请你参与事件", System.currentTimeMillis() / 1000);
                 }
                 //list2给创建者发送拒绝信息
@@ -2114,60 +2230,65 @@ public class EventServiceImpl implements EventService {
         return DtoUtil.getSuccessDto("操作成功",100000);
     }
 
-    /*@Override
-    public Dto test() {
-        SingleEvent singleEvent = new SingleEvent();
-        singleEvent.setAddress("家");
-        singleEvent.setLevel(5L);
-        singleEvent.setUserid(100126L);
-        singleEvent.setIsLoop(1);
-        singleEvent.setYear(2019L);
-        singleEvent.setMonth(8L);
-        singleEvent.setDay(21L);
-        singleEvent.setIsOverdue(0L);
-        singleEvent.setFlag(1L);
-        singleEvent.setRemindTime("10");
-        singleEvent.setPerson("123321");
-        singleEvent.setRemarks("测试");
-        for (int j = 0; j <= 6; j++) {
-            if (j == 0) {
-                singleEvent.setRepeaTtime("[true,false,false,false,false,false,false]");
-            } else if (j == 1) {
-                singleEvent.setRepeaTtime("[false,true,false,false,false,false,false]");
-            } else if (j == 2) {
-                singleEvent.setRepeaTtime("[false,false,true,false,false,false,false]");
-            } else if (j == 3) {
-                singleEvent.setRepeaTtime("[false,false,false,true,false,false,false]");
-            } else if (j == 4) {
-                singleEvent.setRepeaTtime("[false,false,false,false,true,false,false]");
-            } else if (j == 5) {
-                singleEvent.setRepeaTtime("[false,false,false,false,false,true,false]");
-            } else {
-                singleEvent.setRepeaTtime("[false,false,false,false,false,false,true]");
-            }
-            int a = 0;
-            for (int i = 0; i <= 1440; i += 15) {
-                int startTime = i + a;
-                int endTime = i + 15 + a;
-                if (endTime >= 1440){
-                    break;
-                }
-                singleEvent.setType((long) (Math.random() * 8));
-                singleEvent.setEventname(i + a + "-" + (i + 15 + a));
-                singleEvent.setStarttime(startTime+"");
-                singleEvent.setEndtime(endTime+"");
-                singleEvent.setEventid(System.currentTimeMillis() / 1000);
-                a += 1;
-                System.out.println(eventMapper.uploadingEvents(singleEvent));
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+    /**
+     * 修改事件清单
+     * @param backlogListVo
+     * @return
+     */
+    @Override
+    public Dto updateBacklogList(BacklogListVo backlogListVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(backlogListVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        return DtoUtil.getSuccesWithDataDto("","success",100000);
-    }*/
+        BacklogList backlogList=new BacklogList();
+        backlogList.setBacklogStatus(Long.valueOf(backlogListVo.getBacklogStatus()));
+        backlogList.setId(Long.valueOf(backlogListVo.getId()));
+        if ("1".equals(backlogListVo.getBacklogStatus())){
+            backlogList.setFinishTime(System.currentTimeMillis()/1000);
+        }else {
+            backlogList.setFinishTime(-1L);
+        }
+        if (backlogMapper.updateBacklog(backlogList)<1){
+            return DtoUtil.getFalseDto("修改失败",22004);
+        }
+        return DtoUtil.getSuccessDto("修改成功",100000);
+    }
+
+    /**
+     * 添加事件清单
+     * @param backlogListVo
+     * @return
+     */
+    @Override
+    public Dto addBacklogList(BacklogListVo backlogListVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(backlogListVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        SingleEvent singleEvent=eventMapper.queryEventOne(backlogListVo.getUserId(),backlogListVo.getEventId());
+        BacklogList backlogList=new BacklogList();
+        backlogList.setSingleEventId(singleEvent.getId());
+        backlogList.setBacklogName(backlogListVo.getBacklogName());
+        if (backlogMapper.addBacklog(backlogList)<1){
+            return DtoUtil.getFalseDto("添加清单失败",21009);
+        }
+        return DtoUtil.getSuccessDto("添加成功",100000);
+    }
+
+    /**
+     * 删除事件清单
+     * @param backlogListVo
+     * @return
+     */
+    @Override
+    public Dto deleteBacklogList(BacklogListVo backlogListVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(backlogListVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (backlogMapper.deleteBacklog(Long.valueOf(backlogListVo.getId()))<1){
+            return DtoUtil.getFalseDto("删除清单失败",21010);
+        }
+        return DtoUtil.getSuccessDto("删除成功",100000);
+    }
 
     /**
      * 将传进来的事件集合中的已完成的重复事件(冲突的)移除

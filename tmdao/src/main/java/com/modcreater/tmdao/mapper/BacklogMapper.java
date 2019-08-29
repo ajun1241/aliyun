@@ -28,16 +28,38 @@ public interface BacklogMapper {
 
     /**
      * 查询待办事项
-     * @param eventId
-     * @param userId
+     * @param singleEventId
      * @return
      */
-    List<BacklogList> queryBacklogList(String userId,String eventId);
+    List<BacklogList> queryBacklogList(Long singleEventId);
 
     /**
      * 删除待办事项
      * @param id
      * @return
      */
-    int deleteBacklog(String id);
+    int deleteBacklog(Long id);
+
+    /**
+     * 增加清单
+     * @param backlogList
+     * @return
+     */
+    int addBacklog(BacklogList backlogList);
+
+    /**
+     * 草稿批量新增待办事项
+     * @param backlogLists
+     * @return
+     */
+    int insertDraftBacklog(List<BacklogList> backlogLists);
+
+    /**
+     * 草稿查询待办事项
+     * @param singleEventId
+     * @return
+     */
+    List<BacklogList> queryDraftBacklogList(Long singleEventId);
+
+    int deleteDraftBacklogList(Long singleEventId);
 }

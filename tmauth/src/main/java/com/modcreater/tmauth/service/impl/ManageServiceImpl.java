@@ -3,6 +3,7 @@ package com.modcreater.tmauth.service.impl;
 import com.modcreater.tmauth.service.ManageService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.AfterSale;
+import com.modcreater.tmbeans.pojo.SuperAdministrator;
 import com.modcreater.tmbeans.pojo.UserRealInfo;
 import com.modcreater.tmbeans.vo.ComplaintVo;
 import com.modcreater.tmbeans.vo.realname.ReceivedStudentRealInfo;
@@ -10,8 +11,10 @@ import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AfterSaleMapper;
 import com.modcreater.tmdao.mapper.ComplaintMapper;
+import com.modcreater.tmdao.mapper.SuperAdminMapper;
 import com.modcreater.tmdao.mapper.UserRealInfoMapper;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.SendMsgUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +23,9 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Description:
@@ -44,6 +49,9 @@ public class ManageServiceImpl implements ManageService {
     @Resource
     private AfterSaleMapper afterSaleMapper;
 
+    @Resource
+    private SuperAdminMapper superAdminMapper;
+
     /**
      * 上传用户真实信息
      * @param receivedUserRealInfo
@@ -51,7 +59,7 @@ public class ManageServiceImpl implements ManageService {
      * @return
      */
     @Override
-    public Dto uploadUserRealInfo(ReceivedUserRealInfo receivedUserRealInfo, String token) {
+    public synchronized Dto uploadUserRealInfo(ReceivedUserRealInfo receivedUserRealInfo, String token) {
         receivedUserRealInfo.setCategory("1");
         if (StringUtils.isEmpty(token)){
             return DtoUtil.getFalseDto("token未获取到",21013);
@@ -93,6 +101,18 @@ public class ManageServiceImpl implements ManageService {
                 return DtoUtil.getFalseDto("上传数据失败",50001);
             }
         }
+        //通知管理员
+        List<SuperAdministrator> superAdministrators=superAdminMapper.querySuperAdmins();
+        List<String> emails=new ArrayList<>();
+        String title="【智袖】";
+        String content="有新的实名认证等待您的确认！";
+        for (SuperAdministrator administrators : superAdministrators) {
+            if (!StringUtils.isEmpty(administrators.getEmail())){
+                emails.add(administrators.getEmail());
+            }
+        }
+        System.out.println("接收的邮箱"+emails);
+        SendMsgUtil.asynSendEmail(title,content,emails);
         return DtoUtil.getSuccessDto("上传成功",100000);
     }
 

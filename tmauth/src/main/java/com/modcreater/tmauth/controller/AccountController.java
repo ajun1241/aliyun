@@ -187,4 +187,11 @@ public class AccountController {
     public Dto loginByCP(@RequestBody LoginByCPVo loginByCPVo){
         return userService.loginByCP(loginByCPVo );
     }
+
+    @Safety
+    @PostMapping("resetpassword")
+    @ApiOperation("忘记密码，重置密码")
+    public Dto resetPassword(@RequestBody LoginByCPVo loginByCPVo){
+        return userService.resetPassword(loginByCPVo );
+    }
 }

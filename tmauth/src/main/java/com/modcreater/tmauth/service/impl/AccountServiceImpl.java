@@ -1344,6 +1344,14 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Dto resetPassword(LoginByCPVo loginByCPVo) {
-        return null;
+        if (StringUtils.isEmpty(loginByCPVo.getUserCode())||StringUtils.isEmpty(loginByCPVo.getUserPassword())){
+            return DtoUtil.getFalseDto("账号或密码不符合格式",14010);
+        }
+        Account account=accountMapper.checkCode(loginByCPVo.getUserCode());
+        Account account1=new Account();
+        account1.setId(account.getId());
+        account1.setUserPassword(MD5Util.createMD5(loginByCPVo.getUserPassword()));
+        accountMapper.updateAccount(account1);
+        return DtoUtil.getSuccessDto("密码重置成功，请返回登录",100000);
     }
 }

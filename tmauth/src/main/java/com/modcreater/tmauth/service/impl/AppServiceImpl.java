@@ -170,7 +170,7 @@ public class AppServiceImpl implements AppService {
             map.put("discountUserId",discountUser.getId().toString());
             map.put("couponMoney",money);
             map.put("couponName",discountCoupon.getCouponName());
-            map.put("starTime",sdf.format(DateUtil.stampToDate(discountUser.getStarTime().toString())));
+            map.put("starTime",(discountUser.getDiscountId()==2L || discountUser.getDiscountId()==3L) ? "永久" : (sdf.format(DateUtil.stampToDate(discountUser.getStarTime().toString()))+"-"+sdf.format(DateUtil.stampToDate(discountUser.getEndTime().toString()))));
             map.put("entTime",sdf.format(DateUtil.stampToDate(discountUser.getEndTime().toString())));
             map.put("couponType",discountCoupon.getDescribe());
             result.add(map);

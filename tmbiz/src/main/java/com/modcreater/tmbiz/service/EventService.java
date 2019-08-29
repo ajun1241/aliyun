@@ -44,10 +44,10 @@ public interface EventService {
      * @param token
      * @return
      */
-    Dto updateEvents(UpdateEventVo updateEventVo,String token);
+    Dto updateEvents(UploadingEventVo updateEventVo,String token);
 
     /**
-     * 第一次同步
+     * 第一次同步(清单状态)
      * @param synchronousUpdateVo
      * @param token
      * @return
@@ -63,7 +63,7 @@ public interface EventService {
     Dto uplDraft(DraftVo draftVo, String token);
 
     /**
-     * 修改一个草稿
+     * 修改一个草稿（未使用）
      * @param addInviteEventVo
      * @param token
      * @return
@@ -183,7 +183,7 @@ public interface EventService {
     Dto searchDraftOnce(ReceivedSearchOnce receivedSearchOnce, String token);
 
     /**
-     * 将事件从事件表移除到草稿箱
+     * 将事件从事件表移除到草稿箱（未使用）
      * @param addInviteEventVo
      * @param token
      * @return
@@ -261,4 +261,26 @@ public interface EventService {
      * @return
      */
     Dto earlyEventTermination(EarlyEventTermination earlyEventTermination, String token);
+
+    /**
+     * 添加事件清单
+     * @param backlogListVo
+     * @return
+     */
+    Dto updateBacklogList(BacklogListVo backlogListVo, String token);
+
+    /**
+     * 添加事件清单
+     * @param backlogListVo
+     * @return
+     */
+    Dto addBacklogList(BacklogListVo backlogListVo, String token);
+
+    /**
+     * 删除事件清单
+     * @param backlogListVo
+     * @return
+     */
+    Dto deleteBacklogList(BacklogListVo backlogListVo, String token);
+
 }
