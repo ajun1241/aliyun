@@ -2304,6 +2304,9 @@ public class EventServiceImpl implements EventService {
         Iterator<SingleEvent> iterator = ssevent.iterator();
         while (iterator.hasNext()) {
             SingleEvent singleEvent1 = iterator.next();
+            if (ObjectUtils.isEmpty(singleEvent1)){
+                continue;
+            }
             if (singleEvent1.getFlag() == 5) {
                 iterator.remove();
                 if (!SingleEventUtil.eventTime(ssevent, Long.valueOf(singleEvent1.getStarttime()), Long.valueOf(singleEvent1.getEndtime()))) {
@@ -2332,6 +2335,9 @@ public class EventServiceImpl implements EventService {
         week = week == 7 ? 0 : week;
         for (Iterator<ShowSingleEvent> iterator = singleEventList.iterator(); iterator.hasNext(); ) {
             ShowSingleEvent singleEvent1 = iterator.next();
+            if (ObjectUtils.isEmpty(singleEvent1)){
+                continue;
+            }
             for (ShowSingleEvent showSingleEvent : loopEventList.get(week)) {
                 if (singleEvent1.getFlag() == 5) {
                     if (SingleEventUtil.getClashTime(singleEvent1.getStarttime(), singleEvent1.getEndtime(), showSingleEvent.getStarttime(), showSingleEvent.getEndtime())) {
