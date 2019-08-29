@@ -46,7 +46,7 @@ public class EventController {
     @Safety
     @RequestMapping(value = "upd", method = RequestMethod.POST)
     @ApiOperation("修改一个事件")
-    public Dto updateEvents(@RequestBody UpdateEventVo updateEventVo, HttpServletRequest request) {
+    public Dto updateEvents(@RequestBody UploadingEventVo updateEventVo, HttpServletRequest request) {
         return eventService.updateEvents(updateEventVo,request.getHeader("token"));
     }
 
@@ -280,5 +280,26 @@ public class EventController {
     @ApiOperation("提前完成事件")
     public Dto earlyEventTermination(@RequestBody EarlyEventTermination earlyEventTermination,HttpServletRequest request){
         return eventService.earlyEventTermination(earlyEventTermination,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "updateBacklogList")
+    @ApiOperation("在事件中添加清单")
+    public Dto updateBacklogList(@RequestBody BacklogListVo backlogListVo,HttpServletRequest request){
+        return eventService.updateBacklogList(backlogListVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "addbackloglist")
+    @ApiOperation("在事件中添加清单")
+    public Dto addBacklogList(@RequestBody BacklogListVo backlogListVo,HttpServletRequest request){
+        return eventService.addBacklogList(backlogListVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "deletebackloglist")
+    @ApiOperation("在事件中删除清单")
+    public Dto deleteBacklogList(@RequestBody BacklogListVo backlogListVo,HttpServletRequest request){
+        return eventService.deleteBacklogList(backlogListVo,request.getHeader("token"));
     }
 }

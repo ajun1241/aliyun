@@ -7,7 +7,7 @@
         remarks,person,repeatTime,isOverdue,remindTime,day,month,year,type,isloop
     </sql>
 
-    <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
+    <insert id="uploadingEvents" parameterType="com.modcreater.tmbeans.pojo.SingleEvent" useGeneratedKeys="true" keyProperty="id">
             insert into singleevent values
             (null ,
             #{eventid},
@@ -219,7 +219,7 @@
         select count(1) from singleevent where userId=#{userId}
     </select>
 
-    <insert id="uplDraft" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
+    <insert id="uplDraft" parameterType="com.modcreater.tmbeans.pojo.SingleEvent" useGeneratedKeys="true" keyProperty="id">
         insert into draft values
             (null ,
             #{eventid} ,

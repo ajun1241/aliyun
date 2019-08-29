@@ -3,6 +3,7 @@ package com.modcreater.tmutils;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.pojo.SingleEventAndBacklog;
 import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import org.springframework.util.ObjectUtils;
@@ -100,6 +101,37 @@ public class SingleEventUtil {
             showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
             showSingleEvent.setAddress(singleEvent1.getAddress());
             showSingleEvent.setRepeaTtime(getRepeatTime(singleEvent1));
+            return showSingleEvent;
+        }
+        return new ShowSingleEvent();
+    }
+    /**
+     * 将传进来的SingleEvent转换成ShowSingleEvent
+     *
+     * @param singleEvent1
+     * @return
+     */
+    public static ShowSingleEvent getShowSingleEvent(SingleEventAndBacklog singleEvent1) {
+        if (StringUtils.hasText(singleEvent1.getRepeaTtime())) {
+            ShowSingleEvent showSingleEvent = new ShowSingleEvent();
+            showSingleEvent.setUserid(singleEvent1.getUserid());
+            showSingleEvent.setEventid(singleEvent1.getEventid());
+            showSingleEvent.setEventname(singleEvent1.getEventname());
+            showSingleEvent.setStarttime(singleEvent1.getStarttime());
+            showSingleEvent.setEndtime(singleEvent1.getEndtime());
+            showSingleEvent.setFlag(singleEvent1.getFlag());
+            showSingleEvent.setLevel(singleEvent1.getLevel());
+            showSingleEvent.setPerson(singleEvent1.getPerson());
+            showSingleEvent.setRemindTime(singleEvent1.getRemindTime());
+            showSingleEvent.setRemarks(singleEvent1.getRemarks());
+            showSingleEvent.setDay(singleEvent1.getDay());
+            showSingleEvent.setMonth(singleEvent1.getMonth());
+            showSingleEvent.setYear(singleEvent1.getYear());
+            showSingleEvent.setType(singleEvent1.getType());
+            showSingleEvent.setIsOverdue(singleEvent1.getIsOverdue());
+            showSingleEvent.setAddress(singleEvent1.getAddress());
+            showSingleEvent.setRepeaTtime(getRepeatTime(singleEvent1));
+            showSingleEvent.setBacklogList(singleEvent1.getBacklogList());
             return showSingleEvent;
         }
         return new ShowSingleEvent();
