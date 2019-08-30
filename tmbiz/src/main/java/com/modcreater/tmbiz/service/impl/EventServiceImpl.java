@@ -725,7 +725,7 @@ public class EventServiceImpl implements EventService {
                 Iterator<ShowSingleEvent> iterator = loopEventList.get(week).iterator();
                 while (iterator.hasNext()) {
                     ShowSingleEvent loopEvent = iterator.next();
-                    if (ObjectUtils.isEmpty(loopEvent.getFlag())){
+                    if (ObjectUtils.isEmpty(loopEvent.getFlag()) || ObjectUtils.isEmpty(loopEvent.getFlag())){
                         continue;
                     }
                     if (SingleEventUtil.getClashTime(singleEvent.getStarttime(), singleEvent.getEndtime(), loopEvent.getStarttime(), loopEvent.getEndtime())) {
@@ -2222,7 +2222,7 @@ public class EventServiceImpl implements EventService {
             event.setMonth(Long.valueOf(DateUtil.getCurrentMonth()));
             event.setDay(Long.valueOf(DateUtil.getCurrentDay()));
             event.setEventid(System.currentTimeMillis() / 1000);
-            event.setIsOverdue(1L);
+            event.setIsOverdue(3L);
             event.setFlag(5L);
             event.setIsLoop(0);
             event.setRepeaTtime("[false,false,false,false,false,false,false]");
