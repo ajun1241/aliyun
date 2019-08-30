@@ -190,10 +190,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             singleEventCondition.setLevel(Long.valueOf(receivedEventConditions.getEventLevel()));
         }
         if (receivedEventConditions.getStartTime() != null && !"".equals(receivedEventConditions.getStartTime())) {
-            singleEventCondition.setStarttime(receivedEventConditions.getStartTime());
+            singleEventCondition.setStarttime((60 * Long.valueOf(receivedEventConditions.getStartTime()))+"");
         }
         if (receivedEventConditions.getEndTime() != null && !"".equals(receivedEventConditions.getEndTime())) {
-            singleEventCondition.setEndtime(receivedEventConditions.getEndTime());
+            singleEventCondition.setEndtime((60 * Long.valueOf(receivedEventConditions.getEndTime())) + "");
         }
         if (receivedEventConditions.getIsOverdue() != null && !"".equals(receivedEventConditions.getIsOverdue())) {
             singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
