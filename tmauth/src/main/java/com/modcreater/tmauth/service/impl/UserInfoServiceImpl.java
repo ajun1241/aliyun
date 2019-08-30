@@ -243,8 +243,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 //该person为查询结果
                 String[] personsInResult;
                 try {
-                    EventPersons eventPersons1 = JSONObject.parseObject(receivedEventConditions.getPerson(), EventPersons.class);
-                    persons = eventPersons1.getFriendsId().split(",");
+                    persons = receivedEventConditions.getPerson().split(",");
                     EventPersons eventPersons2 = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
                     personsInResult = eventPersons2.getFriendsId().split(",");
                 } catch (NullPointerException e) {
