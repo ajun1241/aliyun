@@ -45,10 +45,7 @@ import java.io.InputStreamReader;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.modcreater.tmtrade.config.AliPayConfig.*;
 
@@ -551,7 +548,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() != 0) {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡将在次卡消耗完后开始计算", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡待使用", 100000);
                 } else {
                     return DtoUtil.getSuccesWithDataDto("searchService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次", 100000);
                 }
@@ -664,12 +661,87 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto getAllUserServiceForIOS(ReceivedId receivedId, String token) {
-        Map<String,Object> result = (Map<String, Object>) searchAllUserService(receivedId,token).getData();
-        result.put("friendService","小主暂未开通该服务");
-        if (isFriendServiceOpened(receivedId,token).getResCode() == 200000){
-            result.put("friendService","您已永久开通好友服务");
+        if (StringUtils.isEmpty(receivedId.getUserId())) {
+            return DtoUtil.getFalseDto("请先登录", 21011);
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+        if (!StringUtils.hasText(token)) {
+            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
+        }
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        List<Map<String, String>> result = new ArrayList<>();
+        String[] serviceIds = {"1", "5", "2", "3", "4"};
+        for (int i = 0; i <= 4; i++) {
+            Map<String, String> service = new HashMap<>();
+            service.put("message", "小主暂未开通该服务");
+            service.put("status", "0");
+            String serviceId = serviceIds[i];
+            service.put("serviceId", serviceId);
+            ServiceRemainingTime serviceRemainingTime = userServiceMapper.getServiceRemainingTime(receivedId.getUserId(), serviceId);
+            if ("1".equals(serviceRemainingTime.getServiceId()) && !ObjectUtils.isEmpty(serviceRemainingTime)) {
+                service.put("message", "您已永久开通好友服务");
+                service.put("status", "1");
+                result.add(service);
+                continue;
+            }
+            if (!"1".equals(serviceRemainingTime.getServiceId()) && ObjectUtils.isEmpty(serviceRemainingTime)) {
+                continue;
+            }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            if ("2".equals(serviceRemainingTime.getServiceId())) {
+                if (serviceRemainingTime.getResidueDegree() == 0) {
+                    String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
+                    if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
+                        service.put("message", time + "到期");
+                        service.put("status", "1");
+                    }
+                } else {
+                    if (serviceRemainingTime.getStorageTime() != 0) {
+                        service.put("message", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡待使用");
+                        service.put("status", "1");
+                    } else {
+                        service.put("message", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次");
+                        service.put("status", "1");
+                    }
+                }
+            } else if ("3".equals(serviceRemainingTime.getServiceId())) {
+                String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
+                if (serviceRemainingTime.getTimeRemaining() != 0) {
+                    if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
+                        service.put("message", time + "到期");
+                        service.put("status", "1");
+                    } else {
+                        service.put("message", "已过期");
+                    }
+                }
+            } else if ("4".equals(serviceRemainingTime.getServiceId())) {
+                if (serviceRemainingTime.getResidueDegree() == 0) {
+                    String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
+                    if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
+                        service.put("message", time + "到期");
+                        service.put("status", "1");
+                    } else if (serviceRemainingTime.getTimeRemaining() != 0) {
+                        service.put("message", "已过期");
+                    }
+                } else {
+                    if (serviceRemainingTime.getStorageTime() == 0) {
+                        service.put("message", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString());
+                        service.put("status", "1");
+                    }
+                }
+            } else if ("5".equals(serviceRemainingTime.getServiceId())) {
+                String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
+                if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
+                    service.put("message", time + "到期");
+                    service.put("status", "1");
+                } else if (serviceRemainingTime.getTimeRemaining() != 0) {
+                    service.put("message", "已过期");
+                }
+            }
+            result.add(service);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 
     /**
