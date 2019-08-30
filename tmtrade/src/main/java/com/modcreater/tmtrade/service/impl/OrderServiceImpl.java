@@ -662,6 +662,16 @@ public class OrderServiceImpl implements OrderService {
         return DtoUtil.getSuccesWithDataDto("获取成功", result, 100000);
     }
 
+    @Override
+    public Dto getAllUserServiceForIOS(ReceivedId receivedId, String token) {
+        Map<String,Object> result = (Map<String, Object>) searchAllUserService(receivedId,token).getData();
+        result.put("friendService","小主暂未开通该服务");
+        if (isFriendServiceOpened(receivedId,token).getResCode() == 200000){
+            result.put("friendService","您已永久开通好友服务");
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
     /**
      * 为ServiceRemainingTime赋值
      *

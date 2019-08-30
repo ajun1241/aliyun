@@ -124,4 +124,12 @@ public interface OrderService {
      * @return
      */
     Dto searchAllUserService(ReceivedId receivedId, String token);
+
+    /**
+     * 获取用户所有服务开通状态(IOS)
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto getAllUserServiceForIOS(ReceivedId receivedId, String token);
 }

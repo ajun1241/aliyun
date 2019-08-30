@@ -95,4 +95,10 @@ public class TradeController {
     public Dto getServicePrice(@RequestBody ReceivedGoodsInfo receivedGoodsInfo , HttpServletRequest request){
         return orderService.getServicePrice(receivedGoodsInfo,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getalluserserviceforios")
+    @ApiOperation("查询用户所有服务(IOS)")
+    public Dto getAllUserServiceForIOS(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
+        return orderService.getAllUserServiceForIOS(receivedId,request.getHeader("token"));
+    }
 }

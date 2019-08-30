@@ -9,6 +9,7 @@ import com.modcreater.tmbeans.show.userinfo.ShowCompletedEvents;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
