@@ -679,17 +679,15 @@ public class OrderServiceImpl implements OrderService {
             String serviceId = serviceIds[i];
             service.put("serviceId", serviceId);
             ServiceRemainingTime serviceRemainingTime = userServiceMapper.getServiceRemainingTime(receivedId.getUserId(), serviceId);
-            if ("1".equals(serviceRemainingTime.getServiceId()) && !ObjectUtils.isEmpty(serviceRemainingTime)) {
-                service.put("message", "您已永久开通好友服务");
-                service.put("status", "1");
-                result.add(service);
-                continue;
-            }
-            if (!"1".equals(serviceRemainingTime.getServiceId()) && ObjectUtils.isEmpty(serviceRemainingTime)) {
+            if (ObjectUtils.isEmpty(serviceRemainingTime)) {
                 continue;
             }
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            if ("2".equals(serviceRemainingTime.getServiceId())) {
+            if ("1".equals(serviceId)) {
+                service.put("message", "您已永久开通好友服务");
+                service.put("status", "1");
+                result.add(service);
+            } else if ("2".equals(serviceRemainingTime.getServiceId())) {
                 if (serviceRemainingTime.getResidueDegree() == 0) {
                     String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
                     if (serviceRemainingTime.getTimeRemaining() > System.currentTimeMillis() / 1000) {
