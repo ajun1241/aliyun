@@ -269,23 +269,6 @@ public class EventServiceImpl implements EventService {
         eventPersons.setFriendsId("");
         singleEvent.setPerson(JSON.toJSONString(eventPersons));
         if (eventMapper.alterEventsByUserId(singleEvent) > 0) {
-            //修改清单内容
-            /*List<BacklogList> backlogLists1=singleEvent.getBacklogList();
-            if (!ObjectUtils.isEmpty(backlogLists1)){
-                System.out.println(backlogLists1);
-                SingleEvent singleEvent1=eventMapper.queryEventOne(singleEvent.getUserid().toString(),singleEvent.getEventid().toString());
-                List<BacklogList> backlogLists2=backlogMapper.queryBacklogList(singleEvent1.getId());
-                System.out.println(backlogLists2);
-                for (BacklogList backlogList:backlogLists2) {
-                    //删除旧的清单
-                    backlogMapper.deleteBacklog(backlogList.getId());
-                }
-                //新增清单
-                for (BacklogList backlogList:backlogLists1) {
-                    backlogList.setSingleEventId(singleEvent1.getId());
-                }
-                backlogMapper.insertBacklog(backlogLists1);
-            }*/
             return DtoUtil.getSuccessDto("修改成功", 100000);
         }
         return DtoUtil.getFalseDto("修改事件失败", 21007);
@@ -714,7 +697,7 @@ public class EventServiceImpl implements EventService {
         if ((dayEventsList.size() + loopEventList.size()) == 0) {
             return DtoUtil.getSuccessDto("没有数据", 200000);
         }
-
+        logger.error(dayEventsList.toString());
         removeFlag5ClashSingleEvent(dayEventsList, loopEventList, searchEventVo.getDayEventId());
 
         for (int i = 0; i <= 6; i++) {
@@ -725,7 +708,7 @@ public class EventServiceImpl implements EventService {
                 Iterator<ShowSingleEvent> iterator = loopEventList.get(week).iterator();
                 while (iterator.hasNext()) {
                     ShowSingleEvent loopEvent = iterator.next();
-                    if (ObjectUtils.isEmpty(loopEvent.getFlag()) || ObjectUtils.isEmpty(loopEvent.getFlag())){
+                    if (ObjectUtils.isEmpty(loopEvent.getFlag())|| ObjectUtils.isEmpty(singleEvent.getFlag())){
                         continue;
                     }
                     if (SingleEventUtil.getClashTime(singleEvent.getStarttime(), singleEvent.getEndtime(), loopEvent.getStarttime(), loopEvent.getEndtime())) {
@@ -848,6 +831,10 @@ public class EventServiceImpl implements EventService {
                 List<BacklogList> backlogLists=new ArrayList<>();
                 for (BacklogList backlogList:singleEvent.getBacklogList()) {
                     backlogList.setSingleEventId(singleEvent.getId());
+                    //判断同步权限
+                    if (!StringUtils.isEmpty(addInviteEventVo.getIsSync()) && "1".equals(addInviteEventVo.getIsSync())){
+                        backlogList.setIsSync(1L);
+                    }
                     backlogLists.add(backlogList);
                 }
                 backlogMapper.insertBacklog(backlogLists);
@@ -2234,7 +2221,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * 修改事件清单
+     * 修改事件清单状态
      * @param backlogListVo
      * @return
      */
@@ -2242,6 +2229,41 @@ public class EventServiceImpl implements EventService {
     public Dto updateBacklogList(BacklogListVo backlogListVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(backlogListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        BacklogList backlogList1=backlogMapper.queryBacklogListById(Long.valueOf(backlogListVo.getId()));
+        //判断同步权限是否开启
+        if (backlogList1.getIsSync() == 1L){
+            //修改其他成员
+            SingleEvent singleEvent=eventMapper.queryEventBySingleEventId(backlogList1.getSingleEventId());
+            //查询是否是创建者
+            SingleEventVice singleEventVice=new SingleEventVice();
+            singleEventVice.setEventId(singleEvent.getEventid());
+            singleEventVice.setUserId(singleEvent.getUserid());
+            if (singleEvent.getUserid().equals(eventViceMapper.queryEventVice(singleEventVice).getCreateBy())){
+                //查询其他成员
+                EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+                String[] friendsId=eventPersons.getFriendsId().split(",");
+                for (String userId:friendsId) {
+                    //查询其他成员的事件
+                    SingleEvent friendEvent=eventMapper.queryEventOne(userId,singleEvent.getEventid().toString());
+                    //查询其他成员的清单
+                    List<BacklogList> backlogLists=backlogMapper.queryBacklogList(friendEvent.getId());
+                    //修改其他成员的清单状态
+                    for (BacklogList backlogList:backlogLists) {
+                        if (backlogList1.getBacklogName().equals(backlogList.getBacklogName())){
+                            backlogList.setBacklogStatus(Long.valueOf(backlogListVo.getBacklogStatus()));
+                            if ("1".equals(backlogListVo.getBacklogStatus())){
+                                backlogList.setFinishTime(System.currentTimeMillis()/1000);
+                            }else {
+                                backlogList.setFinishTime(-1L);
+                            }
+                            backlogMapper.updateBacklog(backlogList);
+                        }
+                    }
+                }
+            }else {
+                return DtoUtil.getFalseDto("事件发起者已开启权限，您没有权限",22104);
+            }
         }
         BacklogList backlogList=new BacklogList();
         backlogList.setBacklogStatus(Long.valueOf(backlogListVo.getBacklogStatus()));
@@ -2258,6 +2280,55 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
+     * 修改事件清单内容
+     * @param backlogListVo
+     * @return
+     */
+    @Override
+    public Dto updateBacklogListDetail(BacklogListVo backlogListVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(backlogListVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        BacklogList backlogList1=backlogMapper.queryBacklogListById(Long.valueOf(backlogListVo.getId()));
+        //判断同步权限是否开启
+        if (backlogList1.getIsSync() == 1L){
+            //修改其他成员
+            SingleEvent singleEvent=eventMapper.queryEventBySingleEventId(backlogList1.getSingleEventId());
+            //查询是否是创建者
+            SingleEventVice singleEventVice=new SingleEventVice();
+            singleEventVice.setEventId(singleEvent.getEventid());
+            singleEventVice.setUserId(singleEvent.getUserid());
+            if (singleEvent.getUserid().equals(eventViceMapper.queryEventVice(singleEventVice).getCreateBy())){
+                //查询其他成员
+                EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+                String[] friendsId=eventPersons.getFriendsId().split(",");
+                for (String userId:friendsId) {
+                    //查询其他成员的事件
+                    SingleEvent friendEvent=eventMapper.queryEventOne(userId,singleEvent.getEventid().toString());
+                    //查询其他成员的清单
+                    List<BacklogList> backlogLists=backlogMapper.queryBacklogList(friendEvent.getId());
+                    //修改其他成员的清单内容
+                    for (BacklogList backlogList:backlogLists) {
+                        if (backlogList1.getBacklogName().equals(backlogList.getBacklogName())){
+                            backlogList.setBacklogName(backlogListVo.getBacklogName());
+                            backlogMapper.updateBacklog(backlogList);
+                        }
+                    }
+                }
+            }else {
+                return DtoUtil.getFalseDto("事件发起者已开启权限，您没有权限",22104);
+            }
+        }
+        BacklogList backlogList=new BacklogList();
+        backlogList.setBacklogName(backlogListVo.getBacklogName());
+        backlogList.setId(Long.valueOf(backlogListVo.getId()));
+        if (backlogMapper.updateBacklog(backlogList)<1){
+            return DtoUtil.getFalseDto("修改失败",22004);
+        }
+        return DtoUtil.getSuccessDto("修改成功",100000);
+    }
+
+    /**
      * 添加事件清单
      * @param backlogListVo
      * @return
@@ -2267,10 +2338,38 @@ public class EventServiceImpl implements EventService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(backlogListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        SingleEvent singleEvent=eventMapper.queryEventOne(backlogListVo.getUserId(),backlogListVo.getEventId());
+        SingleEvent singleEvent1=eventMapper.queryEventOne(backlogListVo.getUserId(),backlogListVo.getEventId());
+        BacklogList backlogList1=backlogMapper.queryBacklogList(singleEvent1.getId()).get(0);
+        //判断同步权限是否开启
+        if (backlogList1.getIsSync() == 1L){
+            //修改其他成员
+            SingleEvent singleEvent=eventMapper.queryEventBySingleEventId(backlogList1.getSingleEventId());
+            //查询是否是创建者
+            SingleEventVice singleEventVice=new SingleEventVice();
+            singleEventVice.setEventId(singleEvent.getEventid());
+            singleEventVice.setUserId(singleEvent.getUserid());
+            if (singleEvent.getUserid().equals(eventViceMapper.queryEventVice(singleEventVice).getCreateBy())){
+                //查询其他成员
+                EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+                String[] friendsId=eventPersons.getFriendsId().split(",");
+                for (String userId:friendsId) {
+                    //查询其他成员的事件
+                    SingleEvent friendEvent=eventMapper.queryEventOne(userId,singleEvent.getEventid().toString());
+                    //添加其他成员的清单
+                    BacklogList backlogList=new BacklogList();
+                    backlogList.setSingleEventId(friendEvent.getId());
+                    backlogList.setBacklogName(backlogListVo.getBacklogName());
+                    backlogList.setIsSync(backlogList1.getIsSync());
+                    backlogMapper.addBacklog(backlogList);
+                }
+            }else {
+                return DtoUtil.getFalseDto("事件发起者已开启权限，您没有权限",22104);
+            }
+        }
         BacklogList backlogList=new BacklogList();
-        backlogList.setSingleEventId(singleEvent.getId());
+        backlogList.setSingleEventId(singleEvent1.getId());
         backlogList.setBacklogName(backlogListVo.getBacklogName());
+        backlogList.setIsSync(backlogList1.getIsSync());
         if (backlogMapper.addBacklog(backlogList)<1){
             return DtoUtil.getFalseDto("添加清单失败",21009);
         }
@@ -2279,6 +2378,7 @@ public class EventServiceImpl implements EventService {
 
     /**
      * 删除事件清单
+     *
      * @param backlogListVo
      * @return
      */
@@ -2286,6 +2386,35 @@ public class EventServiceImpl implements EventService {
     public Dto deleteBacklogList(BacklogListVo backlogListVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(backlogListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        BacklogList backlogList1=backlogMapper.queryBacklogListById(Long.valueOf(backlogListVo.getId()));
+        //判断同步权限是否开启
+        if (backlogList1.getIsSync() == 1L){
+            //修改其他成员
+            SingleEvent singleEvent=eventMapper.queryEventBySingleEventId(backlogList1.getSingleEventId());
+            //查询是否是创建者
+            SingleEventVice singleEventVice=new SingleEventVice();
+            singleEventVice.setEventId(singleEvent.getEventid());
+            singleEventVice.setUserId(singleEvent.getUserid());
+            if (singleEvent.getUserid().equals(eventViceMapper.queryEventVice(singleEventVice).getCreateBy())){
+                //查询其他成员
+                EventPersons eventPersons=JSONObject.parseObject(singleEvent.getPerson(),EventPersons.class);
+                String[] friendsId=eventPersons.getFriendsId().split(",");
+                for (String userId:friendsId) {
+                    //查询其他成员的事件
+                    SingleEvent friendEvent=eventMapper.queryEventOne(userId,singleEvent.getEventid().toString());
+                    //查询其他成员的清单
+                    List<BacklogList> backlogLists=backlogMapper.queryBacklogList(friendEvent.getId());
+                    //删除其他成员的清单
+                    for (BacklogList backlogList:backlogLists) {
+                        if (backlogList1.getBacklogName().equals(backlogList.getBacklogName())){
+                            backlogMapper.deleteBacklog(backlogList.getId());
+                        }
+                    }
+                }
+            }else {
+                return DtoUtil.getFalseDto("事件发起者已开启权限，您没有权限",22104);
+            }
         }
         if (backlogMapper.deleteBacklog(Long.valueOf(backlogListVo.getId()))<1){
             return DtoUtil.getFalseDto("删除清单失败",21010);
@@ -2342,6 +2471,7 @@ public class EventServiceImpl implements EventService {
                 continue;
             }
             for (ShowSingleEvent showSingleEvent : loopEventList.get(week)) {
+                logger.info(singleEvent1.toString());
                 if (singleEvent1.getFlag() == 5) {
                     if (SingleEventUtil.getClashTime(singleEvent1.getStarttime(), singleEvent1.getEndtime(), showSingleEvent.getStarttime(), showSingleEvent.getEndtime())) {
                         iterator.remove();

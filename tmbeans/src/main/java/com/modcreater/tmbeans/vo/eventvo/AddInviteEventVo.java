@@ -14,5 +14,6 @@ import java.io.Serializable;
 public class AddInviteEventVo implements Serializable {
     private String appType;
     private String singleEvent;
+    private String isSync;
     private String userId;
 }

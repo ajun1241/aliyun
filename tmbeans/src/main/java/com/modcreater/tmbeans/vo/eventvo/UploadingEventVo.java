@@ -22,5 +22,6 @@ public class UploadingEventVo implements Serializable {
      */
     private String userId;
     private String singleEvent;
+    private String isSync;
     private String appType;
 }

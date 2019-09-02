@@ -263,15 +263,25 @@ public interface EventService {
     Dto earlyEventTermination(EarlyEventTermination earlyEventTermination, String token);
 
     /**
-     * 添加事件清单
+     * 修改事件清单状态
      * @param backlogListVo
+     * @param token
      * @return
      */
     Dto updateBacklogList(BacklogListVo backlogListVo, String token);
 
     /**
+     * 修改事件清单内容
+     * @param backlogListVo
+     * @param token
+     * @return
+     */
+    Dto updateBacklogListDetail(BacklogListVo backlogListVo, String token);
+
+    /**
      * 添加事件清单
      * @param backlogListVo
+     * @param token
      * @return
      */
     Dto addBacklogList(BacklogListVo backlogListVo, String token);
@@ -279,6 +289,7 @@ public interface EventService {
     /**
      * 删除事件清单
      * @param backlogListVo
+     * @param token
      * @return
      */
     Dto deleteBacklogList(BacklogListVo backlogListVo, String token);

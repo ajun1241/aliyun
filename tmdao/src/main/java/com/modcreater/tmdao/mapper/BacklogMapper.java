@@ -34,6 +34,13 @@ public interface BacklogMapper {
     List<BacklogList> queryBacklogList(Long singleEventId);
 
     /**
+     * 根据id查询待办事项
+     * @param id
+     * @return
+     */
+    BacklogList queryBacklogListById(Long id);
+
+    /**
      * 删除待办事项
      * @param id
      * @return
@@ -61,5 +68,10 @@ public interface BacklogMapper {
      */
     List<BacklogList> queryDraftBacklogList(Long singleEventId);
 
+    /**
+     * 删除草稿箱清单
+     * @param singleEventId
+     * @return
+     */
     int deleteDraftBacklogList(Long singleEventId);
 }

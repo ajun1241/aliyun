@@ -1354,4 +1354,34 @@ public class AccountServiceImpl implements AccountService {
         accountMapper.updateAccount(account1);
         return DtoUtil.getSuccessDto("密码重置成功，请返回登录",100000);
     }
+
+    /**
+     * 退出登录
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto loginOut(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        String apType=receivedId.getAppType();
+        try {
+            if (StringUtils.isEmpty(apType)){
+                apType="0";
+            }  else if (ANDROID.equalsIgnoreCase(apType.substring(0, apType.indexOf(",")))) {
+                apType = "1";
+            } else if (IOS.equalsIgnoreCase(apType.substring(0, apType.indexOf(",")))){
+                apType = "2";
+            }else {
+                apType="0";
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            apType="0";
+        }
+        appTypeMapper.updateAppType(apType,receivedId.getUserId(),null);
+        return DtoUtil.getSuccessDto("您已退出登录",100000);
+    }
 }

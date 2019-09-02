@@ -41,7 +41,7 @@ public class UserInfoController {
     public Dto getMineForIOS(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return userInfoService.getMineForIOS(receivedId.getUserId(),request.getHeader("token"));
     }
-
+    @Safety
     @RequestMapping(value = "filtrateuserevents",method = RequestMethod.POST)
     @ApiOperation("筛选事件")
     public Dto filtrateUserEvents(@RequestBody ReceivedEventConditions receivedEventConditions,HttpServletRequest request){

@@ -284,9 +284,16 @@ public class EventController {
 
     @Safety
     @PostMapping(value = "updateBacklogList")
-    @ApiOperation("在事件中添加清单")
+    @ApiOperation("修改清单状态")
     public Dto updateBacklogList(@RequestBody BacklogListVo backlogListVo,HttpServletRequest request){
         return eventService.updateBacklogList(backlogListVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "updateBacklogListDetail")
+    @ApiOperation("修改清单内容")
+    public Dto updateBacklogListDetail(@RequestBody BacklogListVo backlogListVo,HttpServletRequest request){
+        return eventService.updateBacklogListDetail(backlogListVo,request.getHeader("token"));
     }
 
     @Safety

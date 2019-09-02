@@ -10,6 +10,7 @@ import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
 import com.modcreater.tmutils.SingleEventUtil;
 import com.modcreater.tmutils.mobserver.MobPushUtils;
+import io.netty.util.internal.StringUtil;
 import io.rong.messages.TxtMessage;
 import io.rong.models.response.ResponseResult;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
@@ -148,12 +150,14 @@ public class TimerConfig {
             if (now == remind){
                 //符合时间开始推送
                 AppType appType=appTypeMapper.queryAppType(singleEvent.getUserid().toString());
-                //判断勿扰模式
-                if (userSettingsMapper.getDND(singleEvent.getUserid().toString()) == 1L){
-                    //安卓
-                    if (appType.getAppType()==1L){
-                        logger.info("开始要推送事件"+singleEvent.toString());
-                        MobPushUtils.pushTask("您的事件"+singleEvent.getEventname()+"就要开始啦",new String[]{appType.getDeviceToken()});
+                if (!StringUtils.isEmpty(appType.getDeviceToken())) {
+                    //判断勿扰模式
+                    if (userSettingsMapper.getDND(singleEvent.getUserid().toString()) == 1L) {
+                        //安卓
+                        if (appType.getAppType() == 1L) {
+                            logger.info("开始要推送事件" + singleEvent.toString());
+                            MobPushUtils.pushTask("您的事件" + singleEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
+                        }
                     }
                 }
             }
@@ -166,12 +170,14 @@ public class TimerConfig {
                 if (now == remind){
                     //符合时间开始推送
                     AppType appType=appTypeMapper.queryAppType(singleEvent.getUserid().toString());
-                    //判断勿扰模式
-                    if (userSettingsMapper.getDND(singleEvent.getUserid().toString()) == 1L){
-                        //安卓
-                        if (appType.getAppType()==1L){
-                            logger.info("开始要推送事件"+singleEvent.toString());
-                            MobPushUtils.pushTask("您的事件"+singleEvent.getEventname()+"就要开始啦",new String[]{appType.getDeviceToken()});
+                    if (!StringUtils.isEmpty(appType.getDeviceToken())) {
+                        //判断勿扰模式
+                        if (userSettingsMapper.getDND(singleEvent.getUserid().toString()) == 1L) {
+                            //安卓
+                            if (appType.getAppType() == 1L) {
+                                logger.info("开始要推送事件" + singleEvent.toString());
+                                MobPushUtils.pushTask("您的事件" + singleEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
+                            }
                         }
                     }
                 }
@@ -193,12 +199,14 @@ public class TimerConfig {
                 if (now == remind){
                     //符合时间开始推送
                     AppType appType=appTypeMapper.queryAppType(loopEvent.getUserid().toString());
-                    //判断勿扰模式
-                    if (userSettingsMapper.getDND(loopEvent.getUserid().toString()) == 1L){
-                        //安卓
-                        if (appType.getAppType()==1L){
-                            logger.info("开始要推送事件"+loopEvent.toString());
-                            MobPushUtils.pushTask("您的事件"+loopEvent.getEventname()+"就要开始啦",new String[]{appType.getDeviceToken()});
+                    if (!StringUtils.isEmpty(appType.getDeviceToken())) {
+                        //判断勿扰模式
+                        if (userSettingsMapper.getDND(loopEvent.getUserid().toString()) == 1L) {
+                            //安卓
+                            if (appType.getAppType() == 1L) {
+                                logger.info("开始要推送事件" + loopEvent.toString());
+                                MobPushUtils.pushTask("您的事件" + loopEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
+                            }
                         }
                     }
                 }
@@ -213,12 +221,14 @@ public class TimerConfig {
                     if (now == remind){
                         //符合时间开始推送
                         AppType appType=appTypeMapper.queryAppType(loopEvent.getUserid().toString());
-                        //判断勿扰模式
-                        if (userSettingsMapper.getDND(loopEvent.getUserid().toString()) == 1L){
-                            //安卓
-                            if (appType.getAppType()==1L){
-                                logger.info("开始要推送事件"+loopEvent.toString());
-                                MobPushUtils.pushTask("您的事件"+loopEvent.getEventname()+"就要开始啦",new String[]{appType.getDeviceToken()});
+                        if (!StringUtils.isEmpty(appType.getDeviceToken())) {
+                            //判断勿扰模式
+                            if (userSettingsMapper.getDND(loopEvent.getUserid().toString()) == 1L) {
+                                //安卓
+                                if (appType.getAppType() == 1L) {
+                                    logger.info("开始要推送事件" + loopEvent.toString());
+                                    MobPushUtils.pushTask("您的事件" + loopEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
+                                }
                             }
                         }
                     }
