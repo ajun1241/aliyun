@@ -680,13 +680,13 @@ public class OrderServiceImpl implements OrderService {
             service.put("serviceId", serviceId);
             ServiceRemainingTime serviceRemainingTime = userServiceMapper.getServiceRemainingTime(receivedId.getUserId(), serviceId);
             if (ObjectUtils.isEmpty(serviceRemainingTime)) {
+                result.add(service);
                 continue;
             }
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
             if ("1".equals(serviceId)) {
                 service.put("message", "您已永久开通好友服务");
                 service.put("status", "1");
-                result.add(service);
             } else if ("2".equals(serviceRemainingTime.getServiceId())) {
                 if (serviceRemainingTime.getResidueDegree() == 0) {
                     String time = simpleDateFormat.format(DateUtil.stampToDate(serviceRemainingTime.getTimeRemaining().toString()));
