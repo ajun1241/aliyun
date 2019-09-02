@@ -2205,7 +2205,7 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtils.isEmpty(event)){
             return DtoUtil.getFalseDto("当前事件无法提前完成",22001);
         }
-        if (Long.valueOf(event.getStarttime()) < DateUtil.getCurrentMinutes()){
+        if (Long.valueOf(event.getStarttime()) > DateUtil.getCurrentMinutes()){
             return DtoUtil.getFalseDto("当前事件未开始,无法提前完成",22003);
         }
         if (event.getIsLoop() == 0){
