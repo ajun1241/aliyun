@@ -59,4 +59,11 @@ public class ManageController {
         return manageService.changeRealInfo(receivedId,request.getHeader("token"));
     }
 
+    @Safety
+    @PostMapping(value = "queryRealInfo")
+    @ApiOperation("查询实名信息")
+    public Dto queryRealInfo(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return manageService.queryRealInfo(receivedId,request.getHeader("token"));
+    }
+
 }

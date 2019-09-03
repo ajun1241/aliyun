@@ -47,8 +47,6 @@ public class TmauthApplicationTests {
     }
     @Test
     public void test(){
-        Set<String> set=sensitiveWordsMapper.sensitiveWords();
-        System.out.println(set);
     }
 }
 

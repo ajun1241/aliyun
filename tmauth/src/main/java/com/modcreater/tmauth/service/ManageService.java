@@ -49,4 +49,12 @@ public interface ManageService {
      * @return
      */
     Dto uploadStudentRealInfo(ReceivedStudentRealInfo receivedStudentRealInfo, String token);
+
+    /**
+     * 查询实名认证信息
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto queryRealInfo(ReceivedId receivedId,String token);
 }

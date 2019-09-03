@@ -74,4 +74,11 @@ public interface BacklogMapper {
      * @return
      */
     int deleteDraftBacklogList(Long singleEventId);
+
+    /**
+     * 根据事件Id修改同步状态
+     * @param backlogList
+     * @return
+     */
+    int updateBacklogIsSyncByEventId(BacklogList backlogList);
 }
