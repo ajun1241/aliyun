@@ -429,4 +429,11 @@ public interface EventMapper {
      * @return
      */
     int earlySingleEventTermination(@Param("eventId")String eventId,@Param("userId") String userId,@Param("currentMinutes") int currentMinutes);
+
+    /**
+     * 根据id查询事件详情
+     * @param id
+     * @return
+     */
+    SingleEvent queryEventBySingleEventId(Long id);
 }

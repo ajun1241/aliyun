@@ -194,4 +194,11 @@ public class AccountController {
     public Dto resetPassword(@RequestBody LoginByCPVo loginByCPVo){
         return userService.resetPassword(loginByCPVo );
     }
+
+    @Safety
+    @PostMapping("loginout")
+    @ApiOperation("退出登录")
+    public Dto loginOut(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return userService.loginOut(receivedId,request.getHeader("token"));
+    }
 }

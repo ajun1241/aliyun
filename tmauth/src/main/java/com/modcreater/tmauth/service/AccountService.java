@@ -213,4 +213,12 @@ public interface AccountService {
      * @return
      */
     Dto resetPassword(LoginByCPVo loginByCPVo);
+
+    /**
+     * 退出登录
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto loginOut(ReceivedId receivedId,String token);
 }

@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.BacklogMapper">
     <insert id="insertBacklog">
-        insert into backloglist (singleEventId, backlogName,finishTime,backlogStatus)
+        insert into backloglist (singleEventId, backlogName,finishTime,backlogStatus,isSync)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-        (#{item.singleEventId},#{item.backlogName},#{item.finishTime},#{item.backlogStatus})
+        (#{item.singleEventId},#{item.backlogName},#{item.finishTime},#{item.backlogStatus},#{item.isSync})
         </foreach>
     </insert>
     <insert id="addBacklog">
-        insert into backloglist (singleEventId, backlogName)
-        values (#{singleEventId},#{backlogName})
+        insert into backloglist (singleEventId, backlogName,isSync)
+        values (#{singleEventId},#{backlogName},#{isSync})
     </insert>
     <update id="updateBacklog">
         update backloglist
@@ -18,7 +18,7 @@
                 <if test="backlogName != null and backlogName!=''">
                     backlogName = #{backlogName},
                 </if>
-                <if test="backlogStatus >= 0 ">
+                <if test="backlogStatus != null and backlogStatus >= 0 ">
                     backlogStatus = #{backlogStatus},
                 </if>
                 <if test="finishTime != null and finishTime!=''">
@@ -32,6 +32,9 @@
     </select>
     <select id="queryDraftBacklogList" resultType="com.modcreater.tmbeans.pojo.BacklogList">
         select * from draftbackloglist where singleEventId=#{singleEventId}
+    </select>
+    <select id="queryBacklogListById" resultType="com.modcreater.tmbeans.pojo.BacklogList">
+        select * from backloglist where id=#{id}
     </select>
     <delete id="deleteBacklog">
         delete from backloglist where id=#{id}

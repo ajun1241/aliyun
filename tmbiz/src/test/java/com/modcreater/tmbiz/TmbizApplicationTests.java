@@ -81,8 +81,9 @@ public class TmbizApplicationTests {
     }
 
     public static void main(String[] args) {
-       /* SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
-        LoggerFactory.getLogger(TmbizApplicationTests.class).info("时间："+simpleDateFormat.format(new Date()));*/
+       String s="";
+       String[] strings=s.split(",");
+        System.out.println(Arrays.toString(strings));
     }
 
     @Test
