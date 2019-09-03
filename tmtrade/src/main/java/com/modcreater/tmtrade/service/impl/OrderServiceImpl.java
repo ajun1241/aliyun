@@ -548,9 +548,9 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() != 0) {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡待使用", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "次卡剩" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡待使用", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("searchService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "次卡剩" + serviceRemainingTime.getResidueDegree().toString() + "次", 100000);
                 }
             }
         }
@@ -576,7 +576,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() == 0) {
-                    return DtoUtil.getSuccesWithDataDto("backupService", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString(), 100000);
+                    return DtoUtil.getSuccesWithDataDto("backupService", "次卡剩" + serviceRemainingTime.getResidueDegree().toString(), 100000);
                 }
             }
         }
@@ -696,10 +696,10 @@ public class OrderServiceImpl implements OrderService {
                     }
                 } else {
                     if (serviceRemainingTime.getStorageTime() != 0) {
-                        service.put("message", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡待使用");
+                        service.put("message", "次卡剩" + serviceRemainingTime.getResidueDegree().toString() + "次,月/年卡待使用");
                         service.put("status", "1");
                     } else {
-                        service.put("message", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString() + "次");
+                        service.put("message", "次卡剩" + serviceRemainingTime.getResidueDegree().toString() + "次");
                         service.put("status", "1");
                     }
                 }
@@ -724,7 +724,7 @@ public class OrderServiceImpl implements OrderService {
                     }
                 } else {
                     if (serviceRemainingTime.getStorageTime() == 0) {
-                        service.put("message", "次卡剩余" + serviceRemainingTime.getResidueDegree().toString());
+                        service.put("message", "次卡剩" + serviceRemainingTime.getResidueDegree().toString());
                         service.put("status", "1");
                     }
                 }
