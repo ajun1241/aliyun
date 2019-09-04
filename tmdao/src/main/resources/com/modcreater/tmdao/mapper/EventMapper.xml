@@ -147,7 +147,10 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            <if test="isOverdue != null">
+            <if test="isOverdue != null and isOverdue == 1">
+                and isOverdue in (1,3)
+            </if>
+            <if test="isOverdue != null and isOverdue != 1">
                 and isOverdue = #{isOverdue}
             </if>
             <if test="isOverdue == null">
@@ -176,7 +179,10 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            <if test="isOverdue != null">
+            <if test="isOverdue != null and isOverdue == 1">
+                and isOverdue in (1,3)
+            </if>
+            <if test="isOverdue != null and isOverdue != 1">
                 and isOverdue = #{isOverdue}
             </if>
             <if test="isOverdue == null">
@@ -204,7 +210,10 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            <if test="isOverdue != null">
+            <if test="isOverdue != null and isOverdue == 1">
+                and isOverdue in (1,3)
+            </if>
+            <if test="isOverdue != null and isOverdue != 1">
                 and isOverdue = #{isOverdue}
             </if>
             <if test="isOverdue == null">
@@ -272,7 +281,12 @@
         select eventId,userId,eventName,day,month,year
         from singleevent
         where userId = #{userId}
-        and isOverdue = #{isOverdue}
+        <if test="isOverdue != null and isOverdue == 1">
+            and isOverdue in (1,3)
+        </if>
+        <if test="isOverdue != null and isOverdue != 1">
+            and isOverdue = #{isOverdue}
+        </if>
         order by year desc,month desc,day desc limit #{pageNum},#{pageSize}
     </select>
 
@@ -299,7 +313,10 @@
             <if test="day != null and day != ''">
                 and day = #{day}
             </if>
-            <if test="isOverdue != null">
+            <if test="isOverdue != null and isOverdue == 1">
+                and isOverdue in (1,3)
+            </if>
+            <if test="isOverdue != null and isOverdue != 1">
                 and isOverdue = #{isOverdue}
             </if>
             <if test="starttime != null and starttime != 0 and endtime != null and endtime != 0">
@@ -437,7 +454,10 @@
             <if test="year != null">
                 and year = #{year}
             </if>
-            <if test="isOverdue != null">
+            <if test="isOverdue != null and isOverdue == 1">
+                and isOverdue in (1,3)
+            </if>
+            <if test="isOverdue != null and isOverdue != 1">
                 and isOverdue = #{isOverdue}
             </if>
             <if test="isLoop != null">
@@ -477,7 +497,10 @@
             <if test="day != null and day != ''">
                 and day = #{day}
             </if>
-            <if test="isOverdue != null">
+            <if test="isOverdue != null and isOverdue == 1">
+                and isOverdue in (1,3)
+            </if>
+            <if test="isOverdue != null and isOverdue != 1">
                 and isOverdue = #{isOverdue}
             </if>
             <if test="starttime != null and starttime != 0 and endtime != null and endtime != 0">
