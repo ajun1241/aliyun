@@ -5,7 +5,14 @@
         insert into backloglist (singleEventId, backlogName,finishTime,backlogStatus,isSync)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-        (#{item.singleEventId},#{item.backlogName},#{item.finishTime},#{item.backlogStatus},#{item.isSync})
+        (#{item.singleEventId},#{item.backlogName},#{item.finishTime},#{item.backlogStatus},
+            <if test="item.isSync == null " >
+                0
+            </if>
+            <if test="item.isSync != null">
+                #{item.isSync}
+            </if>
+        )
         </foreach>
     </insert>
     <insert id="addBacklog">
@@ -26,6 +33,9 @@
                 </if>
             </set>
         where id=#{id}
+    </update>
+    <update id="updateBacklogIsSyncByEventId">
+        update backloglist set isSync=#{isSync} where singleEventId=#{singleEventId}
     </update>
     <select id="queryBacklogList" resultType="com.modcreater.tmbeans.pojo.BacklogList">
         select * from backloglist where singleEventId=#{singleEventId}

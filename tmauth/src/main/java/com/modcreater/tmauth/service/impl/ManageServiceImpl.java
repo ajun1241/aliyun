@@ -23,9 +23,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Description:
@@ -208,5 +206,52 @@ public class ManageServiceImpl implements ManageService {
             }
         }
         return DtoUtil.getSuccessDto("上传成功",100000);
+    }
+
+    /**
+     * 查询实名认证信息
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto queryRealInfo(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        UserRealInfo userRealInfo=userRealInfoMapper.queryDetail(receivedId.getUserId());
+        Map<String,Object> map=new HashMap<>();
+        if (ObjectUtils.isEmpty(userRealInfo)){
+            map.put("realStatus",3L);
+            return DtoUtil.getSuccesWithDataDto("您尚未进行实名认证",map,100000);
+        }
+        String category=userRealInfo.getCategory().toString();
+        String userIDNo=userRealInfo.getUserIdNo();
+        String IDNo="";
+        if ("1".equals(category)){
+            category="身份证";
+            char[] chars=userIDNo.toCharArray();
+            for (int i = 0; i < chars.length; i++) {
+                if (i>3 && i<14){
+                    chars[i]='*';
+                }
+                IDNo=IDNo+chars[i];
+            }
+        }else if ("2".equals(category)){
+            IDNo=userIDNo;
+            category="学生证";
+        }
+        String modifyDate="";
+        if (!ObjectUtils.isEmpty(userRealInfo.getModifyDate())){
+            modifyDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(userRealInfo.getModifyDate());
+        }
+        map.put("id",userRealInfo.getId());
+        map.put("userId",userRealInfo.getUserId());
+        map.put("userRealName",userRealInfo.getUserRealName());
+        map.put("userIDNo",IDNo);
+        map.put("modifyDate",modifyDate);
+        map.put("category",category);
+        map.put("realStatus",userRealInfo.getRealStatus());
+        return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
     }
 }

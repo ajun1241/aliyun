@@ -20,4 +20,5 @@ public class UserRealInfo {
     private Date createDate;
     private Date modifyDate;
     private String realBy;
+    private Integer category;
 }

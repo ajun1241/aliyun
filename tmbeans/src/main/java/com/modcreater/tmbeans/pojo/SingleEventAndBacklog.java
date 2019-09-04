@@ -13,4 +13,5 @@ import java.util.List;
 @Data
 public class SingleEventAndBacklog extends SingleEvent{
     private List<BacklogList> backlogList;
+    private String isSync;
 }
