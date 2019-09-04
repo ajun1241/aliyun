@@ -109,4 +109,10 @@ public class UserInfoController {
     public Dto getAchievementNum(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return userInfoService.getAchievementNum(receivedId,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getuserachievementforios")
+    @ApiOperation("获取用户成就(IOS)")
+    public Dto getUserAchievementForIOS(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return userInfoService.getUserAchievementForIOS(receivedId,request.getHeader("token"));
+    }
 }

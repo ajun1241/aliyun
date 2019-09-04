@@ -129,6 +129,23 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
+    public Dto getUserAchievementForIOS(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //查询用户所有成就
+        Map<String, Object> result = new HashMap<>(3);
+        List<Achievement> achievementList = queryUserAchievementInBase(receivedId.getUserId());
+        if (achievementList.size() == 0) {
+            return DtoUtil.getSuccessDto("该用户还没有任何成就", 100000);
+        }
+        result.put("achievementList",achievementList);
+        result.put("achievedNum", achievementMapper.getAchievedNum(receivedId.getUserId()));
+        result.put("totalNum", achievementMapper.getTotalNum(receivedId.getUserId()));
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
+    @Override
     public List<Achievement> queryUserAchievementInBase(String userId) {
         //在此查询用户统计表,并判断该用户是否完成某个成就
         UserStatistics userStatistics = achievementMapper.queryUserStatistics(userId);
