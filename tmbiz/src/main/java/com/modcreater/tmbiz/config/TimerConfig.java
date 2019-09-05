@@ -72,7 +72,7 @@ public class TimerConfig {
         eventStatusScan.setLastYear(Long.valueOf(yesterday.substring(0, 4)));
         eventStatusScan.setLastMonth(Long.valueOf(yesterday.substring(4, 6)));
         eventStatusScan.setYesterday(Long.valueOf(yesterday.substring(6)));
-        Integer time = DateUtil.getCurrentMinutes();
+        int time = DateUtil.getCurrentMinutes();
         eventStatusScan.setTime((long) time);
         List<Long> userIds = eventMapper.queryExpiredEvents(eventStatusScan);
         logger.info("有" + userIds.size() + "条事件待修改");
@@ -105,7 +105,7 @@ public class TimerConfig {
         }
     }
 
-    @Scheduled(cron = "30 * * * * ?")
+    @Scheduled(cron = "* * * * * ?")
     public void orderStatusScan() {
         Long timestamp = System.currentTimeMillis() / 1000;
         Long orders = orderMapper.queryExpiredOrders(timestamp);
@@ -116,12 +116,12 @@ public class TimerConfig {
     }
 
 
-    @Scheduled(cron = "32 * * * * ?")
+    @Scheduled(cron = "* * * * * ?")
     public void discountCouponStatusScan() {
         List<DiscountUser> discountUsers = orderMapper.getBindingDiscountCoupons();
         for (DiscountUser discountUser : discountUsers) {
             String status = orderMapper.getUserOrder(discountUser.getOrderId().toString()).getOrderStatus();
-            if (status.equals("3") || status.equals("4")) {
+            if ("3".equals(status) || "4".equals(status)) {
                 logger.info("已将" + orderMapper.setDiscountCouponOrderId(discountUser.getId(), "0", "0") + "个优惠券状态改为未使用");
             }
         }
