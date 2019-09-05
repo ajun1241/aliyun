@@ -237,13 +237,4 @@ public class TimerConfig {
             }
         }
     }
-
-    public static void main(String[] args) {
-        Date date = new Date(Calendar.DAY_OF_WEEK);
-        System.out.println(date);
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        int week=cal.get(Calendar.DAY_OF_WEEK)-1;
-        TimerConfig.logger.info("星期："+week);
-    }
 }

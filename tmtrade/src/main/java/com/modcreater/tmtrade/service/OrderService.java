@@ -4,7 +4,6 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmbeans.vo.trade.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -132,4 +131,12 @@ public interface OrderService {
      * @return
      */
     Dto getAllUserServiceForIOS(ReceivedId receivedId, String token);
+
+    /**
+     * 订单取消支付
+     * @param receivedTradeId
+     * @param token
+     * @return
+     */
+    Dto orderCancel(ReceivedTradeId receivedTradeId, String token);
 }

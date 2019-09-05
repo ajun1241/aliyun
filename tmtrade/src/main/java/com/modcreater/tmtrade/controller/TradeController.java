@@ -1,10 +1,7 @@
 package com.modcreater.tmtrade.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.vo.trade.ReceivedGoodsInfo;
-import com.modcreater.tmbeans.vo.trade.ReceivedOrderInfo;
-import com.modcreater.tmbeans.vo.trade.ReceivedServiceIdUserId;
-import com.modcreater.tmbeans.vo.trade.ReceivedVerifyInfo;
+import com.modcreater.tmbeans.vo.trade.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmtrade.config.annotation.Safety;
 import com.modcreater.tmtrade.service.OrderService;
@@ -13,11 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * Created with IntelliJ IDEA.
@@ -100,5 +92,11 @@ public class TradeController {
     @ApiOperation("查询用户所有服务(IOS)")
     public Dto getAllUserServiceForIOS(@RequestBody ReceivedId receivedId ,HttpServletRequest request){
         return orderService.getAllUserServiceForIOS(receivedId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "ordercancel")
+    @ApiOperation("取消支付")
+    public Dto orderCancel(@RequestBody ReceivedTradeId receivedTradeId, HttpServletRequest request){
+        return orderService.orderCancel(receivedTradeId,request.getHeader("token"));
     }
 }

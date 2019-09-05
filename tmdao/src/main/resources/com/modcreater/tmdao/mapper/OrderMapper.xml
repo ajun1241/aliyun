@@ -53,7 +53,7 @@
         select <include refid="userOrders"/> from userorders where id = #{tradeId}
     </select>
     <select id="queryExpiredOrders" resultType="java.lang.Long">
-        select count(id) from userorders where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800
+        select count(id) from userorders where orderStatus = 0 and #{timestamp} - createDate &gt;= 300
     </select>
     <select id="getUserAllOrders" resultType="com.modcreater.tmbeans.show.order.ShowUserOrders">
         select
@@ -76,8 +76,11 @@
     <select id="getBindingDiscountCoupons" resultType="com.modcreater.tmbeans.pojo.DiscountUser">
         select * from discountuser where status = 3
     </select>
+    <select id="getBindingDiscountCoupon" resultType="com.modcreater.tmbeans.pojo.DiscountUser">
+        select * from discountuser where status = 3 and orderId = #{tradeId}
+    </select>
     <update id="updateExpiredOrders">
-        update userorders set orderStatus = 3 where orderStatus = 0 and #{timestamp} - createDate &gt;= 1800
+        update userorders set orderStatus = 3 where orderStatus = 0 and #{timestamp} - createDate &gt;= 300
     </update>
     <update id="updateOrderStatus">
         update userorders set orderStatus = #{status} where id = #{outTradeNo}

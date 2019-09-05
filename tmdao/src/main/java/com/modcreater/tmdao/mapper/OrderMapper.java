@@ -113,4 +113,11 @@ public interface OrderMapper {
      * @return
      */
     List<DiscountUser> getBindingDiscountCoupons();
+
+    /**
+     * 查询一个正在与订单绑定的优惠券
+     * @param tradeId
+     * @return
+     */
+    DiscountUser getBindingDiscountCoupon(String tradeId);
 }
