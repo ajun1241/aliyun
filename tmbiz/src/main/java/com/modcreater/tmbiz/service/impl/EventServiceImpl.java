@@ -91,12 +91,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public synchronized Dto addNewEvents(UploadingEventVo uploadingEventVo, String token) {
-        if (!StringUtils.hasText(uploadingEventVo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(uploadingEventVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -104,9 +98,6 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("没有可上传的事件", 21002);
         }
         SingleEventAndBacklog singleEvent = JSONObject.parseObject(uploadingEventVo.getSingleEvent(), SingleEventAndBacklog.class);
-        if (singleEvent.getEventname().length() > 10) {
-            return DtoUtil.getFalseDto("标题太长", 20130);
-        }
         singleEvent.setUserid(Long.valueOf(uploadingEventVo.getUserId()));
         //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
         singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
@@ -136,24 +127,18 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public synchronized Dto deleteEvents(DeleteEventVo deleteEventVo, String token) {
-        if (!StringUtils.hasText(deleteEventVo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(deleteEventVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (!ObjectUtils.isEmpty(eventMapper.getChangingEventStatus(deleteEventVo))) {
             return DtoUtil.getFalseDto("重复操作:已经操作过了", 21003);
         }
-        SingleEvent singleEvent = eventMapper.getAEvent(deleteEventVo.getUserId(), Long.valueOf(deleteEventVo.getEventId()), "singleevent");
+        /*SingleEvent singleEvent = eventMapper.getAEvent(deleteEventVo.getUserId(), Long.valueOf(deleteEventVo.getEventId()), "singleevent");
         if (!ObjectUtils.isEmpty(singleEvent)) {
-            if (singleEvent.getIsLoop() == 1 && deleteEventVo.getEventStatus().equals("1")) {
+            if (singleEvent.getIsLoop() == 1 && "1".equals(deleteEventVo.getEventStatus())) {
                 return DtoUtil.getSuccessDto("修改事件状态成功", 100000);
             }
-        }
+        }*/
         if (eventMapper.withdrawEventsByUserId(deleteEventVo) > 0) {
             return DtoUtil.getSuccessDto("修改事件状态成功", 100000);
         }
@@ -499,12 +484,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto searchByDayEventIds(SearchEventVo searchEventVo, String token) {
-        if (!StringUtils.hasText(searchEventVo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -572,12 +551,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Dto searchByDayEventIdsInMonth(SearchEventVo searchEventVo, String token) {
-        if (!StringUtils.hasText(searchEventVo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(searchEventVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
