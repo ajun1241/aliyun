@@ -33,7 +33,7 @@ public class TradeController {
         return orderService.alipay(receivedOrderInfo ,httpServletRequest.getHeader("token"));
     }
 
-    @PostMapping(value = "alipay/notify_url")
+    @PostMapping(value = "alipay/notify_in_ali_with_mct")
     @ApiOperation("支付宝异步回调")
     public String aliPayNotify(HttpServletRequest request){
         return orderService.alipayNotify(request);
@@ -45,7 +45,7 @@ public class TradeController {
         return orderService.wxPayOrderSubmitted(receivedOrderInfo,httpServletRequest.getHeader("token"));
     }
 
-    @PostMapping(value = "wxpay/notify_url")
+    @PostMapping(value = "wxpay/notify_in_wx_with_mct")
     @ApiOperation("微信支付回调")
     public String wxPayNotify(HttpServletRequest request){
         return orderService.wxPayNotify(request);
@@ -94,6 +94,7 @@ public class TradeController {
         return orderService.getAllUserServiceForIOS(receivedId,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "ordercancel")
     @ApiOperation("取消支付")
     public Dto orderCancel(@RequestBody ReceivedTradeId receivedTradeId, HttpServletRequest request){

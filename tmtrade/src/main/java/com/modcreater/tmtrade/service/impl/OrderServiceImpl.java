@@ -290,7 +290,7 @@ public class OrderServiceImpl implements OrderService {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        calendar.set(Calendar.SECOND,60);
+        calendar.set(Calendar.SECOND,300);
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         model.setOutTradeNo(userOrder.getId());
         model.setSubject("手机端" + userOrder.getOrderTitle() + "移动支付");
@@ -344,7 +344,7 @@ public class OrderServiceImpl implements OrderService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         String sTime = simpleDateFormat.format(calendar.getTime());
-        calendar.set(Calendar.SECOND,60);
+        calendar.set(Calendar.SECOND,300);
         String exTime = simpleDateFormat.format(calendar.getTime());
         data.put("appid", WxPayConfig.APP_ID);
         data.put("mch_id", WxPayConfig.MCH_ID);
