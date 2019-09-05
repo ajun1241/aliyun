@@ -158,6 +158,18 @@ public class ManageServiceImpl implements ManageService {
         if (afterSaleMapper.changeRealInfo(afterSale)==0){
             return DtoUtil.getFalseDto("服务提交失败",50020);
         }
+        //通知管理员
+        List<SuperAdministrator> superAdministrators=superAdminMapper.querySuperAdmins();
+        List<String> emails=new ArrayList<>();
+        String title="【智袖】";
+        String content="有用户需要更换实名信息！";
+        for (SuperAdministrator administrators : superAdministrators) {
+            if (!StringUtils.isEmpty(administrators.getEmail())){
+                emails.add(administrators.getEmail());
+            }
+        }
+        System.out.println("接收的邮箱"+emails);
+        SendMsgUtil.asynSendEmail(title,content,emails);
         return DtoUtil.getSuccessDto("提交成功",100000);
     }
 

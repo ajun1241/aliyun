@@ -32,7 +32,7 @@ public class MobPushUtils {
         logger.info("deviceToken："+ Arrays.toString(registrationIds));
         PushWork push = new PushWork(PlatEnum.all.getCode(),content , PushTypeEnum.notify.getCode()) //初始化基础信息
                 .buildTarget(TargetEnum._4.getCode(), null, null, registrationIds, null, null)  // 设置推送范围
-                .buildAndroid("Android Title", AndroidNotifyStyleEnum.normal.getCode(), null, true, true, true) //定制android样式
+                .buildAndroid("智袖", AndroidNotifyStyleEnum.normal.getCode(), null, true, true, true) //定制android样式
                 .bulidIos("ios Title", "ios Subtitle", null, 1, null, null, null, null) //定制ios设置
                 .buildExtra(1, "{\"key1\":\"value\"}", 1) // 设置扩展信息
                 ;

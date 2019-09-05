@@ -20,6 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -141,8 +142,6 @@ public class TimerConfig {
         List<SingleEvent> singleEventList=eventMapper.querySingleEventByTime(time1[0],time1[1],time1[2]);
         List<SingleEvent> singleEventList1=eventMapper.querySingleEventByTime(time2[0],time2[1],time2[2]);
         long now=(Long.valueOf(time1[3])*60+Long.valueOf(time1[4]));
-        logger.info("今天事件列表："+singleEventList);
-        logger.info("明天事件列表："+singleEventList);
         for (SingleEvent singleEvent : singleEventList) {
             String startTime=singleEvent.getStarttime();
             String remindTime=singleEvent.getRemindTime();
@@ -150,7 +149,7 @@ public class TimerConfig {
             if (now == remind){
                 //符合时间开始推送
                 AppType appType=appTypeMapper.queryAppType(singleEvent.getUserid().toString());
-                if (!StringUtils.isEmpty(appType.getDeviceToken())) {
+                if (!ObjectUtils.isEmpty(appType) && !StringUtils.isEmpty(appType.getDeviceToken())) {
                     //判断勿扰模式
                     if (userSettingsMapper.getDND(singleEvent.getUserid().toString()) == 1L) {
                         //安卓
@@ -170,7 +169,7 @@ public class TimerConfig {
                 if (now == remind){
                     //符合时间开始推送
                     AppType appType=appTypeMapper.queryAppType(singleEvent.getUserid().toString());
-                    if (!StringUtils.isEmpty(appType.getDeviceToken())) {
+                    if (!ObjectUtils.isEmpty(appType) && !StringUtils.isEmpty(appType.getDeviceToken())) {
                         //判断勿扰模式
                         if (userSettingsMapper.getDND(singleEvent.getUserid().toString()) == 1L) {
                             //安卓
@@ -194,12 +193,11 @@ public class TimerConfig {
             String startTime=loopEvent.getStarttime();
             String remindTime=loopEvent.getRemindTime();
             if ("true".equals(le[week1])){
-                logger.info("今天的重复事件："+loopEvent.toString());
                 long remind=(Long.valueOf(startTime)-Long.valueOf(remindTime));
                 if (now == remind){
                     //符合时间开始推送
                     AppType appType=appTypeMapper.queryAppType(loopEvent.getUserid().toString());
-                    if (!StringUtils.isEmpty(appType.getDeviceToken())) {
+                    if (!ObjectUtils.isEmpty(appType) && !StringUtils.isEmpty(appType.getDeviceToken())) {
                         //判断勿扰模式
                         if (userSettingsMapper.getDND(loopEvent.getUserid().toString()) == 1L) {
                             //安卓
@@ -213,7 +211,6 @@ public class TimerConfig {
             }
             //如果明天有重复事件
             if ("true".equals(le[week2])){
-                logger.info("明天的重复事件："+loopEvent.toString());
                 long remind=(Long.valueOf(startTime)-Long.valueOf(remindTime));
                 //如果明天的事件提醒时间是今天
                 if (remind<0){
@@ -221,7 +218,7 @@ public class TimerConfig {
                     if (now == remind){
                         //符合时间开始推送
                         AppType appType=appTypeMapper.queryAppType(loopEvent.getUserid().toString());
-                        if (!StringUtils.isEmpty(appType.getDeviceToken())) {
+                        if (!ObjectUtils.isEmpty(appType) && !StringUtils.isEmpty(appType.getDeviceToken())) {
                             //判断勿扰模式
                             if (userSettingsMapper.getDND(loopEvent.getUserid().toString()) == 1L) {
                                 //安卓

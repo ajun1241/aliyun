@@ -525,7 +525,7 @@ public class EventServiceImpl implements EventService {
                 if (!SingleEventUtil.eventTime(singleEventListOrderByLevel, Long.valueOf(singleEvent1.getStarttime()), Long.valueOf(singleEvent1.getEndtime()))) {
                     continue;
                 }
-                ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+                ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent1(singleEvent1);
                 if (showSingleEvent.getRepeaTtime()[week]) {
                     showSingleEventListOrderByLevel.add(showSingleEvent);
                     showSingleEventListOrderByLevelAndDate.add(showSingleEvent);
@@ -757,7 +757,9 @@ public class EventServiceImpl implements EventService {
                 //查询该事件的清单
                 List<BacklogList> backlogLists=backlogMapper.queryBacklogList(singleEvent.getId());
                 //查询清单权限
-                singleEventAndBacklog.setIsSync(backlogLists.get(0).getIsSync().toString());
+                if (backlogLists.size()>0){
+                    singleEventAndBacklog.setIsSync(backlogLists.get(0).getIsSync().toString());
+                }
                 singleEventAndBacklog.setBacklogList(backlogLists);
                 return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEventAndBacklog), 100000);
             } else {
@@ -1713,7 +1715,9 @@ public class EventServiceImpl implements EventService {
             //查询该事件的清单
             List<BacklogList> backlogLists=backlogMapper.queryDraftBacklogList(singleEvent.getId());
             //查询清单权限
-            singleEventAndBacklog.setIsSync(backlogLists.get(0).getIsSync().toString());
+            if (backlogLists.size()>0){
+                singleEventAndBacklog.setIsSync(backlogLists.get(0).getIsSync().toString());
+            }
             singleEventAndBacklog.setBacklogList(backlogLists);
             return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEventAndBacklog), 100000);
         } else {
@@ -1723,7 +1727,9 @@ public class EventServiceImpl implements EventService {
             //查询该事件的清单
             List<BacklogList> backlogLists=backlogMapper.queryDraftBacklogList(singleEvent.getId());
             //查询清单权限
-            singleEventAndBacklog.setIsSync(backlogLists.get(0).getIsSync().toString());
+            if (backlogLists.size()>0){
+                singleEventAndBacklog.setIsSync(backlogLists.get(0).getIsSync().toString());
+            }
             singleEventAndBacklog.setBacklogList(backlogLists);
             return DtoUtil.getSuccesWithDataDto("查询成功", SingleEventUtil.getShowSingleEvent(singleEventAndBacklog), 100000);
         }
@@ -1818,7 +1824,9 @@ public class EventServiceImpl implements EventService {
         //查询该事件的清单
         List<BacklogList> backlogLists=backlogMapper.queryBacklogList(singleEvent.getId());
         //查询清单权限
-        singleEventAndBacklog.setIsSync(backlogLists.get(0).getIsSync().toString());
+        if (backlogLists.size()>0){
+            singleEventAndBacklog.setIsSync(backlogLists.get(0).getIsSync().toString());
+        }
         singleEventAndBacklog.setBacklogList(backlogLists);
         result.put("event", SingleEventUtil.getShowSingleEvent(singleEventAndBacklog));
         return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
@@ -1863,7 +1871,7 @@ public class EventServiceImpl implements EventService {
             loopEventList.add(new ArrayList<>());
         }
         for (SingleEvent singleEvent1 : list) {
-            ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent(singleEvent1);
+            ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent1(singleEvent1);
             Boolean[] booleans = showSingleEvent.getRepeaTtime();
             //根据拆分出来的boolean数组进行判断并添加到一周的各个天数中
             for (int i = 0; i <= 6; i++) {
@@ -1936,7 +1944,7 @@ public class EventServiceImpl implements EventService {
             }
             RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
             String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
-            InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2", msgStatus.getId().toString());
+            InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent1(singleEvent)), "2", msgStatus.getId().toString());
             ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(userId, new String[]{personList1.get(i)}, 0, inviteMessage);
             if (result.getCode() != 200) {
                 logger.info("添加邀请事件时融云消息异常" + result.toString());
@@ -2223,7 +2231,7 @@ public class EventServiceImpl implements EventService {
         }
         BacklogList backlogList1=backlogMapper.queryBacklogListById(Long.valueOf(backlogListVo.getId()));
         if (ObjectUtils.isEmpty(backlogList1)){
-            return DtoUtil.getFalseDto("清单不存在，可能已被删除",22006);
+            return DtoUtil.getFalseDto("清单不存在，可能已被删除",200000);
         }
         //判断同步权限是否开启
         if (backlogList1.getIsSync() == 1L){
@@ -2282,6 +2290,9 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         BacklogList backlogList1=backlogMapper.queryBacklogListById(Long.valueOf(backlogListVo.getId()));
+        if (ObjectUtils.isEmpty(backlogList1)){
+            return DtoUtil.getFalseDto("清单不存在，可能已被删除",200000);
+        }
         //判断同步权限是否开启
         if (backlogList1.getIsSync() == 1L){
             //查询我的清单列表
@@ -2386,6 +2397,9 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         BacklogList backlogList1=backlogMapper.queryBacklogListById(Long.valueOf(backlogListVo.getId()));
+        if (ObjectUtils.isEmpty(backlogList1)){
+            return DtoUtil.getFalseDto("清单不存在，可能已被删除",200000);
+        }
         //判断同步权限是否开启
         if (backlogList1.getIsSync() == 1L){
             //查询我的清单列表

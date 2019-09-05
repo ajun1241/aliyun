@@ -681,10 +681,9 @@
         and day=#{day}
         and isOverdue=0
         and isLoop=0
-        and level=5
     </select>
     <select id="queryLoopEventByTime" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select * from singleevent where isOverdue=0 and isLoop=1 and level=5
+        select * from singleevent where isOverdue=0 and isLoop=1
     </select>
     <select id="getEarlyEventTermination" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select * from singleevent where userId  = #{userId} and eventId = #{eventId} and isOverdue = 0

@@ -71,7 +71,7 @@ public class SingleEventUtil {
     public static List<ShowSingleEvent> getShowSingleEventList(List<SingleEvent> singleEventList) {
         List<ShowSingleEvent> showSingleEventList = new ArrayList<>();
         for (SingleEvent singleEvent1 : singleEventList) {
-            showSingleEventList.add(getShowSingleEvent(singleEvent1));
+            showSingleEventList.add(getShowSingleEvent1(singleEvent1));
         }
         return showSingleEventList;
     }
@@ -82,7 +82,7 @@ public class SingleEventUtil {
      * @param singleEvent1
      * @return
      */
-    public static ShowSingleEvent getShowSingleEvent(SingleEvent singleEvent1) {
+    public static ShowSingleEvent getShowSingleEvent1(SingleEvent singleEvent1) {
         if (StringUtils.hasText(singleEvent1.getRepeaTtime())) {
             ShowSingleEvent showSingleEvent = new ShowSingleEvent();
             showSingleEvent.setUserid(singleEvent1.getUserid());

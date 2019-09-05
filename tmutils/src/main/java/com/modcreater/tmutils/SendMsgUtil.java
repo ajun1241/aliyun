@@ -28,7 +28,7 @@ public class SendMsgUtil {
     // 发件人用户名、密码
     private static String SEND_USER = "306878615@qq.com";
     private static String SEND_UNAME = "306878615";
-    private static String SEND_PWD = "opvxmagupebacbbh";
+    private static String SEND_PWD = "facdjmtfuwnqbgda";
     // 建立会话
     private static MimeMessage message;
     private static Session s;
