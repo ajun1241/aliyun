@@ -106,7 +106,7 @@ public class TimerConfig {
         }
     }
 
-    @Scheduled(cron = "* * * * * ?")
+    @Scheduled(cron = "30 * * * * ?")
     public void orderStatusScan() {
         Long timestamp = System.currentTimeMillis() / 1000;
         Long orders = orderMapper.queryExpiredOrders(timestamp);
@@ -117,7 +117,7 @@ public class TimerConfig {
     }
 
 
-    @Scheduled(cron = "* * * * * ?")
+    @Scheduled(cron = "32 * * * * ?")
     public void discountCouponStatusScan() {
         List<DiscountUser> discountUsers = orderMapper.getBindingDiscountCoupons();
         for (DiscountUser discountUser : discountUsers) {

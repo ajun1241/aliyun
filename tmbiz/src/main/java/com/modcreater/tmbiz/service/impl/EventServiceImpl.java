@@ -1894,7 +1894,8 @@ public class EventServiceImpl implements EventService {
             if ("all".equals(condition)) {
                 singleEventList = completedLoopEvent(eventMapper.queryEvents(singleEvent));
             } else if ("few".equals(condition)) {
-                singleEventList = completedLoopEvent(eventMapper.queryEventsWithFewInfo(singleEvent));
+                List<SingleEvent> singleEventList1 = eventMapper.queryEventsWithFewInfo(singleEvent);
+                singleEventList = completedLoopEvent(singleEventList1);
             } else {
                 singleEventList = new ArrayList<>();
             }

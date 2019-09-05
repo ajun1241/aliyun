@@ -577,7 +577,7 @@
         select isOverdue,isLoop from singleevent where userId = #{userId} and eventId = #{eventId} and isOverdue = #{eventStatus}
     </select>
     <select id="queryEventsWithFewInfo" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select eventId,userId,eventName,startTime,endTime,flag from singleevent
+        select eventId,userId,eventName,startTime,endTime,flag,repeatTime from singleevent
         <where>
             <if test="userid != null">
                 userid = #{userid}
