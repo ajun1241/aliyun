@@ -19,4 +19,7 @@
     <select id="getGroupUpperLimit" resultType="com.modcreater.tmbeans.pojo.GroupPermission">
         select * from grouppermission where userId = #{userId}
     </select>
+    <select id="queryGroupInfo" resultType="com.modcreater.tmbeans.pojo.GroupInfo">
+        select * from groupinfo where id=#{groupId}
+    </select>
 </mapper>

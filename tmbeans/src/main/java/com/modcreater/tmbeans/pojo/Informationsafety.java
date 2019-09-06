@@ -7,7 +7,7 @@ public class Informationsafety {
 
   private Long id;
   private Long userId;
-  private java.sql.Timestamp createDate;
+  private String createDate;
   private Long operationType;
   private String networkSourceAddress;
   private String networkTargetAddress;

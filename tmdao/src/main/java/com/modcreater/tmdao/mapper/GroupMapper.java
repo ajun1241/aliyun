@@ -54,4 +54,11 @@ public interface GroupMapper {
      * @return
      */
     GroupPermission getGroupUpperLimit(String userId);
+
+    /**
+     * 根据Id查询团队详情
+     * @param groupId
+     * @return
+     */
+    GroupInfo queryGroupInfo(String groupId);
 }

@@ -8,6 +8,7 @@ import com.modcreater.tmbeans.pojo.GroupRelation;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
+import com.modcreater.tmbeans.vo.GroupMsgVo;
 import com.modcreater.tmbeans.vo.GroupRelationVo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.GroupMapper;
@@ -108,5 +109,55 @@ public class GroupServiceImpl implements GroupService {
             status = 0;
         }
         return DtoUtil.getSuccesWithDataDto("操作成功",status,100000);
+    }
+
+    /**
+     * 发送团队名片
+     * @param groupMsgVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto sendGroupCard(GroupMsgVo groupMsgVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(groupMsgVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //查询团队信息
+        GroupInfo groupInfo=groupMapper.queryGroupInfo(groupMsgVo.getGroupId());
+
+        return null;
+    }
+
+    /**
+     * 申请加入团队
+     * @param groupMsgVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto applyJoinGroup(GroupMsgVo groupMsgVo, String token) {
+        return null;
+    }
+
+    /**
+     * 回应团队申请
+     * @param groupMsgVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto respondApply(GroupMsgVo groupMsgVo, String token) {
+        return null;
+    }
+
+    /**
+     * 查询团队验证消息列表
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto applyMsgList(ReceivedId receivedId, String token) {
+        return null;
     }
 }
