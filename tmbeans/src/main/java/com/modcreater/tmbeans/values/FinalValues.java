@@ -44,6 +44,10 @@ public class FinalValues {
      */
     public static final Long TIME_CARD_DURATION = 600L;
     /**
+     * 团队角色
+     */
+    public static final String[] GROUPROLES = {"creator","manager","member"};
+    /**
      * 一个月(单位:秒,计算用户支付用)
      */
     public static Long MONTH = getPayTime(1);

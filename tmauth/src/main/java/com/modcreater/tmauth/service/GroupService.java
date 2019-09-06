@@ -53,4 +53,11 @@ public interface GroupService {
      */
     Dto deleteGroupMember(GroupRelationVo groupRelationVo,String token);
 
+    /**
+     * 获取我创建的团队的数量
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto isNeedValueAdded(ReceivedId receivedId, String token);
 }

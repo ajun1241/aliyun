@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.GroupMapper">
+    <insert id="createGroup" useGeneratedKeys="true" keyProperty="id">
+        insert into groupinfo (groupName,groupPicture,groupUnit,groupScale,groupNature,groupPresentation,createBy) values
+        (#{groupName},#{groupPicture},#{groupUnit},#{groupScale},#{groupNature},#{groupPresentation},#{userId})
+    </insert>
+    <insert id="addCreator">
+        insert into grouprelation
+    </insert>
 
+    <select id="getMyGroup" resultType="com.modcreater.tmbeans.pojo.GroupRelation">
+        select * from grouprelation where memberId = #{userId}
+    </select>
+    <select id="getMyCreatedGroupNum" resultType="java.lang.Integer">
+        select count(id) from grouprelation where memberId = #{userId} and memberLevel = 2
+    </select>
+    <select id="getGroupUpperLimit" resultType="com.modcreater.tmbeans.pojo.GroupPermission">
+        select * from grouppermission where userId = #{userId}
+    </select>
 </mapper>
