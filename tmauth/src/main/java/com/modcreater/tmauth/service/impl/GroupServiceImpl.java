@@ -10,6 +10,7 @@ import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
 import com.modcreater.tmbeans.vo.GroupMsgVo;
 import com.modcreater.tmbeans.vo.GroupRelationVo;
+import com.modcreater.tmbeans.vo.group.ReceivedGroupId;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.GroupMapper;
 import com.modcreater.tmutils.DtoUtil;
@@ -17,6 +18,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -105,7 +107,12 @@ public class GroupServiceImpl implements GroupService {
         //0 : 不需要; 1 : 需要
         int status = 1;
         GroupPermission groupPermission = groupMapper.getGroupUpperLimit(receivedId.getUserId());
-        if (groupMapper.getMyCreatedGroupNum(receivedId.getUserId()) < 5){
+        if (ObjectUtils.isEmpty(groupPermission)){
+            long groupUpperLimit = 5;
+            groupMapper.addGroupPermission(receivedId.getUserId(),groupUpperLimit);
+            groupPermission.setGroupUpperLimit(groupUpperLimit);
+        }
+        if (groupMapper.getMyCreatedGroupNum(receivedId.getUserId()) < groupPermission.getGroupUpperLimit()){
             status = 0;
         }
         return DtoUtil.getSuccesWithDataDto("操作成功",status,100000);
@@ -159,5 +166,17 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Dto applyMsgList(ReceivedId receivedId, String token) {
         return null;
+    }
+
+    @Override
+    public Dto getMyGroupInfo(ReceivedGroupId receivedGroupId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(receivedGroupId.getGroupId());
+        if (!ObjectUtils.isEmpty(groupInfo)){
+            return DtoUtil.getSuccesWithDataDto("查询成功",groupInfo,100000);
+        }
+        return DtoUtil.getSuccessDto("查询失败",200000);
     }
 }

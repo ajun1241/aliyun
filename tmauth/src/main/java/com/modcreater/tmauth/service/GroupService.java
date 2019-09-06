@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
 import com.modcreater.tmbeans.vo.GroupMsgVo;
 import com.modcreater.tmbeans.vo.GroupRelationVo;
+import com.modcreater.tmbeans.vo.group.ReceivedGroupId;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
 /**
@@ -93,4 +94,12 @@ public interface GroupService {
      * @return
      */
     Dto applyMsgList(ReceivedId receivedId,String token);
+
+    /**
+     * 查询团队详细信息
+     * @param receivedGroupId
+     * @param token
+     * @return
+     */
+    Dto getMyGroupInfo(ReceivedGroupId receivedGroupId, String token);
 }

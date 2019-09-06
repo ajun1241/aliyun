@@ -61,4 +61,12 @@ public interface GroupMapper {
      * @return
      */
     GroupInfo queryGroupInfo(String groupId);
+
+    /**
+     * 创建用户群组权限
+     * @param userId
+     * @param groupUpperLimit
+     * @return
+     */
+    int addGroupPermission(@Param("userId") String userId, @Param("groupUpperLimit") Long groupUpperLimit);
 }

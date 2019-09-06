@@ -8,6 +8,9 @@
     <insert id="addCreator">
         insert into grouprelation (groupId, memberId, memberLevel) values (#{groupId},#{userId},2)
     </insert>
+    <insert id="addGroupPermission">
+        insert into grouppermission (userid, groupupperlimit) VALUES (#{userId},#{groupUpperLimit})
+    </insert>
 
     <select id="getMyGroup" resultType="com.modcreater.tmbeans.show.group.ShowMyGroup">
         select gi.id groupId,gi.groupName groupName,gi.groupPicture groupPicture from grouprelation gl,groupinfo gi
