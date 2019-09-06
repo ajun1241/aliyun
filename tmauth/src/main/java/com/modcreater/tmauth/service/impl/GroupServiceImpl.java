@@ -111,12 +111,13 @@ public class GroupServiceImpl implements GroupService {
         GroupInfo groupInfo = groupMapper.queryGroupInfo(updateGroupInfo.getGroupId());
         if ("groupScale".equals(updateGroupInfo.getUpdateType()) && groupInfo.getGroupScale() > Long.valueOf(updateGroupInfo.getValue())) {
             return DtoUtil.getSuccessDto("团队规模不能小于团队现有人数", 80002);
-        } else if ("groupNature".equals(updateGroupInfo.getUpdateType()) && groupInfo.getGroupNature().toString().equals(updateGroupInfo.getValue())) {
+        } else if ("groupNature".equals(updateGroupInfo.getUpdateType()) && !groupInfo.getGroupNature().toString().equals(updateGroupInfo.getValue())) {
+            System.out.println("进入groupNature");
             List<String> urls = groupMapper.getAllGroupDefultHeadImgUrls();
             for (String url : urls){
                 if (url.equals(groupInfo.getGroupPicture())){
                     String urlValue = groupMapper.getGroupDefultHeadImgUrl(updateGroupInfo.getValue());
-                    groupMapper.updateGroupInfo(updateGroupInfo.getGroupId(),"groupNature",urlValue);
+                    groupMapper.updateGroupInfo(updateGroupInfo.getGroupId(),"groupPicture",urlValue);
                 }
             }
         }
