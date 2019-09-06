@@ -14,6 +14,9 @@
     <insert id="createMember">
         insert into grouprelation (groupId, memberId, memberLevel) values (#{groupId},#{memberId},0)
     </insert>
+    <update id="updateGroupInfo" statementType="STATEMENT">
+        update groupinfo set ${updateType} = '${value}' where id = ${groupId}
+    </update>
 
     <select id="getMyGroup" resultType="com.modcreater.tmbeans.show.group.ShowMyGroup">
         select gi.id groupId,gi.groupName groupName,gi.groupPicture groupPicture from grouprelation gl,groupinfo gi
@@ -27,5 +30,24 @@
     </select>
     <select id="queryGroupInfo" resultType="com.modcreater.tmbeans.pojo.GroupInfo">
         select * from groupinfo where id=#{groupId}
+    </select>
+    <select id="getMyGroupInfo" resultType="com.modcreater.tmbeans.show.group.ShowGroupInfo">
+        select id groupId,
+        groupPicture,
+        groupName,
+        groupUnit,
+        groupScale,
+        groupNature,
+        groupPresentation,
+        crateDate from groupinfo where id=#{groupId}
+    </select>
+    <select id="getMembersInfo" resultType="java.lang.Long">
+        select memberId from grouprelation where groupId = #{groupId} and memberLevel in (0,1)
+    </select>
+    <select id="getGroupDefultHeadImgUrl" resultType="java.lang.String">
+        select defaultHeadImgUrl from groupheadimgurl where groupNature = #{groupNature}
+    </select>
+    <select id="getAllGroupDefultHeadImgUrls" resultType="java.lang.String">
+        select defaultHeadImgUrl from groupheadimgurl
     </select>
 </mapper>

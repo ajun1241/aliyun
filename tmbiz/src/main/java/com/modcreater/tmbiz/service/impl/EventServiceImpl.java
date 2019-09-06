@@ -2493,7 +2493,11 @@ public class EventServiceImpl implements EventService {
                 logger.info(singleEvent1.toString());
                 if (singleEvent1.getFlag() == 5) {
                     if (SingleEventUtil.getClashTime(singleEvent1.getStarttime(), singleEvent1.getEndtime(), showSingleEvent.getStarttime(), showSingleEvent.getEndtime())) {
-                        iterator.remove();
+                        try {
+                            iterator.remove();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }

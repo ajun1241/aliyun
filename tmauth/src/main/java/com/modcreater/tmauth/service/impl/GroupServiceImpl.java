@@ -2,16 +2,20 @@ package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.GroupInfo;
 import com.modcreater.tmbeans.pojo.GroupPermission;
 import com.modcreater.tmbeans.pojo.GroupRelation;
+import com.modcreater.tmbeans.show.group.ShowGroupInfo;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
 import com.modcreater.tmbeans.vo.GroupMsgVo;
 import com.modcreater.tmbeans.vo.GroupRelationVo;
 import com.modcreater.tmbeans.vo.group.ReceivedGroupId;
+import com.modcreater.tmbeans.vo.group.UpdateGroupInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.GroupMapper;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -42,6 +47,9 @@ public class GroupServiceImpl implements GroupService {
     @Resource
     private GroupMapper groupMapper;
 
+    @Resource
+    private AccountMapper accountMapper;
+
 
     @Override
     public Dto createGroup(GroupInfoVo groupInfoVo, String token) {
@@ -49,6 +57,9 @@ public class GroupServiceImpl implements GroupService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         try {
+            if (!StringUtils.hasText(groupInfoVo.getGroupPicture())){
+                groupInfoVo.setGroupPicture(groupMapper.getGroupDefultHeadImgUrl(groupInfoVo.getGroupNature()));
+            }
             groupMapper.createGroup(groupInfoVo);
             int i = groupMapper.addCreator(groupInfoVo.getUserId(),groupInfoVo.getId());
             if (i == 1){
@@ -93,11 +104,29 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto updateGroup(GroupInfoVo groupInfoVo, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(groupInfoVo.getUserId()))) {
+    public Dto updateGroup(UpdateGroupInfo updateGroupInfo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(updateGroupInfo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        return null;
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(updateGroupInfo.getGroupId());
+        if ("groupScale".equals(updateGroupInfo.getUpdateType()) && groupInfo.getGroupScale() > Long.valueOf(updateGroupInfo.getValue())) {
+            return DtoUtil.getSuccessDto("团队规模不能小于团队现有人数", 80002);
+        } else if ("groupNature".equals(updateGroupInfo.getUpdateType()) && groupInfo.getGroupNature().toString().equals(updateGroupInfo.getValue())) {
+            List<String> urls = groupMapper.getAllGroupDefultHeadImgUrls();
+            for (String url : urls){
+                if (url.equals(groupInfo.getGroupPicture())){
+                    String urlValue = groupMapper.getGroupDefultHeadImgUrl(updateGroupInfo.getValue());
+                    groupMapper.updateGroupInfo(updateGroupInfo.getGroupId(),"groupNature",urlValue);
+                }
+            }
+        }
+
+        int i = groupMapper.updateGroupInfo(updateGroupInfo.getGroupId(),updateGroupInfo.getUpdateType(),updateGroupInfo.getValue());
+        if (i == 1){
+            return DtoUtil.getSuccessDto("修改成功",100000);
+        }
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        return DtoUtil.getSuccessDto("修改失败",80002);
     }
 
     @Override
@@ -185,9 +214,21 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        GroupInfo groupInfo = groupMapper.queryGroupInfo(receivedGroupId.getGroupId());
-        if (!ObjectUtils.isEmpty(groupInfo)){
-            return DtoUtil.getSuccesWithDataDto("查询成功",groupInfo,100000);
+        ShowGroupInfo showGroupInfo = groupMapper.getMyGroupInfo(receivedGroupId.getGroupId());
+        List<Map<String,Object>> membersInfo = new ArrayList<>();
+        if (!ObjectUtils.isEmpty(showGroupInfo)){
+            List<Long> memberIds = groupMapper.getMembersInfo(receivedGroupId.getGroupId());
+            for (Long memberId : memberIds){
+                Map<String,Object> map = new HashMap<>();
+                Account account = accountMapper.queryAccount(memberId.toString());
+                map.put("memberId",account.getId());
+                map.put("memberName",account.getUserName());
+                map.put("memberHeadImgUrl",account.getHeadImgUrl());
+                membersInfo.add(map);
+            }
+            showGroupInfo.setMembersInfo(membersInfo);
+            showGroupInfo.setMembersNum((long) memberIds.size());
+            return DtoUtil.getSuccesWithDataDto("查询成功",showGroupInfo,100000);
         }
         return DtoUtil.getSuccessDto("查询失败",200000);
     }

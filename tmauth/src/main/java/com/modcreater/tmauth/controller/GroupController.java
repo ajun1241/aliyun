@@ -4,6 +4,7 @@ import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
 import com.modcreater.tmbeans.vo.group.ReceivedGroupId;
+import com.modcreater.tmbeans.vo.group.UpdateGroupInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,12 @@ public class GroupController {
     @ApiOperation("获取团队详细信息")
     public Dto getMyGroupInfo(@RequestBody ReceivedGroupId receivedGroupId, HttpServletRequest request){
         return groupService.getMyGroupInfo(receivedGroupId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "updategroupinfo")
+    @ApiOperation("修改团队信息")
+    public Dto updateGroupInfo(@RequestBody UpdateGroupInfo updateGroupInfo, HttpServletRequest request){
+        return groupService.updateGroup(updateGroupInfo,request.getHeader("token"));
     }
 
 }

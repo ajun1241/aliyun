@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.vo.GroupInfoVo;
 import com.modcreater.tmbeans.vo.GroupMsgVo;
 import com.modcreater.tmbeans.vo.GroupRelationVo;
 import com.modcreater.tmbeans.vo.group.ReceivedGroupId;
+import com.modcreater.tmbeans.vo.group.UpdateGroupInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
 /**
@@ -33,11 +34,11 @@ public interface GroupService {
 
     /**
      * 团队设置
-     * @param groupInfoVo
+     * @param updateGroupInfo
      * @param token
      * @return
      */
-    Dto updateGroup(GroupInfoVo groupInfoVo,String token);
+    Dto updateGroup(UpdateGroupInfo updateGroupInfo, String token);
 
     /**
      * 解散团队
