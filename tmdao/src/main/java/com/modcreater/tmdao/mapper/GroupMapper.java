@@ -69,4 +69,12 @@ public interface GroupMapper {
      * @return
      */
     int addGroupPermission(@Param("userId") String userId, @Param("groupUpperLimit") Long groupUpperLimit);
+
+    /**
+     * 创建成员
+     * @param memberId
+     * @param groupId
+     * @return
+     */
+    int createMember(@Param("memberId") String memberId,@Param("groupId") Long groupId);
 }

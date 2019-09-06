@@ -46,7 +46,7 @@ public class FinalValues {
     /**
      * 团队角色
      */
-    public static final String[] GROUPROLES = {"creator","manager","member"};
+    public static final String[] GROUPROLES = {"member","manager","creator"};
     /**
      * 一个月(单位:秒,计算用户支付用)
      */

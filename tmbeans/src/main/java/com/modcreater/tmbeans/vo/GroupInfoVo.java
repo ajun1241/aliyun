@@ -42,6 +42,10 @@ public class GroupInfoVo implements Serializable {
      * 创建人Id
      */
     private String userId;
+    /**
+     * 成员
+     */
+    private String[] members;
     private String appType;
 
 }

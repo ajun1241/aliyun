@@ -52,6 +52,9 @@ public class GroupServiceImpl implements GroupService {
             groupMapper.createGroup(groupInfoVo);
             int i = groupMapper.addCreator(groupInfoVo.getUserId(),groupInfoVo.getId());
             if (i == 1){
+                for (String memberId : groupInfoVo.getMembers()){
+                    groupMapper.createMember(memberId,groupInfoVo.getId());
+                }
                 return DtoUtil.getSuccessDto("创建成功",100000);
             }
         } catch (Exception e) {
@@ -68,9 +71,23 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        Map<String, List<ShowMyGroup>> result = new HashMap<>(3);
-        for (int i = 0; i <= 2; i++){
-            result.put(FinalValues.GROUPROLES[i],groupMapper.getMyGroup(receivedId.getUserId(),i));
+        Map<String, Map<String, Object>> result = new HashMap<>(3);
+        for (int i = 0; i <= 2; i++) {
+            Map<String, Object> map = new HashMap<>();
+            List<ShowMyGroup> showMyGroups = groupMapper.getMyGroup(receivedId.getUserId(), i);
+            if (i == 2) {
+                GroupPermission groupPermission = groupMapper.getGroupUpperLimit(receivedId.getUserId());
+                if (ObjectUtils.isEmpty(groupPermission)) {
+                    long groupUpperLimit = 5;
+                    groupMapper.addGroupPermission(receivedId.getUserId(), groupUpperLimit);
+                    map.put("totalNum", groupUpperLimit);
+                } else {
+                    map.put("totalNum", groupPermission.getGroupUpperLimit());
+                }
+            }
+            map.put("num", showMyGroups.size());
+            map.put("list", showMyGroups);
+            result.put(FinalValues.GROUPROLES[i], map);
         }
         return DtoUtil.getSuccesWithDataDto("操作成功",result,100000);
     }
@@ -107,11 +124,6 @@ public class GroupServiceImpl implements GroupService {
         //0 : 不需要; 1 : 需要
         int status = 1;
         GroupPermission groupPermission = groupMapper.getGroupUpperLimit(receivedId.getUserId());
-        if (ObjectUtils.isEmpty(groupPermission)){
-            long groupUpperLimit = 5;
-            groupMapper.addGroupPermission(receivedId.getUserId(),groupUpperLimit);
-            groupPermission.setGroupUpperLimit(groupUpperLimit);
-        }
         if (groupMapper.getMyCreatedGroupNum(receivedId.getUserId()) < groupPermission.getGroupUpperLimit()){
             status = 0;
         }
