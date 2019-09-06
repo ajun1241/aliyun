@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Data
 public class GroupInfoVo implements Serializable {
 
+    private Long id;
     /**
      * 团队名称
      */

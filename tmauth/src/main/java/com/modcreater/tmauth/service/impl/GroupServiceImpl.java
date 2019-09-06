@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.GroupInfo;
 import com.modcreater.tmbeans.pojo.GroupPermission;
 import com.modcreater.tmbeans.pojo.GroupRelation;
+import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
 import com.modcreater.tmbeans.vo.GroupRelationVo;
@@ -44,10 +45,16 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(groupInfoVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        int i1 = groupMapper.createGroup(groupInfoVo);
-        int i2 = groupMapper.addCreator(groupInfoVo.getUserId());
-        if (i1 == 1){
-            return DtoUtil.getSuccessDto("创建成功",100000);
+        try {
+            groupMapper.createGroup(groupInfoVo);
+            int i = groupMapper.addCreator(groupInfoVo.getUserId(),groupInfoVo.getId());
+            if (i == 1){
+                return DtoUtil.getSuccessDto("创建成功",100000);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getSuccessDto("创建失败",80001);
         }
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         return DtoUtil.getSuccessDto("创建失败",80001);
@@ -58,20 +65,10 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        Map<String, List<GroupInfo>> result = new HashMap<>(3);
+        Map<String, List<ShowMyGroup>> result = new HashMap<>(3);
         for (int i = 0; i <= 2; i++){
-            result.put(FinalValues.GROUPROLES[i],null);
-            result.put(FinalValues.GROUPROLES[i],null);
-            result.put(FinalValues.GROUPROLES[i],null);
+            result.put(FinalValues.GROUPROLES[i],groupMapper.getMyGroup(receivedId.getUserId(),i));
         }
-        for (int i = 0; i <= 2; i++){
-//            List<GroupInfo> myGroupInfo = groupMapper.getMyGroup(receivedId.getUserId(),i);
-        }
-
-        List<GroupInfo> creator = new ArrayList<>();
-        List<GroupInfo> manager = new ArrayList<>();
-        List<GroupInfo> member = new ArrayList<>();
-
         return DtoUtil.getSuccesWithDataDto("操作成功",result,100000);
     }
 

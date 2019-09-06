@@ -6,11 +6,12 @@
         (#{groupName},#{groupPicture},#{groupUnit},#{groupScale},#{groupNature},#{groupPresentation},#{userId})
     </insert>
     <insert id="addCreator">
-        insert into grouprelation
+        insert into grouprelation (groupId, memberId, memberLevel) values (#{groupId},#{userId},2)
     </insert>
 
-    <select id="getMyGroup" resultType="com.modcreater.tmbeans.pojo.GroupRelation">
-        select * from grouprelation where memberId = #{userId}
+    <select id="getMyGroup" resultType="com.modcreater.tmbeans.show.group.ShowMyGroup">
+        select gi.id groupId,gi.groupName groupName,gi.groupPicture groupPicture from grouprelation gl,groupinfo gi
+        where gi.id = gl.groupId and gl.memberId = #{userId} and gl.memberLevel = #{role}
     </select>
     <select id="getMyCreatedGroupNum" resultType="java.lang.Integer">
         select count(id) from grouprelation where memberId = #{userId} and memberLevel = 2

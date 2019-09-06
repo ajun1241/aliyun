@@ -2,6 +2,7 @@ package com.modcreater.tmauth.controller;
 
 import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.GroupInfoVo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,12 @@ public class GroupController {
 
     @Resource
     private GroupService groupService;
+
+    @PostMapping(value = "createGroup")
+    @ApiOperation("创建团队")
+    public Dto createGroup(@RequestBody GroupInfoVo groupInfoVo,HttpServletRequest request){
+        return groupService.createGroup(groupInfoVo,request.getHeader("token"));
+    }
 
     @PostMapping(value = "getmygroup")
     @ApiOperation("获取我的团队")

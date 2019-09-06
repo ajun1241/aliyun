@@ -3,6 +3,7 @@ package com.modcreater.tmdao.mapper;
 import com.modcreater.tmbeans.pojo.GroupInfo;
 import com.modcreater.tmbeans.pojo.GroupPermission;
 import com.modcreater.tmbeans.pojo.GroupRelation;
+import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -23,7 +24,7 @@ public interface GroupMapper {
      * @param role
      * @return
      */
-    List<GroupRelation> getMyGroup(@Param("userId") String userId, @Param("role") int role);
+    List<ShowMyGroup> getMyGroup(@Param("userId") String userId, @Param("role") int role);
 
     /**
      * 查询我创建的团队数量
@@ -37,14 +38,15 @@ public interface GroupMapper {
      * @param groupInfoVo
      * @return
      */
-    int createGroup(GroupInfoVo groupInfoVo);
+    Long createGroup(GroupInfoVo groupInfoVo);
 
     /**
      * 关系表添加创建者
      * @param userId
+     * @param groupId
      * @return
      */
-    int addCreator(String userId);
+    int addCreator(@Param("userId") String userId,@Param("groupId") Long groupId);
 
     /**
      * 查询团队权限表
