@@ -20,6 +20,9 @@
     <update id="updateManger">
         update grouprelation set memberLevel = #{memberLevel} where groupId = #{groupId} and memberId = #{memberId}
     </update>
+    <delete id="removeMember">
+        delete from grouprelation where groupId = #{groupId} and memberId = #{memberId} and memberLevel != 2
+    </delete>
 
     <select id="getMyGroup" resultType="com.modcreater.tmbeans.show.group.ShowMyGroup">
         select gi.id groupId,gi.groupName groupName,gi.groupPicture groupPicture from grouprelation gl,groupinfo gi

@@ -4,10 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
 import com.modcreater.tmbeans.vo.GroupMsgVo;
 import com.modcreater.tmbeans.vo.GroupRelationVo;
-import com.modcreater.tmbeans.vo.group.AddManager;
-import com.modcreater.tmbeans.vo.group.ReceivedGroupId;
-import com.modcreater.tmbeans.vo.group.RemoveManager;
-import com.modcreater.tmbeans.vo.group.UpdateGroupInfo;
+import com.modcreater.tmbeans.vo.group.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
 /**
@@ -137,4 +134,12 @@ public interface GroupService {
      * @return
      */
     Dto addManager(AddManager addManager, String token);
+
+    /**
+     * 移除成员
+     * @param removeMember
+     * @param token
+     * @return
+     */
+    Dto removeMember(RemoveMember removeMember, String token);
 }

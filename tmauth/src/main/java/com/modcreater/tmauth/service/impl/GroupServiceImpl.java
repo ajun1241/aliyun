@@ -12,10 +12,7 @@ import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
 import com.modcreater.tmbeans.vo.GroupMsgVo;
 import com.modcreater.tmbeans.vo.GroupRelationVo;
-import com.modcreater.tmbeans.vo.group.AddManager;
-import com.modcreater.tmbeans.vo.group.ReceivedGroupId;
-import com.modcreater.tmbeans.vo.group.RemoveManager;
-import com.modcreater.tmbeans.vo.group.UpdateGroupInfo;
+import com.modcreater.tmbeans.vo.group.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.GroupMapper;
@@ -79,7 +76,7 @@ public class GroupServiceImpl implements GroupService {
                     RongCloudMethodUtil rong = new RongCloudMethodUtil();
                     ResponseResult responseResult = rong.sendPrivateMsg("100000",new String[]{memberId},0,new TxtMessage(msgInfo,null));
                     if (responseResult.getCode() != 200){
-                        logger.warn("添加支持者时融云消息异常" + responseResult.toString());
+                        logger.warn("添加团队成员时融云消息异常" + responseResult.toString());
                     }
                 }
                 return DtoUtil.getSuccessDto("创建成功",100000);
@@ -125,8 +122,7 @@ public class GroupServiceImpl implements GroupService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(updateGroupInfo.getGroupId());
-        int level = groupMapper.getMemberLevel(updateGroupInfo.getGroupId(),updateGroupInfo.getUserId());
-        if (level != 2 && level != 1){
+        if (!isHavePermission(updateGroupInfo.getGroupId(),updateGroupInfo.getUserId())){
             return DtoUtil.getFalseDto("您没有操作权限",80004);
         }
         if ("groupScale".equals(updateGroupInfo.getUpdateType()) && groupInfo.getGroupScale() > Long.valueOf(updateGroupInfo.getValue())) {
@@ -328,7 +324,7 @@ public class GroupServiceImpl implements GroupService {
         try {
             ResponseResult result = rongCloudMethodUtil.sendPrivateMsg("100000",new String[]{removeManager.getManagerId()},0,new TxtMessage(msgInfo,null));
             if (result.getCode() != 200){
-                logger.warn("添加支持者时融云消息异常" + result.toString());
+                logger.warn("取消团队管理员时融云消息异常" + result.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -353,7 +349,7 @@ public class GroupServiceImpl implements GroupService {
         try {
             ResponseResult result = rongCloudMethodUtil.sendPrivateMsg("100000",new String[]{addManager.getMemberId()},0,new TxtMessage(msgInfo,null));
             if (result.getCode() != 200){
-                logger.warn("添加支持者时融云消息异常" + result.toString());
+                logger.warn("添加团队管理员时融云消息异常" + result.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -361,4 +357,36 @@ public class GroupServiceImpl implements GroupService {
         return DtoUtil.getSuccessDto("添加管理员操作成功",100000);
     }
 
+    @Override
+    public Dto removeMember(RemoveMember removeMember, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(removeMember.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!isHavePermission(removeMember.getGroupId(),removeMember.getUserId())){
+            return DtoUtil.getFalseDto("您没有操作权限",80004);
+        }
+        int handlerLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),removeMember.getUserId());
+        int memberLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),removeMember.getMemberId());
+        boolean b1 = handlerLevel == 2 && (memberLevel == 1 || memberLevel == 0);
+        boolean b2 = handlerLevel == 1 && memberLevel == 0;
+        if (b1 || b2){
+            if (groupMapper.removeMember(removeMember.getGroupId(),removeMember.getMemberId()) != 1){
+                return DtoUtil.getFalseDto("移除成员失败",80005);
+            }
+            return DtoUtil.getSuccessDto("操作成功",100000);
+        }else {
+            return DtoUtil.getFalseDto("违规操作!",80004);
+        }
+    }
+
+    /**
+     * 判断用户是否有操作团队信息的权限
+     * @param groupId
+     * @param userId
+     * @return
+     */
+    private boolean isHavePermission(String groupId, String userId){
+        int level = groupMapper.getMemberLevel(groupId,userId);
+        return level == 2 || level == 1;
+    }
 }

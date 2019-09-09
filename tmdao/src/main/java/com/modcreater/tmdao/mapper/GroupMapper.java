@@ -161,4 +161,12 @@ public interface GroupMapper {
      * @return
      */
     int getMemberLevel(@Param("groupId")String groupId,@Param("memberId") String userId);
+
+    /**
+     * 移除团队成员
+     * @param groupId
+     * @param memberId
+     * @return
+     */
+    int removeMember(@Param("groupId")String groupId, @Param("memberId")String memberId);
 }

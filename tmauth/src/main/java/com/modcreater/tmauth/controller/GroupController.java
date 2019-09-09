@@ -3,10 +3,7 @@ package com.modcreater.tmauth.controller;
 import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
-import com.modcreater.tmbeans.vo.group.AddManager;
-import com.modcreater.tmbeans.vo.group.ReceivedGroupId;
-import com.modcreater.tmbeans.vo.group.RemoveManager;
-import com.modcreater.tmbeans.vo.group.UpdateGroupInfo;
+import com.modcreater.tmbeans.vo.group.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +75,12 @@ public class GroupController {
     @ApiOperation("移除管理员")
     public Dto removeManager(@RequestBody RemoveManager removeManager, HttpServletRequest request){
         return groupService.removeManager(removeManager,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "removemember")
+    @ApiOperation("移除成员")
+    public Dto removeMember(@RequestBody RemoveMember removeMember, HttpServletRequest request){
+        return groupService.removeMember(removeMember,request.getHeader("token"));
     }
 
     @PostMapping(value = "addmanager")
