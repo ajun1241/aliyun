@@ -72,9 +72,15 @@ public class GroupServiceImpl implements GroupService {
             }
             groupMapper.createGroup(groupInfoVo);
             int i = groupMapper.addCreator(groupInfoVo.getUserId(),groupInfoVo.getId());
+            String msgInfo = "您已成为团队\"" + groupInfoVo.getGroupName() + "\"的成员";
             if (i == 1){
                 for (String memberId : groupInfoVo.getMembers()){
                     groupMapper.createMember(memberId,groupInfoVo.getId());
+                    RongCloudMethodUtil rong = new RongCloudMethodUtil();
+                    ResponseResult responseResult = rong.sendPrivateMsg("100000",new String[]{memberId},0,new TxtMessage(msgInfo,null));
+                    if (responseResult.getCode() != 200){
+                        logger.warn("添加支持者时融云消息异常" + responseResult.toString());
+                    }
                 }
                 return DtoUtil.getSuccessDto("创建成功",100000);
             }
@@ -317,7 +323,7 @@ public class GroupServiceImpl implements GroupService {
             return DtoUtil.getFalseDto("添加管理员操作失败",80003);
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(removeManager.getGroupId());
-        String msgInfo = "您已被取消群\""+groupInfo.getGroupName()+"\"的管理员";
+        String msgInfo = "您已被取消团队\""+groupInfo.getGroupName()+"\"的管理员";
         RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
         try {
             ResponseResult result = rongCloudMethodUtil.sendPrivateMsg("100000",new String[]{removeManager.getManagerId()},0,new TxtMessage(msgInfo,null));
@@ -342,7 +348,7 @@ public class GroupServiceImpl implements GroupService {
             return DtoUtil.getFalseDto("添加管理员操作失败",80003);
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(addManager.getGroupId());
-        String msgInfo = "您已成为群\""+groupInfo.getGroupName()+"\"的管理员";
+        String msgInfo = "您已成为团队\""+groupInfo.getGroupName()+"\"的管理员";
         RongCloudMethodUtil rongCloudMethodUtil = new RongCloudMethodUtil();
         try {
             ResponseResult result = rongCloudMethodUtil.sendPrivateMsg("100000",new String[]{addManager.getMemberId()},0,new TxtMessage(msgInfo,null));
