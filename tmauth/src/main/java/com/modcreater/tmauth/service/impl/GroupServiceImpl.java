@@ -60,34 +60,43 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(groupInfoVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
+        //0 : 不需要; 1 : 需要
+        int status = 1;
+        GroupPermission groupPermission = groupMapper.getGroupUpperLimit(groupInfoVo.getUserId());
+        if (groupMapper.getMyCreatedGroupNum(groupInfoVo.getUserId()) < groupPermission.getGroupUpperLimit()) {
+            status = 0;
+        }
+        if (status == 1){
+            return DtoUtil.getSuccesWithDataDto("创建团队数量已达到上限",status,100000);
+        }
         try {
-            if (!StringUtils.hasText(groupInfoVo.getGroupNature())){
+            if (!StringUtils.hasText(groupInfoVo.getGroupNature())) {
                 groupInfoVo.setGroupNature("7");
             }
-            if (!StringUtils.hasText(groupInfoVo.getGroupPicture())){
+            if (!StringUtils.hasText(groupInfoVo.getGroupPicture())) {
                 groupInfoVo.setGroupPicture(groupMapper.getGroupDefultHeadImgUrl(groupInfoVo.getGroupNature()));
             }
             groupMapper.createGroup(groupInfoVo);
-            int i = groupMapper.addCreator(groupInfoVo.getUserId(),groupInfoVo.getId());
+            int i = groupMapper.addCreator(groupInfoVo.getUserId(), groupInfoVo.getId());
             String msgInfo = "您已成为团队\"" + groupInfoVo.getGroupName() + "\"的成员";
-            if (i == 1){
-                for (String memberId : groupInfoVo.getMembers()){
-                    groupMapper.createMember(memberId,groupInfoVo.getId());
+            if (i == 1) {
+                for (String memberId : groupInfoVo.getMembers()) {
+                    groupMapper.createMember(memberId, groupInfoVo.getId());
                     RongCloudMethodUtil rong = new RongCloudMethodUtil();
-                    ResponseResult responseResult = rong.sendPrivateMsg("100000",new String[]{memberId},0,new TxtMessage(msgInfo,null));
-                    if (responseResult.getCode() != 200){
+                    ResponseResult responseResult = rong.sendPrivateMsg("100000", new String[]{memberId}, 0, new TxtMessage(msgInfo, null));
+                    if (responseResult.getCode() != 200) {
                         logger.warn("添加团队成员时融云消息异常" + responseResult.toString());
                     }
                 }
-                return DtoUtil.getSuccessDto("创建成功",100000);
+                return DtoUtil.getSuccesWithDataDto("创建成功", status, 100000);
             }
         } catch (Exception e) {
             e.printStackTrace();
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return DtoUtil.getSuccessDto("创建失败",80001);
+            return DtoUtil.getSuccessDto("创建失败", 80001);
         }
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        return DtoUtil.getSuccessDto("创建失败",80001);
+        return DtoUtil.getSuccessDto("创建失败", 80001);
     }
 
     @Override
@@ -167,13 +176,7 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        //0 : 不需要; 1 : 需要
-        int status = 1;
-        GroupPermission groupPermission = groupMapper.getGroupUpperLimit(receivedId.getUserId());
-        if (groupMapper.getMyCreatedGroupNum(receivedId.getUserId()) < groupPermission.getGroupUpperLimit()){
-            status = 0;
-        }
-        return DtoUtil.getSuccesWithDataDto("操作成功",status,100000);
+        return null;
     }
 
     /**
@@ -315,7 +318,7 @@ public class GroupServiceImpl implements GroupService {
         if (groupMapper.getMemberLevel(removeManager.getGroupId(),removeManager.getUserId()) != 2){
             return DtoUtil.getFalseDto("您没有操作权限",80004);
         }
-        if (groupMapper.updateManger(removeManager.getGroupId(),removeManager.getManagerId(),0) != 1){
+        if (groupMapper.updateMemberLevel(removeManager.getGroupId(),removeManager.getManagerId(),0) != 1){
             return DtoUtil.getFalseDto("添加管理员操作失败",80003);
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(removeManager.getGroupId());
@@ -340,7 +343,7 @@ public class GroupServiceImpl implements GroupService {
         if (groupMapper.getMemberLevel(addManager.getGroupId(),addManager.getUserId()) != 2){
             return DtoUtil.getFalseDto("您没有操作权限",80004);
         }
-        if (groupMapper.updateManger(addManager.getGroupId(),addManager.getMemberId(),1) != 1){
+        if (groupMapper.updateMemberLevel(addManager.getGroupId(),addManager.getMemberId(),1) != 1){
             return DtoUtil.getFalseDto("添加管理员操作失败",80003);
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(addManager.getGroupId());
@@ -358,7 +361,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto removeMember(RemoveMember removeMember, String token) {
+    public synchronized Dto removeMember(RemoveMember removeMember, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(removeMember.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -366,27 +369,31 @@ public class GroupServiceImpl implements GroupService {
             return DtoUtil.getFalseDto("您没有操作权限",80004);
         }
         int handlerLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),removeMember.getUserId());
-        int memberLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),removeMember.getMemberId());
-        boolean b1 = handlerLevel == 2 && (memberLevel == 1 || memberLevel == 0);
-        boolean b2 = handlerLevel == 1 && memberLevel == 0;
-        if (b1 || b2){
-            if (groupMapper.removeMember(removeMember.getGroupId(),removeMember.getMemberId()) != 1){
-                return DtoUtil.getFalseDto("移除成员失败",80005);
-            }
-            String msgInfo = "您已被团队" + (handlerLevel == 2 ? "创建者" : "管理员") + "移出团队";
-            RongCloudMethodUtil rong = new RongCloudMethodUtil();
-            try {
-                ResponseResult result = rong.sendPrivateMsg("100000",new String[]{removeMember.getMemberId()},0,new TxtMessage(msgInfo,null));
-                if (result.getCode() != 200){
-                    logger.warn("移除团队成员时融云消息异常" + result.toString());
+        for (String memberId : removeMember.getMemberId()){
+            int memberLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),memberId);
+            boolean b1 = handlerLevel == 2 && (memberLevel == 1 || memberLevel == 0);
+            boolean b2 = handlerLevel == 1 && memberLevel == 0;
+            if (b1 || b2){
+                if (groupMapper.removeMember(removeMember.getGroupId(),memberId) != 1){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return DtoUtil.getFalseDto("移除成员失败",80005);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                String msgInfo = "您已被团队" + (handlerLevel == 2 ? "创建者" : "管理员") + "移出团队";
+                RongCloudMethodUtil rong = new RongCloudMethodUtil();
+                try {
+                    ResponseResult result = rong.sendPrivateMsg("100000",new String[]{memberId},0,new TxtMessage(msgInfo,null));
+                    if (result.getCode() != 200){
+                        logger.warn("移除团队成员时融云消息异常" + result.toString());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("违规操作!",80004);
             }
-            return DtoUtil.getSuccessDto("操作成功",100000);
-        }else {
-            return DtoUtil.getFalseDto("违规操作!",80004);
         }
+        return DtoUtil.getSuccessDto("操作成功",100000);
     }
 
     @Override
@@ -409,6 +416,61 @@ public class GroupServiceImpl implements GroupService {
             e.printStackTrace();
         }
         return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
+    @Override
+    public Dto groupMakeOver(GroupMakeOver groupMakeOver, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(groupMakeOver.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (groupMapper.getMemberLevel(groupMakeOver.getGroupId(),groupMakeOver.getUserId()) != 2){
+            return DtoUtil.getFalseDto("违规操作!",80004);
+        }
+        int beCreator = groupMapper.updateMemberLevel(groupMakeOver.getGroupId(),groupMakeOver.getMemberId(),2);
+        int beManager = groupMapper.updateMemberLevel(groupMakeOver.getGroupId(),groupMakeOver.getUserId(),0);
+        if (beCreator + beManager != 2){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("操作失败",80005);
+        }
+        RongCloudMethodUtil rong = new RongCloudMethodUtil();
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(groupMakeOver.getGroupId());
+        Account account = accountMapper.queryAccount(groupMakeOver.getMemberId());
+        try {
+            String msgInfo1 = "\"" + groupInfo.getGroupName() + "\"的创建者已将团队转让给你";
+            ResponseResult result1 = rong.sendPrivateMsg("100000", new String[]{groupMakeOver.getMemberId()}, 0, new TxtMessage(msgInfo1, null));
+            if (result1.getCode() != 200){
+                logger.warn("成为团队创建者时融云消息异常" + result1.toString());
+            }
+            String msgInfo2 = "您已成功将团队\"" + groupInfo.getGroupName() + "\"转让给" + account.getUserName();
+            ResponseResult result2 = rong.sendPrivateMsg("100000", new String[]{groupMakeOver.getUserId()}, 0, new TxtMessage(msgInfo2, null));
+            if (result1.getCode() != 200){
+                logger.warn("转让团队时融云消息异常" + result2.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
+    @Override
+    public Dto getGroupMembers(ReceivedGroupId receivedGroupId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        Map<String ,Object> result = new HashMap<>();
+        for (int i = 2; i >= 0; i--) {
+            if (i == 2){
+                List<Map<String ,Object>> account = groupMapper.queryGroupMemberInfoByLevel(receivedGroupId.getGroupId(),i);
+                if (account.size() > 0){
+                    result.put(FinalValues.GROUPROLES[i],account.get(0));
+                }else {
+                    result.put(FinalValues.GROUPROLES[i],null);
+                }
+            }else {
+                result.put(FinalValues.GROUPROLES[i],groupMapper.queryGroupMemberInfoByLevel(receivedGroupId.getGroupId(),i));
+            }
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
     /**

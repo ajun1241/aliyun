@@ -8,10 +8,10 @@ import lombok.Data;
  *
  * @Author: Goku_yi
  * @Date: 2019-09-09
- * Time: 11:25
+ * Time: 14:57
  */
 @Data
-public class RemoveMember {
+public class GroupMakeOver {
 
     private String userId;
 
@@ -19,6 +19,6 @@ public class RemoveMember {
 
     private String groupId;
 
-    private String[] memberId;
+    private String memberId;
 
 }

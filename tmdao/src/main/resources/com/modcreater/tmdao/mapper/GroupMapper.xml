@@ -17,7 +17,7 @@
     <update id="updateGroupInfo" statementType="STATEMENT">
         update groupinfo set ${updateType} = '${value}' where id = ${groupId}
     </update>
-    <update id="updateManger">
+    <update id="updateMemberLevel">
         update grouprelation set memberLevel = #{memberLevel} where groupId = #{groupId} and memberId = #{memberId}
     </update>
     <delete id="removeMember">
@@ -48,7 +48,7 @@
         crateDate from groupinfo where id=#{groupId}
     </select>
     <select id="getMembersInfo" resultType="java.lang.Long">
-        select memberId from grouprelation where groupId = #{groupId} and memberLevel in (0,1)
+        select memberId from grouprelation where groupId = #{groupId} and memberLevel in (0,1) order by memberLevel desc
     </select>
     <select id="getGroupDefultHeadImgUrl" resultType="java.lang.String">
         select defaultHeadImgUrl from groupheadimgurl where groupNature = #{groupNature}
@@ -74,5 +74,10 @@
     </select>
     <select id="getMemberLevel" resultType="java.lang.Integer">
         select memberLevel from grouprelation where groupId = #{groupId} and memberId = #{memberId}
+    </select>
+    <select id="queryGroupMemberInfoByLevel" resultType="java.util.Map">
+        select a.id userId,a.userName,a.headImgUrl
+        from account a,grouprelation g
+        where a.id = g.memberId and g.memberLevel = #{memberLevel} and g.groupId = #{groupId}
     </select>
 </mapper>

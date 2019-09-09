@@ -146,13 +146,13 @@ public interface GroupMapper {
     Map<String, Object> getCreatorInfo(String groupId);
 
     /**
-     * 移除管理员
+     * 修改成员身份
      * @param groupId
      * @param memberId
      * @param memberLevel
      * @return
      */
-    int updateManger(@Param("groupId") String groupId,@Param("memberId") String memberId,@Param("memberLevel") int memberLevel);
+    int updateMemberLevel(@Param("groupId") String groupId,@Param("memberId") String memberId,@Param("memberLevel") int memberLevel);
 
     /**
      * 获取成员身份
@@ -169,4 +169,12 @@ public interface GroupMapper {
      * @return
      */
     int removeMember(@Param("groupId")String groupId, @Param("memberId")String memberId);
+
+    /**
+     * 根据成员身份查询成员信息
+     * @param groupId
+     * @param i
+     * @return
+     */
+    List<Map<String ,Object>> queryGroupMemberInfoByLevel(@Param("groupId") String groupId,@Param("memberLevel") int memberLevel);
 }

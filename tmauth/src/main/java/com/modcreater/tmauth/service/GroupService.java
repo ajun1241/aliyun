@@ -150,4 +150,20 @@ public interface GroupService {
      * @return
      */
     Dto memberQuitGroup(MemberQuitGroup memberQuitGroup, String token);
+
+    /**
+     * 转让团队
+     * @param groupMakeOver
+     * @param token
+     * @return
+     */
+    Dto groupMakeOver(GroupMakeOver groupMakeOver, String token);
+
+    /**
+     * 获取群成员信息
+     * @param receivedGroupId
+     * @param token
+     * @return
+     */
+    Dto getGroupMembers(ReceivedGroupId receivedGroupId, String token);
 }

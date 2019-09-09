@@ -94,4 +94,16 @@ public class GroupController {
     public Dto memberQuitGroup(@RequestBody MemberQuitGroup memberQuitGroup,HttpServletRequest request){
         return groupService.memberQuitGroup(memberQuitGroup,request.getHeader("token"));
     }
+
+    @PostMapping(value = "groupmakeover")
+    @ApiOperation("转让团队")
+    public Dto groupMakeOver(@RequestBody GroupMakeOver groupMakeOver, HttpServletRequest request){
+        return groupService.groupMakeOver(groupMakeOver,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "getgroupmembers")
+    @ApiOperation("获取群成员信息")
+    public Dto getGroupMembers(@RequestBody ReceivedGroupId receivedGroupId ,HttpServletRequest request){
+        return groupService.getGroupMembers(receivedGroupId,request.getHeader("token"));
+    }
 }
