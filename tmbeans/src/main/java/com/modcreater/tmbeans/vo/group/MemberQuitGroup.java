@@ -19,6 +19,4 @@ public class MemberQuitGroup {
 
     private String groupId;
 
-    private String memberId;
-
 }

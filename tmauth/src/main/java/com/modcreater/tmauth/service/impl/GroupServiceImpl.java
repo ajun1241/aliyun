@@ -394,8 +394,21 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(memberQuitGroup.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-
-        return null;
+        if (groupMapper.removeMember(memberQuitGroup.getGroupId(),memberQuitGroup.getUserId()) != 1){
+            return DtoUtil.getFalseDto("操作失败",80005);
+        }
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(memberQuitGroup.getGroupId());
+        String msgInfo = "您已退出团队\"" + groupInfo.getGroupName() + "\"";
+        RongCloudMethodUtil rong = new RongCloudMethodUtil();
+        try {
+            ResponseResult result = rong.sendPrivateMsg("100000",new String[]{memberQuitGroup.getUserId()},0,new TxtMessage(msgInfo,null));
+            if (result.getCode() != 200){
+                logger.warn("移除团队成员时融云消息异常" + result.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DtoUtil.getSuccessDto("操作成功",100000);
     }
 
     /**
