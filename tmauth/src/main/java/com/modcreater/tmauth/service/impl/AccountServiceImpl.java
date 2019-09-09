@@ -819,35 +819,37 @@ public class AccountServiceImpl implements AccountService {
         }*/
         List list=new ArrayList();
         for (SystemMsgRecord systemMsgRecord:systemMsgRecordList) {
-            System.out.println("我要的数据"+systemMsgRecord.toString());
-            MsgVo msgVo=new MsgVo();
+            System.out.println("我要的数据" + systemMsgRecord.toString());
+            MsgVo msgVo = new MsgVo();
             //查询用户信息
-            Account account=accountMapper.queryAccount(systemMsgRecord.getFromId().toString());
-            //查询好友信息
-            Friendship friendship=accountMapper.queryFriendshipDetail(systemMsgRecord.getUserId().toString(),systemMsgRecord.getFromId().toString());
-            //日规划,月规划
-            MyDetail result=accountMapper.queryPlanByDayAndMonth(account.getId().toString(),myDate[2],myDate[0],myDate[1]);
-            //已完成
-            Long completed = eventMapper.countCompletedEvents(systemMsgRecord.getFromId());
-            if (ObjectUtils.isEmpty(result)){
-                return DtoUtil.getSuccesWithDataDto("好友其他信息失败",null,200000);
+            Account account = accountMapper.queryAccount(systemMsgRecord.getFromId().toString());
+            if (!ObjectUtils.isEmpty(account)) {
+                //查询好友信息
+                Friendship friendship = accountMapper.queryFriendshipDetail(systemMsgRecord.getUserId().toString(), systemMsgRecord.getFromId().toString());
+                //日规划,月规划
+                MyDetail result = accountMapper.queryPlanByDayAndMonth(account.getId().toString(), myDate[2], myDate[0], myDate[1]);
+                //已完成
+                Long completed = eventMapper.countCompletedEvents(systemMsgRecord.getFromId());
+                if (ObjectUtils.isEmpty(result)) {
+                    return DtoUtil.getSuccesWithDataDto("好友其他信息失败", null, 200000);
+                }
+                msgVo.setHeadImgUrl(account.getHeadImgUrl());
+                msgVo.setUserName(account.getUserName());
+                msgVo.setMsgContent(systemMsgRecord.getMsgContent());
+                msgVo.setGender(account.getGender().toString());
+                msgVo.setUserCode(account.getUserCode());
+                if (ObjectUtils.isEmpty(friendship)) {
+                    //如果一个好友都没有
+                    msgVo.setStatus("0");
+                } else {
+                    msgVo.setStatus(friendship.getStatus().toString());
+                }
+                msgVo.setFriendId(systemMsgRecord.getFromId().toString());
+                msgVo.setDayPlan(result.getDay());
+                msgVo.setMonthPlan(result.getMonth());
+                msgVo.setFinish(completed.toString());
+                list.add(msgVo);
             }
-            msgVo.setHeadImgUrl(account.getHeadImgUrl());
-            msgVo.setUserName(account.getUserName());
-            msgVo.setMsgContent(systemMsgRecord.getMsgContent());
-            msgVo.setGender(account.getGender().toString());
-            msgVo.setUserCode(account.getUserCode());
-            if (ObjectUtils.isEmpty(friendship)){
-                //如果一个好友都没有
-                msgVo.setStatus("0");
-            }else {
-                msgVo.setStatus(friendship.getStatus().toString());
-            }
-            msgVo.setFriendId(systemMsgRecord.getFromId().toString());
-            msgVo.setDayPlan(result.getDay());
-            msgVo.setMonthPlan(result.getMonth());
-            msgVo.setFinish(completed.toString());
-            list.add(msgVo);
         }
         map.put("msgList",list);
         //修改消息状态

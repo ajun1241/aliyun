@@ -140,6 +140,7 @@ public interface AccountService {
     /**
      * 查询会话列表好友信息（头像、昵称）
      * @param friendshipVo
+     * @param token
      * @return
      */
     Dto querySessionListDetail(FriendshipVo friendshipVo,String token);

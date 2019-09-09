@@ -18,6 +18,12 @@ import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.GroupMapper;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.RongCloudMethodUtil;
+import com.modcreater.tmutils.messageutil.ApplyJoinGroupMsg;
+import com.modcreater.tmutils.messageutil.GroupCardMsg;
+import io.rong.models.response.ResponseResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +32,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Description:
@@ -41,6 +44,7 @@ import java.util.Map;
 @Transactional(rollbackFor = Exception.class)
 public class GroupServiceImpl implements GroupService {
 
+    private Logger logger = LoggerFactory.getLogger(GroupServiceImpl.class);
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -173,8 +177,18 @@ public class GroupServiceImpl implements GroupService {
         }
         //查询团队信息
         GroupInfo groupInfo=groupMapper.queryGroupInfo(groupMsgVo.getGroupId());
-
-        return null;
+        try {
+            RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+            GroupCardMsg groupCardMsg =new GroupCardMsg(groupInfo.getId().toString(),groupInfo.getGroupName(),groupInfo.getGroupPicture(),groupInfo.getGroupUnit());
+            ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(groupMsgVo.getUserId(),groupMsgVo.getTargetId(),1, groupCardMsg);
+            if (result.getCode()!=200){
+                return DtoUtil.getFalseDto("发送失败",17002);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return DtoUtil.getFalseDto("发送失败",17003);
+        }
+        return DtoUtil.getSuccessDto("发送成功",100000);
     }
 
     /**
@@ -185,7 +199,33 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public Dto applyJoinGroup(GroupMsgVo groupMsgVo, String token) {
-        return null;
+        if (!token.equals(stringRedisTemplate.opsForValue().get(groupMsgVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //查询用户详情
+        Account account=accountMapper.queryAccount(groupMsgVo.getUserId());
+        if (!ObjectUtils.isEmpty(account)){
+            try {
+                RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+                ApplyJoinGroupMsg applyJoinGroupMsg =new ApplyJoinGroupMsg(account.getId().toString(),account.getUserName(),account.getHeadImgUrl(),account.getUserCode(),groupMsgVo.getValidationContent());
+                //查询管理员和群主
+                List<GroupRelation> groupRelationList=groupMapper.queryGroupRelation(groupMsgVo.getGroupId());
+                List<String> userIds=new ArrayList<>();
+                for (GroupRelation groupRelation:groupRelationList) {
+                    if (groupRelation.getMemberLevel().equals(1L) || groupRelation.getMemberLevel().equals(2L)){
+                        userIds.add(groupRelation.getMemberId().toString());
+                    }
+                }
+                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(groupMsgVo.getUserId(),userIds.toArray(new String[userIds.size()]),1, applyJoinGroupMsg);
+                if (result.getCode()!=200){
+                    return DtoUtil.getFalseDto("发送失败",17002);
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                return DtoUtil.getFalseDto("发送失败",17003);
+            }
+        }
+        return DtoUtil.getSuccessDto("您的请求已发送，请耐心等待",100000);
     }
 
     /**

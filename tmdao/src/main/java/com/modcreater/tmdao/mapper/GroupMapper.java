@@ -82,6 +82,13 @@ public interface GroupMapper {
     int createMember(@Param("memberId") String memberId,@Param("groupId") Long groupId);
 
     /**
+     * 根据团队Id查询关系表
+     * @param groupId
+     * @return
+     */
+    List<GroupRelation> queryGroupRelation(String groupId);
+
+    /**
      * 查询团队信息
      * @param groupId
      * @return

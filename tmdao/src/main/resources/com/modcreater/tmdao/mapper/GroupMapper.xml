@@ -50,4 +50,7 @@
     <select id="getAllGroupDefultHeadImgUrls" resultType="java.lang.String">
         select defaultHeadImgUrl from groupheadimgurl
     </select>
+    <select id="queryGroupRelation" resultType="com.modcreater.tmbeans.pojo.GroupRelation">
+        select * from grouprelation where memberId=#{groupId}
+    </select>
 </mapper>
