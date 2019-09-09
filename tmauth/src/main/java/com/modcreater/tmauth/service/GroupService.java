@@ -142,4 +142,12 @@ public interface GroupService {
      * @return
      */
     Dto removeMember(RemoveMember removeMember, String token);
+
+    /**
+     * 成员退出团队
+     * @param memberQuitGroup
+     * @param token
+     * @return
+     */
+    Dto memberQuitGroup(MemberQuitGroup memberQuitGroup, String token);
 }

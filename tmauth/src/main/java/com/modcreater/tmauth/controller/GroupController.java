@@ -88,4 +88,10 @@ public class GroupController {
     public Dto addManager(@RequestBody AddManager addManager, HttpServletRequest request){
         return groupService.addManager(addManager,request.getHeader("token"));
     }
+
+    @PostMapping(value = "memberquitgroup")
+    @ApiOperation("成员退出团队")
+    public Dto memberQuitGroup(@RequestBody MemberQuitGroup memberQuitGroup,HttpServletRequest request){
+        return groupService.memberQuitGroup(memberQuitGroup,request.getHeader("token"));
+    }
 }
