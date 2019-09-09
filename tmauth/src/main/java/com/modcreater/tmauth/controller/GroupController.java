@@ -3,7 +3,9 @@ package com.modcreater.tmauth.controller;
 import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
+import com.modcreater.tmbeans.vo.group.AddManager;
 import com.modcreater.tmbeans.vo.group.ReceivedGroupId;
+import com.modcreater.tmbeans.vo.group.RemoveManager;
 import com.modcreater.tmbeans.vo.group.UpdateGroupInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import io.swagger.annotations.ApiOperation;
@@ -60,4 +62,27 @@ public class GroupController {
         return groupService.updateGroup(updateGroupInfo,request.getHeader("token"));
     }
 
+    @PostMapping(value = "getmanagernum")
+    @ApiOperation("获取管理数量")
+    public Dto getManagerNum(@RequestBody ReceivedGroupId receivedGroupId,HttpServletRequest request){
+        return groupService.getManagerNum(receivedGroupId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "getmanagerinfo")
+    @ApiOperation("获取管理员信息")
+    public Dto getManagerInfo(@RequestBody ReceivedGroupId receivedGroupId,HttpServletRequest request){
+        return groupService.getManagerInfo(receivedGroupId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "removemanager")
+    @ApiOperation("移除管理员")
+    public Dto removeManager(@RequestBody RemoveManager removeManager, HttpServletRequest request){
+        return groupService.removeManager(removeManager,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "addmanager")
+    @ApiOperation("添加管理员")
+    public Dto addManager(@RequestBody AddManager addManager, HttpServletRequest request){
+        return groupService.addManager(addManager,request.getHeader("token"));
+    }
 }

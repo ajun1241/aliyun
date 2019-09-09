@@ -17,6 +17,9 @@
     <update id="updateGroupInfo" statementType="STATEMENT">
         update groupinfo set ${updateType} = '${value}' where id = ${groupId}
     </update>
+    <update id="updateManger">
+        update grouprelation set memberLevel = #{memberLevel} where groupId = #{groupId} and memberId = #{memberId}
+    </update>
 
     <select id="getMyGroup" resultType="com.modcreater.tmbeans.show.group.ShowMyGroup">
         select gi.id groupId,gi.groupName groupName,gi.groupPicture groupPicture from grouprelation gl,groupinfo gi
@@ -52,5 +55,21 @@
     </select>
     <select id="queryGroupRelation" resultType="com.modcreater.tmbeans.pojo.GroupRelation">
         select * from grouprelation where memberId=#{groupId}
+    </select>
+    <select id="getManagerNum" resultType="java.lang.Long">
+        select count(id) from grouprelation where groupId = #{groupId} and memberLevel = 1
+    </select>
+    <select id="getManagerInfo" resultType="java.util.Map">
+        select a.id userId,a.userName,a.headImgUrl
+        from account a,grouprelation g
+        where a.id = g.memberId and g.memberLevel = 1 and g.groupId = #{groupId}
+    </select>
+    <select id="getCreatorInfo" resultType="java.util.Map">
+        select a.id userId,a.userName,a.headImgUrl
+        from account a,grouprelation g
+        where a.id = g.memberId and g.memberLevel = 2 and g.groupId = #{groupId}
+    </select>
+    <select id="getMemberLevel" resultType="java.lang.Integer">
+        select memberLevel from grouprelation where groupId = #{groupId} and memberId = #{memberId}
     </select>
 </mapper>

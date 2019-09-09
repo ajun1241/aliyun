@@ -123,4 +123,42 @@ public interface GroupMapper {
      * @return
      */
     List<String> getAllGroupDefultHeadImgUrls();
+
+    /**
+     * 获取管理员数量
+     * @param groupId
+     * @return
+     */
+    Long getManagerNum(String groupId);
+
+    /**
+     * 获取管理员信息
+     * @param groupId
+     * @return
+     */
+    List<Map<String, Object>> getManagerInfo(String groupId);
+
+    /**
+     * 获取创建者信息
+     * @param groupId
+     * @return
+     */
+    Map<String, Object> getCreatorInfo(String groupId);
+
+    /**
+     * 移除管理员
+     * @param groupId
+     * @param memberId
+     * @param memberLevel
+     * @return
+     */
+    int updateManger(@Param("groupId") String groupId,@Param("memberId") String memberId,@Param("memberLevel") int memberLevel);
+
+    /**
+     * 获取成员身份
+     * @param groupId
+     * @param userId
+     * @return
+     */
+    int getMemberLevel(@Param("groupId")String groupId,@Param("memberId") String userId);
 }
