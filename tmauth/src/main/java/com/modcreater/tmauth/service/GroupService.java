@@ -1,9 +1,7 @@
 package com.modcreater.tmauth.service;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.vo.GroupInfoVo;
-import com.modcreater.tmbeans.vo.GroupMsgVo;
-import com.modcreater.tmbeans.vo.GroupRelationVo;
+import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.group.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
@@ -65,27 +63,27 @@ public interface GroupService {
 
     /**
      * 发送团队名片
-     * @param groupMsgVo
+     * @param groupCardVo
      * @param token
      * @return
      */
-    Dto sendGroupCard(GroupMsgVo groupMsgVo, String token);
+    Dto sendGroupCard(GroupCardVo groupCardVo, String token);
 
     /**
      * 申请加入团队
-     * @param groupMsgVo
+     * @param groupApplyVo
      * @param token
      * @return
      */
-    Dto applyJoinGroup(GroupMsgVo groupMsgVo,String token);
+    Dto applyJoinGroup(GroupApplyVo groupApplyVo, String token);
 
     /**
      * 回应团队申请
-     * @param groupMsgVo
+     * @param groupApplyDisposeVo
      * @param token
      * @return
      */
-    Dto respondApply(GroupMsgVo groupMsgVo,String token);
+    Dto respondApply(GroupApplyDisposeVo groupApplyDisposeVo, String token);
 
     /**
      * 查询团队验证消息列表

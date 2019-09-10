@@ -12,6 +12,9 @@
     <update id="updateMsgStatus">
       update msgstatus set status=#{status} where id=#{id}
     </update>
+    <delete id="clearInformationSafety">
+        delete from informationsafety
+    </delete>
 
     <select id="queryMsg" resultType="com.modcreater.tmbeans.pojo.MsgStatus">
         select * from msgstatus where id=#{id}

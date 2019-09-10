@@ -201,4 +201,11 @@ public class AccountController {
     public Dto loginOut(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return userService.loginOut(receivedId,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping("searchFriend")
+    @ApiOperation("模糊搜索已添加的好友")
+    public Dto searchFriend(@RequestBody SearchFriendVo searchFriendVo, HttpServletRequest request){
+        return userService.searchFriend(searchFriendVo,request.getHeader("token"));
+    }
 }

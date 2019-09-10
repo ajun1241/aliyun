@@ -54,4 +54,10 @@ public interface MsgStatusMapper {
      * @return
      */
     List<Long> getNeedChangedIds(@Param("type") String type ,@Param("time") Long time);
+
+    /**
+     * 清理InformationSafety表
+     * @return
+     */
+    int clearInformationSafety();
 }

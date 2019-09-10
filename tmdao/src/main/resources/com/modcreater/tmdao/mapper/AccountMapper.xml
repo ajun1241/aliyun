@@ -199,5 +199,18 @@
     <select id="queryUserByCp" resultType="java.lang.Integer">
         select count(id) from account where userCode=#{userCode} and userPassword=#{password}
     </select>
+    <select id="searchFriend" resultType="com.modcreater.tmbeans.pojo.Account">
+        SELECT * FROM (SELECT * FROM account
+            <where>
+                <if test="userName != null and userName != '' ">
+                    userName like concat('%',#{userName},'%')
+                </if>
+                <if test="userCode != null and userCode != '' ">
+                    userCode like concat(#{userCode},'%')
+                </if>
+            </where>
+        ) AS a
+        WHERE a.id IN (SELECT friendId FROM friendship WHERE userId=#{userId} AND `status`=20)
+    </select>
 
 </mapper>

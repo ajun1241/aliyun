@@ -14,6 +14,9 @@
     <insert id="createMember">
         insert into grouprelation (groupId, memberId, memberLevel) values (#{groupId},#{memberId},0)
     </insert>
+    <insert id="saveGroupMsg" useGeneratedKeys="true" keyProperty="id">
+        insert into groupsystemmsg (senderId, receiverId, msgContent, msgBody) values (#{senderId},#{receiverId},#{msgContent},#{msgBody})
+    </insert>
     <update id="updateGroupInfo" statementType="STATEMENT">
         update groupinfo set ${updateType} = '${value}' where id = ${groupId}
     </update>
@@ -74,6 +77,12 @@
     </select>
     <select id="getMemberLevel" resultType="java.lang.Integer">
         select memberLevel from grouprelation where groupId = #{groupId} and memberId = #{memberId}
+    </select>
+    <select id="queryGroupMember" resultType="com.modcreater.tmbeans.pojo.GroupRelation">
+        select * from grouprelation where groupId=#{groupId} and memberId=#{memberId}
+    </select>
+    <select id="getGroupMsgById" resultType="com.modcreater.tmbeans.pojo.GroupSystemMsg">
+        select * from groupsystemmsg where id=#{groupMsgId}
     </select>
     <select id="queryGroupMemberInfoByLevel" resultType="java.util.Map">
         select a.id userId,a.userName,a.headImgUrl

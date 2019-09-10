@@ -105,4 +105,14 @@ public class TimingScan {
         }
     }
 
+    /**
+     * 每个月的1号凌晨3点清理InformationSafety表
+     */
+    @Scheduled(cron = "0 0 3 1 * ?")
+    public void clearInformationSafety(){
+        msgStatusMapper.clearInformationSafety();
+        logger.info("清理InformationSafety表");
+    }
+
+
 }

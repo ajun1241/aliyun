@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.Friendship;
 import com.modcreater.tmbeans.show.userinfo.ShowUserDetails;
 import com.modcreater.tmbeans.vo.LoginVo;
+import com.modcreater.tmbeans.vo.SearchFriendVo;
 import com.modcreater.tmbeans.vo.usersettings.GetFriendListInSettings;
 import com.modcreater.tmbeans.vo.uservo.FriendshipVo;
 import com.modcreater.tmbeans.vo.uservo.UpdateFriendJurisdictionVo;
@@ -226,4 +227,13 @@ public interface AccountMapper {
      * @return
      */
     int queryUserByCp(String userCode,String password);
+
+    /**
+     * 模糊搜索已添加好友
+     * @param userId
+     * @param userCode
+     * @param userName
+     * @return
+     */
+    List<Account> searchFriend(String userId,String userCode,String userName);
 }

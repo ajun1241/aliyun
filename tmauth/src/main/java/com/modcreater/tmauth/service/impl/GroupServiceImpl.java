@@ -2,25 +2,22 @@ package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.pojo.Account;
-import com.modcreater.tmbeans.pojo.GroupInfo;
-import com.modcreater.tmbeans.pojo.GroupPermission;
-import com.modcreater.tmbeans.pojo.GroupRelation;
+import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.group.ShowGroupInfo;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.values.FinalValues;
-import com.modcreater.tmbeans.vo.GroupInfoVo;
-import com.modcreater.tmbeans.vo.GroupMsgVo;
-import com.modcreater.tmbeans.vo.GroupRelationVo;
+import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.group.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.GroupMapper;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.GroupCloudUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
 import com.modcreater.tmutils.messageutil.ApplyJoinGroupMsg;
 import com.modcreater.tmutils.messageutil.GroupCardMsg;
 import io.rong.messages.TxtMessage;
+import io.rong.models.Result;
 import io.rong.models.response.ResponseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +51,9 @@ public class GroupServiceImpl implements GroupService {
     @Resource
     private AccountMapper accountMapper;
 
+    private GroupCloudUtil groupCloudUtil=new GroupCloudUtil();
+
+    private RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
 
     @Override
     public synchronized Dto createGroup(GroupInfoVo groupInfoVo, String token) {
@@ -181,21 +181,21 @@ public class GroupServiceImpl implements GroupService {
 
     /**
      * 发送团队名片
-     * @param groupMsgVo
+     * @param groupCardVo
      * @param token
      * @return
      */
     @Override
-    public Dto sendGroupCard(GroupMsgVo groupMsgVo, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(groupMsgVo.getUserId()))) {
+    public Dto sendGroupCard(GroupCardVo groupCardVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(groupCardVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //查询团队信息
-        GroupInfo groupInfo=groupMapper.queryGroupInfo(groupMsgVo.getGroupId());
+        GroupInfo groupInfo=groupMapper.queryGroupInfo(groupCardVo.getGroupId());
         try {
             RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
             GroupCardMsg groupCardMsg =new GroupCardMsg(groupInfo.getId().toString(),groupInfo.getGroupName(),groupInfo.getGroupPicture(),groupInfo.getGroupUnit());
-            ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(groupMsgVo.getUserId(),groupMsgVo.getTargetId(),1, groupCardMsg);
+            ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(groupCardVo.getUserId(), groupCardVo.getTargetId(),1, groupCardMsg);
             if (result.getCode()!=200){
                 return DtoUtil.getFalseDto("发送失败",17002);
             }
@@ -208,32 +208,48 @@ public class GroupServiceImpl implements GroupService {
 
     /**
      * 申请加入团队
-     * @param groupMsgVo
+     * @param groupApplyVo
      * @param token
      * @return
      */
     @Override
-    public Dto applyJoinGroup(GroupMsgVo groupMsgVo, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(groupMsgVo.getUserId()))) {
+    public Dto applyJoinGroup(GroupApplyVo groupApplyVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(groupApplyVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //查询用户详情
-        Account account=accountMapper.queryAccount(groupMsgVo.getUserId());
+        Account account=accountMapper.queryAccount(groupApplyVo.getUserId());
         if (!ObjectUtils.isEmpty(account)){
             try {
-                RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
-                ApplyJoinGroupMsg applyJoinGroupMsg =new ApplyJoinGroupMsg(account.getId().toString(),account.getUserName(),account.getHeadImgUrl(),account.getUserCode(),groupMsgVo.getValidationContent());
                 //查询管理员和群主
-                List<GroupRelation> groupRelationList=groupMapper.queryGroupRelation(groupMsgVo.getGroupId());
+                List<GroupRelation> groupRelationList=groupMapper.queryGroupRelation(groupApplyVo.getGroupId());
                 List<String> userIds=new ArrayList<>();
                 for (GroupRelation groupRelation:groupRelationList) {
                     if (groupRelation.getMemberLevel().equals(1L) || groupRelation.getMemberLevel().equals(2L)){
                         userIds.add(groupRelation.getMemberId().toString());
                     }
                 }
-                ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(groupMsgVo.getUserId(),userIds.toArray(new String[userIds.size()]),1, applyJoinGroupMsg);
-                if (result.getCode()!=200){
-                    return DtoUtil.getFalseDto("发送失败",17002);
+                //验证内容保存
+                GroupValidation groupValidation=new GroupValidation();
+                groupValidation.setUserId(Long.parseLong(groupApplyVo.getUserId()));
+                groupValidation.setValidationContent(groupApplyVo.getValidationContent());
+                groupValidation.setValidationSource(groupApplyVo.getSourceId());
+//                groupMapper.saveValidationContent(groupValidation);
+                for (String userId:userIds){
+                    //消息保存
+                    GroupSystemMsg groupSystemMsg=new GroupSystemMsg();
+                    groupSystemMsg.setSenderId(Long.parseLong(groupApplyVo.getUserId()));
+                    groupSystemMsg.setReceiverId(Long.parseLong(userId));
+                    /*groupSystemMsg.setMsgContent();*/
+                    groupSystemMsg.setGroupValidationId(groupValidation.getId());
+                    groupMapper.saveGroupMsg(groupSystemMsg);
+                    //发送申请消息
+                    RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+                    ApplyJoinGroupMsg applyJoinGroupMsg =new ApplyJoinGroupMsg(account.getId().toString(),account.getUserName(),account.getHeadImgUrl(),account.getUserCode(), groupApplyVo.getValidationContent(),groupSystemMsg.getId().toString());
+                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(groupApplyVo.getUserId(),new String[]{userId},1, applyJoinGroupMsg);
+                    if (result.getCode()!=200){
+                        return DtoUtil.getFalseDto("发送失败",17002);
+                    }
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
@@ -245,12 +261,53 @@ public class GroupServiceImpl implements GroupService {
 
     /**
      * 回应团队申请
-     * @param groupMsgVo
+     * @param groupCardVo
      * @param token
      * @return
      */
     @Override
-    public Dto respondApply(GroupMsgVo groupMsgVo, String token) {
+    public Dto respondApply(GroupApplyDisposeVo groupCardVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(groupCardVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        /*try {
+            GroupInfo groupInfo=groupMapper.queryGroupInfo(groupCardVo.getGroupId());
+            if (ObjectUtils.isEmpty(groupInfo)){
+                return DtoUtil.getFalseDto("要加入的团队不存在，可能已解散",26046);
+            }
+            //查询消息状态
+            GroupSystemMsg groupSystemMsg=groupMapper.getGroupMsgById(groupCardVo.getGroupMsgId());
+            if (!StringUtils.isEmpty(groupCardVo.getChoose())){
+                if ("1".equals(groupCardVo.getChoose())){
+                    //同意
+                    //查询该成员是否已加入
+                    GroupRelation groupRelation=groupMapper.queryGroupMember(groupCardVo.getGroupId(), groupCardVo.getMemberId());
+                    if (!ObjectUtils.isEmpty(groupRelation)){
+                        return DtoUtil.getFalseDto("该用户已加入此团队",26045);
+                    }
+                    //数据库添加群关系
+                    groupMapper.createMember(groupCardVo.getMemberId(),Long.valueOf(groupCardVo.getGroupId()));
+                    //融云同步群关系
+                    List<String> list=new ArrayList<>();
+                    list.add(groupCardVo.getMemberId());
+                    Result result=groupCloudUtil.joinGroup(list, groupCardVo.getGroupId(),groupInfo.getGroupName());
+                    if (result.getCode()!=200){
+                        logger.error("融云同步群关系失败，错误信息："+result);
+                    }
+                    //修改消息状态
+//                    groupMapper.getGroupMsgById(groupCardVo.getGroupMsgId(),"1");
+                    //发送反馈信息
+
+                }else {
+                    //拒绝
+                    //修改消息状态
+
+                    //发送反馈信息
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }*/
         return null;
     }
 

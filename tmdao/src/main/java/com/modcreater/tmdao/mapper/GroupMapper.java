@@ -3,6 +3,7 @@ package com.modcreater.tmdao.mapper;
 import com.modcreater.tmbeans.pojo.GroupInfo;
 import com.modcreater.tmbeans.pojo.GroupPermission;
 import com.modcreater.tmbeans.pojo.GroupRelation;
+import com.modcreater.tmbeans.pojo.GroupSystemMsg;
 import com.modcreater.tmbeans.show.group.ShowGroupInfo;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
@@ -177,4 +178,26 @@ public interface GroupMapper {
      * @return
      */
     List<Map<String ,Object>> queryGroupMemberInfoByLevel(@Param("groupId") String groupId,@Param("memberLevel") int memberLevel);
+
+    /**
+     * 查询团队成员
+     * @param groupId
+     * @param memberId
+     * @return
+     */
+    GroupRelation queryGroupMember(String groupId, String memberId);
+
+    /**
+     * 保存加入团队验证消息
+     * @param groupSystemMsg
+     * @return
+     */
+    int saveGroupMsg(GroupSystemMsg groupSystemMsg);
+
+    /**
+     * 查询消息状态
+     * @param groupMsgId
+     * @return
+     */
+    GroupSystemMsg getGroupMsgById(String groupMsgId);
 }

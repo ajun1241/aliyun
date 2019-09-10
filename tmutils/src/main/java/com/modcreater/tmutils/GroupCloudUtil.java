@@ -182,13 +182,4 @@ public class GroupCloudUtil {
         return refreshResult;
     }
 
-    public static void main(String[] args) throws Exception {
-        GroupCloudUtil groupCloudUtil=new GroupCloudUtil();
-        List<GroupModel> groupModels=new ArrayList<>();
-        groupModels.add(new GroupModel()
-                .setId("20")
-                .setName("墨道心创")
-        );
-        groupCloudUtil.syncGroup(groupModels,"100001");
-    }
 }

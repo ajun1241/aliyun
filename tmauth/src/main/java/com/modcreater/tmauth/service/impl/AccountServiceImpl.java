@@ -39,9 +39,6 @@ import java.util.regex.Pattern;
 public class AccountServiceImpl implements AccountService {
     @Resource
     private AccountMapper accountMapper;
-
-    private static Pattern pattern = Pattern.compile("[0-9]*");
-
     private static final String SYSTEMID = "100000";
     private static final String ANDROID = "android";
     private static final String IOS = "ios";
@@ -1385,5 +1382,50 @@ public class AccountServiceImpl implements AccountService {
         }
         appTypeMapper.updateAppType(apType,receivedId.getUserId(),null);
         return DtoUtil.getSuccessDto("您已退出登录",100000);
+    }
+
+    /**
+     *  搜索已添加的好友
+     * @param searchFriendVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto searchFriend(SearchFriendVo searchFriendVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(searchFriendVo.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        String searchCondition=searchFriendVo.getSearchCondition();
+        List<Map<String,String>> mapList=new ArrayList<>();
+        String userName=null;
+        String userCode=null;
+        String pattern = "^\\d{1,}$";
+        if(!StringUtils.isEmpty(searchCondition)){
+            if (Pattern.matches(pattern,searchCondition)){
+                userCode=searchCondition;
+            }else {
+                userName=searchCondition;
+            }
+            List<Account> accountList=accountMapper.searchFriend(searchFriendVo.getUserId(),userCode,userName);
+            for (Account account:accountList) {
+                Map<String,String> map=new HashMap<>();
+                map.put("friendId",account.getId().toString());
+                map.put("userName",account.getUserName());
+                map.put("headImgUrl",account.getHeadImgUrl());
+                map.put("gender",account.getGender().toString());
+                mapList.add(map);
+            }
+        }else {
+            List<Account> accountList=accountMapper.searchFriend(searchFriendVo.getUserId(),userCode,userName);
+            for (Account account:accountList) {
+                Map<String,String> map=new HashMap<>();
+                map.put("friendId",account.getId().toString());
+                map.put("userName",account.getUserName());
+                map.put("headImgUrl",account.getHeadImgUrl());
+                map.put("gender",account.getGender().toString());
+                mapList.add(map);
+            }
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
     }
 }

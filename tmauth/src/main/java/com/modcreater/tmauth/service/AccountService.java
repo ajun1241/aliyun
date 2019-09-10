@@ -222,4 +222,12 @@ public interface AccountService {
      * @return
      */
     Dto loginOut(ReceivedId receivedId,String token);
+
+    /**
+     *  搜索已添加的好友
+     * @param searchFriendVo
+     * @param token
+     * @return
+     */
+    Dto searchFriend(SearchFriendVo searchFriendVo,String token);
 }
