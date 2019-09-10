@@ -35,6 +35,12 @@
     <delete id="removeMember">
         delete from grouprelation where groupId = #{groupId} and memberId = #{memberId} and memberLevel != 2
     </delete>
+    <delete id="removeAllMember">
+        delete from grouprelation where groupId = #{groupId}
+    </delete>
+    <delete id="removeGroup">
+        delete from groupinfo where id = #{groupId}
+    </delete>
 
     <select id="getMyGroup" resultType="com.modcreater.tmbeans.show.group.ShowMyGroup">
         select gi.id groupId,gi.groupName groupName,gi.groupPicture groupPicture from grouprelation gl,groupinfo gi
@@ -59,10 +65,10 @@
         groupPresentation,
         crateDate from groupinfo where id=#{groupId}
     </select>
-    <select id="getMembersInfo" resultType="java.lang.Long">
+    <select id="getMembersId" resultType="java.lang.String">
         select memberId from grouprelation where groupId = #{groupId} and memberLevel in (0,1) order by memberLevel desc
     </select>
-    <select id="getGroupDefultHeadImgUrl" resultType="java.lang.String">
+    <select id="getGroupDefaultHeadImgUrl" resultType="java.lang.String">
         select defaultHeadImgUrl from groupheadimgurl where groupNature = #{groupNature}
     </select>
     <select id="getAllGroupDefultHeadImgUrls" resultType="java.lang.String">

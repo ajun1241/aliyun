@@ -94,18 +94,18 @@ public interface GroupMapper {
     ShowGroupInfo getMyGroupInfo(String groupId);
 
     /**
-     * 查询团队成员
+     * 查询团队成员Id
      * @param groupId
      * @return
      */
-    List<Long> getMembersInfo(String groupId);
+    List<String> getMembersId(String groupId);
 
     /**
      * 根据type获取团队默认头像地址
      * @param groupNature
      * @return
      */
-    String getGroupDefultHeadImgUrl(String groupNature);
+    String getGroupDefaultHeadImgUrl(String groupNature);
 
     /**
      * 修改团队信息(单个修改)
@@ -212,6 +212,20 @@ public interface GroupMapper {
      * @return
      */
     int changeCreator(@Param("groupId") String groupId,@Param("memberId") String memberId);
+
+    /**
+     * 删除团队内所有成员
+     * @param groupId
+     * @return
+     */
+    int removeAllMember(String groupId);
+
+    /**
+     * 删除团队
+     * @param groupId
+     * @return
+     */
+    int removeGroup(String groupId);
 
     /**
      * 查询验证处理详情

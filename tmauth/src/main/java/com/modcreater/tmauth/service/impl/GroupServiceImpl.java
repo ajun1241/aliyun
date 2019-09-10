@@ -79,7 +79,7 @@ public class GroupServiceImpl implements GroupService {
                 groupInfoVo.setGroupNature("7");
             }
             if (!StringUtils.hasText(groupInfoVo.getGroupPicture())) {
-                groupInfoVo.setGroupPicture(groupMapper.getGroupDefultHeadImgUrl(groupInfoVo.getGroupNature()));
+                groupInfoVo.setGroupPicture(groupMapper.getGroupDefaultHeadImgUrl(groupInfoVo.getGroupNature()));
             }
             groupMapper.createGroup(groupInfoVo);
             int i = groupMapper.addCreator(groupInfoVo.getUserId(), groupInfoVo.getId());
@@ -97,7 +97,7 @@ public class GroupServiceImpl implements GroupService {
                 members.add(groupInfoVo.getUserId());
                 Result result = groupCloudUtil.createGroup(members,groupInfoVo.getId().toString(),groupInfoVo.getGroupName());
                 if (result.getCode() != 200){
-                    logger.warn("注册团队时融云消息异常" + result.toString());
+                    logger.warn("注册团队时异常" + result.toString());
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return DtoUtil.getFalseDto("创建团队时发生错误",80006);
                 }
@@ -154,7 +154,7 @@ public class GroupServiceImpl implements GroupService {
             List<String> urls = groupMapper.getAllGroupDefultHeadImgUrls();
             for (String url : urls){
                 if (url.equals(groupInfo.getGroupPicture())){
-                    String urlValue = groupMapper.getGroupDefultHeadImgUrl(updateGroupInfo.getValue());
+                    String urlValue = groupMapper.getGroupDefaultHeadImgUrl(updateGroupInfo.getValue());
                     groupMapper.updateGroupInfo(updateGroupInfo.getGroupId(),"groupPicture",urlValue);
                 }
             }
@@ -188,8 +188,34 @@ public class GroupServiceImpl implements GroupService {
         if (level != 2){
             return DtoUtil.getFalseDto("违规操作!",80004);
         }
-//        groupMapper.removeAllMember();
-        return null;
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(receivedGroupId.getGroupId());
+        int deleteNum = groupMapper.removeAllMember(receivedGroupId.getGroupId());
+        int delete = groupMapper.removeGroup(receivedGroupId.getGroupId());
+        if (deleteNum >= 3 && delete == 1){
+            List<String> membersId = groupMapper.getMembersId(receivedGroupId.getGroupId());
+            RongCloudMethodUtil rong = new RongCloudMethodUtil();
+            String msgInfo = "团队\"" + groupInfo.getGroupName() + "\"已被群主解散";
+            for (String memberId : membersId){
+                try {
+                    ResponseResult result = rong.sendPrivateMsg(SYSTEM_ID,new String[]{memberId},0,new TxtMessage(msgInfo,null));
+                    if (result.getCode() != 200){
+                        logger.warn("发送解散融云消息异常" + result.toString());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                Result result1 = groupCloudUtil.dissolutionGroup(membersId,receivedGroupId.getGroupId());
+                if (result1.getCode() != 200){
+                    logger.warn("解散团队异常" + result1.toString());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        return DtoUtil.getFalseDto("解散团队失败",80008);
     }
 
     @Override
@@ -389,10 +415,10 @@ public class GroupServiceImpl implements GroupService {
         ShowGroupInfo showGroupInfo = groupMapper.getMyGroupInfo(receivedGroupId.getGroupId());
         List<Map<String,Object>> membersInfo = new ArrayList<>();
         if (!ObjectUtils.isEmpty(showGroupInfo)){
-            List<Long> memberIds = groupMapper.getMembersInfo(receivedGroupId.getGroupId());
-            for (Long memberId : memberIds){
+            List<String> memberIds = groupMapper.getMembersId(receivedGroupId.getGroupId());
+            for (String memberId : memberIds){
                 Map<String,Object> map = new HashMap<>();
-                Account account = accountMapper.queryAccount(memberId.toString());
+                Account account = accountMapper.queryAccount(memberId);
                 map.put("memberId",account.getId());
                 map.put("memberName",account.getUserName());
                 map.put("memberHeadImgUrl",account.getHeadImgUrl());
@@ -623,14 +649,5 @@ public class GroupServiceImpl implements GroupService {
     private boolean isHavePermission(String groupId, String userId){
         int level = groupMapper.getMemberLevel(groupId,userId);
         return level == 2 || level == 1;
-    }
-
-
-    public static void main(String[] args) {
-        List<String> s = new ArrayList<>(Arrays.asList("1","2","3"));
-        s.add("4");
-        for (String sss : s){
-            System.out.println(sss);
-        }
     }
 }
