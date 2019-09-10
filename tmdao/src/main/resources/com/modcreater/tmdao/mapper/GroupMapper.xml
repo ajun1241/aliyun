@@ -17,6 +17,9 @@
     <insert id="saveGroupMsg" useGeneratedKeys="true" keyProperty="id">
         insert into groupsystemmsg (senderId, receiverId, msgContent, msgBody) values (#{senderId},#{receiverId},#{msgContent},#{msgBody})
     </insert>
+    <insert id="saveValidationContent" useGeneratedKeys="true" keyProperty="id">
+        insert into groupvalidation (userId, validationContent, validationSource) values (#{userId},#{validationContent},#{validationSource})
+    </insert>
     <update id="updateGroupInfo" statementType="STATEMENT">
         update groupinfo set ${updateType} = '${value}' where id = ${groupId}
     </update>
@@ -25,6 +28,9 @@
     </update>
     <update id="changeCreator">
         update groupinfo set createBy = #{memberId} where id = #{groupId}
+    </update>
+    <update id="updGroupValidation">
+        update groupvalidation set processState=#{processState},processDate=#{processDate},processBy=#{processBy} where id=#{groupValidationId}
     </update>
     <delete id="removeMember">
         delete from grouprelation where groupId = #{groupId} and memberId = #{memberId} and memberLevel != 2
@@ -91,5 +97,11 @@
         select a.id userId,a.userName,a.headImgUrl
         from account a,grouprelation g
         where a.id = g.memberId and g.memberLevel = #{memberLevel} and g.groupId = #{groupId}
+    </select>
+    <select id="getGroupValidation" resultType="com.modcreater.tmbeans.pojo.GroupValidation">
+        select * from groupvalidation where id=#{groupValidationId}
+    </select>
+    <select id="queryApplyMsgList" resultType="com.modcreater.tmbeans.pojo.GroupSystemMsg">
+        select * from groupsystemmsg where receiverId=#{userId}
     </select>
 </mapper>

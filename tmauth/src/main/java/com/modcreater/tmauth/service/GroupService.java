@@ -94,6 +94,14 @@ public interface GroupService {
     Dto applyMsgList(ReceivedId receivedId,String token);
 
     /**
+     * 查询团队验证消息详情
+     * @param receivedId
+     * @param token
+     * @return
+     */
+//    Dto applyMsgInfo(ReceivedId receivedId,String token);
+
+    /**
      * 查询团队详细信息
      * @param receivedGroupId
      * @param token

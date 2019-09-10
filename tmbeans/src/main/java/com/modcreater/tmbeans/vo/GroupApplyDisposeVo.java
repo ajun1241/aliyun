@@ -15,5 +15,6 @@ public class GroupApplyDisposeVo {
 
     private String memberId;//申请加入的成员Id
     private String choose;//同意还是拒绝（0：拒绝；1：同意）
+    private String groupId;//团队Id
     private String groupMsgId;//消息id
 }

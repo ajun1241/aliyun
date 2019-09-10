@@ -18,14 +18,16 @@ public class ApplyJoinGroupMsg extends BaseMessage {
     private String userCode;
     private String verificationContent;
     private String groupMsgId;
+    private String sourceInfo;
 
-    public ApplyJoinGroupMsg(String userId, String userName, String headImgUrl, String userCode, String verificationContent, String groupMsgId) {
+    public ApplyJoinGroupMsg(String userId, String userName, String headImgUrl, String userCode, String verificationContent, String groupMsgId, String sourceInfo) {
         this.userId = userId;
         this.userName = userName;
         this.headImgUrl = headImgUrl;
         this.userCode = userCode;
         this.verificationContent = verificationContent;
         this.groupMsgId = groupMsgId;
+        this.sourceInfo = sourceInfo;
     }
 
     public String getUserId() {
@@ -74,6 +76,14 @@ public class ApplyJoinGroupMsg extends BaseMessage {
 
     public void setGroupMsgId(String groupMsgId) {
         this.groupMsgId = groupMsgId;
+    }
+
+    public String getSourceInfo() {
+        return sourceInfo;
+    }
+
+    public void setSourceInfo(String sourceInfo) {
+        this.sourceInfo = sourceInfo;
     }
 
     @Override

@@ -11,10 +11,12 @@ import io.rong.models.Result;
 import io.rong.models.group.GroupMember;
 import io.rong.models.group.GroupModel;
 import io.rong.models.group.UserGroup;
+import io.rong.models.response.GroupUserQueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -182,4 +184,18 @@ public class GroupCloudUtil {
         return refreshResult;
     }
 
+    public static void main(String[] args) throws Exception {
+        /**
+         * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/group/group.html#getMembers
+         *
+         * 查询群成员方法
+         *
+         */
+        GroupCloudUtil groupCloudUtil=new GroupCloudUtil();
+        groupCloudUtil.dissolutionGroup(new ArrayList<>(Arrays.asList(new String[]{"100133", "1002", "100126","100124","100118"})),"1002");
+
+        GroupModel group = new GroupModel().setId("1002");
+        GroupUserQueryResult getMemberesult = groupCloudUtil.Group.get(group);
+        System.out.println("group getMember:  " + getMemberesult.toString());
+    }
 }

@@ -1,9 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
-import com.modcreater.tmbeans.pojo.GroupInfo;
-import com.modcreater.tmbeans.pojo.GroupPermission;
-import com.modcreater.tmbeans.pojo.GroupRelation;
-import com.modcreater.tmbeans.pojo.GroupSystemMsg;
+import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.group.ShowGroupInfo;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
@@ -202,10 +199,39 @@ public interface GroupMapper {
     GroupSystemMsg getGroupMsgById(String groupMsgId);
 
     /**
+     * 保存团队申请
+     * @param groupValidation
+     * @return
+     */
+    int saveValidationContent(GroupValidation groupValidation);
+
+    /**
      * 更改团队创建者
      * @param groupId
      * @param memberId
      * @return
      */
     int changeCreator(@Param("groupId") String groupId,@Param("memberId") String memberId);
+
+    /**
+     * 查询验证处理详情
+     * @param groupValidationId
+     * @return
+     */
+    GroupValidation getGroupValidation(Long groupValidationId);
+
+    /**
+     * 修改验证状态
+     * @param groupValidationId
+     * @param processState
+     * @return
+     */
+    int updGroupValidation(Long groupValidationId, String processState,Long processDate,String processBy);
+
+    /**
+     * 查询团队验证消息
+     * @param userId
+     * @return
+     */
+    List<GroupSystemMsg> queryApplyMsgList(String userId);
 }
