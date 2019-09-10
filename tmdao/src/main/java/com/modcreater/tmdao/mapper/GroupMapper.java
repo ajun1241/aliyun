@@ -200,4 +200,12 @@ public interface GroupMapper {
      * @return
      */
     GroupSystemMsg getGroupMsgById(String groupMsgId);
+
+    /**
+     * 更改团队创建者
+     * @param groupId
+     * @param memberId
+     * @return
+     */
+    int changeCreator(@Param("groupId") String groupId,@Param("memberId") String memberId);
 }

@@ -23,6 +23,9 @@
     <update id="updateMemberLevel">
         update grouprelation set memberLevel = #{memberLevel} where groupId = #{groupId} and memberId = #{memberId}
     </update>
+    <update id="changeCreator">
+        update groupinfo set createBy = #{memberId} where id = #{groupId}
+    </update>
     <delete id="removeMember">
         delete from grouprelation where groupId = #{groupId} and memberId = #{memberId} and memberLevel != 2
     </delete>

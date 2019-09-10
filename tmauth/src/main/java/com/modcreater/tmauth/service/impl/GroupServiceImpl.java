@@ -29,6 +29,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -87,6 +88,13 @@ public class GroupServiceImpl implements GroupService {
                     if (responseResult.getCode() != 200) {
                         logger.warn("添加团队成员时融云消息异常" + responseResult.toString());
                     }
+                }
+
+                Result result = groupCloudUtil.createGroup(new ArrayList<>(Arrays.asList(groupInfoVo.getMembers())),groupInfoVo.getId().toString(),groupInfoVo.getGroupName());
+                if (result.getCode() != 200){
+                    logger.warn("注册团队时融云消息异常" + result.toString());
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return DtoUtil.getFalseDto("创建团队时发生错误",80006);
                 }
                 return DtoUtil.getSuccesWithDataDto("创建成功", status, 100000);
             }
@@ -149,6 +157,17 @@ public class GroupServiceImpl implements GroupService {
 
         int i = groupMapper.updateGroupInfo(updateGroupInfo.getGroupId(),updateGroupInfo.getUpdateType(),updateGroupInfo.getValue());
         if (i == 1){
+            if ("groupName".equals(updateGroupInfo.getUpdateType()) && groupInfo.getGroupName().equals(updateGroupInfo.getValue())){
+                try {
+                    Result result = groupCloudUtil.refreshGroup(groupInfo.getId().toString(),updateGroupInfo.getValue());
+                    if (result.getCode() != 200){
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        logger.warn("刷新团队信息时融云消息异常" + result.toString());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             return DtoUtil.getSuccessDto("修改成功",100000);
         }
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -425,6 +444,7 @@ public class GroupServiceImpl implements GroupService {
         if (!isHavePermission(removeMember.getGroupId(),removeMember.getUserId())){
             return DtoUtil.getFalseDto("您没有操作权限",80004);
         }
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(removeMember.getGroupId());
         int handlerLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),removeMember.getUserId());
         for (String memberId : removeMember.getMemberId()){
             int memberLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),memberId);
@@ -450,6 +470,15 @@ public class GroupServiceImpl implements GroupService {
                 return DtoUtil.getFalseDto("违规操作!",80004);
             }
         }
+        try {
+            Result result = groupCloudUtil.quitGroup(new ArrayList<>(Arrays.asList(removeMember.getMemberId())),removeMember.getGroupId(),groupInfo.getGroupName());
+            if (result.getCode()!=200){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                logger.warn("更新移除团队成员时融云消息异常" + result.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return DtoUtil.getSuccessDto("操作成功",100000);
     }
 
@@ -468,6 +497,17 @@ public class GroupServiceImpl implements GroupService {
             ResponseResult result = rong.sendPrivateMsg("100000",new String[]{memberQuitGroup.getUserId()},0,new TxtMessage(msgInfo,null));
             if (result.getCode() != 200){
                 logger.warn("移除团队成员时融云消息异常" + result.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            List<String> rongMemberId = new ArrayList<>();
+            rongMemberId.add(memberQuitGroup.getUserId());
+            Result result = groupCloudUtil.quitGroup(rongMemberId,memberQuitGroup.getGroupId(),groupInfo.getGroupName());
+            if (result.getCode()!=200){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                logger.warn("更新成员退出团队融云消息异常" + result.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -492,6 +532,10 @@ public class GroupServiceImpl implements GroupService {
         RongCloudMethodUtil rong = new RongCloudMethodUtil();
         GroupInfo groupInfo = groupMapper.queryGroupInfo(groupMakeOver.getGroupId());
         Account account = accountMapper.queryAccount(groupMakeOver.getMemberId());
+        if (groupMapper.changeCreator(groupMakeOver.getGroupId(),groupMakeOver.getMemberId()) != 1){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("转让失败",80007);
+        }
         try {
             String msgInfo1 = "\"" + groupInfo.getGroupName() + "\"的创建者已将团队转让给你";
             ResponseResult result1 = rong.sendPrivateMsg("100000", new String[]{groupMakeOver.getMemberId()}, 0, new TxtMessage(msgInfo1, null));
