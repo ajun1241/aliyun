@@ -89,8 +89,9 @@ public class GroupServiceImpl implements GroupService {
                         logger.warn("添加团队成员时融云消息异常" + responseResult.toString());
                     }
                 }
-
-                Result result = groupCloudUtil.createGroup(new ArrayList<>(Arrays.asList(groupInfoVo.getMembers())),groupInfoVo.getId().toString(),groupInfoVo.getGroupName());
+                List<String> members = new ArrayList<>(Arrays.asList(groupInfoVo.getMembers()));
+                members.add(groupInfoVo.getId().toString());
+                Result result = groupCloudUtil.createGroup(members,groupInfoVo.getId().toString(),groupInfoVo.getGroupName());
                 if (result.getCode() != 200){
                     logger.warn("注册团队时融云消息异常" + result.toString());
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
