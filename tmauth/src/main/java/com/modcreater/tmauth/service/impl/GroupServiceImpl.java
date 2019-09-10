@@ -193,6 +193,7 @@ public class GroupServiceImpl implements GroupService {
         int delete = groupMapper.removeGroup(receivedGroupId.getGroupId());
         if (deleteNum >= 3 && delete == 1){
             List<String> membersId = groupMapper.getMembersId(receivedGroupId.getGroupId());
+            membersId.remove(0);
             RongCloudMethodUtil rong = new RongCloudMethodUtil();
             String msgInfo = "团队\"" + groupInfo.getGroupName() + "\"已被群主解散";
             for (String memberId : membersId){
@@ -213,6 +214,7 @@ public class GroupServiceImpl implements GroupService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            return DtoUtil.getSuccessDto("团队解散成功",100000);
         }
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         return DtoUtil.getFalseDto("解散团队失败",80008);
