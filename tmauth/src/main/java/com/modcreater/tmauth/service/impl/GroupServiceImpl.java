@@ -90,7 +90,7 @@ public class GroupServiceImpl implements GroupService {
                     }
                 }
                 List<String> members = new ArrayList<>(Arrays.asList(groupInfoVo.getMembers()));
-                members.add(groupInfoVo.getId().toString());
+                members.add(groupInfoVo.getUserId());
                 Result result = groupCloudUtil.createGroup(members,groupInfoVo.getId().toString(),groupInfoVo.getGroupName());
                 if (result.getCode() != 200){
                     logger.warn("注册团队时融云消息异常" + result.toString());
@@ -176,10 +176,15 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto deleteGroup(GroupInfoVo groupInfoVo, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(groupInfoVo.getUserId()))) {
+    public Dto deleteGroup(ReceivedGroupId receivedGroupId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
+        int level = groupMapper.getMemberLevel(receivedGroupId.getGroupId(),receivedGroupId.getUserId());
+        if (level != 2){
+            return DtoUtil.getFalseDto("违规操作!",80004);
+        }
+//        groupMapper.removeAllMember();
         return null;
     }
 
@@ -584,5 +589,14 @@ public class GroupServiceImpl implements GroupService {
     private boolean isHavePermission(String groupId, String userId){
         int level = groupMapper.getMemberLevel(groupId,userId);
         return level == 2 || level == 1;
+    }
+
+
+    public static void main(String[] args) {
+        List<String> s = new ArrayList<>(Arrays.asList("1","2","3"));
+        s.add("4");
+        for (String sss : s){
+            System.out.println(sss);
+        }
     }
 }

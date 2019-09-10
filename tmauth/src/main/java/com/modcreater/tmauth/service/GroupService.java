@@ -39,11 +39,11 @@ public interface GroupService {
 
     /**
      * 解散团队
-     * @param groupInfoVo
+     * @param receivedGroupId
      * @param token
      * @return
      */
-    Dto deleteGroup(GroupInfoVo groupInfoVo,String token);
+    Dto deleteGroup(ReceivedGroupId receivedGroupId,String token);
 
     /**
      * 移除团队成员
