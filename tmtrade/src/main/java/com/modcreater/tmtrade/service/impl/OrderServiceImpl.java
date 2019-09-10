@@ -552,7 +552,7 @@ public class OrderServiceImpl implements OrderService {
                 } else if (serviceRemainingTime.getTimeRemaining() == 0) {
                     return DtoUtil.getSuccesWithDataDto("searchService", "小主暂未开通该服务", 100000);
                 } else {
-                    return DtoUtil.getSuccesWithDataDto("searchService", time + "到期", 100000);
+                    return DtoUtil.getSuccesWithDataDto("searchService", "已过期", 100000);
                 }
             } else {
                 if (serviceRemainingTime.getStorageTime() != 0) {
