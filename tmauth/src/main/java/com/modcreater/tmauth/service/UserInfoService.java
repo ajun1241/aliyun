@@ -135,4 +135,12 @@ public interface UserInfoService {
      * @return
      */
     Dto getUserAchievementForIOS(ReceivedId receivedId, String token);
+
+    /**
+     * 筛选事件(IOS)
+     * @param receivedEventConditions
+     * @param token
+     * @return
+     */
+    Dto filtrateUserEventsForIOS(ReceivedEventConditions receivedEventConditions, String token);
 }

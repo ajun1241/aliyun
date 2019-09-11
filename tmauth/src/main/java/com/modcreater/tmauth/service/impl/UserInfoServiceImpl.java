@@ -228,7 +228,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!StringUtils.hasText(receivedEventConditions.getPageNum()) || receivedEventConditions.getPageNum().equals("0")) {
             receivedEventConditions.setPageNum("1");
         }
-        if (!StringUtils.hasText(receivedEventConditions.getPageSize()) || !receivedEventConditions.getPageSize().equals("7")) {
+        if (!StringUtils.hasText(receivedEventConditions.getPageSize())) {
             receivedEventConditions.setPageSize("7");
         }
         //此处判断用户是否开启了查询服务
@@ -244,10 +244,13 @@ public class UserInfoServiceImpl implements UserInfoService {
         List<SingleEvent> singleEventList = new ArrayList<>();
         List<ShowCompletedEvents> showCompletedEventsList = new ArrayList<>();
         //searchType为0时查看普通事件,1为查看草稿箱
+        int count = 0;
         if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("0")) {
             singleEventList = eventMapper.queryEventsByConditions(singleEventCondition);
+            count = eventMapper.queryEventsByConditionsNum(singleEventCondition);
         } else if (receivedEventConditions.getSearchType() != null && receivedEventConditions.getSearchType().equals("1")) {
             singleEventList = eventMapper.queryDraft(singleEventCondition);
+            count = eventMapper.queryDraftNum(singleEventCondition);
         }
         if (singleEventList.size() == 0) {
             return DtoUtil.getSuccessDto("没有查询到事件", 200000);
@@ -288,7 +291,20 @@ public class UserInfoServiceImpl implements UserInfoService {
                 showCompletedEventsList.add(SingleEventUtil.getShowCompleted(singleEvent));
             }
         }
-        return DtoUtil.getSuccesWithDataDto("筛选事件成功", showCompletedEventsList, 100000);
+        return DtoUtil.getSuccesWithDataDto("筛选事件成功" + count, showCompletedEventsList, 100000);
+    }
+
+    @Override
+    public Dto filtrateUserEventsForIOS(ReceivedEventConditions receivedEventConditions, String token) {
+        Dto dto = filtrateUserEvents(receivedEventConditions, token);
+        if (dto.getResCode() == 100000) {
+            Map<String,Object> result = new HashMap<>();
+            result.put("list",dto.getData());
+            result.put("count",dto.getResMsg().substring(6));
+            return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+        } else {
+            return dto;
+        }
     }
 
     @Override

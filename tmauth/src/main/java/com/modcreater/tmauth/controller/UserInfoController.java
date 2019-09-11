@@ -48,6 +48,13 @@ public class UserInfoController {
         return userInfoService.filtrateUserEvents(receivedEventConditions,request.getHeader("token"));
     }
 
+    @Safety
+    @PostMapping(value = "filtrateusereventsforios")
+    @ApiOperation("筛选事件(IOS)")
+    public Dto filtrateUserEventsForIOS(@RequestBody ReceivedEventConditions receivedEventConditions ,HttpServletRequest request){
+        return userInfoService.filtrateUserEventsForIOS(receivedEventConditions,request.getHeader("token"));
+    }
+
     @RequestMapping(value = "statisticanalysisofdata",method = RequestMethod.POST)
     @ApiOperation("数据统计")
     public Dto statisticAnalysisOfData(@RequestBody ReceivedId receivedId,HttpServletRequest request){

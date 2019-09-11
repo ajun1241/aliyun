@@ -151,6 +151,13 @@ public interface EventMapper {
     List<SingleEvent> queryEventsByConditions(QueryEventsCondition singleEvent);
 
     /**
+     * 根据筛选条件查询事件数量
+     * @param singleEventCondition
+     * @return
+     */
+    int queryEventsByConditionsNum(QueryEventsCondition singleEventCondition);
+
+    /**
      * 统计单一事件类型数量及用时分钟总和
      * @param userId
      * @return
@@ -194,11 +201,18 @@ public interface EventMapper {
     SingleEvent queryEventOne(String userId,String eventId);
 
     /**
-     * 查询所有草稿箱
+     * 查询筛选所有草稿箱
      * @param singleEvent
      * @return
      */
     List<SingleEvent> queryDraft(QueryEventsCondition singleEvent);
+
+    /**
+     * 查询筛选所有草稿箱数量
+     * @param singleEventCondition
+     * @return
+     */
+    int queryDraftNum(QueryEventsCondition singleEventCondition);
 
     /**
      * 根据删除类型删除(普通事件草稿箱)
