@@ -172,4 +172,12 @@ public interface GroupService {
      * @return
      */
     Dto getGroupMembers(ReceivedGroupId receivedGroupId, String token);
+
+    /**
+     * 添加团队成员
+     * @param addNewMembers
+     * @param token
+     * @return
+     */
+    Dto addNewMembers(AddNewMembers addNewMembers, String token);
 }

@@ -106,4 +106,10 @@ public class GroupController {
     public Dto getGroupMembers(@RequestBody ReceivedGroupId receivedGroupId ,HttpServletRequest request){
         return groupService.getGroupMembers(receivedGroupId,request.getHeader("token"));
     }
+
+    @PostMapping(value = "addnewmembers")
+    @ApiOperation("添加成员")
+    public Dto addNewMembers(@RequestBody AddNewMembers addNewMembers ,HttpServletRequest request){
+        return groupService.addNewMembers(addNewMembers,request.getHeader("token"));
+    }
 }

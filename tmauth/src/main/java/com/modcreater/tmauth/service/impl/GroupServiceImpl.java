@@ -642,6 +642,41 @@ public class GroupServiceImpl implements GroupService {
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
+    @Override
+    public Dto addNewMembers(AddNewMembers addNewMembers, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(addNewMembers.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (addNewMembers.getMembersId().length == 0){
+            return DtoUtil.getFalseDto("请选择要添加的成员",80008);
+        }
+        try {
+            for (String memberId : addNewMembers.getMembersId()){
+                groupMapper.createMember(memberId,Long.valueOf(addNewMembers.getGroupId()));
+            }
+        } catch (NumberFormatException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            e.printStackTrace();
+            return DtoUtil.getFalseDto("创建失败",80009);
+        }
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(addNewMembers.getGroupId());
+        Account account = accountMapper.queryAccount(addNewMembers.getUserId());
+        try {
+            Result result = groupCloudUtil.joinGroup(new ArrayList<>(Arrays.asList(addNewMembers.getMembersId())),addNewMembers.getGroupId(),groupInfo.getGroupName());
+            if (result.getCode() != 200) {
+                logger.warn("注册进入团队时融云消息异常" + result.toString());
+            }
+            String msgInfo = "您已被\"" + account.getUserName() + "\"邀请进入团队\"" + groupInfo.getGroupName() + "\"";
+            ResponseResult result1 = rongCloudMethodUtil.sendPrivateMsg(SYSTEM_ID,addNewMembers.getMembersId(),0,new TxtMessage(msgInfo,null));
+            if (result1.getCode() != 200) {
+                logger.warn("发送加入团队成功融云消息异常" + result1.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DtoUtil.getSuccessDto("添加成员成功",100000);
+    }
+
     /**
      * 判断用户是否有操作团队信息的权限
      * @param groupId
