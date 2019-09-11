@@ -333,7 +333,7 @@ public class SingleEventUtil {
                     map.put("content", "事件开始前" + newMap.get(key) + "分钟");
                 } else if (("g").equals(key) || ("h").equals(key) || ("i").equals(key)) {
                     map.put("title", "日期更改为：");
-                    map.put("content", newMap.get("年") + "年" + newMap.get("月") + "月" + newMap.get("日") + "日");
+                    map.put("content", newMap.get(key) + "年" + newMap.get(key) + "月" + newMap.get(key) + "日");
                 } else if (("j").equals(key)) {
                     map.put("title", "类型更改为：");
                     //0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他

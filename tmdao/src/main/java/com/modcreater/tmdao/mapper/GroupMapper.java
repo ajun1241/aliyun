@@ -243,9 +243,55 @@ public interface GroupMapper {
     int updGroupValidation(Long groupValidationId, String processState,Long processDate,String processBy);
 
     /**
-     * 查询团队验证消息
+     * 查询团队未处理验证消息
      * @param userId
      * @return
      */
-    List<GroupSystemMsg> queryApplyMsgList(String userId);
+    List<GroupSystemMsg> queryApplyUnreadMsgList(String userId,int pageIndex,int pageSize);
+
+    /**
+     * 查询团队已处理验证消息
+     * @param userId
+     * @return
+     */
+    List<GroupSystemMsg> queryApplyReadMsgList(String userId,int pageIndex,int pageSize);
+
+    /**
+     * 修改团队验证消息状态
+     * @param groupMsgId
+     * @return
+     */
+    int updGroupMsgById(String groupMsgId);
+
+    /**
+     * 查询团队未读验证反馈列表
+     * @param userId
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    List<GroupFeedbackValidation> queryApplyUnreadFMsgList(String userId,int pageIndex,int pageSize);
+
+    /**
+     * 查询团队已读验证反馈列表
+     * @param userId
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    List<GroupFeedbackValidation> queryApplyReadFMsgList(String userId,int pageIndex,int pageSize);
+
+    /**
+     * 保存验证反馈信息
+     * @param groupFeedbackValidation
+     * @return
+     */
+    int saveGroupFeedbackMsg(GroupFeedbackValidation groupFeedbackValidation);
+
+    /**
+     * 保存团队历史事件
+     * @param groupEventMsg
+     * @return
+     */
+    int saveGroupEventMsg(GroupEventMsg groupEventMsg);
 }

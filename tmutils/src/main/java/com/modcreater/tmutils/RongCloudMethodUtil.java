@@ -15,6 +15,7 @@ import io.rong.methods.message.system.MsgSystem;
 import io.rong.methods.user.User;
 import io.rong.methods.user.blacklist.Blacklist;
 import io.rong.models.Result;
+import io.rong.models.message.GroupMessage;
 import io.rong.models.message.PrivateMessage;
 import io.rong.models.message.SystemMessage;
 import io.rong.models.response.ResponseResult;
@@ -132,38 +133,28 @@ public class RongCloudMethodUtil {
     }
 
     /**
-     * 融云系统推送
-     * @param content
-     * @param fromUserId
-     * @param toUserId
-     * @param objectName
-     * @param pushContent
-     * @param pushData
-     */
-    /*public static void pushSystemMessage(String content, String fromUserId,
-                                         String toUserId, String objectName, String pushContent,
-                                         String pushData) {
+     * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/message/group.html#send
+     *
+     * 群组消息
+     * */
+    public ResponseResult sendGroupMsg() throws Exception {
 
-        String systemMessage = "https://api.cn.rong.io/message/system/publish.json";
-        Map<String, String> params = new HashMap<String, String>();
-        // String content="{\"content\":\"2\"}";
-        params.put("content", content);
-        params.put("fromUserId", fromUserId);
-        params.put("toUserId", toUserId);
-        params.put("objectName", objectName);
-        params.put("pushContent", pushContent);
-        params.put("pushData", pushData);
-        byte[] resultArray;
-        try {
-            resultArray = RongCloudUtil.post(systemMessage, params,
-                    20000);
-            String result = new String(resultArray);
-            System.out.println(result);
-        } catch (Exception e) {
-            System.out.println("发送信息出错了");
-        }
 
-    }*/
+       /* GroupMessage groupMessage = new GroupMessage()
+                .setSenderId("userId")
+                .setTargetId(targetIds)
+                .setObjectName(txtMessage.getType())
+                .setContent(txtMessage)
+                .setPushContent("this is a push")
+                .setPushData("{\"pushData\":\"hello\"}")
+                .setIsPersisted(0)
+                .setIsIncludeSender(0)
+                .setContentAvailable(0);
+        ResponseResult groupResult = group.send(groupMessage);
+
+        logger.info("send Group message:  " + groupResult.toString());*/
+        return null;
+    }
 
     /**
      * 移除黑名单

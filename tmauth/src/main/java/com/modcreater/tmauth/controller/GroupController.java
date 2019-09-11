@@ -1,10 +1,12 @@
 package com.modcreater.tmauth.controller;
 
+import com.modcreater.tmauth.config.annotation.Safety;
 import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.vo.GroupInfoVo;
+import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.group.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmbeans.vo.uservo.UserIdVo;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -105,6 +107,69 @@ public class GroupController {
     @ApiOperation("获取群成员信息")
     public Dto getGroupMembers(@RequestBody ReceivedGroupId receivedGroupId ,HttpServletRequest request){
         return groupService.getGroupMembers(receivedGroupId,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "sendgroupcard")
+    @ApiOperation("发送团队名片")
+    public Dto sendGroupCard(@RequestBody GroupCardVo groupCardVo , HttpServletRequest request){
+        return groupService.sendGroupCard(groupCardVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "applyjoingroup")
+    @ApiOperation("申请加入团队")
+    public Dto applyJoinGroup(@RequestBody GroupApplyVo groupApplyVo , HttpServletRequest request){
+        return groupService.applyJoinGroup(groupApplyVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "applyunreadmsglist")
+    @ApiOperation("查询团队未处理验证消息列表")
+    public Dto applyUnreadMsgList(@RequestBody UserIdVo receivedId , HttpServletRequest request){
+        return groupService.applyUnreadMsgList(receivedId,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "applyreadmsglist")
+    @ApiOperation("查询团队已处理验证消息列表")
+    public Dto applyReadMsgList(@RequestBody UserIdVo receivedId ,HttpServletRequest request){
+        return groupService.applyReadMsgList(receivedId,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "applyufmsglist")
+    @ApiOperation("查询团队未读验证反馈列表")
+    public Dto applyUFMsgList(@RequestBody UserIdVo receivedId , HttpServletRequest request){
+        return groupService.applyUFMsgList(receivedId,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "applyrfmsglist")
+    @ApiOperation("查询团队已读验证反馈列表")
+    public Dto applyRFMsgList(@RequestBody UserIdVo receivedId ,HttpServletRequest request){
+        return groupService.applyRFMsgList(receivedId,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "applymsginfo")
+    @ApiOperation("查询团队验证消息详情")
+    public Dto applyMsgInfo(@RequestBody ApplyMsgInfoVo applyMsgInfoVo , HttpServletRequest request){
+        return groupService.applyMsgInfo(applyMsgInfoVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "applyfmsginfo")
+    @ApiOperation("查询团队验证反馈详情")
+    public Dto applyRFMsgInfo(@RequestBody ApplyMsgInfoVo applyMsgInfoVo , HttpServletRequest request){
+        return groupService.applyRFMsgInfo(applyMsgInfoVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "respondapply")
+    @ApiOperation("回应团队申请")
+    public Dto respondApply(@RequestBody GroupApplyDisposeVo groupApplyDisposeVo , HttpServletRequest request){
+        return groupService.respondApply(groupApplyDisposeVo,request.getHeader("token"));
     }
 
     @PostMapping(value = "addnewmembers")

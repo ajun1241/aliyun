@@ -184,6 +184,7 @@ public class GroupCloudUtil {
         return refreshResult;
     }
 
+
     public static void main(String[] args) throws Exception {
         /**
          * API 文档: http://www.rongcloud.cn/docs/server_sdk_api/group/group.html#getMembers

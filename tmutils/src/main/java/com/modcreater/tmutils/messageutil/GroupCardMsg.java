@@ -5,7 +5,7 @@ import io.rong.util.GsonUtil;
 
 /**
  * Description:
- *
+ *  团队名片自定义消息类型
  * @Author: AJun
  * @Date: 2019/9/6 11:28
  */

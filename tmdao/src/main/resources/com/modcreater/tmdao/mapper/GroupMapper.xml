@@ -15,10 +15,19 @@
         insert into grouprelation (groupId, memberId, memberLevel) values (#{groupId},#{memberId},0)
     </insert>
     <insert id="saveGroupMsg" useGeneratedKeys="true" keyProperty="id">
-        insert into groupsystemmsg (senderId, receiverId, msgContent, msgBody) values (#{senderId},#{receiverId},#{msgContent},#{msgBody})
+        insert into groupsystemmsg (senderId, receiverId, msgContent, groupValidationId) values (#{senderId},#{receiverId},#{msgContent},#{groupValidationId})
     </insert>
     <insert id="saveValidationContent" useGeneratedKeys="true" keyProperty="id">
         insert into groupvalidation (userId, validationContent, validationSource) values (#{userId},#{validationContent},#{validationSource})
+    </insert>
+    <insert id="saveGroupFeedbackMsg">
+        insert into groupfeedbackvalidation (processId, receiverId, msgContent,processState) values (#{processId},#{receiverId},#{msgContent},#{processState})
+    </insert>
+    <insert id="saveGroupEventMsg">
+        insert into groupeventmsg (userId, groupId, msgBody, eventName, address, startTime, endTime, type, level, repeatTime, remindTime, person, remark, backLogList)
+        values (#{userId},#{groupId},#{msgBody},#{eventName},#{address},
+        #{startTime},#{endTime},#{type},#{level},#{repeatTime},
+        #{remindTime},#{person},#{remark},#{backLogList})
     </insert>
     <update id="updateGroupInfo" statementType="STATEMENT">
         update groupinfo set ${updateType} = '${value}' where id = ${groupId}
@@ -31,6 +40,9 @@
     </update>
     <update id="updGroupValidation">
         update groupvalidation set processState=#{processState},processDate=#{processDate},processBy=#{processBy} where id=#{groupValidationId}
+    </update>
+    <update id="updGroupMsgById">
+        update groupsystemmsg set readStatus=1 where id=#{groupMsgId}
     </update>
     <delete id="removeMember">
         delete from grouprelation where groupId = #{groupId} and memberId = #{memberId} and memberLevel != 2
@@ -75,7 +87,7 @@
         select defaultHeadImgUrl from groupheadimgurl
     </select>
     <select id="queryGroupRelation" resultType="com.modcreater.tmbeans.pojo.GroupRelation">
-        select * from grouprelation where memberId=#{groupId}
+        select * from grouprelation where groupId=#{groupId}
     </select>
     <select id="getManagerNum" resultType="java.lang.Long">
         select count(id) from grouprelation where groupId = #{groupId} and memberLevel = 1
@@ -107,7 +119,20 @@
     <select id="getGroupValidation" resultType="com.modcreater.tmbeans.pojo.GroupValidation">
         select * from groupvalidation where id=#{groupValidationId}
     </select>
-    <select id="queryApplyMsgList" resultType="com.modcreater.tmbeans.pojo.GroupSystemMsg">
-        select * from groupsystemmsg where receiverId=#{userId}
+    <select id="queryApplyUnreadMsgList" resultType="com.modcreater.tmbeans.pojo.GroupSystemMsg">
+        select * from groupsystemmsg where receiverId=#{userId} and groupvalidationId IN (SELECT id FROM groupvalidation WHERE processState=0)
+        limit #{pageIndex},#{pageSize}
+    </select>
+    <select id="queryApplyReadMsgList" resultType="com.modcreater.tmbeans.pojo.GroupSystemMsg">
+        select * from groupsystemmsg where receiverId=#{userId} and groupvalidationId IN (SELECT id FROM groupvalidation WHERE processState=1)
+        limit #{pageIndex},#{pageSize}
+    </select>
+    <select id="queryApplyUnreadFMsgList" resultType="com.modcreater.tmbeans.pojo.GroupFeedbackValidation">
+        select * from groupfeedbackvalidation where receiverId=#{userId} and readStatus=0
+        limit #{pageIndex},#{pageSize}
+    </select>
+    <select id="queryApplyReadFMsgList" resultType="com.modcreater.tmbeans.pojo.GroupFeedbackValidation">
+        select * from groupfeedbackvalidation where receiverId=#{userId} and readStatus=1
+        limit #{pageIndex},#{pageSize}
     </select>
 </mapper>

@@ -1,7 +1,10 @@
 package com.modcreater.tmauth.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.group.ShowGroupInfo;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
@@ -9,13 +12,15 @@ import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.group.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import com.modcreater.tmdao.mapper.AccountMapper;
-import com.modcreater.tmdao.mapper.GroupMapper;
+import com.modcreater.tmbeans.vo.uservo.UserIdVo;
+import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.GroupCloudUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
+import com.modcreater.tmutils.SingleEventUtil;
 import com.modcreater.tmutils.messageutil.ApplyJoinGroupMsg;
 import com.modcreater.tmutils.messageutil.GroupCardMsg;
+import com.modcreater.tmutils.messageutil.InviteMessage;
 import io.rong.messages.TxtMessage;
 import io.rong.models.Result;
 import io.rong.models.response.ResponseResult;
@@ -50,6 +55,15 @@ public class GroupServiceImpl implements GroupService {
 
     @Resource
     private AccountMapper accountMapper;
+
+    @Resource
+    private EventMapper eventMapper;
+
+    @Resource
+    private BacklogMapper backlogMapper;
+
+    @Resource
+    private EventViceMapper eventViceMapper;
 
     private GroupCloudUtil groupCloudUtil=new GroupCloudUtil();
 
@@ -285,6 +299,10 @@ public class GroupServiceImpl implements GroupService {
                 List<GroupRelation> groupRelationList=groupMapper.queryGroupRelation(groupApplyVo.getGroupId());
                 List<String> userIds=new ArrayList<>();
                 for (GroupRelation groupRelation:groupRelationList) {
+                    //查询该成员是否已加入
+                    if (groupRelation.getMemberId().toString().equals(groupApplyVo.getUserId())){
+                        return DtoUtil.getFalseDto("该用户已加入此团队",26045);
+                    }
                     if (groupRelation.getMemberLevel().equals(1L) || groupRelation.getMemberLevel().equals(2L)){
                         userIds.add(groupRelation.getMemberId().toString());
                     }
@@ -306,9 +324,8 @@ public class GroupServiceImpl implements GroupService {
                     groupMapper.saveGroupMsg(groupSystemMsg);
                     //发送申请消息
                     RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
-                    ApplyJoinGroupMsg applyJoinGroupMsg =new ApplyJoinGroupMsg(account.getId().toString(),account.getUserName(),account.getHeadImgUrl(),
-                            account.getUserCode(), groupApplyVo.getValidationContent(),groupSystemMsg.getId().toString(),validationSource);
-                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(VALIDATION_ID,new String[]{userId},0, applyJoinGroupMsg);
+                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(VALIDATION_ID,new String[]{userId},0,
+                            new TxtMessage("用户"+account.getUserName()+"申请加入团队"+groupInfo.getGroupName(),""));
                     if (result.getCode()!=200){
                         return DtoUtil.getFalseDto("发送失败",17002);
                     }
@@ -340,9 +357,13 @@ public class GroupServiceImpl implements GroupService {
             //查询申请处理状态
             GroupSystemMsg groupSystemMsg=groupMapper.getGroupMsgById(groupApplyDisposeVo.getGroupMsgId());
             GroupValidation groupValidation=groupMapper.getGroupValidation(groupSystemMsg.getGroupValidationId());
+            if(groupMapper.getMemberLevel(groupApplyDisposeVo.getGroupId(),groupApplyDisposeVo.getUserId())==0){
+                return DtoUtil.getFalseDto("您没有权限",26076);
+            }
             if (!StringUtils.isEmpty(groupApplyDisposeVo.getChoose())){
                 if (!ObjectUtils.isEmpty(groupValidation) && groupValidation.getProcessState() == 0){
                     Account account=accountMapper.queryAccount(groupApplyDisposeVo.getUserId());
+                    String content="";
                     if ("1".equals(groupApplyDisposeVo.getChoose())){
                         //同意
                         //查询该成员是否已加入
@@ -361,51 +382,191 @@ public class GroupServiceImpl implements GroupService {
                         }
                         //修改验证处理状态
                         groupMapper.updGroupValidation(groupSystemMsg.getGroupValidationId(),"1",System.currentTimeMillis()/1000,groupApplyDisposeVo.getUserId());
-                        //发送反馈信息
-                        rongCloudMethodUtil.sendPrivateMsg(VALIDATION_FEEDBACK_ID,new String[]{groupApplyDisposeVo.getMemberId()},
-                                0,new TxtMessage(account.getUserName()+"已同意您的申请",""));
-                        return DtoUtil.getSuccessDto("操作成功",100000);
+                        content=account.getUserName()+"已同意您的申请";
                     }else {
                         //拒绝
                         //修改验证处理状态
                         groupMapper.updGroupValidation(groupSystemMsg.getGroupValidationId(),"2",System.currentTimeMillis()/1000,groupApplyDisposeVo.getUserId());
-                        //发送反馈信息
-                        rongCloudMethodUtil.sendPrivateMsg(VALIDATION_FEEDBACK_ID,new String[]{groupApplyDisposeVo.getMemberId()},
-                                0,new TxtMessage(account.getUserName()+"已拒绝您的申请",""));
-                        return DtoUtil.getSuccessDto("操作成功",100000);
+                        content=account.getUserName()+"已拒绝您的申请";
                     }
+                    //发送反馈信息
+                    ResponseResult responseResult=rongCloudMethodUtil.sendPrivateMsg(VALIDATION_FEEDBACK_ID,new String[]{groupApplyDisposeVo.getMemberId()},
+                            0,new TxtMessage(content,""));
+                    if (responseResult.getCode()==200){
+                        //保存反馈信息
+                        GroupFeedbackValidation groupFeedbackValidation=new GroupFeedbackValidation();
+                        groupFeedbackValidation.setProcessId(Long.valueOf(groupApplyDisposeVo.getUserId()));
+                        groupFeedbackValidation.setReceiverId(Long.valueOf(groupApplyDisposeVo.getMemberId()));
+                        groupFeedbackValidation.setMsgContent(content);
+                        groupFeedbackValidation.setProcessState(Long.valueOf(groupApplyDisposeVo.getChoose()));
+                        groupMapper.saveGroupFeedbackMsg(groupFeedbackValidation);
+                    }
+                    return DtoUtil.getSuccessDto("操作成功",100000);
                 }
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
-        return DtoUtil.getFalseDto("操作失败",26047);
+        return DtoUtil.getFalseDto("操作失败,该用户可能已加入此团队",26047);
     }
 
     /**
-     * 查询团队验证消息列表
-     * @param receivedId
+     * 查询团队已处理验证消息列表
+     * @param userIdVo
      * @param token
      * @return
      */
     @Override
-    public Dto applyMsgList(ReceivedId receivedId, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+    public Dto applyReadMsgList(UserIdVo userIdVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userIdVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        List<GroupSystemMsg> groupSystemMsgs=groupMapper.queryApplyMsgList(receivedId.getUserId());
-        List<GroupSystemMsg> groupSystemMsgs1=new ArrayList<>();
-        List<GroupSystemMsg> groupSystemMsgs2=new ArrayList<>();
-        Map<String,Object> map=new HashMap<>(2);
+        int pageSize=Integer.parseInt(userIdVo.getPageSize());
+        int pageIndex=(Integer.parseInt(userIdVo.getPageNumber())-1)*pageSize;
+        List<GroupSystemMsg> groupSystemMsgs=groupMapper.queryApplyReadMsgList(userIdVo.getUserId(),pageIndex,pageSize);
+        List<Map<String,Object>> mapList=new ArrayList<>();
         for (GroupSystemMsg groupSystemMsg:groupSystemMsgs) {
-            if (groupSystemMsg.getReadStatus()==0){
-                groupSystemMsgs1.add(groupSystemMsg);
-            }else {
-                groupSystemMsgs2.add(groupSystemMsg);
-            }
+            Map<String,Object> map=new HashMap<>();
+            map.put("msgId",groupSystemMsg.getId());
+            map.put("readStatus",groupSystemMsg.getReadStatus());
+            map.put("msgContent",groupSystemMsg.getMsgContent());
+            mapList.add(map);
         }
-        map.put("readMsg",groupSystemMsgs1);
-        map.put("unreadMsg",groupSystemMsgs2);
+        return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
+    }
+
+    /**
+     * 查询团队未处理验证消息列表
+     * @param userIdVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto applyUnreadMsgList(UserIdVo userIdVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userIdVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        int pageSize=Integer.parseInt(userIdVo.getPageSize());
+        int pageIndex=(Integer.parseInt(userIdVo.getPageNumber())-1)*pageSize;
+        List<GroupSystemMsg> groupSystemMsgs=groupMapper.queryApplyUnreadMsgList(userIdVo.getUserId(),pageIndex,pageSize);
+        List<Map<String,Object>> mapList=new ArrayList<>();
+        for (GroupSystemMsg groupSystemMsg:groupSystemMsgs) {
+            Map<String,Object> map=new HashMap<>();
+            map.put("msgId",groupSystemMsg.getId());
+            map.put("readStatus",groupSystemMsg.getReadStatus());
+            map.put("msgContent",groupSystemMsg.getMsgContent());
+            mapList.add(map);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
+    }
+
+    /**
+     * 查询团队未读验证反馈列表
+     * @param userIdVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto applyUFMsgList(UserIdVo userIdVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userIdVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        int pageSize=Integer.parseInt(userIdVo.getPageSize());
+        int pageIndex=(Integer.parseInt(userIdVo.getPageNumber())-1)*pageSize;
+        List<GroupFeedbackValidation> groupSystemMsgs=groupMapper.queryApplyUnreadFMsgList(userIdVo.getUserId(),pageIndex,pageSize);
+        List<Map<String,Object>> mapList=new ArrayList<>();
+        for (GroupFeedbackValidation groupFeedbackValidation:groupSystemMsgs) {
+            Map<String,Object> map=new HashMap<>();
+            map.put("msgId",groupFeedbackValidation.getId());
+            map.put("processBy",accountMapper.queryAccount(groupFeedbackValidation.getProcessId().toString()).getUserName());
+            map.put("msgContent",groupFeedbackValidation.getMsgContent());
+            map.put("processState",groupFeedbackValidation.getProcessState()==1? "已同意" : "已拒绝");
+            map.put("sendDate",groupFeedbackValidation.getSendDate());
+            mapList.add(map);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
+    }
+
+    /**
+     * 查询团队已读验证反馈列表
+     * @param userIdVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto applyRFMsgList(UserIdVo userIdVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(userIdVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        int pageSize=Integer.parseInt(userIdVo.getPageSize());
+        int pageIndex=(Integer.parseInt(userIdVo.getPageNumber())-1)*pageSize;
+        List<GroupFeedbackValidation> groupSystemMsgs=groupMapper.queryApplyReadFMsgList(userIdVo.getUserId(),pageIndex,pageSize);
+        List<Map<String,Object>> mapList=new ArrayList<>();
+        for (GroupFeedbackValidation groupFeedbackValidation:groupSystemMsgs) {
+            Map<String,Object> map=new HashMap<>();
+            map.put("msgId",groupFeedbackValidation.getId());
+            map.put("processBy",accountMapper.queryAccount(groupFeedbackValidation.getProcessId().toString()).getUserName());
+            map.put("msgContent",groupFeedbackValidation.getMsgContent());
+            map.put("processState",groupFeedbackValidation.getProcessState()==1? "已同意" : "已拒绝");
+            map.put("sendDate",groupFeedbackValidation.getSendDate());
+            mapList.add(map);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
+    }
+
+    /**
+     * 查询团队验证消息详情
+     * @param applyMsgInfoVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto applyMsgInfo(ApplyMsgInfoVo applyMsgInfoVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(applyMsgInfoVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //查询消息详情
+        GroupSystemMsg groupSystemMsg=groupMapper.getGroupMsgById(applyMsgInfoVo.getGroupMsgId());
+        GroupValidation groupValidation=groupMapper.getGroupValidation(groupSystemMsg.getGroupValidationId());
+        Account account=accountMapper.queryAccount(groupValidation.getUserId().toString());
+        Map<String,Object> map=new HashMap<>(8);
+        map.put("userId",account.getId().toString());
+        map.put("userName",account.getUserName());
+        map.put("city",account.getUserAddress());
+        map.put("headImgUrl",account.getHeadImgUrl());
+        map.put("userCode",account.getUserCode());
+        map.put("validationContent",groupValidation.getValidationContent());
+        map.put("validationSource",groupValidation.getValidationSource());
+        //修改消息未读状态
+        groupMapper.updGroupMsgById(applyMsgInfoVo.getGroupMsgId());
+        return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
+    }
+
+    /**
+     * 查询团队验证反馈详情
+     * @param applyMsgInfoVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto applyRFMsgInfo(ApplyMsgInfoVo applyMsgInfoVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(applyMsgInfoVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //查询消息详情
+        GroupSystemMsg groupSystemMsg=groupMapper.getGroupMsgById(applyMsgInfoVo.getGroupMsgId());
+        GroupValidation groupValidation=groupMapper.getGroupValidation(groupSystemMsg.getGroupValidationId());
+        Account account=accountMapper.queryAccount(groupValidation.getUserId().toString());
+        Map<String,Object> map=new HashMap<>(8);
+        map.put("userId",account.getId().toString());
+        map.put("userName",account.getUserName());
+        map.put("city",account.getUserAddress());
+        map.put("headImgUrl",account.getHeadImgUrl());
+        map.put("userCode",account.getUserCode());
+        map.put("validationContent",groupValidation.getValidationContent());
+        map.put("validationSource",groupValidation.getValidationSource());
+        //修改消息未读状态
+        groupMapper.updGroupMsgById(applyMsgInfoVo.getGroupMsgId());
         return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
     }
 
@@ -690,6 +851,94 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
+     * 发送邀请事件至团队
+     * @param sendInviteEventVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto sendInviteEvent(SendInviteEventVo sendInviteEventVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(sendInviteEventVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //判断发送者权限
+        int userLevel=groupMapper.getMemberLevel(sendInviteEventVo.getGroupId(),sendInviteEventVo.getUserId());
+        SingleEventAndBacklog singleEvent=sendInviteEventVo.getSingleEvent();
+        if (userLevel==2 || userLevel==1){
+            //管理员或群主
+            //保存事件至发送者时间轴
+            singleEvent.setUserid(Long.parseLong(sendInviteEventVo.getUserId()));
+            //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
+            singleEvent.setIsLoop(SingleEventUtil.isLoopEvent(singleEvent.getRepeaTtime()) ? 1 : 0);
+            if (singleEvent.getIsLoop() == 1) {
+                List<SingleEvent> loopEventList = eventMapper.queryClashLoopEventList(singleEvent);
+                if (!SingleEventUtil.loopEventTime(loopEventList, singleEvent)) {
+                    return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
+                }
+            } else if (!SingleEventUtil.eventTime(eventMapper.queryClashEventList(singleEvent), Long.valueOf(singleEvent.getStarttime()), Long.valueOf(singleEvent.getEndtime()))) {
+                return DtoUtil.getFalseDto("时间段冲突,无法添加", 21012);
+            }
+            //事件保存在自己的时间轴里
+            eventMapper.uploadingEvents(singleEvent);
+            //添加事件清单
+            if (!ObjectUtils.isEmpty(singleEvent.getBacklogList()) && singleEvent.getBacklogList().size()>0){
+                List<BacklogList> backlogLists=new ArrayList<>();
+                for (BacklogList backlogList:singleEvent.getBacklogList()) {
+                    backlogList.setSingleEventId(singleEvent.getId());
+                    //判断同步权限
+                    if (!StringUtils.isEmpty(singleEvent.getIsSync()) && "1".equals(singleEvent.getIsSync())){
+                        backlogList.setIsSync(1L);
+                    }
+                    backlogLists.add(backlogList);
+                }
+                backlogMapper.insertBacklog(backlogLists);
+            }
+            //在事件副表插入创建者
+            SingleEventVice singleEventVice = new SingleEventVice();
+            singleEventVice.setCreateBy(Long.parseLong(sendInviteEventVo.getUserId()));
+            singleEventVice.setUserId(singleEvent.getUserid());
+            singleEventVice.setEventId(singleEvent.getEventid());
+            eventViceMapper.createEventVice(singleEventVice);
+            //保存事件消息
+            GroupEventMsg groupEventMsg=new GroupEventMsg();
+            groupEventMsg.setUserId(Long.parseLong(sendInviteEventVo.getUserId()));
+            groupEventMsg.setGroupId(Long.parseLong(sendInviteEventVo.getGroupId()));
+            groupEventMsg.setMsgBody("发起");
+            groupEventMsg.setEventName(singleEvent.getEventname());
+            groupEventMsg.setAddress(singleEvent.getAddress());
+            groupEventMsg.setStartTime(Long.valueOf(singleEvent.getStarttime()));
+            groupEventMsg.setEndTime(Long.valueOf(singleEvent.getEndtime()));
+            groupEventMsg.setType(singleEvent.getType());
+            groupEventMsg.setLevel(singleEvent.getLevel());
+            groupEventMsg.setRepeatTime(singleEvent.getRemindTime());
+            groupEventMsg.setRemindTime(singleEvent.getRemindTime());
+            groupEventMsg.setPerson(singleEvent.getPerson());
+            groupEventMsg.setRemark(singleEvent.getRemarks());
+            List<String> backlogs=new ArrayList<>();
+            for (BacklogList backlogList:singleEvent.getBacklogList()) {
+                backlogs.add(backlogList.getBacklogName());
+            }
+            groupEventMsg.setBackLogList(JSON.toJSONString(backlogs));
+            groupMapper.saveGroupEventMsg(groupEventMsg);
+            //发送邀请消息至群聊
+            String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
+            InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2","");
+            logger.info(JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)));
+            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), new String[]{personList1.get(i)}, 0, inviteMessage);
+            if (result.getCode() != 200) {
+                logger.info("添加邀请事件时融云消息异常" + result.toString());
+                return DtoUtil.getFalseDto("消息发送失败", 21040);
+            }
+
+        }else {
+            //普通成员
+            //发送申请消息给管理员
+
+        }
+        return null;
+    }
+
+    /**
      * 判断用户是否有操作团队信息的权限
      * @param groupId
      * @param userId
@@ -699,4 +948,5 @@ public class GroupServiceImpl implements GroupService {
         int level = groupMapper.getMemberLevel(groupId,userId);
         return level == 2 || level == 1;
     }
+
 }

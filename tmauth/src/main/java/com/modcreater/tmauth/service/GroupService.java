@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.group.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmbeans.vo.uservo.UserIdVo;
 
 /**
  * Description:
@@ -86,20 +87,52 @@ public interface GroupService {
     Dto respondApply(GroupApplyDisposeVo groupApplyDisposeVo, String token);
 
     /**
-     * 查询团队验证消息列表
-     * @param receivedId
+     * 查询团队已读验证消息列表
+     * @param userIdVo
      * @param token
      * @return
      */
-    Dto applyMsgList(ReceivedId receivedId,String token);
+    Dto applyReadMsgList(UserIdVo userIdVo, String token);
+
+    /**
+     * 查询团队未读验证消息列表
+     * @param userIdVo
+     * @param token
+     * @return
+     */
+    Dto applyUnreadMsgList(UserIdVo userIdVo,String token);
+
+    /**
+     * 查询团队未读验证反馈列表
+     * @param userIdVo
+     * @param token
+     * @return
+     */
+    Dto applyUFMsgList(UserIdVo userIdVo,String token);
+
+    /**
+     * 查询团队已读验证反馈列表
+     * @param userIdVo
+     * @param token
+     * @return
+     */
+    Dto applyRFMsgList(UserIdVo userIdVo,String token);
 
     /**
      * 查询团队验证消息详情
-     * @param receivedId
+     * @param applyMsgInfoVo
      * @param token
      * @return
      */
-//    Dto applyMsgInfo(ReceivedId receivedId,String token);
+    Dto applyMsgInfo(ApplyMsgInfoVo applyMsgInfoVo,String token);
+
+    /**
+     * 查询团队验证反馈详情
+     * @param applyMsgInfoVo
+     * @param token
+     * @return
+     */
+    Dto applyRFMsgInfo(ApplyMsgInfoVo applyMsgInfoVo, String token);
 
     /**
      * 查询团队详细信息
@@ -181,6 +214,7 @@ public interface GroupService {
      */
     Dto addNewMembers(AddNewMembers addNewMembers, String token);
 
+
     /**
      * 查看成员角色
      * @param receivedGroupId
@@ -188,4 +222,13 @@ public interface GroupService {
      * @return
      */
     Dto checkRole(ReceivedGroupId receivedGroupId, String token);
+
+    /**
+     * 发送邀请事件至团队
+     * @param sendInviteEventVo
+     * @param token
+     * @return
+     */
+    Dto sendInviteEvent(SendInviteEventVo sendInviteEventVo,String token);
+
 }
