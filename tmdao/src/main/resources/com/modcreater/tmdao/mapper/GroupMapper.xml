@@ -81,7 +81,7 @@
         select count(id) from grouprelation where groupId = #{groupId} and memberLevel = 1
     </select>
     <select id="getManagerInfo" resultType="java.util.Map">
-        select a.id userId,a.userName,a.headImgUrl
+        select a.id friendId,a.userName,a.headImgUrl,a.userCode,a.gender,a.userSign
         from account a,grouprelation g
         where a.id = g.memberId and g.memberLevel = 1 and g.groupId = #{groupId}
     </select>

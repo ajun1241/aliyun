@@ -431,7 +431,10 @@ public class GroupServiceImpl implements GroupService {
             }
             showGroupInfo.setMembersInfo(membersInfo);
             showGroupInfo.setMembersNum((long) memberIds.size());
-            return DtoUtil.getSuccesWithDataDto("查询成功",showGroupInfo,100000);
+            Map<String,Object> result = new HashMap<>();
+            result.put("showGroupInfo",showGroupInfo);
+            result.put("role",groupMapper.getMemberLevel(receivedGroupId.getGroupId(),receivedGroupId.getUserId()));
+            return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
         }
         return DtoUtil.getSuccessDto("查询失败",200000);
     }
