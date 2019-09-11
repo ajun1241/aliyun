@@ -30,4 +30,6 @@ public class ShowGroupInfo {
     private String groupPresentation;
     private String crateDate;
 
+    private int role;
+
 }
