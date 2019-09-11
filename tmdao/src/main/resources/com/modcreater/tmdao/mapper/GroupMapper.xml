@@ -135,4 +135,7 @@
         select * from groupfeedbackvalidation where receiverId=#{userId} and readStatus=1
         limit #{pageIndex},#{pageSize}
     </select>
+    <select id="getGroupEventMsg" resultType="com.modcreater.tmbeans.show.group.ShowGroupEventMsg">
+        select id groupEventMsgId,userId,msgBody,createTime,eventName from groupeventmsg where groupId = #{groupId}
+    </select>
 </mapper>

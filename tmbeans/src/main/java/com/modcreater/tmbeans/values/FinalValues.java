@@ -48,6 +48,10 @@ public class FinalValues {
      */
     public static final String[] GROUPROLES = {"member","manager","creator"};
     /**
+     * 团队角色名称
+     */
+    public static final String[] GROUPROLESNAME = {"成员","管理员","团长"};
+    /**
      * 一个月(单位:秒,计算用户支付用)
      */
     public static Long MONTH = getPayTime(1);

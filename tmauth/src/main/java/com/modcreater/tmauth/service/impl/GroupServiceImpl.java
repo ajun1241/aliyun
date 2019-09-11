@@ -6,12 +6,16 @@ import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.*;
+import com.modcreater.tmbeans.show.group.ShowGroupEventMsg;
 import com.modcreater.tmbeans.show.group.ShowGroupInfo;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.group.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmdao.mapper.AccountMapper;
+import com.modcreater.tmdao.mapper.EventMapper;
+import com.modcreater.tmdao.mapper.GroupMapper;
 import com.modcreater.tmbeans.vo.uservo.UserIdVo;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DtoUtil;
@@ -850,6 +854,24 @@ public class GroupServiceImpl implements GroupService {
         return DtoUtil.getSuccesWithDataDto("查询成功",groupMapper.getMemberLevel(receivedGroupId.getGroupId(),receivedGroupId.getUserId()),100000);
     }
 
+    @Override
+    public Dto getGroupEventMsg(ReceivedGroupId receivedGroupId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        List<ShowGroupEventMsg> groupEventMsgs = groupMapper.getGroupEventMsg(receivedGroupId.getGroupId());
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(receivedGroupId.getGroupId());
+        for (ShowGroupEventMsg showGroupEventMsg : groupEventMsgs){
+            String roleName = FinalValues.GROUPROLESNAME[groupMapper.getMemberLevel(receivedGroupId.getGroupId(),showGroupEventMsg.getUserId())];
+            String userName = accountMapper.queryAccount(showGroupEventMsg.getUserId()).getUserName();
+            showGroupEventMsg.setMsgBody(roleName + "\"" + userName + "\"" + showGroupEventMsg.getMsgBody()+ "\""  + showGroupEventMsg.getEventName()+ "\"" );
+            showGroupEventMsg.setGroupPicture(groupInfo.getGroupPicture());
+            showGroupEventMsg.setGroupName(groupInfo.getGroupName());
+        }
+        return DtoUtil.getSuccesWithDataDto("消息列表获取成功",groupEventMsgs,100000);
+    }
+
+
     /**
      * 发送邀请事件至团队
      * @param sendInviteEventVo
@@ -939,7 +961,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
-     * 判断用户是否有操作团队信息的权限
+     * 判断用户是管理员还是团长
      * @param groupId
      * @param userId
      * @return

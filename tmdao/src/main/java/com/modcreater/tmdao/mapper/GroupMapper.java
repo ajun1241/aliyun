@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.*;
+import com.modcreater.tmbeans.show.group.ShowGroupEventMsg;
 import com.modcreater.tmbeans.show.group.ShowGroupInfo;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
@@ -254,6 +255,14 @@ public interface GroupMapper {
      * @param userId
      * @return
      */
+    List<GroupSystemMsg> queryApplyMsgList(String userId);
+
+    /**
+     * 查询团队历史事件消息
+     * @param groupId
+     * @return
+     */
+    List<ShowGroupEventMsg> getGroupEventMsg(String groupId);
     List<GroupSystemMsg> queryApplyReadMsgList(String userId,int pageIndex,int pageSize);
 
     /**

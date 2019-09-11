@@ -231,4 +231,12 @@ public interface GroupService {
      */
     Dto sendInviteEvent(SendInviteEventVo sendInviteEventVo,String token);
 
+
+    /**
+     * 获取团队历史事件
+     * @param receivedGroupId
+     * @param token
+     * @return
+     */
+    Dto getGroupEventMsg(ReceivedGroupId receivedGroupId, String token);
 }
