@@ -421,9 +421,12 @@ public class GroupServiceImpl implements GroupService {
             for (String memberId : memberIds){
                 Map<String,Object> map = new HashMap<>();
                 Account account = accountMapper.queryAccount(memberId);
-                map.put("memberId",account.getId());
-                map.put("memberName",account.getUserName());
-                map.put("memberHeadImgUrl",account.getHeadImgUrl());
+                map.put("userCode",account.getUserCode());
+                map.put("headImgUrl",account.getHeadImgUrl());
+                map.put("gender",account.getGender());
+                map.put("friendId",account.getId());
+                map.put("userSign",account.getUserSign());
+                map.put("userName",account.getUserName());
                 membersInfo.add(map);
             }
             showGroupInfo.setMembersInfo(membersInfo);
@@ -675,6 +678,14 @@ public class GroupServiceImpl implements GroupService {
             e.printStackTrace();
         }
         return DtoUtil.getSuccessDto("添加成员成功",100000);
+    }
+
+    @Override
+    public Dto checkRole(ReceivedGroupId receivedGroupId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",groupMapper.getMemberLevel(receivedGroupId.getGroupId(),receivedGroupId.getUserId()),100000);
     }
 
     /**

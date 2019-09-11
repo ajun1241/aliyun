@@ -112,4 +112,10 @@ public class GroupController {
     public Dto addNewMembers(@RequestBody AddNewMembers addNewMembers ,HttpServletRequest request){
         return groupService.addNewMembers(addNewMembers,request.getHeader("token"));
     }
+
+    @PostMapping(value = "checkrole")
+    @ApiOperation("查看成员角色")
+    public Dto checkRole(@RequestBody ReceivedGroupId receivedGroupId,HttpServletRequest request){
+        return groupService.checkRole(receivedGroupId,request.getHeader("token"));
+    }
 }

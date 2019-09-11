@@ -180,4 +180,12 @@ public interface GroupService {
      * @return
      */
     Dto addNewMembers(AddNewMembers addNewMembers, String token);
+
+    /**
+     * 查看成员角色
+     * @param receivedGroupId
+     * @param token
+     * @return
+     */
+    Dto checkRole(ReceivedGroupId receivedGroupId, String token);
 }
