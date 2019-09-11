@@ -110,4 +110,7 @@
     <select id="queryApplyMsgList" resultType="com.modcreater.tmbeans.pojo.GroupSystemMsg">
         select * from groupsystemmsg where receiverId=#{userId}
     </select>
+    <select id="getGroupEventMsg" resultType="com.modcreater.tmbeans.show.group.ShowGroupEventMsg">
+        select id groupEventMsgId,userId,msgBody,createTime,eventName from groupeventmsg where groupId = #{groupId}
+    </select>
 </mapper>

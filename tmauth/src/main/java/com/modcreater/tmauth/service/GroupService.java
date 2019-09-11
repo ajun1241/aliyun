@@ -188,4 +188,12 @@ public interface GroupService {
      * @return
      */
     Dto checkRole(ReceivedGroupId receivedGroupId, String token);
+
+    /**
+     * 获取团队历史事件
+     * @param receivedGroupId
+     * @param token
+     * @return
+     */
+    Dto getGroupEventMsg(ReceivedGroupId receivedGroupId, String token);
 }
