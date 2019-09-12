@@ -327,7 +327,7 @@
             </if>
         </where>
         and userId = #{userid}
-        order by year desc,month desc,day desc
+        order by year desc,month desc,day desc,startTime desc
         <if test="pageSize != 0 and pageSize != ''">
             limit #{pageNum},#{pageSize}
         </if>
@@ -550,7 +550,7 @@
             </if>
         </where>
         and userId = #{userid}
-        order by year asc,month asc,day asc
+        order by year desc,month desc,day desc,startTime desc
         <if test="pageSize != 0 and pageSize != ''">
             limit #{pageNum},#{pageSize}
         </if>
