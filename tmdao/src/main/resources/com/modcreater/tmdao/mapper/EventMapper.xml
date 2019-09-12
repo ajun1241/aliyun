@@ -327,7 +327,13 @@
             </if>
         </where>
         and userId = #{userid}
-        order by year desc,month desc,day desc,startTime desc
+        order by year desc,month desc,day desc
+        <if test="isOverdue != null and isOverdue == 1">
+            ,startTime desc
+        </if>
+        <if test="isOverdue != null and isOverdue != 1">
+            ,startTime asc
+        </if>
         <if test="pageSize != 0 and pageSize != ''">
             limit #{pageNum},#{pageSize}
         </if>
@@ -550,7 +556,7 @@
             </if>
         </where>
         and userId = #{userid}
-        order by year desc,month desc,day desc,startTime desc
+        order by year desc,month desc,day desc,startTime asc
         <if test="pageSize != 0 and pageSize != ''">
             limit #{pageNum},#{pageSize}
         </if>
