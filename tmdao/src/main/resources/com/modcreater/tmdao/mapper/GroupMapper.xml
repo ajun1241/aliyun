@@ -144,4 +144,7 @@
     <select id="searchMembersByCondition" resultType="java.lang.String">
         select memberId from grouprelation g ,account a where a.id = g.memberId and g.groupId = #{groupId} and (a.userName like "%"#{condition}"%" or a.userCode like "%"#{condition}"%")
     </select>
+    <select id="getGroupRelation" resultType="com.modcreater.tmbeans.pojo.GroupRelation">
+        select * from grouprelation where groupId = #{groupId} and memberId = #{memberId}
+    </select>
 </mapper>

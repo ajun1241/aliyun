@@ -318,4 +318,12 @@ public interface GroupMapper {
      * @return
      */
     List<String> searchMembersByCondition(@Param("groupId") String groupId,@Param("condition") String condition);
+
+    /**
+     * 查询团队成员关系表
+     * @param groupId
+     * @param memberId
+     * @return
+     */
+    GroupRelation getGroupRelation(@Param("groupId") String groupId,@Param("memberId") String memberId);
 }

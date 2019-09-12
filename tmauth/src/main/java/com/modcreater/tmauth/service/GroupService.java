@@ -207,7 +207,7 @@ public interface GroupService {
     Dto groupMakeOver(GroupMakeOver groupMakeOver, String token);
 
     /**
-     * 获取群成员信息
+     * 获取群成员信息(团长管理员成员分开)
      * @param receivedGroupId
      * @param token
      * @return

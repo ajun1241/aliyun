@@ -849,6 +849,11 @@ public class GroupServiceImpl implements GroupService {
         }
         try {
             for (String memberId : addNewMembers.getMembersId()){
+                if (!ObjectUtils.isEmpty(groupMapper.getGroupRelation(addNewMembers.getGroupId(),memberId))){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    Account account = accountMapper.queryAccount(memberId);
+                    return DtoUtil.getFalseDto("成员\""+ account.getUserName() +"\"已存在",80009);
+                }
                 groupMapper.createMember(memberId,Long.valueOf(addNewMembers.getGroupId()));
             }
         } catch (NumberFormatException e) {
