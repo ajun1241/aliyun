@@ -55,6 +55,12 @@ public class GroupController {
         return groupService.getMyGroupInfo(receivedGroupId,request.getHeader("token"));
     }
 
+    @PostMapping(value = "getmygroupmembers")
+    @ApiOperation("获取团队成员")
+    public Dto getMyGroupMembers(@RequestBody SearchMembersConditions searchMembersConditions, HttpServletRequest request){
+        return groupService.getMyGroupMembers(searchMembersConditions,request.getHeader("token"));
+    }
+
     @PostMapping(value = "updategroupinfo")
     @ApiOperation("修改团队信息")
     public Dto updateGroupInfo(@RequestBody UpdateGroupInfo updateGroupInfo, HttpServletRequest request){

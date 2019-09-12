@@ -604,6 +604,33 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Dto getMyGroupMembers(SearchMembersConditions searchMembersConditions, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(searchMembersConditions.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        List<Map<String, Object>> membersInfo = new ArrayList<>();
+        List<String> memberIds;
+        if (!StringUtils.hasText(searchMembersConditions.getCondition())) {
+            memberIds = groupMapper.getMembersId(searchMembersConditions.getGroupId());
+        } else {
+            memberIds = groupMapper.searchMembersByCondition(searchMembersConditions.getGroupId(), searchMembersConditions.getCondition());
+        }
+        for (String memberId : memberIds) {
+            System.out.println(memberId);
+            Map<String, Object> map = new HashMap<>();
+            Account account = accountMapper.queryAccount(memberId);
+            map.put("headImgUrl", account.getHeadImgUrl());
+            map.put("userSign", account.getUserSign());
+            map.put("userCode", account.getUserCode());
+            map.put("friendId", account.getId());
+            map.put("userName", account.getUserName());
+            map.put("gender", account.getGender());
+            membersInfo.add(map);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功", membersInfo, 100000);
+    }
+
+    @Override
     public Dto getManagerNum(ReceivedGroupId receivedGroupId, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
@@ -879,7 +906,7 @@ public class GroupServiceImpl implements GroupService {
         }
         GroupEventMsg groupEventMsg = groupMapper.getGroupEventMsgInfo(receivedGroupEventMsgId.getGroupEventMsgId());
         List<BacklogList> bac = new ArrayList<>();
-        for (Object s : JSONObject.parseArray(groupEventMsg.getBackLogList(),ArrayList.class)){
+        for (Object s : JSONObject.parseArray(groupEventMsg.getBacklogList(),ArrayList.class)){
             BacklogList backlogList = new BacklogList();
             backlogList.setBacklogName(s.toString());
             bac.add(backlogList);
@@ -959,7 +986,7 @@ public class GroupServiceImpl implements GroupService {
             for (BacklogList backlogList:singleEvent.getBacklogList()) {
                 backlogs.add(backlogList.getBacklogName());
             }
-            groupEventMsg.setBackLogList(JSON.toJSONString(backlogs));
+            groupEventMsg.setBacklogList(JSON.toJSONString(backlogs));
             groupMapper.saveGroupEventMsg(groupEventMsg);
             //发送邀请消息至群聊
             String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
@@ -989,13 +1016,4 @@ public class GroupServiceImpl implements GroupService {
         int level = groupMapper.getMemberLevel(groupId,userId);
         return level == 2 || level == 1;
     }
-
-    public static void main(String[] args) {
-        List<String> strings = new ArrayList<>();
-        strings.add("1");
-        strings.add("2");
-        strings.add("3");
-        System.out.println(JSON.toJSONString(strings));
-    }
-
 }

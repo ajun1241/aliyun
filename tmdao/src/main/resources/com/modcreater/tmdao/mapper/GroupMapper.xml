@@ -141,4 +141,7 @@
     <select id="getGroupEventMsgInfo" resultType="com.modcreater.tmbeans.pojo.GroupEventMsg">
         select * from groupeventmsg where id = #{groupEventMsgId}
     </select>
+    <select id="searchMembersByCondition" resultType="java.lang.String">
+        select memberId from grouprelation g ,account a where a.id = g.memberId and g.groupId = #{groupId} and (a.userName like "%"#{condition}"%" or a.userCode like "%"#{condition}"%")
+    </select>
 </mapper>

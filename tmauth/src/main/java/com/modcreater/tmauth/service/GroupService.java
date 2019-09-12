@@ -143,6 +143,14 @@ public interface GroupService {
     Dto getMyGroupInfo(ReceivedGroupId receivedGroupId, String token);
 
     /**
+     * 查询团队成员
+     * @param searchMembersConditions
+     * @param token
+     * @return
+     */
+    Dto getMyGroupMembers(SearchMembersConditions searchMembersConditions,String token);
+
+    /**
      * 获取管理员数量
      * @param receivedGroupId
      * @param token

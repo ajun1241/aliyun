@@ -310,4 +310,12 @@ public interface GroupMapper {
      * @return
      */
     int saveGroupEventMsg(GroupEventMsg groupEventMsg);
+
+    /**
+     * 条件查询成员
+     * @param groupId
+     * @param condition
+     * @return
+     */
+    List<String> searchMembersByCondition(@Param("groupId") String groupId,@Param("condition") String condition);
 }
