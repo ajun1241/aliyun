@@ -15,7 +15,7 @@
         insert into grouprelation (groupId, memberId, memberLevel) values (#{groupId},#{memberId},0)
     </insert>
     <insert id="saveGroupMsg" useGeneratedKeys="true" keyProperty="id">
-        insert into groupsystemmsg (senderId, receiverId, msgContent, groupValidationId) values (#{senderId},#{receiverId},#{msgContent},#{groupValidationId})
+        insert into groupsystemmsg (senderId, receiverId, msgContent, groupValidationId,msgType) values (#{senderId},#{receiverId},#{msgContent},#{groupValidationId},#{msgType})
     </insert>
     <insert id="saveValidationContent" useGeneratedKeys="true" keyProperty="id">
         insert into groupvalidation (userId, validationContent, validationSource) values (#{userId},#{validationContent},#{validationSource})
@@ -28,6 +28,9 @@
         values (#{userId},#{groupId},#{msgBody},#{eventName},#{address},
         #{startTime},#{endTime},#{type},#{level},#{repeatTime},
         #{remindTime},#{person},#{remark},#{backLogList})
+    </insert>
+    <insert id="saveSendEventMsg">
+        insert into groupsendeventmsg (groupId, eventId, senderId) values (#{groupId},#{eventId},#{senderId})
     </insert>
     <update id="updateGroupInfo" statementType="STATEMENT">
         update groupinfo set ${updateType} = '${value}' where id = ${groupId}
@@ -43,6 +46,9 @@
     </update>
     <update id="updGroupMsgById">
         update groupsystemmsg set readStatus=1 where id=#{groupMsgId}
+    </update>
+    <update id="updGroupSendEventMsg">
+        update groupsendeventmsg set processState=#{processState},processDate=#{processDate},processBy=#{processBy} where id=#{groupValidationId}
     </update>
     <delete id="removeMember">
         delete from grouprelation where groupId = #{groupId} and memberId = #{memberId} and memberLevel != 2
@@ -120,11 +126,15 @@
         select * from groupvalidation where id=#{groupValidationId}
     </select>
     <select id="queryApplyUnreadMsgList" resultType="com.modcreater.tmbeans.pojo.GroupSystemMsg">
-        select * from groupsystemmsg where receiverId=#{userId} and groupvalidationId IN (SELECT id FROM groupvalidation WHERE processState=0)
+        select * from groupsystemmsg where receiverId=#{userId}
+        and groupvalidationId IN (SELECT id FROM groupvalidation WHERE processState = 0)
+        OR groupvalidationId IN (SELECT id FROM groupsendeventmsg WHERE processState = 0)
         limit #{pageIndex},#{pageSize}
     </select>
     <select id="queryApplyReadMsgList" resultType="com.modcreater.tmbeans.pojo.GroupSystemMsg">
-        select * from groupsystemmsg where receiverId=#{userId} and groupvalidationId IN (SELECT id FROM groupvalidation WHERE processState=1)
+        select * from groupsystemmsg where receiverId=#{userId}
+        and groupvalidationId IN (SELECT id FROM groupvalidation WHERE processState &lt;&gt; 0)
+        OR groupvalidationId IN (SELECT id FROM groupsendeventmsg WHERE processState &lt;&gt; 0)
         limit #{pageIndex},#{pageSize}
     </select>
     <select id="queryApplyUnreadFMsgList" resultType="com.modcreater.tmbeans.pojo.GroupFeedbackValidation">
@@ -146,5 +156,8 @@
     </select>
     <select id="getGroupRelation" resultType="com.modcreater.tmbeans.pojo.GroupRelation">
         select * from grouprelation where groupId = #{groupId} and memberId = #{memberId}
+    </select>
+    <select id="getGroupSendEventMsg" resultType="com.modcreater.tmbeans.pojo.GroupSendEventMsg">
+        select * from groupsendeventmsg where id=#{groupValidationId}
     </select>
 </mapper>

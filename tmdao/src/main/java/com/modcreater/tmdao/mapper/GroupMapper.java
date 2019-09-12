@@ -326,4 +326,28 @@ public interface GroupMapper {
      * @return
      */
     GroupRelation getGroupRelation(@Param("groupId") String groupId,@Param("memberId") String memberId);
+
+    /**
+     * 保存发送事件邀请申请
+     * @param groupSendEventMsg
+     * @return
+     */
+    int saveSendEventMsg(GroupSendEventMsg groupSendEventMsg);
+
+    /**
+     *  查询事件邀请申请详情
+     * @param groupValidationId
+     * @return
+     */
+    GroupSendEventMsg getGroupSendEventMsg(Long groupValidationId);
+
+    /**
+     * 修改事件邀请申请状态
+     * @param processState
+     * @param processDate
+     * @param processBy
+     * @param groupSendEventMsgId
+     * @return
+     */
+    int updGroupSendEventMsg(Long processState, long processDate, String processBy,Long groupSendEventMsgId);
 }

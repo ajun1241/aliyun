@@ -185,6 +185,13 @@ public class GroupController {
         return groupService.sendInviteEvent(sendInviteEventVo,request.getHeader("token"));
     }
 
+    @Safety
+    @PostMapping(value = "feedbackgroupevent")
+    @ApiOperation("回应团队事件邀请申请")
+    public Dto feedbackGroupEvent(@RequestBody FeedbackGroupEventVo feedbackGroupEventVo , HttpServletRequest request){
+        return groupService.feedbackGroupEvent(feedbackGroupEventVo,request.getHeader("token"));
+    }
+
     @PostMapping(value = "addnewmembers")
     @ApiOperation("添加成员")
     public Dto addNewMembers(@RequestBody AddNewMembers addNewMembers ,HttpServletRequest request){

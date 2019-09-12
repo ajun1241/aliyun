@@ -773,6 +773,6 @@
         select * from singleevent where userId  = #{userId} and eventId = #{eventId} and isOverdue = 0
     </select>
     <select id="queryEventBySingleEventId" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select * from singleevent where id=#{id};
+        select * from singleevent where id=#{id} and isOverdue = 0;
     </select>
 </mapper>
