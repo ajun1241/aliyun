@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.TempEventMapper">
-    <insert id="addTempEvent" parameterType="com.modcreater.tmbeans.pojo.SingleEvent">
+    <insert id="addTempEvent" parameterType="com.modcreater.tmbeans.pojo.SingleEvent"  useGeneratedKeys="true" keyProperty="id">
         insert into tempevent values
             (null ,
             #{eventid},
@@ -28,5 +28,8 @@
     </delete>
     <select id="queryTempEvent" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select * from tempevent where userId=#{userId} and eventId=#{eventId}
+    </select>
+    <select id="queryTempEventById" resultType="com.modcreater.tmbeans.pojo.SingleEventAndBacklog">
+        select * from tempevent where id=#{id}
     </select>
 </mapper>

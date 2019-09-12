@@ -87,7 +87,7 @@ public interface GroupService {
     Dto respondApply(GroupApplyDisposeVo groupApplyDisposeVo, String token);
 
     /**
-     * 查询团队已读验证消息列表
+     * 查询团队已处理验证消息列表
      * @param userIdVo
      * @param token
      * @return
@@ -95,7 +95,7 @@ public interface GroupService {
     Dto applyReadMsgList(UserIdVo userIdVo, String token);
 
     /**
-     * 查询团队未读验证消息列表
+     * 查询团队未处理验证消息列表
      * @param userIdVo
      * @param token
      * @return
@@ -255,4 +255,12 @@ public interface GroupService {
      * @return
      */
     Dto getGroupEventMsgInfo(ReceivedGroupEventMsgId receivedGroupEventMsgId, String token);
+
+    /**
+     * 回应团队事件邀请申请
+     * @param feedbackGroupEventVo
+     * @param token
+     * @return
+     */
+    Dto feedbackGroupEvent(FeedbackGroupEventVo feedbackGroupEventVo, String token);
 }

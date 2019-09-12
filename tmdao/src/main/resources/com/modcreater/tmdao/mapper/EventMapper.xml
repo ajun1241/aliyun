@@ -726,7 +726,7 @@
         select count(id) from singleevent where userId = #{userId} and isOverdue &lt;&gt; 2
     </select>
     <select id="queryAllDrafts" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
-        select * from draft where userId = #{userId}
+        select * from draft where userId = #{userId} and isOverdue &lt;&gt; 2
     </select>
     <select id="getTodayEvents" resultType="com.modcreater.tmbeans.pojo.SingleEvent">
         select * from singleevent where userId = #{userId}

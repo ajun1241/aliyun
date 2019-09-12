@@ -178,6 +178,13 @@ public class GroupController {
         return groupService.respondApply(groupApplyDisposeVo,request.getHeader("token"));
     }
 
+    @Safety
+    @PostMapping(value = "sendinviteevent")
+    @ApiOperation("发送邀请事件至团队")
+    public Dto sendInviteEvent(@RequestBody SendInviteEventVo sendInviteEventVo , HttpServletRequest request){
+        return groupService.sendInviteEvent(sendInviteEventVo,request.getHeader("token"));
+    }
+
     @PostMapping(value = "addnewmembers")
     @ApiOperation("添加成员")
     public Dto addNewMembers(@RequestBody AddNewMembers addNewMembers ,HttpServletRequest request){

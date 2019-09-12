@@ -917,6 +917,72 @@ public class GroupServiceImpl implements GroupService {
         return DtoUtil.getSuccesWithDataDto("查询成功",showSingleEvent,100000);
     }
 
+    /**
+     * 回应团队事件邀请申请
+     * @param feedbackGroupEventVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto feedbackGroupEvent(FeedbackGroupEventVo feedbackGroupEventVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(feedbackGroupEventVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        try {
+            GroupSystemMsg groupSystemMsg=groupMapper.getGroupMsgById(feedbackGroupEventVo.getMsgId());
+            //查询事件
+            SingleEvent singleEvent=eventMapper.queryEventBySingleEventId(groupSystemMsg.getGroupValidationId());
+            SingleEventAndBacklog singleEventAndBacklog=JSONObject.parseObject(JSON.toJSONString(singleEvent),SingleEventAndBacklog.class);
+            //查询清单
+            List<BacklogList> backlogLists=backlogMapper.queryBacklogList(singleEvent.getId());
+            singleEventAndBacklog.setBacklogList(backlogLists);
+            //同意
+            if ("1".equals(feedbackGroupEventVo.getChoose())){
+                //保存事件消息
+                GroupEventMsg groupEventMsg=new GroupEventMsg();
+                groupEventMsg.setUserId(singleEvent.getUserid());
+    //            groupEventMsg.setGroupId(Long.parseLong(groupSystemMsg.getGroupId()));
+                groupEventMsg.setMsgBody("发起");
+                groupEventMsg.setEventName(singleEvent.getEventname());
+                groupEventMsg.setAddress(singleEvent.getAddress());
+                groupEventMsg.setStartTime(Long.valueOf(singleEvent.getStarttime()));
+                groupEventMsg.setEndTime(Long.valueOf(singleEvent.getEndtime()));
+                groupEventMsg.setType(singleEvent.getType());
+                groupEventMsg.setLevel(singleEvent.getLevel());
+                groupEventMsg.setRepeatTime(singleEvent.getRemindTime());
+                groupEventMsg.setRemindTime(singleEvent.getRemindTime());
+                groupEventMsg.setPerson(singleEvent.getPerson());
+                groupEventMsg.setRemark(singleEvent.getRemarks());
+                List<String> backlogs=new ArrayList<>();
+                for (BacklogList backlogList:backlogLists) {
+                    backlogs.add(backlogList.getBacklogName());
+                }
+                groupEventMsg.setBacklogList(JSON.toJSONString(backlogs));
+                groupMapper.saveGroupEventMsg(groupEventMsg);
+                //发送邀请消息至群聊
+                String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
+                InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEventAndBacklog)), "2","");
+                logger.info(JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEventAndBacklog)));
+                ResponseResult result = rongCloudMethodUtil.sendGroupMsg(singleEvent.getUserid().toString(), new String[]{""}, inviteMessage,1);
+                if (result.getCode() != 200) {
+                    logger.info("群聊发送邀请事件时融云消息异常" + result.toString());
+                    return DtoUtil.getFalseDto("消息发送失败", 21040);
+                }
+                //修改申请处理状态
+
+            }else {//拒绝
+                //修改申请处理状态
+
+            }
+            //发送反馈信息
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return DtoUtil.getFalseDto("操作失败",20155);
+        }
+        return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
 
     /**
      * 发送邀请事件至团队
@@ -929,11 +995,9 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(sendInviteEventVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        //判断发送者权限
-        int userLevel=groupMapper.getMemberLevel(sendInviteEventVo.getGroupId(),sendInviteEventVo.getUserId());
-        SingleEventAndBacklog singleEvent=sendInviteEventVo.getSingleEvent();
-        if (userLevel==2 || userLevel==1){
-            //管理员或群主
+        try {
+            int userLevel=groupMapper.getMemberLevel(sendInviteEventVo.getGroupId(),sendInviteEventVo.getUserId());
+            SingleEventAndBacklog singleEvent=JSONObject.parseObject(sendInviteEventVo.getSingleEvent(),SingleEventAndBacklog.class);
             //保存事件至发送者时间轴
             singleEvent.setUserid(Long.parseLong(sendInviteEventVo.getUserId()));
             //这里开始判断是否是一个重复事件,如果状态值为真,则该事件为重复事件
@@ -967,43 +1031,76 @@ public class GroupServiceImpl implements GroupService {
             singleEventVice.setUserId(singleEvent.getUserid());
             singleEventVice.setEventId(singleEvent.getEventid());
             eventViceMapper.createEventVice(singleEventVice);
-            //保存事件消息
-            GroupEventMsg groupEventMsg=new GroupEventMsg();
-            groupEventMsg.setUserId(Long.parseLong(sendInviteEventVo.getUserId()));
-            groupEventMsg.setGroupId(Long.parseLong(sendInviteEventVo.getGroupId()));
-            groupEventMsg.setMsgBody("发起");
-            groupEventMsg.setEventName(singleEvent.getEventname());
-            groupEventMsg.setAddress(singleEvent.getAddress());
-            groupEventMsg.setStartTime(Long.valueOf(singleEvent.getStarttime()));
-            groupEventMsg.setEndTime(Long.valueOf(singleEvent.getEndtime()));
-            groupEventMsg.setType(singleEvent.getType());
-            groupEventMsg.setLevel(singleEvent.getLevel());
-            groupEventMsg.setRepeatTime(singleEvent.getRemindTime());
-            groupEventMsg.setRemindTime(singleEvent.getRemindTime());
-            groupEventMsg.setPerson(singleEvent.getPerson());
-            groupEventMsg.setRemark(singleEvent.getRemarks());
-            List<String> backlogs=new ArrayList<>();
-            for (BacklogList backlogList:singleEvent.getBacklogList()) {
-                backlogs.add(backlogList.getBacklogName());
+            //判断发送者权限
+            if (userLevel==2 || userLevel==1){
+                //管理员或群主
+                //保存事件消息
+                GroupEventMsg groupEventMsg=new GroupEventMsg();
+                groupEventMsg.setUserId(Long.parseLong(sendInviteEventVo.getUserId()));
+                groupEventMsg.setGroupId(Long.parseLong(sendInviteEventVo.getGroupId()));
+                groupEventMsg.setMsgBody("发起");
+                groupEventMsg.setEventName(singleEvent.getEventname());
+                groupEventMsg.setAddress(singleEvent.getAddress());
+                groupEventMsg.setStartTime(Long.valueOf(singleEvent.getStarttime()));
+                groupEventMsg.setEndTime(Long.valueOf(singleEvent.getEndtime()));
+                groupEventMsg.setType(singleEvent.getType());
+                groupEventMsg.setLevel(singleEvent.getLevel());
+                groupEventMsg.setRepeatTime(singleEvent.getRemindTime());
+                groupEventMsg.setRemindTime(singleEvent.getRemindTime());
+                groupEventMsg.setPerson(singleEvent.getPerson());
+                groupEventMsg.setRemark(singleEvent.getRemarks());
+                List<String> backlogs=new ArrayList<>();
+                for (BacklogList backlogList:singleEvent.getBacklogList()) {
+                    backlogs.add(backlogList.getBacklogName());
+                }
+                groupEventMsg.setBacklogList(JSON.toJSONString(backlogs));
+                groupMapper.saveGroupEventMsg(groupEventMsg);
+                //发送邀请消息至群聊
+                String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
+                InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2","");
+                logger.info(JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)));
+                ResponseResult result = rongCloudMethodUtil.sendGroupMsg(sendInviteEventVo.getUserId(), new String[]{sendInviteEventVo.getGroupId()}, inviteMessage,1);
+                if (result.getCode() != 200) {
+                    logger.info("群聊发送邀请事件时融云消息异常" + result.toString());
+                    return DtoUtil.getFalseDto("消息发送失败", 21040);
+                }
+                return DtoUtil.getSuccessDto("发送成功",100000);
+            }else {
+                //普通成员
+                Account account=accountMapper.queryAccount(sendInviteEventVo.getUserId());
+                //查询管理员和群主
+                List<GroupRelation> groupRelationList=groupMapper.queryGroupRelation(sendInviteEventVo.getGroupId());
+                List<String> userIds=new ArrayList<>();
+                for (GroupRelation groupRelation:groupRelationList) {
+                    if (groupRelation.getMemberLevel().equals(1L) || groupRelation.getMemberLevel().equals(2L)){
+                        userIds.add(groupRelation.getMemberId().toString());
+                    }
+                }
+                //发送申请消息给管理员
+                for (String userId:userIds) {
+                    String content="用户"+account.getUserName()+"申请发送事件“"+singleEvent.getEventname()+"”至团队";
+                    //消息保存
+                    GroupSystemMsg groupSystemMsg=new GroupSystemMsg();
+                    groupSystemMsg.setSenderId(Long.parseLong(sendInviteEventVo.getUserId()));
+                    groupSystemMsg.setReceiverId(Long.parseLong(userId));
+                    groupSystemMsg.setMsgContent(content);
+                    groupSystemMsg.setGroupValidationId(singleEvent.getId());
+                    groupSystemMsg.setMsgType(2L);
+                    groupMapper.saveGroupMsg(groupSystemMsg);
+                    //发送申请消息
+                    RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+                    ResponseResult result=rongCloudMethodUtil.sendPrivateMsg(VALIDATION_ID,new String[]{userId},0,
+                            new TxtMessage(content,""));
+                    if (result.getCode()!=200){
+                        return DtoUtil.getFalseDto("发送失败",17002);
+                    }
+                }
+                return DtoUtil.getSuccessDto("请求已发送,请等待管理员审核",100000);
             }
-            groupEventMsg.setBacklogList(JSON.toJSONString(backlogs));
-            groupMapper.saveGroupEventMsg(groupEventMsg);
-            //发送邀请消息至群聊
-            String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
-            InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2","");
-            logger.info(JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)));
-//            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), new String[]{personList1.get(i)}, 0, inviteMessage);
-//            if (result.getCode() != 200) {
-//                logger.info("添加邀请事件时融云消息异常" + result.toString());
-//                return DtoUtil.getFalseDto("消息发送失败", 21040);
-//            }
-
-        }else {
-            //普通成员
-            //发送申请消息给管理员
-
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
         }
-        return null;
+        return DtoUtil.getFalseDto("发送失败了",17002);
     }
 
     /**

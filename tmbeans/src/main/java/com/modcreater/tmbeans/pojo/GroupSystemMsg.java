@@ -15,5 +15,6 @@ public class GroupSystemMsg {
   private String msgContent;
   private Long readStatus;
   private String sendDate;
+  private Long msgType;
 
 }

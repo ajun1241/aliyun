@@ -20,6 +20,13 @@ public interface BacklogMapper {
     int insertBacklog(List<BacklogList> backlogLists);
 
     /**
+     * 批量新增临时待办事项
+     * @param backlogLists
+     * @return
+     */
+    int insertTempBacklog(List<BacklogList> backlogLists);
+
+    /**
      * 修改待办事项
      * @param backlogList
      * @return
@@ -81,4 +88,26 @@ public interface BacklogMapper {
      * @return
      */
     int updateBacklogIsSyncByEventId(BacklogList backlogList);
+
+    /**
+     * 根据事件Id修改临时状态
+     * @param oldSingleEventId
+     * @param newSingleEventId
+     * @return
+     */
+    int updateBacklogIsTestByEventId(Long newSingleEventId,Long oldSingleEventId);
+
+    /**
+     * 查询临时清单
+     * @param id
+     * @return
+     */
+    List<BacklogList> queryTempBacklogList(Long id);
+
+    /**
+     * 删除临时清单
+     * @param singleEventId
+     * @return
+     */
+    int deleteTempBacklogList(Long singleEventId);
 }

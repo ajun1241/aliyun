@@ -255,7 +255,7 @@ public interface GroupMapper {
      * @param userId
      * @return
      */
-    List<GroupSystemMsg> queryApplyMsgList(String userId);
+    List<GroupSystemMsg> queryApplyReadMsgList(String userId,int pageIndex,int pageSize);
 
     /**
      * 查询团队历史事件消息
@@ -270,7 +270,7 @@ public interface GroupMapper {
      * @return
      */
     GroupEventMsg getGroupEventMsgInfo(String groupEventMsgId);
-    List<GroupSystemMsg> queryApplyReadMsgList(String userId,int pageIndex,int pageSize);
+
 
     /**
      * 修改团队验证消息状态
