@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.SingleEvent;
+import com.modcreater.tmbeans.pojo.SingleEventAndBacklog;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -34,4 +35,11 @@ public interface TempEventMapper {
      * @return
      */
     SingleEvent queryTempEvent(String eventId, String userId);
+
+    /**
+     * 根据id查询临时事件
+     * @param id
+     * @return
+     */
+    SingleEventAndBacklog queryTempEventById(Long id);
 }

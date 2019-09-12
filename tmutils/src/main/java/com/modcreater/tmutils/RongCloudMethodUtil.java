@@ -137,23 +137,21 @@ public class RongCloudMethodUtil {
      *
      * 群组消息
      * */
-    public ResponseResult sendGroupMsg() throws Exception {
-
-
-       /* GroupMessage groupMessage = new GroupMessage()
-                .setSenderId("userId")
+    public ResponseResult sendGroupMsg(String senderId, String[] targetIds,BaseMessage baseMessage,Integer isIncludeSender) throws Exception {
+        GroupMessage groupMessage = new GroupMessage()
+                .setSenderId(senderId)
                 .setTargetId(targetIds)
-                .setObjectName(txtMessage.getType())
-                .setContent(txtMessage)
-                .setPushContent("this is a push")
-                .setPushData("{\"pushData\":\"hello\"}")
+                .setObjectName(baseMessage.getType())
+                .setContent(baseMessage)
+                .setPushContent("")
+                .setPushData("")
                 .setIsPersisted(0)
-                .setIsIncludeSender(0)
+                .setIsIncludeSender(isIncludeSender)
                 .setContentAvailable(0);
         ResponseResult groupResult = group.send(groupMessage);
 
-        logger.info("send Group message:  " + groupResult.toString());*/
-        return null;
+        logger.info("send Group message:  " + groupResult.toString());
+        return groupResult;
     }
 
     /**

@@ -15,6 +15,20 @@
         )
         </foreach>
     </insert>
+    <insert id="insertTempBacklog">
+        insert into backloglist (singleEventId, backlogName,finishTime,backlogStatus,isSync,isTest)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.singleEventId},#{item.backlogName},#{item.finishTime},#{item.backlogStatus},
+            <if test="item.isSync == null " >
+                0,
+            </if>
+            <if test="item.isSync != null">
+                #{item.isSync},
+            </if>
+            1)
+        </foreach>
+    </insert>
     <insert id="addBacklog">
         insert into backloglist (singleEventId, backlogName,isSync)
         values (#{singleEventId},#{backlogName},#{isSync})
@@ -35,10 +49,13 @@
         where id=#{id}
     </update>
     <update id="updateBacklogIsSyncByEventId">
-        update backloglist set isSync=#{isSync} where singleEventId=#{singleEventId}
+        update backloglist set isSync=#{isSync} where singleEventId=#{singleEventId} and isTest=0
+    </update>
+    <update id="updateBacklogIsTestByEventId">
+        update backloglist set isTest=1,singleEventId=#{newSingleEventId} where singleEventId=#{oldSingleEventId} and isTest=0
     </update>
     <select id="queryBacklogList" resultType="com.modcreater.tmbeans.pojo.BacklogList">
-        select * from backloglist where singleEventId=#{singleEventId}
+        select * from backloglist where singleEventId=#{singleEventId} and isTest=0
     </select>
     <select id="queryDraftBacklogList" resultType="com.modcreater.tmbeans.pojo.BacklogList">
         select * from draftbackloglist where singleEventId=#{singleEventId}
@@ -46,11 +63,17 @@
     <select id="queryBacklogListById" resultType="com.modcreater.tmbeans.pojo.BacklogList">
         select * from backloglist where id=#{id}
     </select>
+    <select id="queryTempBacklogList" resultType="com.modcreater.tmbeans.pojo.BacklogList">
+        select * from backloglist where singleEventId=#{singleEventId} and isTest=1
+    </select>
     <delete id="deleteBacklog">
         delete from backloglist where id=#{id}
     </delete>
     <delete id="deleteDraftBacklogList">
         delete from draftbackloglist where singleEventId=#{singleEventId}
+    </delete>
+    <delete id="deleteTempBacklogList">
+        delete from backloglist where isTest=1 and singleEventId=#{singleEventId}
     </delete>
     <insert id="insertDraftBacklog">
         insert into draftbackloglist (singleEventId, backlogName,finishTime,backlogStatus)
