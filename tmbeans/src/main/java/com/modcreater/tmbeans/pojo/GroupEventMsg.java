@@ -19,10 +19,13 @@ public class GroupEventMsg {
   private Long type;
   private Long level;
   private String repeatTime;
+  private Long year;
+  private Long month;
+  private Long day;
   private String remindTime;
   private String person;
   private String remark;
-  private String backLogList;
+  private String backlogList;
   private String createTime;
 
 }

@@ -189,4 +189,10 @@ public class GroupController {
     public Dto getGroupEventMsg(@RequestBody ReceivedGroupId receivedGroupId,HttpServletRequest request){
         return groupService.getGroupEventMsg(receivedGroupId,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getgroupeventmsginfo")
+    @ApiOperation("获取团队历史事件详情")
+    public Dto getGroupEventMsgInfo(@RequestBody ReceivedGroupEventMsgId receivedGroupEventMsgId,HttpServletRequest request){
+        return groupService.getGroupEventMsgInfo(receivedGroupEventMsgId,request.getHeader("token"));
+    }
 }

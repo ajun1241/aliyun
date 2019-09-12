@@ -138,4 +138,7 @@
     <select id="getGroupEventMsg" resultType="com.modcreater.tmbeans.show.group.ShowGroupEventMsg">
         select id groupEventMsgId,userId,msgBody,createTime,eventName from groupeventmsg where groupId = #{groupId}
     </select>
+    <select id="getGroupEventMsgInfo" resultType="com.modcreater.tmbeans.pojo.GroupEventMsg">
+        select * from groupeventmsg where id = #{groupEventMsgId}
+    </select>
 </mapper>

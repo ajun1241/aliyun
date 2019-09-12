@@ -263,6 +263,13 @@ public interface GroupMapper {
      * @return
      */
     List<ShowGroupEventMsg> getGroupEventMsg(String groupId);
+
+    /**
+     * 获取团队历史事件详情
+     * @param groupEventMsgId
+     * @return
+     */
+    GroupEventMsg getGroupEventMsgInfo(String groupEventMsgId);
     List<GroupSystemMsg> queryApplyReadMsgList(String userId,int pageIndex,int pageSize);
 
     /**

@@ -6,6 +6,7 @@ import com.modcreater.tmauth.service.GroupService;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.dto.EventPersons;
 import com.modcreater.tmbeans.pojo.*;
+import com.modcreater.tmbeans.show.ShowSingleEvent;
 import com.modcreater.tmbeans.show.group.ShowGroupEventMsg;
 import com.modcreater.tmbeans.show.group.ShowGroupInfo;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
@@ -871,6 +872,24 @@ public class GroupServiceImpl implements GroupService {
         return DtoUtil.getSuccesWithDataDto("消息列表获取成功",groupEventMsgs,100000);
     }
 
+    @Override
+    public Dto getGroupEventMsgInfo(ReceivedGroupEventMsgId receivedGroupEventMsgId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupEventMsgId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        GroupEventMsg groupEventMsg = groupMapper.getGroupEventMsgInfo(receivedGroupEventMsgId.getGroupEventMsgId());
+        List<BacklogList> bac = new ArrayList<>();
+        for (Object s : JSONObject.parseArray(groupEventMsg.getBackLogList(),ArrayList.class)){
+            BacklogList backlogList = new BacklogList();
+            backlogList.setBacklogName(s.toString());
+            bac.add(backlogList);
+        }
+        SingleEvent singleEvent = JSONObject.parseObject(JSON.toJSONString(groupEventMsg),SingleEvent.class);
+        ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent1(singleEvent);
+        showSingleEvent.setBacklogList(bac);
+        return DtoUtil.getSuccesWithDataDto("查询成功",showSingleEvent,100000);
+    }
+
 
     /**
      * 发送邀请事件至团队
@@ -946,11 +965,11 @@ public class GroupServiceImpl implements GroupService {
             String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
             InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2","");
             logger.info(JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)));
-            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), new String[]{personList1.get(i)}, 0, inviteMessage);
-            if (result.getCode() != 200) {
-                logger.info("添加邀请事件时融云消息异常" + result.toString());
-                return DtoUtil.getFalseDto("消息发送失败", 21040);
-            }
+//            ResponseResult result = rongCloudMethodUtil.sendPrivateMsg(addInviteEventVo.getUserId(), new String[]{personList1.get(i)}, 0, inviteMessage);
+//            if (result.getCode() != 200) {
+//                logger.info("添加邀请事件时融云消息异常" + result.toString());
+//                return DtoUtil.getFalseDto("消息发送失败", 21040);
+//            }
 
         }else {
             //普通成员
@@ -969,6 +988,14 @@ public class GroupServiceImpl implements GroupService {
     private boolean isHavePermission(String groupId, String userId){
         int level = groupMapper.getMemberLevel(groupId,userId);
         return level == 2 || level == 1;
+    }
+
+    public static void main(String[] args) {
+        List<String> strings = new ArrayList<>();
+        strings.add("1");
+        strings.add("2");
+        strings.add("3");
+        System.out.println(JSON.toJSONString(strings));
     }
 
 }

@@ -239,4 +239,12 @@ public interface GroupService {
      * @return
      */
     Dto getGroupEventMsg(ReceivedGroupId receivedGroupId, String token);
+
+    /**
+     * 获取团队历史事件详情
+     * @param receivedGroupEventMsgId
+     * @param token
+     * @return
+     */
+    Dto getGroupEventMsgInfo(ReceivedGroupEventMsgId receivedGroupEventMsgId, String token);
 }
