@@ -19,6 +19,6 @@ public class RemoveMember {
 
     private String groupId;
 
-    private String[] memberId;
+    private String[] membersId;
 
 }

@@ -762,7 +762,7 @@ public class GroupServiceImpl implements GroupService {
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(removeMember.getGroupId());
         int handlerLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),removeMember.getUserId());
-        String[] membersId = removeMember.getMemberId();
+        String[] membersId = removeMember.getMembersId();
         if (ObjectUtils.isEmpty(membersId)){
             return DtoUtil.getFalseDto("请选择要移除的成员",80010);
         }
@@ -791,7 +791,7 @@ public class GroupServiceImpl implements GroupService {
             }
         }
         try {
-            Result result = groupCloudUtil.quitGroup(new ArrayList<>(Arrays.asList(removeMember.getMemberId())),removeMember.getGroupId(),groupInfo.getGroupName());
+            Result result = groupCloudUtil.quitGroup(new ArrayList<>(Arrays.asList(removeMember.getMembersId())),removeMember.getGroupId(),groupInfo.getGroupName());
             if (result.getCode()!=200){
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 logger.warn("更新移除团队成员时融云消息异常" + result.toString());
