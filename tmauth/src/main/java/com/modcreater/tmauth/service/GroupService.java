@@ -263,4 +263,12 @@ public interface GroupService {
      * @return
      */
     Dto feedbackGroupEvent(FeedbackGroupEventVo feedbackGroupEventVo, String token);
+
+    /**
+     * 解散团队
+     * @param receivedGroupId
+     * @param token
+     * @return
+     */
+    Dto breakGroup(ReceivedGroupId receivedGroupId, String token);
 }

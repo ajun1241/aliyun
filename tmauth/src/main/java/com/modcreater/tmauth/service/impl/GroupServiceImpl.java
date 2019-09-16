@@ -84,6 +84,9 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(groupInfoVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
+        if (groupInfoVo.getMembers().length > Integer.valueOf(groupInfoVo.getGroupScale())){
+            return DtoUtil.getFalseDto("当前选中人数超出上限,请重新选择",80014);
+        }
         //0 : 不需要; 1 : 需要
         int status = 1;
         GroupPermission groupPermission = groupMapper.getGroupUpperLimit(groupInfoVo.getUserId());
@@ -1062,6 +1065,46 @@ public class GroupServiceImpl implements GroupService {
             return DtoUtil.getFalseDto("操作失败",20155);
         }
         return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
+    @Override
+    public Dto breakGroup(ReceivedGroupId receivedGroupId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (groupMapper.getMemberLevel(receivedGroupId.getGroupId(),receivedGroupId.getUserId()) != 2){
+            return DtoUtil.getFalseDto("您没有操作权限",80004);
+        }
+        List<String> membersId = groupMapper.getMembersId(receivedGroupId.getGroupId());
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(receivedGroupId.getGroupId());
+        int b1 = groupMapper.deleteGroup(receivedGroupId.getGroupId());
+        int b2 = groupMapper.deleteAllMembers(receivedGroupId.getGroupId());
+        if (b1 == 1 && b2 >= 3){
+            List<String> allMembersId = groupMapper.getMembersId(receivedGroupId.getGroupId());
+            allMembersId.add(receivedGroupId.getUserId());
+            try {
+                Result result = groupCloudUtil.dissolutionGroup(allMembersId,receivedGroupId.getGroupId());
+                if (result.getCode() != 200){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    logger.warn("解散团队出错");
+                    return DtoUtil.getFalseDto("解散团队失败,请检查网络环境",80012);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String msgInfo = "团队\"" + groupInfo.getGroupName() + "\"已被创建者解散";
+            try {
+                ResponseResult result1 = rongCloudMethodUtil.sendPrivateMsg(SYSTEM_ID, (String[]) membersId.toArray(),0,new TxtMessage(msgInfo,null));
+                if (result1.getCode() != 200){
+                    logger.warn("解散团队消息发送失败");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return DtoUtil.getSuccessDto("解散成功",100000);
+        }
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        return DtoUtil.getFalseDto("解散失败,请勿重复操作",80013);
     }
 
 

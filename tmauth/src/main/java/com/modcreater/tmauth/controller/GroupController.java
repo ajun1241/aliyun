@@ -216,4 +216,10 @@ public class GroupController {
     public Dto getGroupEventMsgInfo(@RequestBody ReceivedGroupEventMsgId receivedGroupEventMsgId,HttpServletRequest request){
         return groupService.getGroupEventMsgInfo(receivedGroupEventMsgId,request.getHeader("token"));
     }
+
+    @PostMapping(value = "breakgroup")
+    @ApiOperation("解散团队")
+    public Dto breakGroup(@RequestBody ReceivedGroupId receivedGroupId,HttpServletRequest request){
+        return groupService.breakGroup(receivedGroupId,request.getHeader("token"));
+    }
 }

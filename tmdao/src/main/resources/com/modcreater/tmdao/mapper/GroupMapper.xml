@@ -59,6 +59,12 @@
     <delete id="removeGroup">
         delete from groupinfo where id = #{groupId}
     </delete>
+    <delete id="deleteGroup">
+        delete from groupinfo where id = #{groupId}
+    </delete>
+    <delete id="deleteAllMembers">
+        delete from grouprelation where groupId = #{groupId}
+    </delete>
 
     <select id="getMyGroup" resultType="com.modcreater.tmbeans.show.group.ShowMyGroup">
         select gi.id groupId,gi.groupName groupName,gi.groupPicture groupPicture from grouprelation gl,groupinfo gi

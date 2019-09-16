@@ -358,4 +358,18 @@ public interface GroupMapper {
      * @return
      */
     int isMemberInGroup(@Param("memberId") String memberId,@Param("groupId") String groupId);
+
+    /**
+     * 删除团队信息
+     * @param groupId
+     * @return
+     */
+    int deleteGroup(String groupId);
+
+    /**
+     * 删除团队关系
+     * @param groupId
+     * @return
+     */
+    int deleteAllMembers(String groupId);
 }
