@@ -85,6 +85,7 @@ public class GroupController {
         return groupService.removeManager(removeManager,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "removemember")
     @ApiOperation("移除成员")
     public Dto removeMember(@RequestBody RemoveMember removeMember, HttpServletRequest request){

@@ -762,7 +762,11 @@ public class GroupServiceImpl implements GroupService {
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(removeMember.getGroupId());
         int handlerLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),removeMember.getUserId());
-        for (String memberId : removeMember.getMemberId()){
+        String[] membersId = removeMember.getMemberId();
+        if (ObjectUtils.isEmpty(membersId)){
+            return DtoUtil.getFalseDto("请选择要移除的成员",80010);
+        }
+        for (String memberId : membersId){
             int memberLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),memberId);
             boolean b1 = handlerLevel == 2 && (memberLevel == 1 || memberLevel == 0);
             boolean b2 = handlerLevel == 1 && memberLevel == 0;
