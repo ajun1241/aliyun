@@ -2153,7 +2153,7 @@ public class EventServiceImpl implements EventService {
         for (int i = 0; i <= 6; i++) {
             String currentDay = DateUtil.getDay(i);
             StringBuffer stringBuffer = new StringBuffer(currentDay);
-            StringBuffer eventIds = new StringBuffer();
+            StringBuffer eventIds = new StringBuffer("1");
             int currentWeek = DateUtil.stringToWeek(currentDay);
             currentWeek = currentWeek == 7 ? 0 : currentWeek;
                     NaturalWeek naturalWeek = new NaturalWeek();
@@ -2167,18 +2167,26 @@ public class EventServiceImpl implements EventService {
                 Boolean[] repeatTime = SingleEventUtil.getRepeatTime(loop);
                 if (repeatTime[currentWeek]) {
                     if (!SingleEventUtil.eventTime(singleList,Long.valueOf(loop.getStarttime()), Long.valueOf(loop.getEndtime()))){
-                        eventIds.append(loop.getEventid());
+                        eventIds.append(",").append(loop.getEventid());
                     }
                 }
             }
             for (SingleEvent singleEvent : singleList){
-                eventIds.append(singleEvent.getEventid());
+                eventIds.append(",").append(singleEvent.getEventid());
             }
             eventIdsList.add(eventIds.toString());
         }
-        List<List<SingleEvent>> result = new ArrayList<>();
-        for (String s : eventIdsList){
-            result.add(eventMapper.getEventsByEventIds(s));
+        List<List<ShowSingleEvent>> result = new ArrayList<>();
+        for (String s : eventIdsList) {
+            List<ShowSingleEvent> singleEventList = new ArrayList<>();
+            for (String s1 : s.split(",")) {
+                SingleEvent singleEvent = eventMapper.getAEvent(receivedId.getUserId(),Long.valueOf(s1),"singleevent");
+                if (ObjectUtils.isEmpty(singleEvent)){
+                    continue;
+                }
+                singleEventList.add(SingleEventUtil.getShowSingleEvent1(singleEvent));
+            }
+            result.add(singleEventList);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
