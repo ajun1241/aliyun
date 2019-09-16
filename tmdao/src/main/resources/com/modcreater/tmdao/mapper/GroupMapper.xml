@@ -53,12 +53,6 @@
     <delete id="removeMember">
         delete from grouprelation where groupId = #{groupId} and memberId = #{memberId} and memberLevel != 2
     </delete>
-    <delete id="removeAllMember">
-        delete from grouprelation where groupId = #{groupId}
-    </delete>
-    <delete id="removeGroup">
-        delete from groupinfo where id = #{groupId}
-    </delete>
     <delete id="deleteGroup">
         delete from groupinfo where id = #{groupId}
     </delete>
