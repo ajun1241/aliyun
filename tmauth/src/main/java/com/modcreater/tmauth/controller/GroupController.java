@@ -61,6 +61,12 @@ public class GroupController {
         return groupService.getMyGroupMembers(searchMembersConditions,request.getHeader("token"));
     }
 
+    @PostMapping(value = "groupingmembers")
+    @ApiOperation("分组获取团队成员")
+    public Dto groupingMembers(@RequestBody SearchMembersConditions searchMembersConditions,HttpServletRequest request){
+        return groupService.groupingMembers(searchMembersConditions,request.getHeader("token"));
+    }
+
     @PostMapping(value = "updategroupinfo")
     @ApiOperation("修改团队信息")
     public Dto updateGroupInfo(@RequestBody UpdateGroupInfo updateGroupInfo, HttpServletRequest request){
@@ -222,4 +228,6 @@ public class GroupController {
     public Dto breakGroup(@RequestBody ReceivedGroupId receivedGroupId,HttpServletRequest request){
         return groupService.breakGroup(receivedGroupId,request.getHeader("token"));
     }
+
+
 }

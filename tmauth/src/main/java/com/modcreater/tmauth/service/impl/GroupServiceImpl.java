@@ -202,47 +202,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto deleteGroup(ReceivedGroupId receivedGroupId, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21014);
-        }
-        int level = groupMapper.getMemberLevel(receivedGroupId.getGroupId(),receivedGroupId.getUserId());
-        if (level != 2){
-            return DtoUtil.getFalseDto("违规操作!",80004);
-        }
-        GroupInfo groupInfo = groupMapper.queryGroupInfo(receivedGroupId.getGroupId());
-        int deleteNum = groupMapper.removeAllMember(receivedGroupId.getGroupId());
-        int delete = groupMapper.removeGroup(receivedGroupId.getGroupId());
-        if (deleteNum >= 3 && delete == 1){
-            List<String> membersId = groupMapper.getMembersId(receivedGroupId.getGroupId());
-            membersId.remove(0);
-            RongCloudMethodUtil rong = new RongCloudMethodUtil();
-            String msgInfo = "团队\"" + groupInfo.getGroupName() + "\"已被群主解散";
-            for (String memberId : membersId){
-                try {
-                    ResponseResult result = rong.sendPrivateMsg(SYSTEM_ID,new String[]{memberId},0,new TxtMessage(msgInfo,null));
-                    if (result.getCode() != 200){
-                        logger.warn("发送解散融云消息异常" + result.toString());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            try {
-                Result result1 = groupCloudUtil.dissolutionGroup(membersId,receivedGroupId.getGroupId());
-                if (result1.getCode() != 200){
-                    logger.warn("解散团队异常" + result1.toString());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return DtoUtil.getSuccessDto("团队解散成功",100000);
-        }
-        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        return DtoUtil.getFalseDto("解散团队失败",80008);
-    }
-
-    @Override
     public Dto deleteGroupMember(GroupRelationVo groupRelationVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(groupRelationVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
@@ -637,17 +596,9 @@ public class GroupServiceImpl implements GroupService {
         ShowGroupInfo showGroupInfo = groupMapper.getMyGroupInfo(receivedGroupId.getGroupId());
         List<Map<String,Object>> membersInfo = new ArrayList<>();
         if (!ObjectUtils.isEmpty(showGroupInfo)){
-            List<String> memberIds = groupMapper.getMembersId(receivedGroupId.getGroupId());
+            List<String> memberIds = groupMapper.getMembersIdExceptSelf(receivedGroupId.getGroupId(),receivedGroupId.getUserId());
             for (String memberId : memberIds){
-                Map<String,Object> map = new HashMap<>();
-                Account account = accountMapper.queryAccount(memberId);
-                map.put("userCode",account.getUserCode());
-                map.put("headImgUrl",account.getHeadImgUrl());
-                map.put("gender",account.getGender());
-                map.put("friendId",account.getId());
-                map.put("userSign",account.getUserSign());
-                map.put("userName",account.getUserName());
-                membersInfo.add(map);
+                membersInfo.add(setAccount(memberId));
             }
             showGroupInfo.setMembersInfo(membersInfo);
             showGroupInfo.setMembersNum((long) memberIds.size());
@@ -665,23 +616,49 @@ public class GroupServiceImpl implements GroupService {
         List<Map<String, Object>> membersInfo = new ArrayList<>();
         List<String> memberIds;
         if (!StringUtils.hasText(searchMembersConditions.getCondition())) {
-            memberIds = groupMapper.getMembersId(searchMembersConditions.getGroupId());
+            memberIds = groupMapper.getMembersIdExceptSelf(searchMembersConditions.getGroupId(),searchMembersConditions.getUserId());
         } else {
             memberIds = groupMapper.searchMembersByCondition(searchMembersConditions.getGroupId(), searchMembersConditions.getCondition());
         }
         for (String memberId : memberIds) {
-            System.out.println(memberId);
-            Map<String, Object> map = new HashMap<>();
-            Account account = accountMapper.queryAccount(memberId);
-            map.put("headImgUrl", account.getHeadImgUrl());
-            map.put("userSign", account.getUserSign());
-            map.put("userCode", account.getUserCode());
-            map.put("friendId", account.getId());
-            map.put("userName", account.getUserName());
-            map.put("gender", account.getGender());
-            membersInfo.add(map);
+            membersInfo.add(setAccount(memberId));
         }
         return DtoUtil.getSuccesWithDataDto("查询成功", membersInfo, 100000);
+    }
+
+
+    /**
+     * 只分组管理员和普通成员
+     * @param searchMembersConditions
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto groupingMembers(SearchMembersConditions searchMembersConditions, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(searchMembersConditions.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        Map<String,Object> result = new HashMap<>();
+        List<Map<String, Object>> managersInfo = new ArrayList<>();
+        List<Map<String, Object>> membersInfo = new ArrayList<>();
+        List<String> managersId;
+        List<String> membersId;
+        if (!StringUtils.hasText(searchMembersConditions.getCondition())) {
+            membersId = groupMapper.groupingMembers(searchMembersConditions.getGroupId(),0,searchMembersConditions.getUserId());
+            managersId = groupMapper.groupingMembers(searchMembersConditions.getGroupId(),1,searchMembersConditions.getUserId());
+        } else {
+            membersId = groupMapper.groupingMembersByCondition(searchMembersConditions.getCondition(),searchMembersConditions.getGroupId(),0,searchMembersConditions.getUserId());
+            managersId = groupMapper.groupingMembersByCondition(searchMembersConditions.getCondition(),searchMembersConditions.getGroupId(),1,searchMembersConditions.getUserId());
+        }
+        for (String memberId : managersId) {
+            managersInfo.add(setAccount(memberId));
+        }
+        for (String memberId : membersId) {
+            membersInfo.add(setAccount(memberId));
+        }
+        result.put("managersInfo",managersInfo);
+        result.put("membersInfo",membersInfo);
+        return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 
     @Override
@@ -770,7 +747,7 @@ public class GroupServiceImpl implements GroupService {
             return DtoUtil.getFalseDto("请选择要移除的成员",80010);
         }
         for (String memberId : membersId){
-            if (groupMapper.isMemberInGroup(memberId,removeMember.getGroupId()) >= 1){
+            if (groupMapper.isMemberInGroup(memberId,removeMember.getGroupId()) < 1){
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return DtoUtil.getFalseDto("删除失败,成员\""+ accountMapper.queryAccount(memberId).getUserName() + "\"不在团队中",80011);
             }
@@ -1075,12 +1052,12 @@ public class GroupServiceImpl implements GroupService {
         if (groupMapper.getMemberLevel(receivedGroupId.getGroupId(),receivedGroupId.getUserId()) != 2){
             return DtoUtil.getFalseDto("您没有操作权限",80004);
         }
-        List<String> membersId = groupMapper.getMembersId(receivedGroupId.getGroupId());
+        List<String> membersId = groupMapper.getMembersIdExceptSelf(receivedGroupId.getGroupId(),receivedGroupId.getUserId());
         GroupInfo groupInfo = groupMapper.queryGroupInfo(receivedGroupId.getGroupId());
         int b1 = groupMapper.deleteGroup(receivedGroupId.getGroupId());
         int b2 = groupMapper.deleteAllMembers(receivedGroupId.getGroupId());
         if (b1 == 1 && b2 >= 3){
-            List<String> allMembersId = groupMapper.getMembersId(receivedGroupId.getGroupId());
+            List<String> allMembersId = groupMapper.getMembersIdExceptSelf(receivedGroupId.getGroupId(),receivedGroupId.getUserId());
             allMembersId.add(receivedGroupId.getUserId());
             try {
                 Result result = groupCloudUtil.dissolutionGroup(allMembersId,receivedGroupId.getGroupId());
@@ -1242,5 +1219,17 @@ public class GroupServiceImpl implements GroupService {
     private boolean isHavePermission(String groupId, String userId){
         int level = groupMapper.getMemberLevel(groupId,userId);
         return level == 2 || level == 1;
+    }
+
+    private Map<String,Object> setAccount(String memberId){
+        Map<String, Object> map = new HashMap<>();
+        Account account = accountMapper.queryAccount(memberId);
+        map.put("userSign", account.getUserSign());
+        map.put("headImgUrl", account.getHeadImgUrl());
+        map.put("userName", account.getUserName());
+        map.put("friendId", account.getId());
+        map.put("gender", account.getGender());
+        map.put("userCode", account.getUserCode());
+        return map;
     }
 }

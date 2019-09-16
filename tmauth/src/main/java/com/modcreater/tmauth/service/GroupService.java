@@ -39,14 +39,6 @@ public interface GroupService {
     Dto updateGroup(UpdateGroupInfo updateGroupInfo, String token);
 
     /**
-     * 解散团队
-     * @param receivedGroupId
-     * @param token
-     * @return
-     */
-    Dto deleteGroup(ReceivedGroupId receivedGroupId,String token);
-
-    /**
      * 移除团队成员
      * @param groupRelationVo
      * @param token
@@ -149,6 +141,14 @@ public interface GroupService {
      * @return
      */
     Dto getMyGroupMembers(SearchMembersConditions searchMembersConditions,String token);
+
+    /**
+     * 分组查询团队成员
+     * @param searchMembersConditions
+     * @param token
+     * @return
+     */
+    Dto groupingMembers(SearchMembersConditions searchMembersConditions, String token);
 
     /**
      * 获取管理员数量

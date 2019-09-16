@@ -95,11 +95,19 @@ public interface GroupMapper {
     ShowGroupInfo getMyGroupInfo(String groupId);
 
     /**
-     * 查询团队成员Id
+     * 查询团队成员Id(除群主以外)
      * @param groupId
      * @return
      */
     List<String> getMembersId(String groupId);
+
+    /**
+     * 查询除自己以外的成员Id
+     * @param groupId
+     * @param memberId
+     * @return
+     */
+    List<String> getMembersIdExceptSelf(@Param("groupId") String groupId,@Param("memberId") String memberId);
 
     /**
      * 根据type获取团队默认头像地址
@@ -213,20 +221,6 @@ public interface GroupMapper {
      * @return
      */
     int changeCreator(@Param("groupId") String groupId,@Param("memberId") String memberId);
-
-    /**
-     * 删除团队内所有成员
-     * @param groupId
-     * @return
-     */
-    int removeAllMember(String groupId);
-
-    /**
-     * 删除团队
-     * @param groupId
-     * @return
-     */
-    int removeGroup(String groupId);
 
     /**
      * 查询验证处理详情
@@ -372,4 +366,23 @@ public interface GroupMapper {
      * @return
      */
     int deleteAllMembers(String groupId);
+
+    /**
+     * 查询团队成员id(携带成员身份)
+     * @param groupId
+     * @param memberLevel
+     * @param memberId
+     * @return
+     */
+    List<String> groupingMembers(@Param("groupId") String groupId,@Param("memberLevel") int memberLevel,@Param("memberId") String memberId);
+
+    /**
+     * 条件查询团队成员Id(携带成员身份)
+     * @param condition
+     * @param groupId
+     * @param memberLevel
+     * @param memberId
+     * @return
+     */
+    List<String> groupingMembersByCondition(@Param("condition") String condition ,@Param("groupId") String groupId,@Param("memberLevel") int memberLevel,@Param("memberId") String memberId);
 }
