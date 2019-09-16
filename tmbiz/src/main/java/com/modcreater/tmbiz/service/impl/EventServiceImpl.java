@@ -2153,7 +2153,7 @@ public class EventServiceImpl implements EventService {
         for (int i = 0; i <= 6; i++) {
             String currentDay = DateUtil.getDay(i);
             StringBuffer stringBuffer = new StringBuffer(currentDay);
-            StringBuffer eventIds = new StringBuffer("1");
+            StringBuffer eventIds = new StringBuffer();
             int currentWeek = DateUtil.stringToWeek(currentDay);
             currentWeek = currentWeek == 7 ? 0 : currentWeek;
                     NaturalWeek naturalWeek = new NaturalWeek();
