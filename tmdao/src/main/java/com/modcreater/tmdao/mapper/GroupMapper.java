@@ -350,4 +350,12 @@ public interface GroupMapper {
      * @return
      */
     int updGroupSendEventMsg(Long processState, long processDate, String processBy,Long groupSendEventMsgId);
+
+    /**
+     * 查询成员是否还在团队中
+     * @param memberId
+     * @param groupId
+     * @return
+     */
+    int isMemberInGroup(@Param("memberId") String memberId,@Param("groupId") String groupId);
 }

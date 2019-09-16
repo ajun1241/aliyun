@@ -767,6 +767,10 @@ public class GroupServiceImpl implements GroupService {
             return DtoUtil.getFalseDto("请选择要移除的成员",80010);
         }
         for (String memberId : membersId){
+            if (groupMapper.isMemberInGroup(memberId,removeMember.getGroupId()) >= 1){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("删除失败,成员\""+ accountMapper.queryAccount(memberId).getUserName() + "\"不在团队中",80011);
+            }
             int memberLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),memberId);
             boolean b1 = handlerLevel == 2 && (memberLevel == 1 || memberLevel == 0);
             boolean b2 = handlerLevel == 1 && memberLevel == 0;

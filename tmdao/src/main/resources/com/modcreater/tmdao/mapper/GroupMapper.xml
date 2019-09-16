@@ -160,4 +160,7 @@
     <select id="getGroupSendEventMsg" resultType="com.modcreater.tmbeans.pojo.GroupSendEventMsg">
         select * from groupsendeventmsg where id=#{groupValidationId}
     </select>
+    <select id="isMemberInGroup" resultType="java.lang.Integer">
+        select count(id) from grouprelation where groupId = #{groupId} and memberId = #{memberId}
+    </select>
 </mapper>
