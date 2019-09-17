@@ -693,7 +693,7 @@ public class GroupServiceImpl implements GroupService {
         if (groupMapper.updateMemberLevel(removeManager.getGroupId(),removeManager.getManagerId(),0) != 1){
             return DtoUtil.getFalseDto("移除失败",80003);
         }
-        if (groupMapper.isMemberInGroup(removeManager.getManagerId(),removeManager.getGroupId()) >= 1){
+        if (groupMapper.isMemberInGroup(removeManager.getManagerId(),removeManager.getGroupId()) != 1){
             return DtoUtil.getFalseDto("移除失败,成员\""+ accountMapper.queryAccount(removeManager.getManagerId()).getUserName() + "\"不在团队中",80011);
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(removeManager.getGroupId());
@@ -718,11 +718,11 @@ public class GroupServiceImpl implements GroupService {
         if (groupMapper.getMemberLevel(addManager.getGroupId(),addManager.getUserId()) != 2){
             return DtoUtil.getFalseDto("您没有操作权限",80004);
         }
+        if (groupMapper.isMemberInGroup(addManager.getMemberId(),addManager.getGroupId()) != 1){
+            return DtoUtil.getFalseDto("添加失败,成员\""+ accountMapper.queryAccount(addManager.getMemberId()).getUserName() + "\"不在团队中",80011);
+        }
         if (groupMapper.updateMemberLevel(addManager.getGroupId(),addManager.getMemberId(),1) != 1){
             return DtoUtil.getFalseDto("添加管理员操作失败",80003);
-        }
-        if (groupMapper.isMemberInGroup(addManager.getMemberId(),addManager.getGroupId()) >= 1){
-            return DtoUtil.getFalseDto("添加失败,成员\""+ accountMapper.queryAccount(addManager.getMemberId()).getUserName() + "\"不在团队中",80011);
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(addManager.getGroupId());
         String msgInfo = "您已成为团队\""+groupInfo.getGroupName()+"\"的管理员";
@@ -753,9 +753,9 @@ public class GroupServiceImpl implements GroupService {
             return DtoUtil.getFalseDto("请选择要移除的成员",80010);
         }
         for (String memberId : membersId){
-            if (groupMapper.isMemberInGroup(memberId,removeMember.getGroupId()) < 1){
+            if (groupMapper.isMemberInGroup(memberId,removeMember.getGroupId()) != 1){
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return DtoUtil.getFalseDto("删除失败,成员\""+ accountMapper.queryAccount(memberId).getUserName() + "\"不在团队中",80011);
+                return DtoUtil.getFalseDto("移除失败,成员\""+ accountMapper.queryAccount(memberId).getUserName() + "\"不在团队中",80011);
             }
             int memberLevel = groupMapper.getMemberLevel(removeMember.getGroupId(),memberId);
             boolean b1 = handlerLevel == 2 && (memberLevel == 1 || memberLevel == 0);
@@ -800,7 +800,7 @@ public class GroupServiceImpl implements GroupService {
         if (groupMapper.removeMember(memberQuitGroup.getGroupId(),memberQuitGroup.getUserId()) != 1){
             return DtoUtil.getFalseDto("操作失败",80005);
         }
-        if (groupMapper.isMemberInGroup(memberQuitGroup.getUserId(),memberQuitGroup.getGroupId()) >= 1){
+        if (groupMapper.isMemberInGroup(memberQuitGroup.getUserId(),memberQuitGroup.getGroupId()) != 1){
             return DtoUtil.getFalseDto("退出失败,您已不在团队中",80011);
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(memberQuitGroup.getGroupId());
@@ -836,7 +836,7 @@ public class GroupServiceImpl implements GroupService {
         if (groupMapper.getMemberLevel(groupMakeOver.getGroupId(),groupMakeOver.getUserId()) != 2){
             return DtoUtil.getFalseDto("违规操作!",80004);
         }
-        if (groupMapper.isMemberInGroup(groupMakeOver.getMemberId(),groupMakeOver.getGroupId()) >= 1){
+        if (groupMapper.isMemberInGroup(groupMakeOver.getMemberId(),groupMakeOver.getGroupId()) != 1){
             return DtoUtil.getFalseDto("转让失败,成员\""+ accountMapper.queryAccount(groupMakeOver.getMemberId()).getUserName() + "\"不在团队中",80011);
         }
         int beCreator = groupMapper.updateMemberLevel(groupMakeOver.getGroupId(),groupMakeOver.getMemberId(),2);
