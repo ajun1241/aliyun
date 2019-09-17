@@ -32,6 +32,9 @@
     <insert id="saveSendEventMsg">
         insert into groupsendeventmsg (groupId, eventId, senderId) values (#{groupId},#{eventId},#{senderId})
     </insert>
+    <update id="addCreateLimit">
+        update grouppermission set groupUpperLimit = groupUpperLimit + #{num} where userId = #{userId}
+    </update>
     <update id="updateGroupInfo" statementType="STATEMENT">
         update groupinfo set ${updateType} = '${value}' where id = ${groupId}
     </update>

@@ -139,4 +139,12 @@ public interface OrderService {
      * @return
      */
     Dto orderCancel(ReceivedTradeId receivedTradeId, String token);
+
+    /**
+     * 增加创建群聊上限
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto addCreateLimit(ReceivedId receivedId ,String token);
 }

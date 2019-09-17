@@ -47,6 +47,9 @@
         <if test="serviceType == 'quarter'">
             quarterCardPrice
         </if>
+        <if test="serviceType == 'addCreateLimit'">
+            timeCardPrice
+        </if>
         from servicefunction where id = #{serviceId}
     </select>
     <select id="getUserOrder" resultType="com.modcreater.tmbeans.pojo.UserOrders">

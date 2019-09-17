@@ -385,4 +385,12 @@ public interface GroupMapper {
      * @return
      */
     List<String> groupingMembersByCondition(@Param("condition") String condition ,@Param("groupId") String groupId,@Param("memberLevel") int memberLevel,@Param("memberId") String memberId);
+
+    /**
+     * 修改创建群聊的上限
+     * @param userId
+     * @param num
+     * @return
+     */
+    int addCreateLimit(@Param("userId") String userId,@Param("num") String num);
 }

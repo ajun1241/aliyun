@@ -15,6 +15,7 @@ import com.modcreater.tmbeans.show.order.ShowUserOrders;
 import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.trade.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmdao.mapper.GroupMapper;
 import com.modcreater.tmdao.mapper.OrderMapper;
 import com.modcreater.tmdao.mapper.UserServiceMapper;
 import com.modcreater.tmtrade.config.WxPayConfig;
@@ -63,6 +64,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Resource
     private UserServiceMapper userServiceMapper;
+
+    @Resource
+    private GroupMapper groupMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -138,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
                 return DtoUtil.getFalseDto("优惠券使用失败", 61001);
             }
         } else {
-            userOrder.setPaymentAmount(receivedOrderInfo.getPaymentAmount());
+            userOrder.setPaymentAmount(unitPrice);
         }
         userOrder.setCreateDate(System.currentTimeMillis() / 1000);
         userOrder.setRemark(receivedOrderInfo.getUserRemark());
@@ -174,12 +178,6 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public Dto payInfoVerify(ReceivedVerifyInfo receivedVerifyInfo, String token) {
-        if (StringUtils.isEmpty(receivedVerifyInfo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedVerifyInfo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -255,28 +253,22 @@ public class OrderServiceImpl implements OrderService {
                     orderMapper.updateDiscountStatus(outTradeNo);
                     return "success";
                 } else {
-                    System.out.println("订单状态修改失败");
+                    logger.info("订单状态修改失败");
                     return "fail";
                 }
             } else {
-                System.out.println("支付失败");
+                logger.info("支付失败");
                 return "fail";
             }
         } else {
             //验签不通过
-            System.out.println("验签失败");
+            logger.info("验签失败");
             return "fail";
         }
     }
 
     @Override
     public Dto alipay(ReceivedOrderInfo receivedOrderInfo, String token) {
-        if (StringUtils.isEmpty(receivedOrderInfo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -299,7 +291,7 @@ public class OrderServiceImpl implements OrderService {
         model.setTimeExpire(simpleDateFormat.format(calendar.getTime()));
         model.setProductCode("QUICK_MSECURITY_PAY");
         request.setNotifyUrl(NOTIFY_URL);
-        System.out.println(model.toString());
+        logger.info(model.toString());
         request.setBizModel(model);
         try {
             //这里和普通的接口调用不同，使用的是sdkExecute
@@ -315,12 +307,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto wxPayOrderSubmitted(ReceivedOrderInfo receivedOrderInfo, String token) throws Exception {
-        if (StringUtils.isEmpty(receivedOrderInfo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -364,7 +350,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             //使用官方API请求预付订单
             Map<String, String> response = wxpay.unifiedOrder(data);
-            System.out.println(response.toString());
+            logger.info(response.toString());
             String returnCode = response.get("return_code");
             //若返回码为SUCCESS，则会返回一个result_code,再对该result_code进行判断
             if (returnCode.equals("SUCCESS")) {
@@ -410,7 +396,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String wxPayNotify(HttpServletRequest request) {
-        System.out.println("微信支付回调成功");
+        logger.info("微信支付回调成功");
         String resXml = "";
         try {
             InputStream inputStream = request.getInputStream();
@@ -440,7 +426,7 @@ public class OrderServiceImpl implements OrderService {
             }
             return result;
         } catch (Exception e) {
-            System.out.println("微信手机支付失败:" + e.getMessage());
+            logger.info("微信手机支付失败:" + e.getMessage());
             String result = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
             return result;
         }
@@ -488,7 +474,7 @@ public class OrderServiceImpl implements OrderService {
                         if (returnResult == 0) {
                             return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
                         }
-                        System.err.println("支付成功");
+                        logger.info("支付成功");
                         logger.info("微信手机支付回调成功订单号:{}", tradeNo);
                         xmlBack = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
                     } else {
@@ -513,12 +499,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto isFriendServiceOpened(ReceivedId receivedId, String token) {
-        if (StringUtils.isEmpty(receivedId.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -530,12 +510,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto searchUserService(ReceivedServiceIdUserId receivedServiceIdUserId, String token) {
-        if (StringUtils.isEmpty(receivedServiceIdUserId.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedServiceIdUserId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -603,12 +577,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto searchUserOrders(ReceivedId receivedId, String token) {
-        if (StringUtils.isEmpty(receivedId.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -621,11 +589,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto getServicePrice(ReceivedGoodsInfo receivedGoodsInfo, String token) {
-        if (StringUtils.isEmpty(receivedGoodsInfo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGoodsInfo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         Double price = orderMapper.getUnitPrice(receivedGoodsInfo.getServiceId(), receivedGoodsInfo.getServiceType());
         if (price != 0) {
@@ -639,8 +604,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto searchAllUserService(ReceivedId receivedId, String token) {
-        if (!StringUtils.hasText(receivedId.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         ReceivedServiceIdUserId receivedServiceIdUserId = new ReceivedServiceIdUserId();
         receivedServiceIdUserId.setUserId(receivedId.getUserId());
@@ -669,12 +634,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Dto getAllUserServiceForIOS(ReceivedId receivedId, String token) {
-        if (StringUtils.isEmpty(receivedId.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("操作失败,token未获取到", 21013);
-        }
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -771,6 +730,15 @@ public class OrderServiceImpl implements OrderService {
         }
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         return DtoUtil.getSuccessDto("订单状态异常", 61023);
+    }
+
+    @Override
+    public Dto addCreateLimit(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+
+        return null;
     }
 
     /**
@@ -875,6 +843,10 @@ public class OrderServiceImpl implements OrderService {
                 }
             } else if ("perpetual".equals(userOrders.getServiceType())) {
                 if (userServiceMapper.addNewServiceRemainingTime(setServiceRemainingTime(userOrders.getUserId(), userOrders.getServiceId(), 0L, 0L, 0L, 0L)) == 0) {
+                    return false;
+                }
+            }else if ("addCreateLimit".equals(userOrders.getServiceType())){
+                if (groupMapper.addCreateLimit(userOrders.getUserId(),"1") == 0){
                     return false;
                 }
             }
