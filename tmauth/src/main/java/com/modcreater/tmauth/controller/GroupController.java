@@ -213,8 +213,8 @@ public class GroupController {
 
     @PostMapping(value = "getgroupeventmsg")
     @ApiOperation("获取团队历史事件")
-    public Dto getGroupEventMsg(@RequestBody ReceivedGroupId receivedGroupId,HttpServletRequest request){
-        return groupService.getGroupEventMsg(receivedGroupId,request.getHeader("token"));
+    public Dto getGroupEventMsg(@RequestBody GetGroupEventMsg getGroupEventMsg,HttpServletRequest request){
+        return groupService.getGroupEventMsg(getGroupEventMsg,request.getHeader("token"));
     }
 
     @PostMapping(value = "getgroupeventmsginfo")

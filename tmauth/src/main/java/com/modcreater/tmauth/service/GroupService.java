@@ -242,11 +242,11 @@ public interface GroupService {
 
     /**
      * 获取团队历史事件
-     * @param receivedGroupId
+     * @param getGroupEventMsg
      * @param token
      * @return
      */
-    Dto getGroupEventMsg(ReceivedGroupId receivedGroupId, String token);
+    Dto getGroupEventMsg(GetGroupEventMsg getGroupEventMsg, String token);
 
     /**
      * 获取团队历史事件详情

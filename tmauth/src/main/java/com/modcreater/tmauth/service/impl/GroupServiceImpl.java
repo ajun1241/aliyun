@@ -939,14 +939,15 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto getGroupEventMsg(ReceivedGroupId receivedGroupId, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
+    public Dto getGroupEventMsg(GetGroupEventMsg getGroupEventMsg, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getGroupEventMsg.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        List<ShowGroupEventMsg> groupEventMsgs = groupMapper.getGroupEventMsg(receivedGroupId.getGroupId());
-        GroupInfo groupInfo = groupMapper.queryGroupInfo(receivedGroupId.getGroupId());
+
+        List<ShowGroupEventMsg> groupEventMsgs = groupMapper.getGroupEventMsg(getGroupEventMsg.getGroupId());
+        GroupInfo groupInfo = groupMapper.queryGroupInfo(getGroupEventMsg.getGroupId());
         for (ShowGroupEventMsg showGroupEventMsg : groupEventMsgs){
-            String roleName = FinalValues.GROUPROLESNAME[groupMapper.getMemberLevel(receivedGroupId.getGroupId(),showGroupEventMsg.getUserId())];
+            String roleName = FinalValues.GROUPROLESNAME[groupMapper.getMemberLevel(getGroupEventMsg.getGroupId(),showGroupEventMsg.getUserId())];
             String userName = accountMapper.queryAccount(showGroupEventMsg.getUserId()).getUserName();
             showGroupEventMsg.setMsgBody(roleName + "\"" + userName + "\"" + showGroupEventMsg.getMsgBody()+ "\""  + showGroupEventMsg.getEventName()+ "\"" );
             showGroupEventMsg.setGroupPicture(groupInfo.getGroupPicture());
@@ -962,7 +963,7 @@ public class GroupServiceImpl implements GroupService {
         }
         GroupEventMsg groupEventMsg = groupMapper.getGroupEventMsgInfo(receivedGroupEventMsgId.getGroupEventMsgId());
         List<BacklogList> bac = new ArrayList<>();
-        for (Object s : JSONObject.parseArray(groupEventMsg.getBacklogList(),ArrayList.class)){
+        for (Object s : JSONObject.parseObject(groupEventMsg.getBacklogList(),ArrayList.class)){
             BacklogList backlogList = new BacklogList();
             backlogList.setBacklogName(s.toString());
             bac.add(backlogList);
@@ -1008,10 +1009,13 @@ public class GroupServiceImpl implements GroupService {
                 groupEventMsg.setEndTime(Long.valueOf(singleEvent.getEndtime()));
                 groupEventMsg.setType(singleEvent.getType());
                 groupEventMsg.setLevel(singleEvent.getLevel());
-                groupEventMsg.setRepeatTime(singleEvent.getRemindTime());
+                groupEventMsg.setRepeatTime(singleEvent.getRepeaTtime());
                 groupEventMsg.setRemindTime(singleEvent.getRemindTime());
                 groupEventMsg.setPerson(singleEvent.getPerson());
                 groupEventMsg.setRemark(singleEvent.getRemarks());
+                groupEventMsg.setYear(singleEvent.getYear());
+                groupEventMsg.setMonth(singleEvent.getMonth());
+                groupEventMsg.setDay(singleEvent.getDay());
                 List<String> backlogs=new ArrayList<>();
                 for (BacklogList backlogList:backlogLists) {
                     backlogs.add(backlogList.getBacklogName());
@@ -1158,10 +1162,13 @@ public class GroupServiceImpl implements GroupService {
                 groupEventMsg.setEndTime(Long.valueOf(singleEvent.getEndtime()));
                 groupEventMsg.setType(singleEvent.getType());
                 groupEventMsg.setLevel(singleEvent.getLevel());
-                groupEventMsg.setRepeatTime(singleEvent.getRemindTime());
+                groupEventMsg.setRepeatTime(singleEvent.getRepeaTtime());
                 groupEventMsg.setRemindTime(singleEvent.getRemindTime());
                 groupEventMsg.setPerson(singleEvent.getPerson());
                 groupEventMsg.setRemark(singleEvent.getRemarks());
+                groupEventMsg.setYear(singleEvent.getYear());
+                groupEventMsg.setMonth(singleEvent.getMonth());
+                groupEventMsg.setDay(singleEvent.getDay());
                 List<String> backlogs=new ArrayList<>();
                 for (BacklogList backlogList:singleEvent.getBacklogList()) {
                     backlogs.add(backlogList.getBacklogName());
