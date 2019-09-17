@@ -167,7 +167,7 @@
         select memberId from grouprelation where groupId = #{groupId} and memberLevel = #{memberLevel} and memberId != #{memberId} order by memberLevel desc
     </select>
     <select id="groupingMembersByCondition" resultType="java.lang.String">
-        select memberId from grouprelation g ,account a where a.id = g.memberId and g.groupId = #{groupId} and g.memberId != #{memberId} and (a.userName like "%"#{condition}"%" or a.userCode like "%"#{condition}"%")
+        select memberId from grouprelation g ,account a where a.id = g.memberId and g.memberLevel = #{memberLevel} and g.groupId = #{groupId} and g.memberId != #{memberId} and (a.userName like "%"#{condition}"%" or a.userCode like "%"#{condition}"%")
     </select>
     <select id="getMembersIdExceptSelf" resultType="java.lang.String">
         select memberId from grouprelation where groupId = #{groupId} and memberId != #{memberId} order by memberLevel desc
