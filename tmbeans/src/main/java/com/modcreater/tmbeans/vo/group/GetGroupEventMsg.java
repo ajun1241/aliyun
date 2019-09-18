@@ -21,10 +21,10 @@ public class GetGroupEventMsg {
      * 事件名称
      */
     private String eventName;
-    /**
-     * 开始日期(20190517)
-     */
-    private String startDate;
+
+    private String year;
+    private String month;
+    private String day;
     /**
      * 事件类型(0：学习；1：工作；2：商务；3：休闲；4：家庭；5：节日；6：假期；7：其他)
      */
@@ -46,21 +46,13 @@ public class GetGroupEventMsg {
      */
     private String person;
     /**
-     * 事件状态
-     */
-    private String isOverdue;
-    /**
-     * 要查询的类型(0:普通事件1:草稿箱)
-     */
-    private String searchType;
-    /**
      * 当前页
      */
-    private String pageNum;
+    private Long pageNum;
     /**
      * 每页显示的条数
      */
-    private String pageSize;
+    private Long pageSize;
 
     private String groupId;
 

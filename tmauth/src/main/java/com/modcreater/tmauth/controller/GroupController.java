@@ -211,6 +211,7 @@ public class GroupController {
         return groupService.checkRole(receivedGroupId,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getgroupeventmsg")
     @ApiOperation("获取团队历史事件")
     public Dto getGroupEventMsg(@RequestBody GetGroupEventMsg getGroupEventMsg,HttpServletRequest request){

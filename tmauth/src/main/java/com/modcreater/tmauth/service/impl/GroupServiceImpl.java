@@ -943,8 +943,75 @@ public class GroupServiceImpl implements GroupService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGroupEventMsg.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-
-        List<ShowGroupEventMsg> groupEventMsgs = groupMapper.getGroupEventMsg(getGroupEventMsg.getGroupId());
+        if (!StringUtils.hasText(getGroupEventMsg.getEventType())){
+            getGroupEventMsg.setEventType(null);
+        }
+        if (!StringUtils.hasText(getGroupEventMsg.getEventLevel())){
+            getGroupEventMsg.setEventLevel(null);
+        }
+        if (!StringUtils.hasText(getGroupEventMsg.getYear())){
+            getGroupEventMsg.setYear(null);
+        }
+        if (!StringUtils.hasText(getGroupEventMsg.getMonth())){
+            getGroupEventMsg.setMonth(null);
+        }
+        if (!StringUtils.hasText(getGroupEventMsg.getDay())){
+            getGroupEventMsg.setDay(null);
+        }
+        if (getGroupEventMsg.getPageNum() != null && getGroupEventMsg.getPageNum() != 0){
+            getGroupEventMsg.setPageNum((getGroupEventMsg.getPageNum() - 1) * getGroupEventMsg.getPageSize());
+        }else {
+            getGroupEventMsg.setPageNum(0L);
+        }
+        if (getGroupEventMsg.getPageSize() == null || getGroupEventMsg.getPageSize() == 0){
+            getGroupEventMsg.setPageSize(5L);
+        }
+        List<GroupEventMsg> ids = groupMapper.getGroupEventMsg(getGroupEventMsg);
+        List<ShowGroupEventMsg> groupEventMsgs = new ArrayList<>();
+        long bPageNum = getGroupEventMsg.getPageNum();
+        long lPageNum = bPageNum + getGroupEventMsg.getPageSize() - 1;
+        if (StringUtils.hasText(getGroupEventMsg.getPerson())){
+            int index = 0;
+            for (GroupEventMsg groupEventMsg : ids){
+                //该person为传入的条件
+                String[] persons;
+                //该person为查询结果
+                String[] personsInResult;
+                try {
+                    persons = getGroupEventMsg.getPerson().split(",");
+                    EventPersons eventPersons2 = JSONObject.parseObject(groupEventMsg.getPerson(), EventPersons.class);
+                    personsInResult = eventPersons2.getFriendsId().split(",");
+                } catch (NullPointerException e) {
+                    continue;
+                }
+                int i = 0;
+                //如果条件人数多于查询结果人数,则不符合查询结果
+                if (persons.length > personsInResult.length) {
+                    continue;
+                }
+                //此处将i作为person字段条件与结果的匹配成功次数
+                for (String sOut : persons) {
+                    for (String sInside : personsInResult) {
+                        if (sOut.equals(sInside)) {
+                            i += 1;
+                        }
+                    }
+                }
+                //如果成功次数和传入条件人数相等则本次查询成功
+                if (i == persons.length && index >= bPageNum && index <= lPageNum) {
+                    groupEventMsgs.add(groupMapper.getGroupEventMsgBody(groupEventMsg.getId().toString()));
+                }
+                index += 1;
+            }
+        }else {
+            int index = 0;
+            for (GroupEventMsg groupEventMsg : ids){
+                if (index >= bPageNum && index <= lPageNum) {
+                    groupEventMsgs.add(groupMapper.getGroupEventMsgBody(groupEventMsg.getId().toString()));
+                }
+                index += 1;
+            }
+        }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(getGroupEventMsg.getGroupId());
         for (ShowGroupEventMsg showGroupEventMsg : groupEventMsgs){
             String roleName = FinalValues.GROUPROLESNAME[groupMapper.getMemberLevel(getGroupEventMsg.getGroupId(),showGroupEventMsg.getUserId())];

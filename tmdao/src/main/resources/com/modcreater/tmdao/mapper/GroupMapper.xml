@@ -148,8 +148,40 @@
         select * from groupfeedbackvalidation where receiverId=#{userId} and readStatus=1
         limit #{pageIndex},#{pageSize}
     </select>
-    <select id="getGroupEventMsg" resultType="com.modcreater.tmbeans.show.group.ShowGroupEventMsg">
-        select id groupEventMsgId,userId,msgBody,createTime,eventName from groupeventmsg where groupId = #{groupId}
+    <select id="getGroupEventMsg" resultType="com.modcreater.tmbeans.pojo.GroupEventMsg">
+        select * from groupeventmsg
+        <where>
+            1 = 1
+            <if test="eventName != null and eventName != ''">
+                and eventName like "%"#{eventName}"%"
+            </if>
+            <if test="eventType != null">
+                and type = #{eventType}
+            </if>
+            <if test="eventLevel != null">
+                and level = #{eventLevel}
+            </if>
+            <if test="year != null and year != ''">
+                and year = #{year}
+            </if>
+            <if test="month != null and month != ''">
+                and month = #{month}
+            </if>
+            <if test="day != null and day != ''">
+                and day = #{day}
+            </if>
+            <if test="startTime != null and startTime != 0 and endTime != null and endTime != 0">
+                and ((startTime &gt;= #{startTime} and startTime &lt;= #{endTime}) or
+                (endTime &gt;= #{startTime} and endTime &lt;= #{endTime}) or
+                (startTime &lt;= #{startTime} and endTime &gt;= #{endTime}) or
+                (startTime &gt;= #{startTime} and endTime &lt;= #{endTime}))
+            </if>
+        </where>
+        and groupId = #{groupId}
+        order by createTime desc
+        <!--<if test="pageSize != 0 and pageSize != ''">
+            limit #{pageNum},#{pageSize}
+        </if>-->
     </select>
     <select id="getGroupEventMsgInfo" resultType="com.modcreater.tmbeans.pojo.GroupEventMsg">
         select * from groupeventmsg where id = #{groupEventMsgId}
@@ -174,5 +206,8 @@
     </select>
     <select id="getMembersIdExceptSelf" resultType="java.lang.String">
         select memberId from grouprelation where groupId = #{groupId} and memberId != #{memberId} order by memberLevel desc
+    </select>
+    <select id="getGroupEventMsgBody" resultType="com.modcreater.tmbeans.show.group.ShowGroupEventMsg">
+        select id groupEventMsgId,userId,msgBody,createTime,eventName from groupeventmsg where id = #{id}
     </select>
 </mapper>

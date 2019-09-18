@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.show.group.ShowGroupEventMsg;
 import com.modcreater.tmbeans.show.group.ShowGroupInfo;
 import com.modcreater.tmbeans.show.group.ShowMyGroup;
 import com.modcreater.tmbeans.vo.GroupInfoVo;
+import com.modcreater.tmbeans.vo.group.GetGroupEventMsg;
 import com.modcreater.tmbeans.vo.group.UpdateGroupInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -253,10 +254,10 @@ public interface GroupMapper {
 
     /**
      * 查询团队历史事件消息
-     * @param groupId
+     * @param getGroupEventMsg
      * @return
      */
-    List<ShowGroupEventMsg> getGroupEventMsg(String groupId);
+    List<GroupEventMsg> getGroupEventMsg(GetGroupEventMsg getGroupEventMsg);
 
     /**
      * 获取团队历史事件详情
@@ -393,4 +394,11 @@ public interface GroupMapper {
      * @return
      */
     int addCreateLimit(@Param("userId") String userId,@Param("num") String num);
+
+    /**
+     * 查询团队历史消息
+     * @param id
+     * @return
+     */
+    ShowGroupEventMsg getGroupEventMsgBody(String id);
 }
