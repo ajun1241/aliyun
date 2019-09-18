@@ -693,7 +693,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto removeManager(RemoveManager removeManager, String token) {
+    public synchronized Dto removeManager(RemoveManager removeManager, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(removeManager.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -721,7 +721,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto addManager(AddManager addManager, String token) {
+    public synchronized Dto addManager(AddManager addManager, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(addManager.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -803,7 +803,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto memberQuitGroup(MemberQuitGroup memberQuitGroup, String token) {
+    public synchronized Dto memberQuitGroup(MemberQuitGroup memberQuitGroup, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(memberQuitGroup.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -839,7 +839,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto groupMakeOver(GroupMakeOver groupMakeOver, String token) {
+    public synchronized Dto groupMakeOver(GroupMakeOver groupMakeOver, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(groupMakeOver.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -901,26 +901,25 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto addNewMembers(AddNewMembers addNewMembers, String token) {
+    public synchronized Dto addNewMembers(AddNewMembers addNewMembers, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(addNewMembers.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (addNewMembers.getMembersId().length == 0){
             return DtoUtil.getFalseDto("请选择要添加的成员",80008);
         }
-        try {
-            for (String memberId : addNewMembers.getMembersId()){
-                if (!ObjectUtils.isEmpty(groupMapper.getGroupRelation(addNewMembers.getGroupId(),memberId))){
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    Account account = accountMapper.queryAccount(memberId);
-                    return DtoUtil.getFalseDto("成员\""+ account.getUserName() +"\"已存在",80009);
-                }
-                groupMapper.createMember(memberId,Long.valueOf(addNewMembers.getGroupId()));
+        String[] membersId = addNewMembers.getMembersId();
+        for (String memberId : membersId){
+            if (groupMapper.getGroupRelation(addNewMembers.getGroupId(),memberId) >= 1){
+                Account account = accountMapper.queryAccount(memberId);
+                return DtoUtil.getFalseDto("成员\""+ account.getUserName() +"\"已存在",80009);
             }
-        } catch (NumberFormatException e) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            e.printStackTrace();
-            return DtoUtil.getFalseDto("创建失败",80009);
+        }
+        for (String memberId : membersId) {
+            if (groupMapper.createMember(memberId, Long.valueOf(addNewMembers.getGroupId())) == 0){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getSuccessDto("添加成员失败",80004);
+            }
         }
         GroupInfo groupInfo = groupMapper.queryGroupInfo(addNewMembers.getGroupId());
         Account account = accountMapper.queryAccount(addNewMembers.getUserId());
@@ -1046,6 +1045,18 @@ public class GroupServiceImpl implements GroupService {
             bac.add(backlogList);
         }
         SingleEvent singleEvent = JSONObject.parseObject(JSON.toJSONString(groupEventMsg),SingleEvent.class);
+        EventPersons eventPersons = JSONObject.parseObject(singleEvent.getPerson(), EventPersons.class);
+        Map<String, Object> maps = new HashMap<>();
+        ArrayList<Map> list = new ArrayList<>();
+        if (!StringUtils.isEmpty(eventPersons.getFriendsId())) {
+            String[] friendsId = eventPersons.getFriendsId().split(",");
+            for (String friendId : friendsId) {
+                list.add(setAccount(friendId));
+            }
+        }
+        maps.put("friendsId", list);
+        maps.put("others", eventPersons.getOthers());
+        singleEvent.setPerson(JSON.toJSONString(maps));
         ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent1(singleEvent);
         showSingleEvent.setBacklogList(bac);
         return DtoUtil.getSuccesWithDataDto("查询成功",showSingleEvent,100000);
@@ -1165,7 +1176,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Dto breakGroup(ReceivedGroupId receivedGroupId, String token) {
+    public synchronized Dto breakGroup(ReceivedGroupId receivedGroupId, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGroupId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }

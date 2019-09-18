@@ -229,6 +229,4 @@ public class GroupController {
     public Dto breakGroup(@RequestBody ReceivedGroupId receivedGroupId,HttpServletRequest request){
         return groupService.breakGroup(receivedGroupId,request.getHeader("token"));
     }
-
-
 }

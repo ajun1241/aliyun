@@ -320,7 +320,7 @@ public interface GroupMapper {
      * @param memberId
      * @return
      */
-    GroupRelation getGroupRelation(@Param("groupId") String groupId,@Param("memberId") String memberId);
+    int getGroupRelation(@Param("groupId") String groupId,@Param("memberId") String memberId);
 
     /**
      * 保存发送事件邀请申请
