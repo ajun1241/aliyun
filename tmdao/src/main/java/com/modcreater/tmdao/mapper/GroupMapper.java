@@ -347,12 +347,49 @@ public interface GroupMapper {
     int updGroupSendEventMsg(Long processState, long processDate, String processBy,Long groupSendEventMsgId);
 
     /**
+     * 保存群聊事件消息
+     * @param mapList
+     * @return
+     */
+    int saveGroupInviteMsg(List<Map<String,String>> mapList);
+
+    /**
+     * 查询群聊消息状态
+     * @param msgStatusId
+     * @return
+     */
+    GroupInviteMsgStatus queryGroupInviteMsgStatus(Long msgStatusId,String userId);
+
+    /**
+     * 修改群聊消息状态
+     * @param status
+     * @param msgId
+     * @param userId
+     * @return
+     */
+    int updGroupInviteMsg(String status, String msgId, String userId);
+
+    /**
      * 查询成员是否还在团队中
      * @param memberId
      * @param groupId
      * @return
      */
     int isMemberInGroup(@Param("memberId") String memberId,@Param("groupId") String groupId);
+
+    /**
+     * 查询团队验证反馈详情
+     * @param groupMsgId
+     * @return
+     */
+    GroupFeedbackValidation queryGroupFeedback(String groupMsgId);
+
+    /**
+     * 修改团队验证反馈状态
+     * @param groupMsgId
+     * @return
+     */
+    int updGroupFeedback(String groupMsgId);
 
     /**
      * 删除团队信息
