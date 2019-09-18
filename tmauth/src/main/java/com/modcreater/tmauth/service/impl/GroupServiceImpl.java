@@ -1042,6 +1042,13 @@ public class GroupServiceImpl implements GroupService {
         for (Object s : JSONObject.parseObject(groupEventMsg.getBacklogList(),ArrayList.class)){
             BacklogList backlogList = new BacklogList();
             backlogList.setBacklogName(s.toString());
+            backlogList.setId(0L);
+            backlogList.setSingleEventId(0L);
+            backlogList.setBacklogStatus(0L);
+            backlogList.setFinishTime(0L);
+            backlogList.setIsTest(0L);
+            backlogList.setIsSync(0L);
+            backlogList.setCreateTime("");
             bac.add(backlogList);
         }
         SingleEvent singleEvent = JSONObject.parseObject(JSON.toJSONString(groupEventMsg),SingleEvent.class);
@@ -1058,7 +1065,11 @@ public class GroupServiceImpl implements GroupService {
         maps.put("others", eventPersons.getOthers());
         singleEvent.setPerson(JSON.toJSONString(maps));
         ShowSingleEvent showSingleEvent = SingleEventUtil.getShowSingleEvent1(singleEvent);
+        showSingleEvent.setEventid(0L);
+        showSingleEvent.setFlag(1L);
+        showSingleEvent.setIsOverdue(1L);
         showSingleEvent.setBacklogList(bac);
+        showSingleEvent.setRemarks("");
         return DtoUtil.getSuccesWithDataDto("查询成功",showSingleEvent,100000);
     }
 
