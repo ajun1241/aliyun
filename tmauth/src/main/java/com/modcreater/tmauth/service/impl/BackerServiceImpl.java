@@ -129,6 +129,7 @@ public class BackerServiceImpl implements BackerService {
             Account account = accountMapper.queryAccount(receivedChangeBackerInfo.getUserId());
             MsgStatus msgStatus = new MsgStatus();
             msgStatus.setUserId(Long.valueOf(receivedChangeBackerInfo.getUserId()));
+            msgStatus.setReceiverId(Long.valueOf(receivedChangeBackerInfo.getFriendId()));
             msgStatus.setType(2L);
             msgStatusMapper.addNewMsg(msgStatus);
             AddBackerMessage addBackerMessage = new AddBackerMessage();

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.MsgStatusMapper">
     <insert id="addNewMsg" parameterType="com.modcreater.tmbeans.pojo.MsgStatus" useGeneratedKeys="true" keyProperty="id">
-        insert into msgstatus(userId, type) values (#{userId},#{type})
+        insert into msgstatus(userId, type,receiverId) values (#{userId},#{type},#{receiverId})
     </insert>
     <insert id="addNewEventMsg">
         insert into eventmsg(msgOwnerId, eventId, msgSenderId, content, createDate)

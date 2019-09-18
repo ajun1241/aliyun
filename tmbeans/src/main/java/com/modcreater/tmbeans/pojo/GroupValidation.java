@@ -7,6 +7,7 @@ public class GroupValidation {
 
   private Long id;
   private Long userId;
+  private Long groupId;
   private String validationContent;
   private String validationSource;
   private Long processState;

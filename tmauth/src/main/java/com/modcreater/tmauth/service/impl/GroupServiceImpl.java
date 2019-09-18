@@ -70,6 +70,9 @@ public class GroupServiceImpl implements GroupService {
     @Resource
     private EventViceMapper eventViceMapper;
 
+    @Resource
+    private MsgStatusMapper msgStatusMapper;
+
     private GroupCloudUtil groupCloudUtil=new GroupCloudUtil();
 
     private RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
@@ -230,6 +233,9 @@ public class GroupServiceImpl implements GroupService {
         }
         //查询团队信息
         GroupInfo groupInfo=groupMapper.queryGroupInfo(groupCardVo.getGroupId());
+        if (ObjectUtils.isEmpty(groupInfo)){
+            return DtoUtil.getFalseDto("该团队不存在,可能已被解散",17004);
+        }
         try {
             RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
             GroupCardMsg groupCardMsg =new GroupCardMsg(groupInfo.getId().toString(),groupInfo.getGroupName(),groupInfo.getGroupPicture(),groupInfo.getGroupUnit());
@@ -260,6 +266,9 @@ public class GroupServiceImpl implements GroupService {
         Account source=accountMapper.queryAccount(groupApplyVo.getSourceId());
         //查询团队详情
         GroupInfo groupInfo=groupMapper.queryGroupInfo(groupApplyVo.getGroupId());
+        if (ObjectUtils.isEmpty(groupInfo)){
+            return DtoUtil.getFalseDto("该团队不存在,可能已被解散",17004);
+        }
         if (!ObjectUtils.isEmpty(account)){
             try {
                 //查询管理员和群主
@@ -274,12 +283,12 @@ public class GroupServiceImpl implements GroupService {
                         userIds.add(groupRelation.getMemberId().toString());
                     }
                 }
-                String validationSource="由用户"+source.getUserName()+"介绍";
                 //验证内容保存
                 GroupValidation groupValidation=new GroupValidation();
                 groupValidation.setUserId(Long.parseLong(groupApplyVo.getUserId()));
+                groupValidation.setGroupId(Long.parseLong(groupApplyVo.getGroupId()));
                 groupValidation.setValidationContent(groupApplyVo.getValidationContent());
-                groupValidation.setValidationSource(validationSource);
+                groupValidation.setValidationSource(source.getUserName());
                 groupMapper.saveValidationContent(groupValidation);
                 for (String userId:userIds){
                     //消息保存
@@ -370,6 +379,7 @@ public class GroupServiceImpl implements GroupService {
                         groupFeedbackValidation.setReceiverId(Long.valueOf(groupApplyDisposeVo.getMemberId()));
                         groupFeedbackValidation.setMsgContent(content);
                         groupFeedbackValidation.setProcessState(flag);
+                        groupFeedbackValidation.setGroupId(groupInfo.getId());
                         groupMapper.saveGroupFeedbackMsg(groupFeedbackValidation);
                     }
                     return DtoUtil.getSuccessDto("操作成功",100000);
@@ -400,10 +410,10 @@ public class GroupServiceImpl implements GroupService {
         for (GroupSystemMsg groupSystemMsg:groupSystemMsgs) {
             Map<String,Object> map=new HashMap<>();
             map.put("msgId",groupSystemMsg.getId());
-            map.put("headImgUrl",account.getHeadImgUrl());
+            map.put("headImgUrl","https://mdxc2019-1258779334.cos.ap-chengdu.myqcloud.com/icon/tm_verify_feedback_gray.png");
             map.put("userName",account.getUserName());
             map.put("msgContent",groupSystemMsg.getMsgContent());
-            map.put("sendDate",groupSystemMsg.getSendDate());
+            map.put("sendDate",groupSystemMsg.getSendDate().substring(11,16));
             mapList.add(map);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
@@ -431,7 +441,7 @@ public class GroupServiceImpl implements GroupService {
             map.put("headImgUrl",account.getHeadImgUrl());
             map.put("userName",account.getUserName());
             map.put("msgContent",groupSystemMsg.getMsgContent());
-            map.put("sendDate",groupSystemMsg.getSendDate());
+            map.put("sendDate",groupSystemMsg.getSendDate().substring(11,16));
             mapList.add(map);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
@@ -459,7 +469,7 @@ public class GroupServiceImpl implements GroupService {
             map.put("headImgUrl",account.getHeadImgUrl());
             map.put("userName",account.getUserName());
             map.put("msgContent",groupFeedbackValidation.getMsgContent());
-            map.put("sendDate",groupFeedbackValidation.getSendDate());
+            map.put("sendDate",groupFeedbackValidation.getSendDate().substring(11,16));
             mapList.add(map);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
@@ -484,10 +494,10 @@ public class GroupServiceImpl implements GroupService {
         for (GroupFeedbackValidation groupFeedbackValidation:groupSystemMsgs) {
             Map<String,Object> map=new HashMap<>();
             map.put("msgId",groupFeedbackValidation.getId());
-            map.put("headImgUrl",account.getHeadImgUrl());
+            map.put("headImgUrl","https://mdxc2019-1258779334.cos.ap-chengdu.myqcloud.com/icon/tm_verify_message_gray.png");
             map.put("userName",account.getUserName());
             map.put("msgContent",groupFeedbackValidation.getMsgContent());
-            map.put("sendDate",groupFeedbackValidation.getSendDate());
+            map.put("sendDate",groupFeedbackValidation.getSendDate().substring(11,16));
             mapList.add(map);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
@@ -549,10 +559,12 @@ public class GroupServiceImpl implements GroupService {
         Account account=accountMapper.queryAccount(groupValidation.getUserId().toString());
         Map<String,Object> map=new HashMap<>(8);
         map.put("userId",account.getId().toString());
+        map.put("groupId",groupValidation.getGroupId().toString());
         map.put("userName",account.getUserName());
         map.put("city",account.getUserAddress());
         map.put("headImgUrl",account.getHeadImgUrl());
         map.put("userCode",account.getUserCode());
+        map.put("processState",groupValidation.getProcessState());
         map.put("validationContent",groupValidation.getValidationContent());
         map.put("validationSource",groupValidation.getValidationSource());
         //修改消息未读状态
@@ -568,23 +580,21 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public Dto applyRFMsgInfo(ApplyMsgInfoVo applyMsgInfoVo, String token) {
+        System.out.println(token);
         if (!token.equals(stringRedisTemplate.opsForValue().get(applyMsgInfoVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         //查询消息详情
-        GroupSystemMsg groupSystemMsg=groupMapper.getGroupMsgById(applyMsgInfoVo.getGroupMsgId());
-        GroupValidation groupValidation=groupMapper.getGroupValidation(groupSystemMsg.getGroupValidationId());
-        Account account=accountMapper.queryAccount(groupValidation.getUserId().toString());
-        Map<String,Object> map=new HashMap<>(8);
-        map.put("userId",account.getId().toString());
-        map.put("userName",account.getUserName());
-        map.put("city",account.getUserAddress());
-        map.put("headImgUrl",account.getHeadImgUrl());
-        map.put("userCode",account.getUserCode());
-        map.put("validationContent",groupValidation.getValidationContent());
-        map.put("validationSource",groupValidation.getValidationSource());
+        GroupFeedbackValidation groupSystemMsg=groupMapper.queryGroupFeedback(applyMsgInfoVo.getGroupMsgId());
+        Map<String,Object> map=new HashMap<>(4);
+        GroupInfo groupInfo=groupMapper.queryGroupInfo(groupSystemMsg.getGroupId().toString());
+        map.put("groupName",ObjectUtils.isEmpty(groupInfo)?"该群已被解散":"“"+groupMapper.getMyGroupInfo(groupSystemMsg.getGroupId().toString()).getGroupName()+"”");
+        map.put("status",groupSystemMsg.getProcessState().toString());
+        map.put("content",groupSystemMsg.getMsgContent());
+        map.put("time",groupSystemMsg.getSendDate());
+        map.put("title",groupSystemMsg.getProcessState()==1?"欢迎您加入":"拒绝您加入");
         //修改消息未读状态
-        groupMapper.updGroupMsgById(applyMsgInfoVo.getGroupMsgId());
+        groupMapper.updGroupFeedback(applyMsgInfoVo.getGroupMsgId());
         return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
     }
 
@@ -998,6 +1008,11 @@ public class GroupServiceImpl implements GroupService {
             Long flag=-1L;
             //同意
             if ("1".equals(feedbackGroupEventVo.getChoose())){
+                //查询团队详情
+                GroupInfo groupInfo=groupMapper.queryGroupInfo(groupSendEventMsg.getGroupId().toString());
+                if (ObjectUtils.isEmpty(groupInfo)){
+                    return DtoUtil.getFalseDto("该团队不存在,可能已被解散",17004);
+                }
                 //保存事件消息
                 GroupEventMsg groupEventMsg=new GroupEventMsg();
                 groupEventMsg.setUserId(singleEvent.getUserid());
@@ -1022,9 +1037,30 @@ public class GroupServiceImpl implements GroupService {
                 }
                 groupEventMsg.setBacklogList(JSON.toJSONString(backlogs));
                 groupMapper.saveGroupEventMsg(groupEventMsg);
+                //消息保存
+                MsgStatus msgStatus = new MsgStatus();
+                msgStatus.setType(1L);
+                msgStatus.setUserId(singleEvent.getUserid());
+                msgStatus.setReceiverId(groupEventMsg.getGroupId());
+                msgStatusMapper.addNewMsg(msgStatus);
+                //保存群聊事件消息
+                List<GroupRelation> groupRelationList=groupMapper.queryGroupRelation(groupSendEventMsg.getGroupId().toString());
+                List<Map<String,String>> mapList=new ArrayList<>();
+                for (GroupRelation relation:groupRelationList) {
+                    Map<String,String> map=new HashMap(2);
+                    map.put("msgStatusId",msgStatus.getId().toString());
+                    map.put("userId",relation.getMemberId().toString());
+                    if (relation.getMemberId().equals(singleEvent.getUserid())){
+                        map.put("status","1");
+                    }else {
+                        map.put("status","2");
+                    }
+                    mapList.add(map);
+                }
+                groupMapper.saveGroupInviteMsg(mapList);
                 //发送邀请消息至群聊
                 String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
-                InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEventAndBacklog)), "2","");
+                InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEventAndBacklog)), "2",msgStatus.getId().toString());
                 logger.info(JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEventAndBacklog)));
                 ResponseResult result = rongCloudMethodUtil.sendGroupMsg(singleEvent.getUserid().toString(), new String[]{groupSendEventMsg.getGroupId().toString()}, inviteMessage,1);
                 if (result.getCode() != 200) {
@@ -1051,6 +1087,7 @@ public class GroupServiceImpl implements GroupService {
                 groupFeedbackValidation.setReceiverId(groupSendEventMsg.getSenderId());
                 groupFeedbackValidation.setMsgContent(content);
                 groupFeedbackValidation.setProcessState(flag);
+                groupFeedbackValidation.setGroupId(groupSendEventMsg.getGroupId());
                 groupMapper.saveGroupFeedbackMsg(groupFeedbackValidation);
             }
         } catch (Exception e) {
@@ -1111,6 +1148,11 @@ public class GroupServiceImpl implements GroupService {
     public Dto sendInviteEvent(SendInviteEventVo sendInviteEventVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(sendInviteEventVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //查询团队详情
+        GroupInfo groupInfo=groupMapper.queryGroupInfo(sendInviteEventVo.getGroupId());
+        if (ObjectUtils.isEmpty(groupInfo)){
+            return DtoUtil.getFalseDto("该团队不存在,可能已被解散",17004);
         }
         try {
             int userLevel=groupMapper.getMemberLevel(sendInviteEventVo.getGroupId(),sendInviteEventVo.getUserId());
@@ -1175,9 +1217,30 @@ public class GroupServiceImpl implements GroupService {
                 }
                 groupEventMsg.setBacklogList(JSON.toJSONString(backlogs));
                 groupMapper.saveGroupEventMsg(groupEventMsg);
+                //消息保存
+                MsgStatus msgStatus = new MsgStatus();
+                msgStatus.setType(1L);
+                msgStatus.setUserId(Long.parseLong(sendInviteEventVo.getUserId()));
+                msgStatus.setReceiverId(Long.parseLong(sendInviteEventVo.getGroupId()));
+                msgStatusMapper.addNewMsg(msgStatus);
+                //保存群聊事件消息
+                List<GroupRelation> groupRelationList=groupMapper.queryGroupRelation(sendInviteEventVo.getGroupId());
+                List<Map<String,String>> mapList=new ArrayList<>();
+                for (GroupRelation relation:groupRelationList) {
+                    Map<String,String> map=new HashMap(2);
+                    map.put("msgStatusId",msgStatus.getId().toString());
+                    map.put("userId",relation.getMemberId().toString());
+                    if (relation.getMemberId().equals(singleEvent.getUserid())){
+                        map.put("status","1");
+                    }else {
+                        map.put("status","2");
+                    }
+                    mapList.add(map);
+                }
+                groupMapper.saveGroupInviteMsg(mapList);
                 //发送邀请消息至群聊
                 String date = singleEvent.getYear() + "/" + singleEvent.getMonth() + "/" + singleEvent.getDay();
-                InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2","");
+                InviteMessage inviteMessage = new InviteMessage(singleEvent.getEventname(), date, JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)), "2",msgStatus.getId().toString());
                 logger.info(JSON.toJSONString(SingleEventUtil.getShowSingleEvent(singleEvent)));
                 ResponseResult result = rongCloudMethodUtil.sendGroupMsg(sendInviteEventVo.getUserId(), new String[]{sendInviteEventVo.getGroupId()}, inviteMessage,1);
                 if (result.getCode() != 200) {

@@ -11,6 +11,7 @@ public class GroupFeedbackValidation {
   private Long id;
   private Long processId;
   private Long receiverId;
+  private Long groupId;
   private String msgContent;
   private Long readStatus;
   private Long processState;

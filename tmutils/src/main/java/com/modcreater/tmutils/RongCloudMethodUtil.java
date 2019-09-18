@@ -2,6 +2,7 @@ package com.modcreater.tmutils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.show.MyToken;
+import com.modcreater.tmutils.messageutil.RefreshMsg;
 import io.rong.RongCloud;
 import io.rong.messages.BaseMessage;
 import io.rong.messages.ContactNtfMessage;
@@ -196,6 +197,22 @@ public class RongCloudMethodUtil {
         Result refreshResult = User.update(user);
         logger.info("refresh:  " + refreshResult.toString());
         return refreshResult.toString();
+    }
+
+    /**
+     * 刷新界面消息
+     * @param senderId
+     * @param receiverId
+     * @param type
+     * @return
+     */
+    public void refreshMsg(String senderId,String[] receiverId,String type){
+        try {
+            RefreshMsg refreshMsg=new RefreshMsg(type);
+            sendSystemMessage(senderId,receiverId,refreshMsg,"","");
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
     }
 }
 

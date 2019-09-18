@@ -71,9 +71,9 @@ public class ManageServiceImpl implements ManageService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedUserRealInfo.getUserId()))){
             return DtoUtil.getFalseDto("请重新登录",21014);
         }
-        /*if (receivedUserRealInfo.getUserIDNo().length()>18){
-            return DtoUtil.getFalseDto("身份证号码有误",50003);
-        }*/
+        if (receivedUserRealInfo.getUserIDNo().length()>18){
+            return DtoUtil.getFalseDto("证件号码有误",50003);
+        }
         //第一次上传认证
         UserRealInfo userRealInfo1=userRealInfoMapper.queryDetail(receivedUserRealInfo.getUserId());
         if (ObjectUtils.isEmpty(userRealInfo1)){

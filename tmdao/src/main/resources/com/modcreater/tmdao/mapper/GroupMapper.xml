@@ -18,19 +18,25 @@
         insert into groupsystemmsg (senderId, receiverId, msgContent, groupValidationId,msgType) values (#{senderId},#{receiverId},#{msgContent},#{groupValidationId},#{msgType})
     </insert>
     <insert id="saveValidationContent" useGeneratedKeys="true" keyProperty="id">
-        insert into groupvalidation (userId, validationContent, validationSource) values (#{userId},#{validationContent},#{validationSource})
+        insert into groupvalidation (userId, validationContent,groupId, validationSource) values (#{userId},#{validationContent},#{groupId},#{validationSource})
     </insert>
     <insert id="saveGroupFeedbackMsg">
-        insert into groupfeedbackvalidation (processId, receiverId, msgContent,processState) values (#{processId},#{receiverId},#{msgContent},#{processState})
+        insert into groupfeedbackvalidation (processId, receiverId,groupId, msgContent,processState) values (#{processId},#{receiverId},#{groupId},#{msgContent},#{processState})
     </insert>
     <insert id="saveGroupEventMsg">
         insert into groupeventmsg (userId, groupId, msgBody, eventName, address, startTime, endTime, type, level, repeatTime, remindTime, person, remark, backLogList)
         values (#{userId},#{groupId},#{msgBody},#{eventName},#{address},
         #{startTime},#{endTime},#{type},#{level},#{repeatTime},
-        #{remindTime},#{person},#{remark},#{backLogList})
+        #{remindTime},#{person},#{remark},#{backlogList})
     </insert>
     <insert id="saveSendEventMsg">
         insert into groupsendeventmsg (groupId, eventId, senderId) values (#{groupId},#{eventId},#{senderId})
+    </insert>
+    <insert id="saveGroupInviteMsg">
+        insert into groupinvitemsgstatus (msgStatusId, userId,status) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.msgStatusId},#{item.userId},#{item.status})
+        </foreach>
     </insert>
     <update id="addCreateLimit">
         update grouppermission set groupUpperLimit = groupUpperLimit + #{num} where userId = #{userId}
@@ -52,6 +58,12 @@
     </update>
     <update id="updGroupSendEventMsg">
         update groupsendeventmsg set processState=#{processState},processDate=#{processDate},processBy=#{processBy} where id=#{groupValidationId}
+    </update>
+    <update id="updGroupInviteMsg">
+        update groupinvitemsgstatus set status=#{status},userId=#{userId} where id=#{msgId}
+    </update>
+    <update id="updGroupFeedback">
+        update groupfeedbackvalidation set readStatus=1 where id=#{groupMsgId}
     </update>
     <delete id="removeMember">
         delete from grouprelation where groupId = #{groupId} and memberId = #{memberId} and memberLevel != 2
@@ -163,8 +175,14 @@
     <select id="getGroupSendEventMsg" resultType="com.modcreater.tmbeans.pojo.GroupSendEventMsg">
         select * from groupsendeventmsg where id=#{groupValidationId}
     </select>
+    <select id="queryGroupInviteMsgStatus" resultType="com.modcreater.tmbeans.pojo.GroupInviteMsgStatus">
+        select * from groupinvitemsgstatus where msgStatusId=#{msgStatusId} and userId=#{userId}
+    </select>
     <select id="isMemberInGroup" resultType="java.lang.Integer">
         select count(id) from grouprelation where groupId = #{groupId} and memberId = #{memberId}
+    </select>
+    <select id="queryGroupFeedback" resultType="com.modcreater.tmbeans.pojo.GroupFeedbackValidation">
+        select * from groupfeedbackvalidation where id=#{groupMsgId}
     </select>
     <select id="groupingMembers" resultType="java.lang.String">
         select memberId from grouprelation where groupId = #{groupId} and memberLevel = #{memberLevel} and memberId != #{memberId} order by memberLevel desc
