@@ -7,6 +7,7 @@ import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbeans.pojo.TimedTask;
 import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DateUtil;
+import com.modcreater.tmutils.PushUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
 import com.modcreater.tmutils.SingleEventUtil;
 import com.modcreater.tmutils.mobserver.MobPushUtils;
@@ -130,6 +131,8 @@ public class TimerConfig {
 
     @Scheduled(cron = "0 * * * * ?")
     public void pushTask() {
+//        PushUtil.APNSPush("c83be9ffcbe7128a0248d78268b8be2f9ccc226c9afb65edaebabfa162d1d242","IOS,推送测试",1);
+        logger.info("推送提醒");
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         //今天
         String[] time1=simpleDateFormat.format(new Date()).split("-");
@@ -156,6 +159,9 @@ public class TimerConfig {
                         if (appType.getAppType() == 1L) {
                             logger.info("开始要推送事件" + singleEvent.toString());
                             MobPushUtils.pushTask("您的事件" + singleEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
+                        }else if (appType.getAppType() == 2L){
+                            logger.info("IOS开始要推送事件" + singleEvent.toString());
+                            PushUtil.APNSPush(appType.getDeviceToken(),"您的事件" + singleEvent.getEventname() + "就要开始啦",1);
                         }
                     }
                 }
@@ -176,6 +182,9 @@ public class TimerConfig {
                             if (appType.getAppType() == 1L) {
                                 logger.info("开始要推送事件" + singleEvent.toString());
                                 MobPushUtils.pushTask("您的事件" + singleEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
+                            }else if (appType.getAppType() == 2L){
+                                logger.info("IOS开始要推送事件" + singleEvent.toString());
+                                PushUtil.APNSPush(appType.getDeviceToken(),"您的事件" + singleEvent.getEventname() + "就要开始啦",1);
                             }
                         }
                     }
@@ -202,8 +211,11 @@ public class TimerConfig {
                         if (userSettingsMapper.getDND(loopEvent.getUserid().toString()) == 1L) {
                             //安卓
                             if (appType.getAppType() == 1L) {
-                                logger.info("开始要推送事件" + loopEvent.toString());
+                                logger.info("安卓开始要推送事件" + loopEvent.toString());
                                 MobPushUtils.pushTask("您的事件" + loopEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
+                            }else if (appType.getAppType() == 2L){
+                                logger.info("IOS开始要推送事件" + loopEvent.toString());
+                                PushUtil.APNSPush(appType.getDeviceToken(),"您的事件" + loopEvent.getEventname() + "就要开始啦",1);
                             }
                         }
                     }
@@ -225,12 +237,14 @@ public class TimerConfig {
                                 if (appType.getAppType() == 1L) {
                                     logger.info("开始要推送事件" + loopEvent.toString());
                                     MobPushUtils.pushTask("您的事件" + loopEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
+                                }else if (appType.getAppType() == 2L){
+                                    logger.info("IOS开始要推送事件" + loopEvent.toString());
+                                    PushUtil.APNSPush(appType.getDeviceToken(),"您的事件" + loopEvent.getEventname() + "就要开始啦",1);
                                 }
                             }
                         }
                     }
                 }
-
             }
         }
     }

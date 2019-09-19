@@ -21,7 +21,7 @@ public class PushUtil {
     /**
      * 证书路径
      */
-    private static final String CERTIFICATE_PATH = "E:\\DevelopentPushManager.p12";
+    private static final String CERTIFICATE_PATH = "C:\\DevelopentPushManager.p12";
     /**
      * 证书密码
      */
@@ -71,9 +71,15 @@ public class PushUtil {
                 }
                 notifications = pushManager.sendNotifications(payLoad, device);
             }
+            System.out.println("推送");
             pushManager.stopConnection();
         } catch (Exception e) {
+            System.out.println("sad");
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        PushUtil.APNSPush("0b7a7fd7a60b7ed945862b58a5b4c00eff1e9fd2c18c0d4d1bb7042a8a8a1c96","sad",1);
     }
 }

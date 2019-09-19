@@ -16,7 +16,7 @@
         <module>tmutils</module>
         <module>tmbiz</module>
         <module>tmtrade</module>
-        <module>tmtest</module>
+        <module>tmstore</module>
     </modules>
 
     <parent>

@@ -60,7 +60,7 @@
         update groupsendeventmsg set processState=#{processState},processDate=#{processDate},processBy=#{processBy} where id=#{groupValidationId}
     </update>
     <update id="updGroupInviteMsg">
-        update groupinvitemsgstatus set status=#{status},userId=#{userId} where id=#{msgId}
+        update groupinvitemsgstatus set status=#{status},userId=#{userId} where msgStatusId=#{msgId}
     </update>
     <update id="updGroupFeedback">
         update groupfeedbackvalidation set readStatus=1 where id=#{groupMsgId}

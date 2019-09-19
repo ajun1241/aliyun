@@ -1136,7 +1136,7 @@ public class GroupServiceImpl implements GroupService {
                 List<GroupRelation> groupRelationList=groupMapper.queryGroupRelation(groupSendEventMsg.getGroupId().toString());
                 List<Map<String,String>> mapList=new ArrayList<>();
                 for (GroupRelation relation:groupRelationList) {
-                    Map<String,String> map=new HashMap(2);
+                    Map<String,String> map=new HashMap(3);
                     map.put("msgStatusId",msgStatus.getId().toString());
                     map.put("userId",relation.getMemberId().toString());
                     if (relation.getMemberId().equals(singleEvent.getUserid())){
