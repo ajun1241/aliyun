@@ -92,19 +92,19 @@ public class BackerServiceImpl implements BackerService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedChangeBackerInfo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        if (!StringUtils.hasText(receivedChangeBackerInfo.getFriendId())){
-            backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId());
-            return DtoUtil.getFalseDto("操作失败了,请再试一次哦", 22005);
-        }
         try {
             Backers backer = backerMapper.getMyBacker(receivedChangeBackerInfo.getUserId());
-            if (ObjectUtils.isEmpty(backer) && !StringUtils.hasText(receivedChangeBackerInfo.getFriendId())){
-                return DtoUtil.getFalseDto("操作错误",22013);
+            if (ObjectUtils.isEmpty(backer) && !StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
+                return DtoUtil.getFalseDto("请选择支持者", 22013);
+            }
+            if (!ObjectUtils.isEmpty(backer) && !StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
+                backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId());
+                return DtoUtil.getFalseDto("", 100000);
             }
             if (!ObjectUtils.isEmpty(backer) && backer.getStatus().equals("0")) {
-                if (System.currentTimeMillis()/1000 - backer.getCreateDate() < 1800){
-                    return DtoUtil.getFalseDto("请等待您上一个邀请的好友回应", 22002);
-                }else {
+                if (System.currentTimeMillis() / 1000 - backer.getCreateDate() < 600) {
+                    return DtoUtil.getFalseDto("请等待您上一个邀请的好友回应:" + (System.currentTimeMillis() / 1000 - backer.getCreateDate()), 22002);
+                } else {
                     backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId());
                 }
             }
@@ -136,23 +136,23 @@ public class BackerServiceImpl implements BackerService {
             String[] friendId = {ObjectUtils.isEmpty(backer) ? receivedChangeBackerInfo.getFriendId() : backer.getBackerId()};
             if (ObjectUtils.isEmpty(backer)) {
                 if (StringUtils.hasText(receivedChangeBackerInfo.getFriendId())) {
-                    Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(),receivedChangeBackerInfo.getUserId());
-                    if (friendship.getSustain().toString().equals("0")){
-                        ResponseResult result = rong.sendPrivateMsg("100000", new String[]{receivedChangeBackerInfo.getUserId()}, 0, new TxtMessage("您的支持者邀请被拒绝了",""));
+                    Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(), receivedChangeBackerInfo.getUserId());
+                    if (friendship.getSustain().toString().equals("0")) {
+                        ResponseResult result = rong.sendPrivateMsg("100000", new String[]{receivedChangeBackerInfo.getUserId()}, 0, new TxtMessage("您的支持者邀请被拒绝了", ""));
                         if (result.getCode() != 200) {
                             logger.info("添加支持者时融云消息异常" + result.toString());
                         }
-                        msgStatusMapper.addNewEventMsg(receivedChangeBackerInfo.getUserId(),1L,"100000",":您的支持者邀请被拒绝了",System.currentTimeMillis()/1000);
+                        msgStatusMapper.addNewEventMsg(receivedChangeBackerInfo.getUserId(), 1L, "100000", ":您的支持者邀请被拒绝了", System.currentTimeMillis() / 1000);
                         return DtoUtil.getSuccessDto("消息发送成功", 100000);
                     }
                     ResponseResult result = rong.sendPrivateMsg(receivedChangeBackerInfo.getUserId(), friendId, 0, addBackerMessage);
                     if (result.getCode() != 200) {
                         logger.info("添加支持者时融云消息异常" + result.toString());
                     }
-                    for (String s : friendId){
-                        msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),":来来来,当我的支持者,搞起!",System.currentTimeMillis()/1000);
+                    for (String s : friendId) {
+                        msgStatusMapper.addNewEventMsg(s, 1L, receivedChangeBackerInfo.getUserId(), ":来来来,当我的支持者,搞起!", System.currentTimeMillis() / 1000);
                     }
-                    if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000 ,msgStatus.getId()) > 0) {
+                    if (backerMapper.addBackers(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000, msgStatus.getId()) > 0) {
                         return DtoUtil.getSuccessDto("修改成功", 100000);
                     }
                 }
@@ -163,8 +163,8 @@ public class BackerServiceImpl implements BackerService {
                     if (result.getCode() != 200) {
                         logger.info("发送删除支持者时融云消息异常" + result.toString());
                     }
-                    for (String s : friendId){
-                        msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),"取消了您作为ta支持者的身份",System.currentTimeMillis()/1000);
+                    for (String s : friendId) {
+                        msgStatusMapper.addNewEventMsg(s, 1L, receivedChangeBackerInfo.getUserId(), "取消了您作为ta支持者的身份", System.currentTimeMillis() / 1000);
                     }
                     if (backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId()) > 0) {
                         return DtoUtil.getSuccessDto("修改成功", 100000);
@@ -176,16 +176,16 @@ public class BackerServiceImpl implements BackerService {
                         if (result1.getCode() != 200) {
                             logger.info("发送删除支持者时融云消息异常" + result1.toString());
                         }
-                        for (String s : deletedId){
-                            msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),"取消了您作为ta支持者的身份",System.currentTimeMillis()/1000);
+                        for (String s : deletedId) {
+                            msgStatusMapper.addNewEventMsg(s, 1L, receivedChangeBackerInfo.getUserId(), "取消了您作为ta支持者的身份", System.currentTimeMillis() / 1000);
                         }
-                        Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(),receivedChangeBackerInfo.getUserId());
-                        if (friendship.getSustain().toString().equals("0")){
-                            ResponseResult result = rong.sendPrivateMsg("100000", new String[]{receivedChangeBackerInfo.getUserId()}, 0, new TxtMessage(account.getUserName()+"拒绝了您的支持者邀请",""));
+                        Friendship friendship = accountMapper.queryFriendshipDetail(receivedChangeBackerInfo.getFriendId(), receivedChangeBackerInfo.getUserId());
+                        if (friendship.getSustain().toString().equals("0")) {
+                            ResponseResult result = rong.sendPrivateMsg("100000", new String[]{receivedChangeBackerInfo.getUserId()}, 0, new TxtMessage(account.getUserName() + "拒绝了您的支持者邀请", ""));
                             if (result.getCode() != 200) {
                                 logger.info("添加支持者时融云消息异常" + result.toString());
                             }
-                            msgStatusMapper.addNewEventMsg(receivedChangeBackerInfo.getUserId(),1L,"100000",":您的支持者邀请被拒绝了",System.currentTimeMillis()/1000);
+                            msgStatusMapper.addNewEventMsg(receivedChangeBackerInfo.getUserId(), 1L, "100000", ":您的支持者邀请被拒绝了", System.currentTimeMillis() / 1000);
                             return DtoUtil.getSuccessDto("消息发送成功", 100000);
                         }
                         String[] changedId = {receivedChangeBackerInfo.getFriendId()};
@@ -193,13 +193,13 @@ public class BackerServiceImpl implements BackerService {
                         if (result2.getCode() != 200) {
                             logger.info("添加邀请事件时融云消息异常" + result2.toString());
                         }
-                        for (String s : changedId){
-                            msgStatusMapper.addNewEventMsg(s,1L,receivedChangeBackerInfo.getUserId(),":来来来,当我的支持者,搞起!",System.currentTimeMillis()/1000);
+                        for (String s : changedId) {
+                            msgStatusMapper.addNewEventMsg(s, 1L, receivedChangeBackerInfo.getUserId(), ":来来来,当我的支持者,搞起!", System.currentTimeMillis() / 1000);
                         }
-                        if (backerMapper.updateBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000 ,msgStatus.getId()) > 0) {
+                        if (backerMapper.updateBacker(receivedChangeBackerInfo.getUserId(), receivedChangeBackerInfo.getFriendId(), System.currentTimeMillis() / 1000, msgStatus.getId()) > 0) {
                             return DtoUtil.getSuccessDto("修改成功", 100000);
                         }
-                    } else if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId()) && backer.getStatus().equals("1")){
+                    } else if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId()) && backer.getStatus().equals("1")) {
                         return DtoUtil.getFalseDto("您已经将ta设置为您的支持者了", 22002);
                     }
                 }
@@ -260,14 +260,14 @@ public class BackerServiceImpl implements BackerService {
         }
         Backers backer = backerMapper.getMyBacker(receivedBeSupporterFeedback.getReceiverId());
         MsgStatus msgStatus = msgStatusMapper.queryMsg(receivedBeSupporterFeedback.getMsgId());
-        if (ObjectUtils.isEmpty(backer)){
-            return DtoUtil.getFalseDto("操作失败 ",22013);
+        if (ObjectUtils.isEmpty(backer)) {
+            return DtoUtil.getFalseDto("操作失败 ", 22013);
         }
-        if (msgStatus.getStatus().equals("3") || System.currentTimeMillis()/1000 - backer.getCreateDate() >= 1800){
+        if (msgStatus.getStatus().equals("3") || System.currentTimeMillis() / 1000 - backer.getCreateDate() >= 1800) {
             return DtoUtil.getFalseDto("消息已过期", 22012);
         }
         try {
-            if (!ObjectUtils.isEmpty(backer) && backer.getStatus().equals("0") && System.currentTimeMillis()/1000 - backer.getCreateDate() < 1800) {
+            if (!ObjectUtils.isEmpty(backer) && backer.getStatus().equals("0") && System.currentTimeMillis() / 1000 - backer.getCreateDate() < 1800) {
                 int i = backerMapper.updateMsgStatus(receivedBeSupporterFeedback.getMsgId(), receivedBeSupporterFeedback.getReceiverId(), receivedBeSupporterFeedback.getStatus());
                 if (i <= 0) {
                     return DtoUtil.getFalseDto("消息已过期", 22012);
@@ -280,12 +280,12 @@ public class BackerServiceImpl implements BackerService {
                 Account account = accountMapper.queryAccount(receivedBeSupporterFeedback.getUserId());
                 String[] receiver = {receivedBeSupporterFeedback.getReceiverId()};
                 String msg = receivedBeSupporterFeedback.getStatus().equals("0") ? "同意了您的支持者邀请" : "拒绝了您的支持者邀请";
-                ResponseResult result1 = rong.sendPrivateMsg("100000",receiver, 0, new TxtMessage(account.getUserName() + msg, ""));
-                if (result1.getCode() != 200){
+                ResponseResult result1 = rong.sendPrivateMsg("100000", receiver, 0, new TxtMessage(account.getUserName() + msg, ""));
+                if (result1.getCode() != 200) {
                     logger.info("添加邀请事件时融云消息异常" + result1.toString());
                 }
 //                backerMapper.deleteBacker(receivedBeSupporterFeedback.getUserId());
-                msgStatusMapper.addNewEventMsg(receivedBeSupporterFeedback.getReceiverId(),1L,account.getId().toString(),msg,System.currentTimeMillis()/1000);
+                msgStatusMapper.addNewEventMsg(receivedBeSupporterFeedback.getReceiverId(), 1L, account.getId().toString(), msg, System.currentTimeMillis() / 1000);
                 return DtoUtil.getSuccessDto("", 100000);
             }
         } catch (Exception e) {
