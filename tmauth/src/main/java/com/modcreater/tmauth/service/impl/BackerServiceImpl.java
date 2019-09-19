@@ -89,15 +89,12 @@ public class BackerServiceImpl implements BackerService {
 
     @Override
     public synchronized Dto changeBacker(ReceivedChangeBackerInfo receivedChangeBackerInfo, String token) {
-        if (StringUtils.isEmpty(receivedChangeBackerInfo.getUserId())) {
-            return DtoUtil.getFalseDto("请先登录", 21011);
-        }
-        if (!StringUtils.hasText(token)) {
-            return DtoUtil.getFalseDto("token未获取到", 21013);
-        }
-        String redisToken = stringRedisTemplate.opsForValue().get(receivedChangeBackerInfo.getUserId());
-        if (!token.equals(redisToken)) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedChangeBackerInfo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!StringUtils.hasText(receivedChangeBackerInfo.getFriendId())){
+            backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId());
+            return DtoUtil.getFalseDto("操作失败了,请再试一次哦", 22005);
         }
         try {
             Backers backer = backerMapper.getMyBacker(receivedChangeBackerInfo.getUserId());
@@ -204,9 +201,6 @@ public class BackerServiceImpl implements BackerService {
                         }
                     } else if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId()) && backer.getStatus().equals("1")){
                         return DtoUtil.getFalseDto("您已经将ta设置为您的支持者了", 22002);
-                    }else if (receivedChangeBackerInfo.getFriendId().equals(backer.getBackerId()) && backer.getStatus().equals("2")){
-                        backerMapper.deleteBacker(receivedChangeBackerInfo.getUserId());
-                        return DtoUtil.getFalseDto("操作失败了,请再试一次哦", 22005);
                     }
                 }
             }
