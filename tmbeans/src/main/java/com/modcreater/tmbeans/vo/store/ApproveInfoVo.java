@@ -14,8 +14,6 @@ import java.io.Serializable;
 public class ApproveInfoVo implements Serializable {
     private String appType;
     private String userId;
-    private String proposer;
-    private String phoneNo;
     private String businessLicense;
 
 }

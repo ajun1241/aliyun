@@ -23,6 +23,12 @@ public class StoreController {
     @Resource
     private StoreService storeService;
 
+    @PostMapping("queryaccountinfo")
+    @ApiOperation("查询认证页面信息")
+    public Dto queryAccountInfo(@RequestBody ApproveInfoVo approveInfoVo, HttpServletRequest request){
+        return storeService.queryAccountInfo(approveInfoVo,request.getHeader("token"));
+    }
+
     @PostMapping("uploadapproveinfo")
     @ApiOperation("上传商铺认证信息")
     public Dto uploadApproveInfo(@RequestBody ApproveInfoVo approveInfoVo, HttpServletRequest request){

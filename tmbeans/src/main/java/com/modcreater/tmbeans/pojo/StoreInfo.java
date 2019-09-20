@@ -16,5 +16,6 @@ public class StoreInfo {
   private String businessScope;
   private String createDate;
   private Long status;
+  private Long attestationId;
 
 }
