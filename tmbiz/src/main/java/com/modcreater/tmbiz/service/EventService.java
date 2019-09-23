@@ -246,11 +246,11 @@ public interface EventService {
 
     /**
      * 获取今天计划(IOS)
-     * @param receivedId
+     * @param seaByWeekForIOS
      * @param token
      * @return
      */
-    Dto searchByWeekForIos(ReceivedId receivedId, String token);
+    Dto searchByWeekForIos(SeaByWeekForIOS seaByWeekForIOS, String token);
 
     /**
      * 提前完成事件

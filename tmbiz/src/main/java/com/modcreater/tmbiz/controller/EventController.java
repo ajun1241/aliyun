@@ -96,8 +96,8 @@ public class EventController {
     @GLOT
     @PostMapping(value = "searchbyweekforios")
     @ApiOperation("查询我的一周")
-    public Dto searchByWeekForIos(@RequestBody ReceivedId receivedId, HttpServletRequest request){
-        return eventService.searchByWeekForIos(receivedId,request.getHeader("token"));
+    public Dto searchByWeekForIos(@RequestBody SeaByWeekForIOS seaByWeekForIOS, HttpServletRequest request){
+        return eventService.searchByWeekForIos(seaByWeekForIOS,request.getHeader("token"));
     }
 
     @GLOT

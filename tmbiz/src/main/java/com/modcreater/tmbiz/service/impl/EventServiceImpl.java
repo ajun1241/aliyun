@@ -2191,9 +2191,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Dto searchByWeekForIos(ReceivedId receivedId, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+    public Dto searchByWeekForIos(SeaByWeekForIOS seaByWeekForIOS, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(seaByWeekForIOS.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        ReceivedId receivedId = new ReceivedId();
+        if ("seaF".equals(seaByWeekForIOS.getSeaType())){
+            receivedId.setUserId(seaByWeekForIOS.getFriendId());
         }
         List<String> eventIdsList = new ArrayList<>();
         for (int i = 0; i <= 6; i++) {
