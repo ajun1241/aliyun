@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.vo.goods.RegisterGoods;
 import com.modcreater.tmstore.config.annotation.Safety;
 import com.modcreater.tmstore.service.GoodsService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ public class GoodsController {
     private GoodsService goodsService;
 
     @Safety
-    @RequestMapping(value = "registerGoods")
+    @PostMapping(value = "registerGoods")
     @ApiOperation("注册商品")
     public Dto registerGoods(@RequestBody RegisterGoods registerGoods, HttpServletRequest request){
         return goodsService.registerGoods(registerGoods,request.getHeader("token"));

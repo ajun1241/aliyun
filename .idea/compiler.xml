@@ -12,6 +12,7 @@
         <module name="tmbiz" />
         <module name="tmdao" />
         <module name="tmstore" />
+        <module name="tmstore (2)" />
         <module name="tmtrade" />
         <module name="tmutils" />
       </profile>
@@ -19,6 +20,8 @@
     <bytecodeTargetLevel>
       <module name="tmauth2" target="1.8" />
       <module name="tmchat" target="1.8" />
+      <module name="tmstore (1)" target="1.8" />
+      <module name="tmstore (2)" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -31,6 +34,8 @@
       <module name="tmchat" options="-parameters" />
       <module name="tmdao" options="-parameters" />
       <module name="tmstore" options="-parameters" />
+      <module name="tmstore (1)" options="-parameters" />
+      <module name="tmstore (2)" options="-parameters" />
       <module name="tmtrade" options="-parameters" />
       <module name="tmutils" options="-parameters" />
     </option>

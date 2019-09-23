@@ -16,12 +16,8 @@
         <option value="$PROJECT_DIR$/tmtrade/pom.xml" />
         <option value="$PROJECT_DIR$/tmtest/pom.xml" />
         <option value="$PROJECT_DIR$/tmstore_/pom.xml" />
-      </list>
-    </option>
-    <option name="ignoredFiles">
-      <set>
         <option value="$PROJECT_DIR$/tmstore/pom.xml" />
-      </set>
+      </list>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">

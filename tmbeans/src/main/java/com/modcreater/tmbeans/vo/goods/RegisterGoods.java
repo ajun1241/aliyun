@@ -52,7 +52,7 @@ public class RegisterGoods {
     /**
      * 商品类型
      */
-    private String goodsType;
+    private String goodsTypeId;
 
     private String goodsUnit;
     /**
@@ -62,15 +62,15 @@ public class RegisterGoods {
     /**
      * 来源0手动添加1进货
      */
-    private String source;
+    private String goodSource;
     /**
-     * 大单位
+     * 父单位
      */
-    private String bigUnit;
+    private String goodsFUnit;
     /**
      * 大单位换算到小单位的数量
      */
-    private Long smallUnitNum;
+    private Long faUnitNum;
     /**
      * 消耗品清单
      */

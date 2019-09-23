@@ -1,6 +1,9 @@
 package com.modcreater.tmstore.service.impl;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.StoreGoods;
+import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
+import com.modcreater.tmbeans.vo.goods.ConsumablesList;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
 import com.modcreater.tmdao.mapper.GoodsMapper;
 import com.modcreater.tmstore.service.GoodsService;
@@ -10,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,6 +40,24 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         goodsMapper.addNewGoods(registerGoods);
+        goodsMapper.addNewGoodsStock(registerGoods.getId(),registerGoods.getGoodsNum(),0);
+        if (registerGoods.getConsumablesLists().length > 0){
+            NumberFormat nf = NumberFormat.getNumberInstance();
+            nf.setRoundingMode(RoundingMode.HALF_UP);
+            nf.setMaximumFractionDigits(2);
+            for (ConsumablesList consumablesList : registerGoods.getConsumablesLists()){
+                StoreGoods goods = goodsMapper.getGoodsInfo(consumablesList.getConsumablesId());
+                StoreGoodsConsumable consumable = new StoreGoodsConsumable();
+                consumable.setGoodsId(Long.valueOf(registerGoods.getId()));
+                consumable.setConsumableGoodsId(Long.valueOf(consumablesList.getConsumablesId()));
+                consumable.setRegisteredRatioIn(Long.valueOf(consumablesList.getConsumablesNum()));
+                consumable.setRegisteredRationInUnit(goods.getGoodsUnit());
+                consumable.setRegisteredRatioOut(Long.valueOf(consumablesList.getFinishedNum()));
+                consumable.setRegisteredRationOutUnit(registerGoods.getGoodsUnit());
+                consumable.setRegisteredTime(System.currentTimeMillis()/1000);
+                goodsMapper.addNewGoodsConsumable(consumable);
+            }
+        }
         return DtoUtil.getSuccesWithDataDto("添加成功",registerGoods.getId(),100000);
     }
 }
