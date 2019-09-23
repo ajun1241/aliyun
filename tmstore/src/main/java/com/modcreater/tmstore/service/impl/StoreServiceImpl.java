@@ -36,6 +36,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Resource
     private StoreMapper storeMapper;
+
     @Resource
     private AccountMapper accountMapper;
 

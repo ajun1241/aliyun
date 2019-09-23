@@ -39,6 +39,9 @@ import java.util.regex.Pattern;
 public class AccountServiceImpl implements AccountService {
     @Resource
     private AccountMapper accountMapper;
+
+
+
     private static final String SYSTEMID = "100000";
     private static final String ANDROID = "android";
     private static final String IOS = "ios";

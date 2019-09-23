@@ -15,7 +15,7 @@ public interface StoreService {
      * @param token
      * @return
      */
-    Dto queryAccountInfo(ApproveInfoVo approveInfoVo,String token);
+    Dto queryAccountInfo(ApproveInfoVo approveInfoVo, String token);
 
     /**
      * 上传商铺认证信息
@@ -23,6 +23,6 @@ public interface StoreService {
      * @param token
      * @return
      */
-    Dto uploadApproveInfo(ApproveInfoVo approveInfoVo,String token);
+    Dto uploadApproveInfo(ApproveInfoVo approveInfoVo, String token);
 
 }
