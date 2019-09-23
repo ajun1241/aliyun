@@ -31,8 +31,6 @@ public class StoreServiceImpl implements StoreService {
     private static final String ANDROID = "android";
     private static final String IOS = "ios";
 
-
-
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
