@@ -46,10 +46,6 @@ public class RegisterGoods {
      */
     private String goodsAllergen;
     /**
-     * 商品单价
-     */
-    private Double goodsPrice;
-    /**
      * 商品类型
      */
     private String goodsTypeId;

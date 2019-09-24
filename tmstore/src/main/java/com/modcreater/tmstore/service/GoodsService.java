@@ -1,7 +1,10 @@
 package com.modcreater.tmstore.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
+import com.modcreater.tmbeans.vo.goods.ReceivedStoreId;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
 
@@ -21,6 +24,14 @@ public interface GoodsService {
      * @return
      */
     Dto registerGoods(RegisterGoods registerGoods, String token);
+
+    /**
+     * 获取我的库存列表
+     * @param getGoodsStockList
+     * @param token
+     * @return
+     */
+    Dto getGoodsStockList(GetGoodsStockList getGoodsStockList, String token);
 
     /**
      * 根据类型查询商铺商品列表

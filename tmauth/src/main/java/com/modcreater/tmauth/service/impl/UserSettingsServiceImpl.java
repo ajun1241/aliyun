@@ -179,6 +179,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
             List<ShowFriendList> showFriendListForHideList = userSettingsMapper.getHideFriendList(getFriendListInSettings.getUserId());
             if (showFriendListForHideList.size() != 0){
                 for (ShowFriendList showFriendList : showFriendListForHideList){
+                    //数据库存储状态值与回参相反,数据库为1,则返回0
                     if ("1".equals(showFriendList.getStatus())){
                         showFriendList.setStatus("0");
                     }else if ("0".equals(showFriendList.getStatus())){

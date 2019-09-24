@@ -1,7 +1,10 @@
 package com.modcreater.tmstore.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
+import com.modcreater.tmbeans.vo.goods.ReceivedStoreId;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
 import com.modcreater.tmstore.config.annotation.Safety;
@@ -35,6 +38,13 @@ public class GoodsController {
     @ApiOperation("注册商品")
     public Dto registerGoods(@RequestBody RegisterGoods registerGoods, HttpServletRequest request){
         return goodsService.registerGoods(registerGoods,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "getgoodsstocklist")
+    @ApiOperation("获取我的商品库存列表()")
+    public Dto getGoodsStockList(@RequestBody GetGoodsStockList getGoodsStockList, HttpServletRequest request){
+        return goodsService.getGoodsStockList(getGoodsStockList,request.getHeader("token"));
     }
 
     @Safety
