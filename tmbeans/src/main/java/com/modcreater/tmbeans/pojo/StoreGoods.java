@@ -15,7 +15,7 @@ public class StoreGoods {
   private String goodsAllergen;
   private double goodsPrice;
   private String goodsUnit;
-  private long goodsType;
+  private String goodsTypeId;
   private long goodsStatus;
 
 }
