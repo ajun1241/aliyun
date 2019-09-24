@@ -2,10 +2,11 @@ package com.modcreater.tmstore.service.impl;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.StoreGoods;
-import com.modcreater.tmbeans.pojo.StoreGoods;
 import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
+import com.modcreater.tmbeans.pojo.StoreGoodsType;
 import com.modcreater.tmbeans.vo.goods.ConsumablesList;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
+import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
 import com.modcreater.tmdao.mapper.GoodsMapper;
 import com.modcreater.tmstore.service.GoodsService;
@@ -13,12 +14,13 @@ import com.modcreater.tmutils.DtoUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,12 +76,18 @@ public class GoodsServiceImpl implements GoodsService {
      * @return
      */
     @Override
-    public Dto grtGoodsList(GoodsListVo goodsListVo, String token) {
+    public Dto getGoodsList(GoodsListVo goodsListVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(goodsListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
+        if (StringUtils.isEmpty(goodsListVo.getGoodsType())){
+            goodsListVo.setGoodsType("1");
+        }
         int pageSize=Integer.parseInt(goodsListVo.getPageSize());
         int pageIndex=(Integer.parseInt(goodsListVo.getPageNumber())-1)*pageSize;
+        Map<String,Object> map=new HashMap<>(2);
+        List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList();
+        map.put("goodsTypeList",goodsTypeList);
         List<Map<String,String>> goodsList=null;
         if ("1".equals(goodsListVo.getGoodsType())){
             //优惠
@@ -89,9 +97,26 @@ public class GoodsServiceImpl implements GoodsService {
             goodsList=new ArrayList<>();
         }else {
             //普通分类
-            goodsList=goodsMapper.grtGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
+            goodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",goodsList,100000);
+        map.put("goodsList",goodsList);
+        return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
+    }
+
+    /**
+     * 根据Id查询商品详情
+     * @param goodsInfoVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto getGoodsInfo(GoodsInfoVo goodsInfoVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(goodsInfoVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreGoods storeGoods=goodsMapper.getGoodsInfo(goodsInfoVo.getGoodsId());
+
+        return null;
     }
 
 }

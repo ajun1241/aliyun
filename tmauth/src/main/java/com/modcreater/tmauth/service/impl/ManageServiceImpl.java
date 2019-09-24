@@ -2,6 +2,7 @@ package com.modcreater.tmauth.service.impl;
 
 import com.modcreater.tmauth.service.ManageService;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.AfterSale;
 import com.modcreater.tmbeans.pojo.SuperAdministrator;
 import com.modcreater.tmbeans.pojo.UserRealInfo;
@@ -9,10 +10,7 @@ import com.modcreater.tmbeans.vo.ComplaintVo;
 import com.modcreater.tmbeans.vo.realname.ReceivedStudentRealInfo;
 import com.modcreater.tmbeans.vo.realname.ReceivedUserRealInfo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import com.modcreater.tmdao.mapper.AfterSaleMapper;
-import com.modcreater.tmdao.mapper.ComplaintMapper;
-import com.modcreater.tmdao.mapper.SuperAdminMapper;
-import com.modcreater.tmdao.mapper.UserRealInfoMapper;
+import com.modcreater.tmdao.mapper.*;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.SendMsgUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -43,6 +41,9 @@ public class ManageServiceImpl implements ManageService {
 
     @Resource
     private ComplaintMapper complaintMapper;
+
+    @Resource
+    private AccountMapper accountMapper;
 
     @Resource
     private AfterSaleMapper afterSaleMapper;
@@ -151,6 +152,7 @@ public class ManageServiceImpl implements ManageService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
             return DtoUtil.getFalseDto("请重新登录",21014);
         }
+        Account account=accountMapper.queryAccount(receivedId.getUserId());
         AfterSale afterSale=new AfterSale();
         afterSale.setUserId(Long.parseLong(receivedId.getUserId()));
         afterSale.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -162,7 +164,7 @@ public class ManageServiceImpl implements ManageService {
         List<SuperAdministrator> superAdministrators=superAdminMapper.querySuperAdmins();
         List<String> emails=new ArrayList<>();
         String title="【智袖】";
-        String content="有用户需要更换实名信息！";
+        String content="用户"+account.getUserCode()+"需要更换实名信息！";
         for (SuperAdministrator administrators : superAdministrators) {
             if (!StringUtils.isEmpty(administrators.getEmail())){
                 emails.add(administrators.getEmail());

@@ -11,6 +11,7 @@ import com.modcreater.tmdao.mapper.EventMapper;
 import com.modcreater.tmdao.mapper.MsgStatusMapper;
 import com.modcreater.tmdao.mapper.SensitiveWordsMapper;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.IOSPushUtil;
 import com.modcreater.tmutils.MD5Util;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,18 +36,16 @@ import java.util.regex.Pattern;
 @WebAppConfiguration
 @Component
 public class TmauthApplicationTests {
-    @Resource
-    MsgStatusMapper msgStatusMapper;
-    @Resource
-    private AccountMapper accountMapper;
-    @Resource
-    private static SensitiveWordsMapper sensitiveWordsMapper;
+
     @Test
     public void contextLoads() {
 
     }
     @Test
     public void test(){
+        List<String> list=new ArrayList<>();
+        list.add("0b7a7fd7a60b7ed945862b58a5b4c00eff1e9fd2c18c0d4d1bb7042a8a8a1c96");
+        IOSPushUtil.push(list,"智袖","你的时间吃饭就要开始了",false,new HashMap<>(),1);
     }
 }
 

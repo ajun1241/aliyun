@@ -2,6 +2,7 @@ package com.modcreater.tmstore.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
+import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
 
 /**
@@ -27,5 +28,13 @@ public interface GoodsService {
      * @param token
      * @return
      */
-    Dto grtGoodsList(GoodsListVo goodsListVo, String token);
+    Dto getGoodsList(GoodsListVo goodsListVo, String token);
+
+    /**
+     * 根据Id查询商品详情
+      * @param goodsInfoVo
+     * @param token
+     * @return
+     */
+    Dto getGoodsInfo(GoodsInfoVo goodsInfoVo, String token);
 }

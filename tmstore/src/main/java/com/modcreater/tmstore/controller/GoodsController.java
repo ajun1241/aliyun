@@ -2,6 +2,7 @@ package com.modcreater.tmstore.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
+import com.modcreater.tmbeans.vo.store.GoodsListVo;
 import com.modcreater.tmstore.config.annotation.Safety;
 import com.modcreater.tmstore.service.GoodsService;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +34,13 @@ public class GoodsController {
     @ApiOperation("注册商品")
     public Dto registerGoods(@RequestBody RegisterGoods registerGoods, HttpServletRequest request){
         return goodsService.registerGoods(registerGoods,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "getgoodslist")
+    @ApiOperation("查询商品列表")
+    public Dto getGoodsList(@RequestBody GoodsListVo goodsListVo, HttpServletRequest request){
+        return goodsService.getGoodsList(goodsListVo,request.getHeader("token"));
     }
 
 }

@@ -2,6 +2,7 @@ package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.StoreGoods;
 import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
+import com.modcreater.tmbeans.pojo.StoreGoodsType;
 import com.modcreater.tmbeans.vo.goods.ConsumablesList;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
 import org.apache.ibatis.annotations.Mapper;
@@ -37,7 +38,7 @@ public interface GoodsMapper {
      * @param pageSize
      * @return
      */
-    List<Map<String, String>> grtGoodsList(String storeId, String goodsName, String goodsType, int pageIndex, int pageSize);
+    List<Map<String, String>> getGoodsList(String storeId, String goodsName, String goodsType, int pageIndex, int pageSize);
 
     /**
      * 添加商品库存
@@ -61,4 +62,11 @@ public interface GoodsMapper {
      * @return
      */
     StoreGoods getGoodsInfo(String goodsId);
+
+    /**
+     * 查询商品类型表
+     * @return
+     */
+    List<StoreGoodsType> getGoodsTypeList();
+
 }

@@ -12,7 +12,7 @@
         insert into store_goodsstock (goodsId, stockNum, goodsSource)
         values (#{goodsId},#{stockNum},#{goodsSource})
     </insert>
-    <select id="grtGoodsList" resultType="java.util.Map">
+    <select id="getGoodsList" resultType="java.util.Map">
         select * from store_goods where storeId=#{storeId}
         <if test=" goodsName != null and goodsName != ''" >
             and goodsName like concat('%',#{goodsName},'%')
@@ -30,5 +30,8 @@
     </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
+    </select>
+    <select id="getGoodsTypeList" resultType="com.modcreater.tmbeans.pojo.StoreGoodsType">
+        select * from store_goods_type
     </select>
 </mapper>
