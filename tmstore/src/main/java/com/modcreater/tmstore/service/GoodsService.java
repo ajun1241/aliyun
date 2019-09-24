@@ -2,6 +2,7 @@ package com.modcreater.tmstore.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
+import com.modcreater.tmbeans.vo.store.GoodsListVo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,4 +20,12 @@ public interface GoodsService {
      * @return
      */
     Dto registerGoods(RegisterGoods registerGoods, String token);
+
+    /**
+     * 根据类型查询商铺商品列表
+     * @param goodsListVo
+     * @param token
+     * @return
+     */
+    Dto grtGoodsList(GoodsListVo goodsListVo, String token);
 }

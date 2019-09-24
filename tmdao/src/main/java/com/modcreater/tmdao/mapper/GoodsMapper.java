@@ -7,6 +7,9 @@ import com.modcreater.tmbeans.vo.goods.RegisterGoods;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -24,6 +27,17 @@ public interface GoodsMapper {
      * @return
      */
     Long addNewGoods(RegisterGoods registerGoods);
+
+    /**
+     * 根据条件查询商品列表
+     * @param storeId
+     * @param goodsName
+     * @param goodsType
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    List<Map<String, String>> grtGoodsList(String storeId, String goodsName, String goodsType, int pageIndex, int pageSize);
 
     /**
      * 添加商品库存

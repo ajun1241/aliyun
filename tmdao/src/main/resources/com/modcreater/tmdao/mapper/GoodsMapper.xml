@@ -12,6 +12,16 @@
         insert into store_goodsstock (goodsId, stockNum, goodsSource)
         values (#{goodsId},#{stockNum},#{goodsSource})
     </insert>
+    <select id="grtGoodsList" resultType="java.util.Map">
+        select * from store_goods where storeId=#{storeId}
+        <if test=" goodsName != null and goodsName != ''" >
+            and goodsName like concat('%',#{goodsName},'%')
+        </if>
+        <if test=" goodsType != null and goodsType > 0 " >
+            and goodsTypeId = #{goodsTypeId}
+        </if>
+        limit #{pageIndex},#{pageSize}
+    </select>
     <insert id="addNewGoodsConsumable">
         insert into store_goodsconsumable (goodsId, consumableGoodsId,  registeredRatioIn,
         registeredRationInUnit, registeredRatioOut, registeredRationOutUnit, registeredTime)

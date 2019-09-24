@@ -15,5 +15,7 @@ public class ApproveInfoVo implements Serializable {
     private String appType;
     private String userId;
     private String businessLicense;
+    private String exequatur;
+    private String storeLogo;
 
 }

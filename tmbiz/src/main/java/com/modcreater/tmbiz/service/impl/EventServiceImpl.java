@@ -30,7 +30,6 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -226,7 +225,7 @@ public class EventServiceImpl implements EventService {
                     //如果是ios发送推送信息
                     UserDeviceToken userDeviceToken = deviceTokenMapper.queryDeviceToken(personList1.get(i));
                     if (!ObjectUtils.isEmpty(userDeviceToken) && userDeviceToken.getAppType() == 1L && !StringUtils.isEmpty(userDeviceToken.getDeviceToken())) {
-                        PushUtil.APNSPush(userDeviceToken.getDeviceToken(), "你的好友邀请你参与他的事件", 1);
+//                        IOSPushUtil.push(userDeviceToken.getDeviceToken(), "你的好友邀请你参与他的事件", 1);
                     }
                     msgStatusMapper.addNewEventMsg(personList1.get(i), singleEvent.getEventid(), updateEventVo.getUserId(), "邀请你参与事件", System.currentTimeMillis() / 1000);
                 }

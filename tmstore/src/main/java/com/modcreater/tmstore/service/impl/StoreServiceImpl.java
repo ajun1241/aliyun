@@ -82,6 +82,8 @@ public class StoreServiceImpl implements StoreService {
         }
         StoreAttestation storeAttestation=new StoreAttestation();
         storeAttestation.setBusinessLicense(approveInfoVo.getBusinessLicense());
+        storeAttestation.setExequatur(approveInfoVo.getExequatur());
+        storeAttestation.setStoreLogo(approveInfoVo.getStoreLogo());
         storeAttestation.setUserId(approveInfoVo.getUserId());
         int i=storeMapper.insertStoreAttestation(storeAttestation);
         if (i==0){
