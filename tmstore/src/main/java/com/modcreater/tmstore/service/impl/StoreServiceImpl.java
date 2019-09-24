@@ -1,5 +1,6 @@
 package com.modcreater.tmstore.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.StoreAttestation;
@@ -82,7 +83,7 @@ public class StoreServiceImpl implements StoreService {
         }
         StoreAttestation storeAttestation=new StoreAttestation();
         storeAttestation.setBusinessLicense(approveInfoVo.getBusinessLicense());
-        storeAttestation.setExequatur(approveInfoVo.getExequatur());
+        storeAttestation.setExequatur(JSON.toJSONString(approveInfoVo.getExequatur()));
         storeAttestation.setStoreLogo(approveInfoVo.getStoreLogo());
         storeAttestation.setUserId(approveInfoVo.getUserId());
         int i=storeMapper.insertStoreAttestation(storeAttestation);

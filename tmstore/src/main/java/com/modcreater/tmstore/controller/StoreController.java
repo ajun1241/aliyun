@@ -4,6 +4,7 @@ package com.modcreater.tmstore.controller;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.store.ApproveInfoVo;
+import com.modcreater.tmstore.config.annotation.Safety;
 import com.modcreater.tmstore.service.StoreService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +29,7 @@ public class StoreController {
     public Dto queryAccountInfo(@RequestBody ApproveInfoVo approveInfoVo, HttpServletRequest request){
         return storeService.queryAccountInfo(approveInfoVo,request.getHeader("token"));
     }
-
+    @Safety
     @PostMapping("uploadapproveinfo")
     @ApiOperation("上传商铺认证信息")
     public Dto uploadApproveInfo(@RequestBody ApproveInfoVo approveInfoVo, HttpServletRequest request){

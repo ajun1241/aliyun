@@ -55,6 +55,9 @@ public class EventServiceImpl implements EventService {
     private AccountMapper accountMapper;
 
     @Resource
+    private AppTypeMapper appTypeMapper;
+
+    @Resource
     private StatisticsMapper statisticsMapper;
 
     @Resource
@@ -1107,6 +1110,15 @@ public class EventServiceImpl implements EventService {
                 if (StringUtils.isEmpty(eventPersons.getFriendsId())) {
                     //直接修改
                     if (eventMapper.alterEventsByUserId(singleEvent) > 0) {
+                        //如果是IOS采用静默推送刷新事件详情
+                        AppType appType=appTypeMapper.queryAppType(addInviteEventVo.getUserId());
+                        if (appType.getAppType()==2L){
+                            List<String> list=new ArrayList<>();
+                            Map<String,Object> map=new HashMap<>(1);
+                            map.put("refreshType",1);
+                            list.add(appType.getDeviceToken());
+                            IOSPushUtil.push(list,null,null,true,map,0,false);
+                        }
                         return DtoUtil.getSuccessDto("修改成功", 100000);
                     } else {
                         return DtoUtil.getSuccessDto("修改失败", 2333);
@@ -1455,6 +1467,15 @@ public class EventServiceImpl implements EventService {
                     singleEvent.setUserid(Long.valueOf(userId));
                     singleEvent.setPerson(singleEvent1.getPerson());
                     eventMapper.alterEventsByUserId(singleEvent);
+                    //如果是IOS采用静默推送刷新事件详情
+                    AppType appType=appTypeMapper.queryAppType(userId);
+                    if (appType.getAppType()==2L){
+                        List<String> deviceToken=new ArrayList<>();
+                        Map<String,Object> map=new HashMap<>(1);
+                        map.put("refreshType",1);
+                        deviceToken.add(appType.getDeviceToken());
+                        IOSPushUtil.push(deviceToken,null,null,true,map,0,false);
+                    }
                 }
                 //删除临时表的事件
                 tempEventMapper.deleteTempEvent(singleEvent.getEventid().toString(), eventCreatorChooseVo.getUserId());

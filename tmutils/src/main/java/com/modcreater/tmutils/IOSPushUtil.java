@@ -38,6 +38,7 @@ public class IOSPushUtil {
     private static final String authKeyPath="C:\\AuthKey_4XT8A6366N.p8";
     private static final String teamId="GCZ6GJ4PY7";
     private static final String keyId="4XT8A6366N";
+    private static final String bundleId="com.modcreater.TimeManagerForiOS";
 
     //Semaphore又称信号量，是操作系统中的一个概念，在Java并发编程中，信号量控制的是线程并发的数量。
     private static final Semaphore semaphore = new Semaphore(10000);
@@ -71,7 +72,7 @@ public class IOSPushUtil {
      * @param badge 如果badge小于0，则不推送这个右上角的角标，主要用于消息盒子新增或者已读时，更新此状态
      */
     @SuppressWarnings("rawtypes")
-    public static void push(final List<String> deviceTokens, String alertTitle, String alertBody, boolean contentAvailable, Map<String, Object> customProperty, int badge) {
+    public static void push(final List<String> deviceTokens, String alertTitle, String alertBody, boolean contentAvailable, Map<String, Object> customProperty, int badge,boolean sound) {
 
         long startTime = System.currentTimeMillis();
 
@@ -93,6 +94,11 @@ public class IOSPushUtil {
                 payloadBuilder.setAlertBody(alertBody);
                 payloadBuilder.setAlertTitle(alertTitle);
             }
+            //设置提示音等通知参数
+            if (sound){
+                payloadBuilder.setSound("default");
+            }
+
 
             //如果badge小于0，则不推送这个右上角的角标，主要用于消息盒子新增或者已读时，更新此状态
             if (badge > 0) {
@@ -105,18 +111,17 @@ public class IOSPushUtil {
                     payloadBuilder.addCustomProperty(map.getKey(), map.getValue());
                 }
             }
-
             // true：表示的是产品发布推送服务 false：表示的是产品测试推送服务
             payloadBuilder.setContentAvailable(contentAvailable);
-
             String payload = payloadBuilder.buildWithDefaultMaximumLength();
             final String token = TokenUtil.sanitizeTokenString(deviceToken);
-            SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(token, "com.imagedt.basho.dev", payload);
-
+            SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(token, bundleId, payload);
             try {
-                semaphore.acquire();//从信号量中获取一个允许机会
+                //从信号量中获取一个允许机会
+                semaphore.acquire();
             } catch (Exception e) {
-                logger.error("ios push get semaphore failed, deviceToken:{}", deviceToken);//线程太多了，没有多余的信号量可以获取了
+                //线程太多了，没有多余的信号量可以获取了
+                logger.error("ios push get semaphore failed, deviceToken:{}", deviceToken);
                 e.printStackTrace();
             }
 
@@ -160,7 +165,7 @@ public class IOSPushUtil {
 
         long endPushTime = System.currentTimeMillis();
 
-        logger.info("test pushMessage success. [共推送" + total + "个][成功" + (successCnt.get()) + "个],totalcost= " + (endPushTime - startTime) + ", pushCost=" + (endPushTime - startPushTime));
+        logger.info("test pushMessage success. [共推送" + total + "个][成功" + (successCnt.get()) + "个],totalCost= " + (endPushTime - startTime) + ", pushCost=" + (endPushTime - startPushTime));
     }
 
 }

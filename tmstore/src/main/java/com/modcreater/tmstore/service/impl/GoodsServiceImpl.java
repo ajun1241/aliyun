@@ -14,6 +14,7 @@ import com.modcreater.tmutils.DtoUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -115,8 +116,16 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         StoreGoods storeGoods=goodsMapper.getGoodsInfo(goodsInfoVo.getGoodsId());
-
-        return null;
+        Map<String,Object> map=new HashMap<>(5);
+        if (!ObjectUtils.isEmpty(storeGoods)){
+            map.put("goodsPicture",storeGoods.getGoodsPrice());
+            map.put("goodsName",storeGoods.getGoodsBrand()+storeGoods.getGoodsName()+storeGoods.getGoodsSpecifications()+storeGoods.getGoodsUnit()+"装");
+            map.put("weekSalesVolume",0);
+            map.put("goodsPrice",storeGoods.getGoodsPrice());
+        }else {
+            return DtoUtil.getFalseDto("查询失败，该商品可能已下架",24105);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
     }
 
 }

@@ -3,6 +3,7 @@ package com.modcreater.tmbeans.vo.store;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Description:
@@ -15,7 +16,7 @@ public class ApproveInfoVo implements Serializable {
     private String appType;
     private String userId;
     private String businessLicense;
-    private String exequatur;
+    private List<String> exequatur;
     private String storeLogo;
 
 }

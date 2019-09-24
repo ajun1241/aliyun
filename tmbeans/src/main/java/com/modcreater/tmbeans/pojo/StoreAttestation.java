@@ -2,6 +2,8 @@ package com.modcreater.tmbeans.pojo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Author: AJun
  */

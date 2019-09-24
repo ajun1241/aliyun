@@ -155,7 +155,9 @@ public class TimerConfig {
                             MobPushUtils.pushTask("您的事件" + singleEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
                         }else if (appType.getAppType() == 2L){
                             logger.info("IOS开始要推送事件" + singleEvent.toString());
-//                            IOSPushUtil.APNSPush(appType.getDeviceToken(),"您的事件" + singleEvent.getEventname() + "就要开始啦",1);
+                            List<String> list=new ArrayList<>();
+                            list.add(appType.getDeviceToken());
+                            IOSPushUtil.push(list,"智袖","您的事件" + singleEvent.getEventname() + "就要开始啦",true,null,1,true);
                         }
                     }
                 }
@@ -178,7 +180,9 @@ public class TimerConfig {
                                 MobPushUtils.pushTask("您的事件" + singleEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
                             }else if (appType.getAppType() == 2L){
                                 logger.info("IOS开始要推送事件" + singleEvent.toString());
-//                                IOSPushUtil.APNSPush(appType.getDeviceToken(),"您的事件" + singleEvent.getEventname() + "就要开始啦",1);
+                                List<String> list=new ArrayList<>();
+                                list.add(appType.getDeviceToken());
+                                IOSPushUtil.push(list,"智袖","您的事件" + singleEvent.getEventname() + "就要开始啦",true,null,1,true);
                             }
                         }
                     }
@@ -209,7 +213,9 @@ public class TimerConfig {
                                 MobPushUtils.pushTask("您的事件" + loopEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
                             }else if (appType.getAppType() == 2L){
                                 logger.info("IOS开始要推送事件" + loopEvent.toString());
-//                                IOSPushUtil.APNSPush(appType.getDeviceToken(),"您的事件" + loopEvent.getEventname() + "就要开始啦",1);
+                                List<String> list=new ArrayList<>();
+                                list.add(appType.getDeviceToken());
+                                IOSPushUtil.push(list,"智袖","您的事件" + loopEvent.getEventname() + "就要开始啦",true,null,1,true);
                             }
                         }
                     }
@@ -233,7 +239,9 @@ public class TimerConfig {
                                     MobPushUtils.pushTask("您的事件" + loopEvent.getEventname() + "就要开始啦", new String[]{appType.getDeviceToken()});
                                 }else if (appType.getAppType() == 2L){
                                     logger.info("IOS开始要推送事件" + loopEvent.toString());
-//                                    IOSPushUtil.APNSPush(appType.getDeviceToken(),"您的事件" + loopEvent.getEventname() + "就要开始啦",1);
+                                    List<String> list=new ArrayList<>();
+                                    list.add(appType.getDeviceToken());
+                                    IOSPushUtil.push(list,"智袖","您的事件" + loopEvent.getEventname() + "就要开始啦",true,null,1,true);
                                 }
                             }
                         }
