@@ -2198,8 +2198,9 @@ public class EventServiceImpl implements EventService {
         ReceivedId receivedId = new ReceivedId();
         if ("seaF".equals(seaByWeekForIOS.getSeaType())){
             receivedId.setUserId(seaByWeekForIOS.getFriendId());
+        }else {
+            receivedId.setUserId(seaByWeekForIOS.getUserId());
         }
-        receivedId.setUserId(seaByWeekForIOS.getUserId());
         List<String> eventIdsList = new ArrayList<>();
         for (int i = 0; i <= 6; i++) {
             String currentDay = DateUtil.getDay(i);
