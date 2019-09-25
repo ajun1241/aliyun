@@ -35,23 +35,29 @@
         select * from store_goods_type
     </select>
     <select id="getGoodsStockList" resultType="com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo">
-        select sg.id goodsId,sg.goodsPicture goodsPicture,concat(sg.goodsBrand,sg.goodsName,sg.goodsSpecifications) goodsName,
+        select sg.id goodsId,sg.goodsPicture goodsPicture,sg.goodsName goodsName,
         sgt.type goodsType,sg.goodsUnit goodsUnit,sum(sgk.stockNum) goodsStock
         from store_goods sg,store_goodsstock sgk,store_goods_type sgt
         where sg.id = sgk.goodsId and sgt.id = sg.goodsTypeId and sg.storeId = #{storeId}
         <if test="goodsName != '' and goodsName != null">
-            and sg.goodsName like "%"#{goodsName}"%"
+            and
+            (sg.goodsName like "%"#{goodsName}"%"
+            or sg.goodsBrand like "%"#{goodsName}"%"
+            or sg.goodsSpecifications like "%"#{goodsName}"%")
         </if>
         group by goodsId
         limit #{pageNum},#{pageSize}
     </select>
     <select id="getGoodsPriceList" resultType="com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo">
-        select sg.id goodsId,sg.goodsPicture goodsPicture,concat(sg.goodsBrand,sg.goodsName,sg.goodsSpecifications) goodsName,
+        select sg.id goodsId,sg.goodsPicture goodsPicture,sg.goodsName goodsName,
         sgt.type goodsType,sg.goodsUnit goodsUnit,sg.goodsPrice goodsPrice
         from store_goods sg,store_goods_type sgt
         where sgt.id = sg.goodsTypeId and sg.storeId = #{storeId}
         <if test="goodsName != '' and goodsName != null">
-            and sg.goodsName like "%"#{goodsName}"%"
+            and
+            (sg.goodsName like "%"#{goodsName}"%"
+            or sg.goodsBrand like "%"#{goodsName}"%"
+            or sg.goodsSpecifications like "%"#{goodsName}"%")
         </if>
         group by goodsId
         limit #{pageNum},#{pageSize}

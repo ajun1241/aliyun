@@ -11,10 +11,7 @@ import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
 import com.modcreater.tmbeans.pojo.StoreGoodsType;
 import com.modcreater.tmbeans.utils.Barcode;
 import com.modcreater.tmbeans.utils.GetBarcode;
-import com.modcreater.tmbeans.vo.goods.ConsumablesList;
-import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
-import com.modcreater.tmbeans.vo.goods.ReceivedStoreId;
-import com.modcreater.tmbeans.vo.goods.RegisterGoods;
+import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
@@ -84,6 +81,34 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    public Dto updateGoodsInfo(UpdateGoods updateGoods, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(updateGoods.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (reg(updateGoods.getUserId(),updateGoods.getStoreId())){
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        /*goodsMapper.updateGoods(updateGoods);
+        goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum());*/
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setRoundingMode(RoundingMode.HALF_UP);
+        nf.setMaximumFractionDigits(2);
+        for (ConsumablesList consumablesList : updateGoods.getConsumablesLists()) {
+            StoreGoods goods = goodsMapper.getGoodsInfo(consumablesList.getConsumablesId());
+            StoreGoodsConsumable consumable = new StoreGoodsConsumable();
+            consumable.setGoodsId(Long.valueOf(updateGoods.getGoodsId()));
+            consumable.setConsumableGoodsId(Long.valueOf(consumablesList.getConsumablesId()));
+            consumable.setRegisteredRatioIn(Long.valueOf(consumablesList.getConsumablesNum()));
+            consumable.setRegisteredRationInUnit(goods.getGoodsUnit());
+            consumable.setRegisteredRatioOut(Long.valueOf(consumablesList.getFinishedNum()));
+            consumable.setRegisteredRationOutUnit(updateGoods.getGoodsUnit());
+            consumable.setRegisteredTime(System.currentTimeMillis() / 1000);
+            goodsMapper.addNewGoodsConsumable(consumable);
+        }
+        return null;
+    }
+
+    @Override
     public Dto getGoodsStockList(GetGoodsStockList getGoodsStockList, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsStockList.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
@@ -108,6 +133,12 @@ public class GoodsServiceImpl implements GoodsService {
         }
     }
 
+    /**
+     * 返回false为不符合
+     * @param userId
+     * @param storeId
+     * @return
+     */
     private boolean reg(String userId, String storeId) {
         return goodsMapper.getStoreMaster(userId, storeId) == 1;
     }
@@ -184,5 +215,6 @@ public class GoodsServiceImpl implements GoodsService {
         }
         return DtoUtil.getSuccesWithDataDto("获取成功",getBarcode.getData(),100000);
     }
+
 
 }

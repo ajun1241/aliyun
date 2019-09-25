@@ -4,6 +4,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
 import com.modcreater.tmbeans.vo.goods.ReceivedStoreId;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
+import com.modcreater.tmbeans.vo.goods.UpdateGoods;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
@@ -55,4 +56,12 @@ public interface GoodsService {
      * @return
      */
     Dto getBarcodeInfo(String barcode);
+
+    /**
+     * 修改商品信息
+     * @param registerGoods
+     * @param token
+     * @return
+     */
+    Dto updateGoodsInfo(UpdateGoods updateGoods, String token);
 }
