@@ -171,6 +171,7 @@ public class GoodsServiceImpl implements GoodsService {
             //热销
             goodsList=new ArrayList<>();
         }else {
+
             //普通分类
             goodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
             for (StoreGoods storeGoods:goodsList) {
