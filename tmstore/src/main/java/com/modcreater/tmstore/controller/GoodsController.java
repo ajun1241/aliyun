@@ -63,7 +63,7 @@ public class GoodsController {
         return goodsService.getGoodsInfo(goodsInfoVo,request.getHeader("token"));
     }
 
-    @PostMapping("getBarcodeInfo")
+    @PostMapping("getbarcodeinfo")
     @ApiOperation("获取条形码内信息")
     public Dto getBarcodeInfo(@RequestBody String barcode){
         return goodsService.getBarcodeInfo(barcode);

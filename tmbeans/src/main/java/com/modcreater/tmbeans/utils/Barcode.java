@@ -17,9 +17,11 @@ public class Barcode {
 
     private String goodsName;
 
+    private String brand;
+
     private String supplier;
 
-    private Double price;
+//    private Double price;
 
     private String standard;
 

@@ -1,5 +1,6 @@
 package com.modcreater.tmstore.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.StoreGoods;
@@ -8,6 +9,8 @@ import com.modcreater.tmbeans.pojo.StoreInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
 import com.modcreater.tmbeans.pojo.StoreGoodsType;
+import com.modcreater.tmbeans.utils.Barcode;
+import com.modcreater.tmbeans.utils.GetBarcode;
 import com.modcreater.tmbeans.vo.goods.ConsumablesList;
 import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
 import com.modcreater.tmbeans.vo.goods.ReceivedStoreId;
@@ -175,15 +178,11 @@ public class GoodsServiceImpl implements GoodsService {
         String url = "https://www.mxnzp.com/api/barcode/goods/details?barcode="+barcode;
         RestTemplate template = new RestTemplate();
         ResponseEntity responseEntity = template.getForEntity(url,String.class);
-        Map<String,String> body = JSONObject.parseObject(responseEntity.getBody().toString(),Map.class);
-        Map<String,String> data = JSONObject.parseObject(body.get("data"),Map.class);
-        System.out.println(data.get("goodsName"));
-        System.out.println(data.get("barcode"));
-        System.out.println(data.get("price"));
-        System.out.println(data.get("brand"));
-        System.out.println(data.get("supplier"));
-        System.out.println(data.get("standard"));
-        return null;
+        GetBarcode getBarcode= JSONObject.parseObject(responseEntity.getBody().toString(),GetBarcode.class);
+        if ("0".equals(getBarcode.getCode())){
+            return DtoUtil.getFalseDto("获取失败",80004);
+        }
+        return DtoUtil.getSuccesWithDataDto("获取成功",getBarcode.getData(),100000);
     }
 
 }
