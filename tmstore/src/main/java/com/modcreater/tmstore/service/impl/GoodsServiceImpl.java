@@ -161,8 +161,9 @@ public class GoodsServiceImpl implements GoodsService {
         int pageIndex=(Integer.parseInt(goodsListVo.getPageNumber())-1)*pageSize;
         Map<String,Object> map=new HashMap<>(2);
         List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList();
+        List<Map<String,Object>> mapList=new ArrayList<>();
         map.put("goodsTypeList",goodsTypeList);
-        List<Map<String,String>> goodsList=null;
+        List<StoreGoods> goodsList=null;
         if ("1".equals(goodsListVo.getGoodsType())){
             //优惠
             goodsList=new ArrayList<>();
@@ -172,8 +173,18 @@ public class GoodsServiceImpl implements GoodsService {
         }else {
             //普通分类
             goodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
+            for (StoreGoods storeGoods:goodsList) {
+                Map<String,Object> goodsMap=new HashMap<>(7);
+                goodsMap.put("goodsId",storeGoods.getId());
+                goodsMap.put("goodsPicture",storeGoods.getGoodsPicture());
+                goodsMap.put("goodsName",storeGoods.getGoodsName()+storeGoods.getGoodsUnit()+"装");
+                goodsMap.put("weekSalesVolume",0);
+                goodsMap.put("goodsPrice",storeGoods.getGoodsPrice());
+                goodsMap.put("goodsUnit",storeGoods.getGoodsUnit());
+                mapList.add(goodsMap);
+            }
         }
-        map.put("goodsList",goodsList);
+        map.put("goodsList",mapList);
         return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
     }
 
@@ -191,10 +202,12 @@ public class GoodsServiceImpl implements GoodsService {
         StoreGoods storeGoods=goodsMapper.getGoodsInfo(goodsInfoVo.getGoodsId());
         Map<String,Object> map=new HashMap<>(5);
         if (!ObjectUtils.isEmpty(storeGoods)){
-            map.put("goodsPicture",storeGoods.getGoodsPrice());
-            map.put("goodsName",storeGoods.getGoodsBrand()+storeGoods.getGoodsName()+storeGoods.getGoodsSpecifications()+storeGoods.getGoodsUnit()+"装");
+            map.put("goodsId",storeGoods.getId());
+            map.put("goodsPicture",storeGoods.getGoodsPicture());
+            map.put("goodsName",storeGoods.getGoodsName()+storeGoods.getGoodsUnit()+"装");
             map.put("weekSalesVolume",0);
             map.put("goodsPrice",storeGoods.getGoodsPrice());
+            map.put("goodsUnit",storeGoods.getGoodsUnit());
         }else {
             return DtoUtil.getFalseDto("查询失败，该商品可能已下架",24105);
         }

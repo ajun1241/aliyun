@@ -3,6 +3,7 @@ package com.modcreater.tmstore.service;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.store.ApproveInfoVo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
 /**
  * @Author: AJun
@@ -24,5 +25,13 @@ public interface StoreService {
      * @return
      */
     Dto uploadApproveInfo(ApproveInfoVo approveInfoVo, String token);
+
+    /**
+     * 查询商铺信息
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    Dto queryStoreInfo(ReceivedId receivedId,String token);
 
 }

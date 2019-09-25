@@ -7,4 +7,10 @@
     <select id="getStoreInfo" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
         select * from store_info where id = #{storeId}
     </select>
+    <select id="getDisposeStatus" resultType="com.modcreater.tmbeans.pojo.StoreAttestation">
+        select * from store_attestation where userId=#{userId}
+    </select>
+    <select id="getStoreInfoByAttestationId" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
+        select * from store_info where attestationId=#{attestationId}
+    </select>
 </mapper>

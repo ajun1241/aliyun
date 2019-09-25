@@ -5,17 +5,17 @@ import lombok.Data;
 @Data
 public class StoreGoods {
 
-  private long id;
-  private long storeId;
+  private Long id;
+  private Long storeId;
   private String goodsName;
   private String goodsBrand;
   private String goodsPicture;
   private String goodsBarCode;
   private String goodsSpecifications;
   private String goodsAllergen;
-  private double goodsPrice;
+  private Double goodsPrice;
   private String goodsUnit;
   private String goodsTypeId;
-  private long goodsStatus;
+  private Long goodsStatus;
 
 }

@@ -36,12 +36,12 @@ public interface GoodsMapper {
      * 根据条件查询商品列表
      * @param storeId
      * @param goodsName
-     * @param goodsType
+     * @param goodsTypeId
      * @param pageIndex
      * @param pageSize
      * @return
      */
-    List<Map<String, String>> getGoodsList(String storeId, String goodsName, String goodsType, int pageIndex, int pageSize);
+    List<StoreGoods> getGoodsList(String storeId, String goodsName, String goodsTypeId, int pageIndex, int pageSize);
 
     /**
      * 添加商品库存

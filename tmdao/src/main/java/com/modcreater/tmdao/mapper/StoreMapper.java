@@ -24,4 +24,18 @@ public interface StoreMapper {
      * @return
      */
     StoreInfo getStoreInfo(String storeId);
+
+    /**
+     * 查询商铺认证状态
+     * @param userId
+     * @return
+     */
+    StoreAttestation getDisposeStatus(String userId);
+
+    /**
+     * 根据认证信息查询商铺详情
+     * @param storeAttestationId
+     * @return
+     */
+    StoreInfo getStoreInfoByAttestationId(Long storeAttestationId);
 }

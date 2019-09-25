@@ -59,7 +59,7 @@ public class GoodsController {
 
     @Safety
     @PostMapping(value = "getgoodsinfo")
-    @ApiOperation("查询商品列表")
+    @ApiOperation("查询商品详情")
     public Dto getGoodsInfo(@RequestBody GoodsInfoVo goodsInfoVo, HttpServletRequest request){
         return goodsService.getGoodsInfo(goodsInfoVo,request.getHeader("token"));
     }

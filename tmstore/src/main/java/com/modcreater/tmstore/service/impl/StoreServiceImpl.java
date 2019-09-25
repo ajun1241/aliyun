@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.StoreAttestation;
+import com.modcreater.tmbeans.pojo.StoreInfo;
 import com.modcreater.tmbeans.vo.store.ApproveInfoVo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.StoreMapper;
 import com.modcreater.tmstore.service.StoreService;
@@ -91,5 +93,38 @@ public class StoreServiceImpl implements StoreService {
             return DtoUtil.getFalseDto("上传商铺认证信息失败",21022);
         }
         return DtoUtil.getSuccessDto("上传商铺认证信息成功，请耐心等待",100000);
+    }
+
+    /**
+     * 查询商铺信息
+     * @param receivedId
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto queryStoreInfo(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
+            return DtoUtil.getFalseDto("请重新登录",21014);
+        }
+        Map<String,Object> resultMap=new HashMap<>(3);
+        //查询用户信息
+        Account account=accountMapper.queryAccount(receivedId.getUserId());
+        Map<String,Object> accountMap=new HashMap<>(2);
+        accountMap.put("userName",account.getUserName());
+        accountMap.put("balance", 0);
+        resultMap.put("account",accountMap);
+        //查询认证状态
+        StoreAttestation storeAttestation=storeMapper.getDisposeStatus(receivedId.getUserId());
+        resultMap.put("disposeStatus",storeAttestation.getDisposeStatus());
+        //查询商铺信息
+        StoreInfo storeInfo=storeMapper.getStoreInfoByAttestationId(storeAttestation.getId());
+        Map<String,Object> storeMap=new HashMap<>(3);
+        if (!ObjectUtils.isEmpty(storeInfo)){
+            storeMap.put("storeId",storeInfo.getId());
+            storeMap.put("storeName",storeInfo.getStoreName());
+            storeMap.put("storeAddress",storeInfo.getStoreAddress());
+        }
+        resultMap.put("storeInfo",storeMap);
+        return DtoUtil.getSuccesWithDataDto("查询成功",resultMap,100000);
     }
 }

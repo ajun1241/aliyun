@@ -1467,7 +1467,7 @@ public class EventServiceImpl implements EventService {
                     singleEvent.setUserid(Long.valueOf(userId));
                     singleEvent.setPerson(singleEvent1.getPerson());
                     eventMapper.alterEventsByUserId(singleEvent);
-                    //如果是IOS采用静默推送刷新事件详情
+                    //如果是IOS采用静默推送刷新事件详情     refreshType：1修改邀请事件刷新；2：实名认证
                     AppType appType=appTypeMapper.queryAppType(userId);
                     if (appType.getAppType()==2L){
                         List<String> deviceToken=new ArrayList<>();

@@ -45,8 +45,11 @@ public class TmauthApplicationTests {
     public void test(){
         List<String> list=new ArrayList<>();
         list.add("0b7a7fd7a60b7ed945862b58a5b4c00eff1e9fd2c18c0d4d1bb7042a8a8a1c96");
-        IOSPushUtil.push(list,"智袖","你的时间吃饭就要开始了",false,new HashMap<>(),1);
+        Map<String,Object> map=new HashMap<>();
+        map.put("refreshType",1);
+        IOSPushUtil.push(list,"会比较看好看","卡拉和",true,null,1,true);
     }
+
 }
 
 /*

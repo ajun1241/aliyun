@@ -4,6 +4,7 @@ package com.modcreater.tmstore.controller;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.*;
 import com.modcreater.tmbeans.vo.store.ApproveInfoVo;
+import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmstore.config.annotation.Safety;
 import com.modcreater.tmstore.service.StoreService;
 import io.swagger.annotations.ApiOperation;
@@ -34,5 +35,12 @@ public class StoreController {
     @ApiOperation("上传商铺认证信息")
     public Dto uploadApproveInfo(@RequestBody ApproveInfoVo approveInfoVo, HttpServletRequest request){
         return storeService.uploadApproveInfo(approveInfoVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping("querystoreinfo")
+    @ApiOperation("查询商铺主页信息")
+    public Dto queryStoreInfo(@RequestBody ReceivedId receivedId, HttpServletRequest request){
+        return storeService.queryStoreInfo(receivedId,request.getHeader("token"));
     }
 }
