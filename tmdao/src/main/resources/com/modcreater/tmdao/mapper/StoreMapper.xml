@@ -4,4 +4,7 @@
     <insert id="insertStoreAttestation">
         insert into store_attestation (userId, businessLicense, exequatur, storeLogo) values (#{userId},#{businessLicense},#{exequatur},#{storeLogo})
     </insert>
+    <select id="getStoreInfo" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
+        select * from store_info where id = #{storeId}
+    </select>
 </mapper>

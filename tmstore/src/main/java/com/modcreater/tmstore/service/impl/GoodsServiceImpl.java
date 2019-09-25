@@ -1,8 +1,10 @@
 package com.modcreater.tmstore.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.StoreGoods;
 import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
+import com.modcreater.tmbeans.pojo.StoreInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
 import com.modcreater.tmbeans.pojo.StoreGoodsType;
@@ -14,21 +16,21 @@ import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
 import com.modcreater.tmdao.mapper.GoodsMapper;
+import com.modcreater.tmdao.mapper.StoreMapper;
 import com.modcreater.tmstore.service.GoodsService;
 import com.modcreater.tmutils.DtoUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -44,6 +46,9 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Resource
     private GoodsMapper goodsMapper;
+
+    @Resource
+    private StoreMapper storeMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -84,12 +89,17 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
         getGoodsStockList.setPageNum(getGoodsStockList.getPageNum() - 1);
+        Map<String,Object> result = new HashMap<>();
+        StoreInfo storeInfo = storeMapper.getStoreInfo(getGoodsStockList.getStoreId());
+        result.put("storeName",storeInfo.getStoreName());
         if ("stock".equals(getGoodsStockList.getGetType())){
             List<ShowGoodsStockInfo> goodsStockInfos = goodsMapper.getGoodsStockList(getGoodsStockList);
-            return DtoUtil.getSuccesWithDataDto("查询成功", goodsStockInfos, 100000);
+            result.put("goodsList",goodsStockInfos);
+            return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         }else if ("price".equals(getGoodsStockList.getGetType())){
             List<ShowGoodsPriceInfo> goodsPriceList = goodsMapper.getGoodsPriceList(getGoodsStockList);
-            return DtoUtil.getSuccesWithDataDto("查询成功", goodsPriceList, 100000);
+            result.put("goodsList",goodsPriceList);
+            return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         }else {
             return DtoUtil.getFalseDto("参数有误",90002);
         }
@@ -155,6 +165,25 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("查询失败，该商品可能已下架",24105);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
+    }
+
+    @Override
+    public Dto getBarcodeInfo(String barcode) {
+        if (!StringUtils.hasText(barcode)){
+            return DtoUtil.getFalseDto("barcode不存在",90003);
+        }
+        String url = "https://www.mxnzp.com/api/barcode/goods/details?barcode="+barcode;
+        RestTemplate template = new RestTemplate();
+        ResponseEntity responseEntity = template.getForEntity(url,String.class);
+        Map<String,String> body = JSONObject.parseObject(responseEntity.getBody().toString(),Map.class);
+        Map<String,String> data = JSONObject.parseObject(body.get("data"),Map.class);
+        System.out.println(data.get("goodsName"));
+        System.out.println(data.get("barcode"));
+        System.out.println(data.get("price"));
+        System.out.println(data.get("brand"));
+        System.out.println(data.get("supplier"));
+        System.out.println(data.get("standard"));
+        return null;
     }
 
 }

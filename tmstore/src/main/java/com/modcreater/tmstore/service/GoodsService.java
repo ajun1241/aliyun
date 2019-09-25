@@ -48,4 +48,11 @@ public interface GoodsService {
      * @return
      */
     Dto getGoodsInfo(GoodsInfoVo goodsInfoVo, String token);
+
+    /**
+     * 获取条形码内信息
+     * @param barcode
+     * @return
+     */
+    Dto getBarcodeInfo(String barcode);
 }

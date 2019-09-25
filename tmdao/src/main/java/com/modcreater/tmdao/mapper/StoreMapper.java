@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.StoreAttestation;
+import com.modcreater.tmbeans.pojo.StoreInfo;
 
 /**
  * Description:
@@ -16,4 +17,11 @@ public interface StoreMapper {
      * @return
      */
     int insertStoreAttestation(StoreAttestation storeAttestation);
+
+    /**
+     * 根据商铺Id查询商铺信息
+     * @param storeId
+     * @return
+     */
+    StoreInfo getStoreInfo(String storeId);
 }
