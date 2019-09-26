@@ -132,4 +132,10 @@ public interface GoodsMapper {
      * @return
      */
     int updateGoodsStatus(@Param("goodsId") String goodsId,@Param("status") int status);
+
+    /**
+     * 获取商品全部
+     * @return
+     */
+    List<Map<String,String>> getGoodsAllTypeList();
 }

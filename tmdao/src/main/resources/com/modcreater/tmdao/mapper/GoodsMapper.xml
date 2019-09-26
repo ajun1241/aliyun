@@ -92,4 +92,7 @@
     <select id="getStoreMaster" resultType="java.lang.Long">
         select count(id) from store_info where id = #{storeId} and userId = #{userId}
     </select>
+    <select id="getGoodsAllTypeList" resultType="java.util.Map">
+        select * from store_goods_type where id != 2
+    </select>
 </mapper>

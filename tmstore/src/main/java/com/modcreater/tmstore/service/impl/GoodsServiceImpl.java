@@ -156,7 +156,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public Dto getGoodsTypes() {
-        return DtoUtil.getSuccesWithDataDto("获取成功",goodsMapper.getGoodsTypeList(),100000);
+        return DtoUtil.getSuccesWithDataDto("获取成功",goodsMapper.getGoodsAllTypeList(),100000);
     }
 
     @Override
