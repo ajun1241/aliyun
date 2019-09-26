@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.StoreGoods;
 import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
 import com.modcreater.tmbeans.pojo.StoreInfo;
+import com.modcreater.tmbeans.show.goods.ShowConsumableGoods;
 import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
 import com.modcreater.tmbeans.pojo.StoreGoodsType;
@@ -160,6 +161,18 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    public Dto goodsDownShelf(GoodsDownShelf goodsDownShelf, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(goodsDownShelf.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(goodsDownShelf.getUserId(), goodsDownShelf.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        //批量下架商品
+        return null;
+    }
+
+    @Override
     public Dto getGoodsStockList(GetGoodsStockList getGoodsStockList, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsStockList.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
@@ -168,19 +181,23 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
         getGoodsStockList.setPageNum(getGoodsStockList.getPageNum() - 1);
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         StoreInfo storeInfo = storeMapper.getStoreInfo(getGoodsStockList.getStoreId());
-        result.put("storeName",storeInfo.getStoreName());
-        if ("stock".equals(getGoodsStockList.getGetType())){
+        result.put("storeName", storeInfo.getStoreName());
+        if ("stock".equals(getGoodsStockList.getGetType())) {
             List<ShowGoodsStockInfo> goodsStockInfos = goodsMapper.getGoodsStockList(getGoodsStockList);
-            result.put("goodsList",goodsStockInfos);
+            result.put("goodsList", goodsStockInfos);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
-        }else if ("price".equals(getGoodsStockList.getGetType())){
+        } else if ("price".equals(getGoodsStockList.getGetType())) {
             List<ShowGoodsPriceInfo> goodsPriceList = goodsMapper.getGoodsPriceList(getGoodsStockList);
-            result.put("goodsList",goodsPriceList);
+            result.put("goodsList", goodsPriceList);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
-        }else {
-            return DtoUtil.getFalseDto("参数有误",90002);
+        } else if ("consumable".equals(getGoodsStockList.getGetType())) {
+            List<ShowConsumableGoods> consumableGoods = goodsMapper.getConsumableGoods(getGoodsStockList);
+            result.put("goodsList", consumableGoods);
+            return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+        } else {
+            return DtoUtil.getFalseDto("参数有误", 90002);
         }
     }
 

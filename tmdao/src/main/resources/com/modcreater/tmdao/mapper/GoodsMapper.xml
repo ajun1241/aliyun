@@ -72,7 +72,7 @@
             or sg.goodsBrand like "%"#{goodsName}"%"
             or sg.goodsSpecifications like "%"#{goodsName}"%")
         </if>
-        group by goodsId
+        group by sg,id
         limit #{pageNum},#{pageSize}
     </select>
     <select id="getGoodsPriceList" resultType="com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo">
@@ -86,7 +86,7 @@
             or sg.goodsBrand like "%"#{goodsName}"%"
             or sg.goodsSpecifications like "%"#{goodsName}"%")
         </if>
-        group by goodsId
+        group by sg.id
         limit #{pageNum},#{pageSize}
     </select>
     <select id="getStoreMaster" resultType="java.lang.Long">
@@ -94,5 +94,19 @@
     </select>
     <select id="getGoodsAllTypeList" resultType="java.util.Map">
         select * from store_goods_type where id != 2
+    </select>
+    <select id="getConsumableGoods" resultType="com.modcreater.tmbeans.show.goods.ShowConsumableGoods">
+        select id goodsId,goodsPicture,goodsName,
+        goodsUnit,goodsFUnit,faUnitNum
+        from store_goods
+        where storeId = #{storeId}
+        <if test="goodsName != '' and goodsName != null">
+            and
+            (goodsName like "%"#{goodsName}"%"
+            or goodsBrand like "%"#{goodsName}"%"
+            or goodsSpecifications like "%"#{goodsName}"%")
+        </if>
+        group by id
+        limit #{pageNum},#{pageSize}
     </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.StoreGoods;
 import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
+import com.modcreater.tmbeans.show.goods.ShowConsumableGoods;
 import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
 import com.modcreater.tmbeans.pojo.StoreGoodsType;
@@ -138,4 +139,11 @@ public interface GoodsMapper {
      * @return
      */
     List<Map<String,String>> getGoodsAllTypeList();
+
+    /**
+     * 获取消耗商品
+     * @param getGoodsStockList
+     * @return
+     */
+    List<ShowConsumableGoods> getConsumableGoods(GetGoodsStockList getGoodsStockList);
 }

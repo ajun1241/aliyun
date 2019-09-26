@@ -83,4 +83,12 @@ public interface GoodsService {
      * @return
      */
     Dto getGoodsTypes();
+
+    /**
+     * 商品下架
+     * @param goodsDownShelf
+     * @param token
+     * @return
+     */
+    Dto goodsDownShelf(GoodsDownShelf goodsDownShelf, String token);
 }
