@@ -144,11 +144,19 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(updateGoodsPrice.getUserId(),goods.getStoreId().toString())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
+        if (goods.getGoodsPrice() == null || goods.getGoodsPrice() == 0){
+            goodsMapper.updateGoodsStatus(updateGoodsPrice.getGoodsId(),1);
+        }
         if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(),updateGoodsPrice.getUnitPrice()) != 1){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DtoUtil.getFalseDto("修改价格失败",80005);
         }
         return DtoUtil.getSuccessDto("修改成功",100000);
+    }
+
+    @Override
+    public Dto getGoodsTypes() {
+        return DtoUtil.getSuccesWithDataDto("获取成功",goodsMapper.getGoodsTypeList(),100000);
     }
 
     @Override

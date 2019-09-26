@@ -33,6 +33,9 @@
     <update id="updateGoodsUnitPrice">
         update store_goods set goodsPrice = #{goodsPrice} where id = #{goodsId}
     </update>
+    <update id="updateGoodsStatus">
+        update store_goods set goodsStatus = #{status} where id = #{goodsId}
+    </update>
     <delete id="cleanConsumablesList">
         delete from store_goodsconsumable where goodsId = #{goodsId}
     </delete>

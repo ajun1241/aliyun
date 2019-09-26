@@ -124,4 +124,12 @@ public interface GoodsMapper {
      * @return
      */
     int updateGoodsUnitPrice(@Param("goodsId") String goodsId,@Param("goodsPrice") Double unitPrice);
+
+    /**
+     * 修改商品状态
+     * @param goodsId
+     * @param status
+     * @return
+     */
+    int updateGoodsStatus(@Param("goodsId") String goodsId,@Param("status") int status);
 }

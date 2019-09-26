@@ -34,7 +34,7 @@ public class GoodsController {
     private GoodsService goodsService;
 
     @Safety
-    @PostMapping(value = "registerGoods")
+    @PostMapping(value = "registergoods")
     @ApiOperation("注册商品")
     public Dto registerGoods(@RequestBody RegisterGoods registerGoods, HttpServletRequest request){
         return goodsService.registerGoods(registerGoods,request.getHeader("token"));
@@ -83,6 +83,12 @@ public class GoodsController {
     @ApiOperation("修改单价")
     public Dto updateGoodsPrice(@RequestBody UpdateGoodsPrice updateGoodsPrice,HttpServletRequest request){
         return goodsService.updateGoodsPrice(updateGoodsPrice,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "getgoodstypes")
+    @ApiOperation("获取商品类型")
+    public Dto getGoodsTypes(){
+        return goodsService.getGoodsTypes();
     }
 
 }

@@ -77,4 +77,10 @@ public interface GoodsService {
      * @return
      */
     Dto updateGoodsPrice(UpdateGoodsPrice updateGoodsPrice, String token);
+
+    /**
+     * 获取商品类型
+     * @return
+     */
+    Dto getGoodsTypes();
 }
