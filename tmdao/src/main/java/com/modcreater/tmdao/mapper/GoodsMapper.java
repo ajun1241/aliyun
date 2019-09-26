@@ -8,6 +8,7 @@ import com.modcreater.tmbeans.pojo.StoreGoodsType;
 import com.modcreater.tmbeans.vo.goods.ConsumablesList;
 import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
+import com.modcreater.tmbeans.vo.goods.UpdateGoods;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -94,4 +95,33 @@ public interface GoodsMapper {
      */
     List<StoreGoodsType> getGoodsTypeList();
 
+    /**
+     * 修改商品基本信息
+     * @param updateGoods
+     * @return
+     */
+    int updateGoods(UpdateGoods updateGoods);
+
+    /**
+     * 修改商品库存
+     * @param goodsId
+     * @param goodsNum
+     * @return
+     */
+    int updateGoodsStock(@Param("goodsId") String goodsId,@Param("goodsStock") Long goodsNum);
+
+    /**
+     * 清除商品的所有消耗品
+     * @param goodsId
+     * @return
+     */
+    int cleanConsumablesList(String goodsId);
+
+    /**
+     * 修改商品单价
+     * @param goodsId
+     * @param unitPrice
+     * @return
+     */
+    int updateGoodsUnitPrice(@Param("goodsId") String goodsId,@Param("goodsPrice") Double unitPrice);
 }

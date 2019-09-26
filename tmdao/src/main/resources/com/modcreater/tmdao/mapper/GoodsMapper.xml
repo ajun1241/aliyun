@@ -12,6 +12,30 @@
         insert into store_goodsstock (goodsId, stockNum, goodsSource)
         values (#{goodsId},#{stockNum},#{goodsSource})
     </insert>
+    <update id="updateGoods">
+        update store_goods set
+        goodsName = #{goodsName},
+        goodsBrand = #{goodsBrand},
+        goodsPicture = #{goodsPicture},
+        goodsBarCode = #{goodsBarCode},
+        goodsSpecifications = #{goodsSpecifications},
+        goodsAllergen = #{goodsAllergen},
+        goodsPrice = #{goodsPrice},
+        goodsUnit = #{goodsUnit},
+        goodsTypeId = #{goodsTypeId},
+        goodsFUnit = #{goodsFUnit},
+        faUnitNum = #{faUnitNum}
+        where id = #{storeId}
+    </update>
+    <update id="updateGoodsStock">
+        update store_goodsstock set stockNum = #{goodsStock} where goodsId = #{goodsId}
+    </update>
+    <update id="updateGoodsUnitPrice">
+        update store_goods set goodsPrice = #{goodsPrice} where id = #{goodsId}
+    </update>
+    <delete id="cleanConsumablesList">
+        delete from store_goodsconsumable where goodsId = #{goodsId}
+    </delete>
     <select id="getGoodsList" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where storeId=#{storeId}
         <if test=" goodsName != null and goodsName != ''" >

@@ -17,5 +17,7 @@ public class StoreGoods {
   private String goodsUnit;
   private String goodsTypeId;
   private Long goodsStatus;
+  private String goodsFUnit;
+  private Long faUnitNum;
 
 }

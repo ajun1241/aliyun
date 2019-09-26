@@ -1,10 +1,7 @@
 package com.modcreater.tmstore.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
-import com.modcreater.tmbeans.vo.goods.ReceivedStoreId;
-import com.modcreater.tmbeans.vo.goods.RegisterGoods;
-import com.modcreater.tmbeans.vo.goods.UpdateGoods;
+import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
@@ -74,6 +71,18 @@ public class GoodsController {
     @PostMapping(value = "updategoodsinfo")
     public Dto updateGoodsInfo(@RequestBody UpdateGoods updateGoods, HttpServletRequest request){
         return goodsService.updateGoodsInfo(updateGoods,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "getupdatepriceinfo")
+    @ApiOperation("获取修改价格信息")
+    public Dto getUpdatePriceInfo(@RequestBody ReceivedGoodsId receivedGoodsId, HttpServletRequest request){
+        return goodsService.getUpdatePriceInfo(receivedGoodsId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "udpategoodsprice")
+    @ApiOperation("修改单价")
+    public Dto updateGoodsPrice(@RequestBody UpdateGoodsPrice updateGoodsPrice,HttpServletRequest request){
+        return goodsService.updateGoodsPrice(updateGoodsPrice,request.getHeader("token"));
     }
 
 }

@@ -23,6 +23,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -88,24 +89,66 @@ public class GoodsServiceImpl implements GoodsService {
         if (reg(updateGoods.getUserId(),updateGoods.getStoreId())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        /*goodsMapper.updateGoods(updateGoods);
-        goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum());*/
-        NumberFormat nf = NumberFormat.getNumberInstance();
-        nf.setRoundingMode(RoundingMode.HALF_UP);
-        nf.setMaximumFractionDigits(2);
-        for (ConsumablesList consumablesList : updateGoods.getConsumablesLists()) {
-            StoreGoods goods = goodsMapper.getGoodsInfo(consumablesList.getConsumablesId());
-            StoreGoodsConsumable consumable = new StoreGoodsConsumable();
-            consumable.setGoodsId(Long.valueOf(updateGoods.getGoodsId()));
-            consumable.setConsumableGoodsId(Long.valueOf(consumablesList.getConsumablesId()));
-            consumable.setRegisteredRatioIn(Long.valueOf(consumablesList.getConsumablesNum()));
-            consumable.setRegisteredRationInUnit(goods.getGoodsUnit());
-            consumable.setRegisteredRatioOut(Long.valueOf(consumablesList.getFinishedNum()));
-            consumable.setRegisteredRationOutUnit(updateGoods.getGoodsUnit());
-            consumable.setRegisteredTime(System.currentTimeMillis() / 1000);
-            goodsMapper.addNewGoodsConsumable(consumable);
+        //此处要知道,商品修改了除条形码外的所有信息,那该商品是否还是原来的商品
+        //相同的商品用什么来做标识,如果是条形码,不同的生产商条形码会不同导致商品不同
+        goodsMapper.updateGoods(updateGoods);
+        goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum());
+        goodsMapper.cleanConsumablesList(updateGoods.getGoodsId());
+        if (updateGoods.getConsumablesLists().length > 0){
+            NumberFormat nf = NumberFormat.getNumberInstance();
+            nf.setRoundingMode(RoundingMode.HALF_UP);
+            nf.setMaximumFractionDigits(2);
+            for (ConsumablesList consumablesList : updateGoods.getConsumablesLists()) {
+                StoreGoods goods = goodsMapper.getGoodsInfo(consumablesList.getConsumablesId());
+                StoreGoodsConsumable consumable = new StoreGoodsConsumable();
+                consumable.setGoodsId(Long.valueOf(updateGoods.getGoodsId()));
+                consumable.setRegisteredRatioIn(Long.valueOf(consumablesList.getConsumablesNum()));
+                consumable.setConsumableGoodsId(Long.valueOf(consumablesList.getConsumablesId()));
+                consumable.setRegisteredRationInUnit(goods.getGoodsUnit());
+                consumable.setRegisteredRatioOut(Long.valueOf(consumablesList.getFinishedNum()));
+                consumable.setRegisteredTime(System.currentTimeMillis() / 1000);
+                consumable.setRegisteredRationOutUnit(updateGoods.getGoodsUnit());
+                goodsMapper.addNewGoodsConsumable(consumable);
+            }
         }
         return null;
+    }
+
+    @Override
+    public Dto getUpdatePriceInfo(ReceivedGoodsId receivedGoodsId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGoodsId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreGoods goods = goodsMapper.getGoodsInfo(receivedGoodsId.getGoodsId());
+        if (ObjectUtils.isEmpty(goods)){
+            return DtoUtil.getFalseDto("商品信息未查到",90004);
+        }
+        if (!reg(receivedGoodsId.getUserId(),goods.getStoreId().toString())){
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        Map<String,Object> result = new HashMap<>();
+        result.put("goodsName",goods.getGoodsName());
+        result.put("goodsBrand",goods.getGoodsBrand());
+        result.put("goodsUnit",goods.getGoodsUnit());
+        result.put("goodsFUnit",goods.getGoodsFUnit());
+        result.put("faUnitNum",goods.getFaUnitNum());
+        return DtoUtil.getSuccesWithDataDto("操作成功",result,100000);
+    }
+
+    @Override
+    public Dto updateGoodsPrice(UpdateGoodsPrice updateGoodsPrice, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(updateGoodsPrice.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreGoods goods = goodsMapper.getGoodsInfo(updateGoodsPrice.getGoodsId());
+        if (!reg(updateGoodsPrice.getUserId(),goods.getStoreId().toString())){
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(),updateGoodsPrice.getUnitPrice()) != 1){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("修改价格失败",80005);
+        }
+        return DtoUtil.getSuccessDto("修改成功",100000);
     }
 
     @Override
