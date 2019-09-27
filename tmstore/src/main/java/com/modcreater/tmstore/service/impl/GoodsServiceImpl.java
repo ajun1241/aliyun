@@ -13,6 +13,7 @@ import com.modcreater.tmbeans.pojo.StoreGoodsType;
 import com.modcreater.tmbeans.utils.Barcode;
 import com.modcreater.tmbeans.utils.GetBarcode;
 import com.modcreater.tmbeans.vo.goods.*;
+import com.modcreater.tmbeans.vo.store.ClaimGoodsVo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
@@ -160,6 +161,27 @@ public class GoodsServiceImpl implements GoodsService {
         return DtoUtil.getSuccesWithDataDto("获取成功",goodsMapper.getGoodsAllTypeList(),100000);
     }
 
+    /**
+     * 收货完成交易
+     * @param claimGoodsVo
+     * @param token
+     * @return
+     */
+    @Override
+    public synchronized Dto claimGoods(ClaimGoodsVo claimGoodsVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(claimGoodsVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //查询商品库存
+        /*goodsMapper.getGoodsStock();
+        //减去出货商家的库存
+        goodsMapper.deductionStock(claimGoodsVo.getSourceStoreId());*/
+        //收货商户添加一批货物
+        //保存交易记录
+        //反馈交易双方
+        return null;
+    }
+
     @Override
     public Dto goodsDownShelf(GoodsDownShelf goodsDownShelf, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(goodsDownShelf.getUserId()))) {
@@ -231,16 +253,16 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(goodsListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        if (StringUtils.isEmpty(goodsListVo.getGoodsType())){
-            goodsListVo.setGoodsType("1");
-        }
+        /*if (StringUtils.isEmpty(goodsListVo.getStoreId())){
+            return DtoUtil.getFalseDto("抱歉，您尚未拥有店铺",27058);
+        }*/
         int pageSize=Integer.parseInt(goodsListVo.getPageSize());
         int pageIndex=(Integer.parseInt(goodsListVo.getPageNumber())-1)*pageSize;
         Map<String,Object> map=new HashMap<>(2);
-        List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList();
+        List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList(goodsListVo.getStoreId());
         List<Map<String,Object>> mapList=new ArrayList<>();
         map.put("goodsTypeList",goodsTypeList);
-        List<StoreGoods> goodsList=null;
+        List<Map<String,Object>> goodsList=null;
         if ("1".equals(goodsListVo.getGoodsType())){
             //优惠
             goodsList=new ArrayList<>();
@@ -248,10 +270,54 @@ public class GoodsServiceImpl implements GoodsService {
             //热销
             goodsList=new ArrayList<>();
         }else {
-
             //普通分类
+            if (StringUtils.isEmpty(goodsListVo.getGoodsType())){
+                goodsListVo.setGoodsType(goodsTypeList.size()>0?goodsTypeList.get(0).getId().toString():"");
+            }
             goodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
-            for (StoreGoods storeGoods:goodsList) {
+            for (Map<String,Object> storeGoods:goodsList) {
+                Map<String,Object> goodsMap=new HashMap<>(7);
+                goodsMap.put("goodsId",storeGoods.get("goodsId"));
+                goodsMap.put("goodsPicture",storeGoods.get("goodsPicture"));
+                goodsMap.put("goodsName",storeGoods.get("goodsBrand"));
+                //周销量
+                goodsMap.put("weekSalesVolume",0);
+                goodsMap.put("goodsPrice",storeGoods.get("goodsPrice"));
+                goodsMap.put("goodsUnit",storeGoods.get("goodsUnit"));
+                mapList.add(goodsMap);
+            }
+        }
+        map.put("goodsList",mapList);
+        return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
+    }
+
+    /**
+     * 根据类型查询商铺商品列表（一次性查所有）
+     * @param goodsListVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto getGoodsList2(GoodsListVo goodsListVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(goodsListVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
+        List<List<Map<String,Object>>> resultList=new ArrayList<>();
+        List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList(goodsListVo.getStoreId());
+        if ("1".equals(goodsListVo.getGoodsType())){
+            //优惠
+//            goodsList=new ArrayList<>();
+        }else if ("2".equals(goodsListVo.getGoodsType())){
+            //热销
+//            goodsList=new ArrayList<>();
+        }else {
+            //普通分类
+            if (StringUtils.isEmpty(goodsListVo.getGoodsType())){
+                goodsListVo.setGoodsType(goodsTypeList.size()>0?goodsTypeList.get(0).getId().toString():"");
+            }
+//            goodsList=
+            /*for (StoreGoods storeGoods:goodsList) {
                 Map<String,Object> goodsMap=new HashMap<>(7);
                 goodsMap.put("goodsId",storeGoods.getId());
                 goodsMap.put("goodsPicture",storeGoods.getGoodsPicture());
@@ -260,10 +326,12 @@ public class GoodsServiceImpl implements GoodsService {
                 goodsMap.put("goodsPrice",storeGoods.getGoodsPrice());
                 goodsMap.put("goodsUnit",storeGoods.getGoodsUnit());
                 mapList.add(goodsMap);
-            }
+            }*/
         }
-        map.put("goodsList",mapList);
-        return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
+        for (StoreGoodsType storeGoodsType:goodsTypeList) {
+
+        }
+        return null;
     }
 
     /**
@@ -306,6 +374,4 @@ public class GoodsServiceImpl implements GoodsService {
         }
         return DtoUtil.getSuccesWithDataDto("获取成功",getBarcode.getData(),100000);
     }
-
-
 }

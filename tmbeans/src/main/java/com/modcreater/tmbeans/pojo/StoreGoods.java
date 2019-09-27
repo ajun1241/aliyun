@@ -13,10 +13,8 @@ public class StoreGoods {
   private String goodsBarCode;
   private String goodsSpecifications;
   private String goodsAllergen;
-  private Double goodsPrice;
   private String goodsUnit;
-  private String goodsTypeId;
-  private Long goodsStatus;
+  private Long goodsTypeId;
   private String goodsFUnit;
   private Long faUnitNum;
 

@@ -113,9 +113,17 @@ public class StoreServiceImpl implements StoreService {
         accountMap.put("userName",account.getUserName());
         accountMap.put("balance", 0);
         resultMap.put("account",accountMap);
-        //查询认证状态
+        //查询认证状态  0:未认证；1：认证中；2：已认证；3：未通过
         StoreAttestation storeAttestation=storeMapper.getDisposeStatus(receivedId.getUserId());
-        resultMap.put("disposeStatus",storeAttestation.getDisposeStatus());
+        if (ObjectUtils.isEmpty(storeAttestation)){
+            resultMap.put("disposeStatus",0);
+        }else if (storeAttestation.getDisposeStatus()==0L){
+            resultMap.put("disposeStatus",1);
+        }else if (storeAttestation.getDisposeStatus()==1L){
+            resultMap.put("disposeStatus",2);
+        }else if (storeAttestation.getDisposeStatus()==2L){
+            resultMap.put("disposeStatus",3);
+        }
         //查询商铺信息
         StoreInfo storeInfo=storeMapper.getStoreInfoByAttestationId(storeAttestation.getId());
         Map<String,Object> storeMap=new HashMap<>(3);
