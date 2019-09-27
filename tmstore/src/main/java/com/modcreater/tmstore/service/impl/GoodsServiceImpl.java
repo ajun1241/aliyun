@@ -62,7 +62,7 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         goodsMapper.addNewGoods(registerGoods);
-        goodsMapper.addNewGoodsStock(registerGoods.getId(), registerGoods.getGoodsNum(),"1");
+        goodsMapper.addNewGoodsStock(registerGoods.getId(),registerGoods.getStoreId(), registerGoods.getGoodsNum(),"1");
         if (goodsMapper.getCorRelation(registerGoods.getCorGoodsId()) >= 1){
             return DtoUtil.getFalseDto("当前选中的转换商品已被其他产品绑定",80006);
         }

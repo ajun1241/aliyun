@@ -52,7 +52,7 @@ public interface GoodsMapper {
      * @param goodsStatus
      * @return
      */
-    Long addNewGoodsStock(@Param("goodsId") String id, @Param("stockNum") Long goodsNum, @Param("goodsStatus") String goodsStatus);
+    Long addNewGoodsStock(@Param("goodsId") String id,@Param("storeId") String storeId, @Param("stockNum") Long goodsNum, @Param("goodsStatus") String goodsStatus);
 
     /**
      * 添加商品消耗品清单
