@@ -25,7 +25,7 @@ public class ConsumablesList {
     /**
      * 消耗数量
      */
-    private String consumablesNum;
+    private Double consumablesNum;
     /**
      * 可合成数量
      */

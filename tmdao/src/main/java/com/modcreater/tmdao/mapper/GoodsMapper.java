@@ -49,10 +49,10 @@ public interface GoodsMapper {
      * 添加商品库存
      * @param id
      * @param goodsNum
-     * @param source
+     * @param goodsStatus
      * @return
      */
-    Long addNewGoodsStock(@Param("goodsId") String id, @Param("stockNum") Long goodsNum, @Param("goodsSource") int source);
+    Long addNewGoodsStock(@Param("goodsId") String id, @Param("stockNum") Long goodsNum, @Param("goodsStatus") String goodsStatus);
 
     /**
      * 添加商品消耗品清单
@@ -146,4 +146,18 @@ public interface GoodsMapper {
      * @return
      */
     List<ShowConsumableGoods> getConsumableGoods(GetGoodsStockList getGoodsStockList);
+
+    /**
+     * 获取商品单位
+     * @param userId
+     * @return
+     */
+    List<Map<String,Object>> getGoodsUnit(String userId);
+
+    /**
+     * 添加商品单位
+     * @param goodsUnit
+     * @return
+     */
+    int addGoodsUnit(String goodsUnit);
 }

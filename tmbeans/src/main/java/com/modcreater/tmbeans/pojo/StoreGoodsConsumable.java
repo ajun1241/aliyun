@@ -9,7 +9,7 @@ public class StoreGoodsConsumable {
   private long id;
   private long goodsId;
   private long consumableGoodsId;
-  private long registeredRatioIn;
+  private Double registeredRatioIn;
   private String registeredRationInUnit;
   private long registeredRatioOut;
   private String registeredRationOutUnit;

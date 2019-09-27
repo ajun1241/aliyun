@@ -61,7 +61,7 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         goodsMapper.addNewGoods(registerGoods);
-        goodsMapper.addNewGoodsStock(registerGoods.getId(), registerGoods.getGoodsNum(), 0);
+        goodsMapper.addNewGoodsStock(registerGoods.getId(), registerGoods.getGoodsNum(),"1");
         if (registerGoods.getConsumablesLists().length > 0) {
             NumberFormat nf = NumberFormat.getNumberInstance();
             nf.setRoundingMode(RoundingMode.HALF_UP);
@@ -71,7 +71,7 @@ public class GoodsServiceImpl implements GoodsService {
                 StoreGoodsConsumable consumable = new StoreGoodsConsumable();
                 consumable.setGoodsId(Long.valueOf(registerGoods.getId()));
                 consumable.setConsumableGoodsId(Long.valueOf(consumablesList.getConsumablesId()));
-                consumable.setRegisteredRatioIn(Long.valueOf(consumablesList.getConsumablesNum()));
+                consumable.setRegisteredRatioIn(consumablesList.getConsumablesNum());
                 consumable.setRegisteredRationInUnit(goods.getGoodsUnit());
                 consumable.setRegisteredRatioOut(Long.valueOf(consumablesList.getFinishedNum()));
                 consumable.setRegisteredRationOutUnit(registerGoods.getGoodsUnit());
@@ -103,7 +103,7 @@ public class GoodsServiceImpl implements GoodsService {
                 StoreGoods goods = goodsMapper.getGoodsInfo(consumablesList.getConsumablesId());
                 StoreGoodsConsumable consumable = new StoreGoodsConsumable();
                 consumable.setGoodsId(Long.valueOf(updateGoods.getGoodsId()));
-                consumable.setRegisteredRatioIn(Long.valueOf(consumablesList.getConsumablesNum()));
+                consumable.setRegisteredRatioIn(consumablesList.getConsumablesNum());
                 consumable.setConsumableGoodsId(Long.valueOf(consumablesList.getConsumablesId()));
                 consumable.setRegisteredRationInUnit(goods.getGoodsUnit());
                 consumable.setRegisteredRatioOut(Long.valueOf(consumablesList.getFinishedNum()));
@@ -168,7 +168,12 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(goodsDownShelf.getUserId(), goodsDownShelf.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        //批量下架商品
+        if (goodsDownShelf.getGoodsId() == null){
+            return DtoUtil.getFalseDto("参数错误",90006);
+        }
+        for (String goodsId : goodsDownShelf.getGoodsId()){
+//            goodsMapper.updateGoodsStatus(goodsId,);
+        }
         return null;
     }
 
@@ -193,6 +198,10 @@ public class GoodsServiceImpl implements GoodsService {
             result.put("goodsList", goodsPriceList);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         } else if ("consumable".equals(getGoodsStockList.getGetType())) {
+            List<ShowConsumableGoods> consumableGoods = goodsMapper.getConsumableGoods(getGoodsStockList);
+            result.put("goodsList", consumableGoods);
+            return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
+        } else if ("son".equals(getGoodsStockList.getGetType())) {
             List<ShowConsumableGoods> consumableGoods = goodsMapper.getConsumableGoods(getGoodsStockList);
             result.put("goodsList", consumableGoods);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);

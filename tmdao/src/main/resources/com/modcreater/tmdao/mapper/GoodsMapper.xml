@@ -4,13 +4,13 @@
 
     <insert id="addNewGoods" useGeneratedKeys="true" keyProperty="id">
         insert into store_goods (storeId, goodsName, goodsBrand, goodsPicture, goodsBarCode,
-        goodsSpecifications, goodsAllergen, goodsPrice, goodsUnit, goodsTypeId, goodsStatus, goodsFUnit, faUnitNum)
+        goodsSpecifications, goodsAllergen, goodsUnit, goodsTypeId, goodsFUnit, faUnitNum)
          values (#{storeId},#{goodsName},#{goodsBrand},#{goodsPicture},#{goodsBarCode},
-         #{goodsSpecifications},#{goodsAllergen},#{goodsPrice},#{goodsUnit},#{goodsTypeId},1,#{goodsFUnit},#{faUnitNum})
+         #{goodsSpecifications},#{goodsAllergen},#{goodsUnit},#{goodsTypeId},#{goodsFUnit},#{faUnitNum})
     </insert>
     <insert id="addNewGoodsStock">
-        insert into store_goodsstock (goodsId, stockNum, goodsSource)
-        values (#{goodsId},#{stockNum},#{goodsSource})
+        insert into store_goodsstock (goodsId, stockNum, goodsStatus)
+        values (#{goodsId},#{stockNum},#{goodsStatus})
     </insert>
     <update id="updateGoods">
         update store_goods set
@@ -108,5 +108,8 @@
         </if>
         group by id
         limit #{pageNum},#{pageSize}
+    </select>
+    <select id="getGoodsUnit" resultType="java.util.Map">
+        select id unitId,name unitName from store_goods_unit where type = 1 and (createBy = 100000 or createBy = #{userId}) order by createTime desc
     </select>
 </mapper>

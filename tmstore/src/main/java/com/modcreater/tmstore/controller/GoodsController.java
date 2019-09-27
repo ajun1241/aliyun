@@ -91,6 +91,7 @@ public class GoodsController {
         return goodsService.getGoodsTypes();
     }
 
+
     @PostMapping(value = "goodsdownshelf")
     @ApiOperation("商品下架")
     public Dto goodsDownShelf(@RequestBody GoodsDownShelf goodsDownShelf,HttpServletRequest request){

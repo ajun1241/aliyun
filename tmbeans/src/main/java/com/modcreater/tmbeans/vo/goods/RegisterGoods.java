@@ -56,11 +56,7 @@ public class RegisterGoods {
      */
     private Long goodsNum;
     /**
-     * 来源0手动添加1进货
-     */
-    private String goodSource;
-    /**
-     * 父单位
+     * 子单位
      */
     private String goodsFUnit;
     /**
