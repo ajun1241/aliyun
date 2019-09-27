@@ -157,7 +157,10 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public Dto getGoodsTypes() {
+    public Dto getGoodsTypes(ReceivedId receivedId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
         return DtoUtil.getSuccesWithDataDto("获取成功",goodsMapper.getGoodsAllTypeList(),100000);
     }
 

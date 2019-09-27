@@ -87,8 +87,8 @@ public class GoodsController {
 
     @PostMapping(value = "getgoodstypes")
     @ApiOperation("获取商品类型")
-    public Dto getGoodsTypes(){
-        return goodsService.getGoodsTypes();
+    public Dto getGoodsTypes(@RequestBody ReceivedId receivedId,HttpServletRequest request){
+        return goodsService.getGoodsTypes(receivedId,request.getHeader("token"));
     }
 
 

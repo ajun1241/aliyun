@@ -89,9 +89,11 @@ public interface GoodsService {
 
     /**
      * 获取商品类型
+     * @param receivedId
+     * @param token
      * @return
      */
-    Dto getGoodsTypes();
+    Dto getGoodsTypes(ReceivedId receivedId, String token);
 
     /**
      * 收货 完成交易
