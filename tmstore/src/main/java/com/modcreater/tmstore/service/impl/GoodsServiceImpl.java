@@ -146,9 +146,9 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(updateGoodsPrice.getUserId(),goods.getStoreId().toString())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        if (goods.getGoodsPrice() == null || goods.getGoodsPrice() == 0){
+        /*if (goods.getGoodsPrice() == null || goods.getGoodsPrice() == 0){
             goodsMapper.updateGoodsStatus(updateGoodsPrice.getGoodsId(),1);
-        }
+        }*/
         if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(),updateGoodsPrice.getUnitPrice()) != 1){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DtoUtil.getFalseDto("修改价格失败",80005);
@@ -302,7 +302,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(goodsListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
+//        goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
         List<List<Map<String,Object>>> resultList=new ArrayList<>();
         List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList(goodsListVo.getStoreId());
         if ("1".equals(goodsListVo.getGoodsType())){
@@ -352,7 +352,7 @@ public class GoodsServiceImpl implements GoodsService {
             map.put("goodsPicture",storeGoods.getGoodsPicture());
             map.put("goodsName",storeGoods.getGoodsName()+storeGoods.getGoodsUnit()+"装");
             map.put("weekSalesVolume",0);
-            map.put("goodsPrice",storeGoods.getGoodsPrice());
+//            map.put("goodsPrice",storeGoods.getGoodsPrice());
             map.put("goodsUnit",storeGoods.getGoodsUnit());
         }else {
             return DtoUtil.getFalseDto("查询失败，该商品可能已下架",24105);
