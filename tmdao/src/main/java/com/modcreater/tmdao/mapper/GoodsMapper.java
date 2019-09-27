@@ -43,7 +43,7 @@ public interface GoodsMapper {
      * @param pageSize
      * @return
      */
-    List<StoreGoods> getGoodsList(String storeId, String goodsName, String goodsTypeId, int pageIndex, int pageSize);
+    List<Map<String,Object>> getGoodsList(String storeId, String goodsName, String goodsTypeId, int pageIndex, int pageSize);
 
     /**
      * 添加商品库存
@@ -92,9 +92,10 @@ public interface GoodsMapper {
 
     /**
      * 查询商品类型表
+     * @param storeId
      * @return
      */
-    List<StoreGoodsType> getGoodsTypeList();
+    List<StoreGoodsType> getGoodsTypeList(String storeId);
 
     /**
      * 修改商品基本信息

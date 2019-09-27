@@ -3,12 +3,11 @@ package com.modcreater.tmutils;
 
 import com.modcreater.tmbeans.dto.Dto;
 
-/*
-        1 成功
-        2 失败
-        3 异常
-        4 带结果的成功
-
+/**
+ *         1 成功
+ *         2 失败
+ *         3 异常
+ *         4 带结果的成功
  */
 public class DtoUtil {
 

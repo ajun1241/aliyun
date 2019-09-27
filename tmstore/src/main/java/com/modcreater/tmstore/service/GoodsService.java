@@ -2,6 +2,7 @@ package com.modcreater.tmstore.service;
 
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.vo.goods.*;
+import com.modcreater.tmbeans.vo.store.ClaimGoodsVo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
@@ -40,6 +41,14 @@ public interface GoodsService {
     Dto getGoodsList(GoodsListVo goodsListVo, String token);
 
     /**
+     * 根据类型查询商铺商品列表（一次性查所有）
+     * @param goodsListVo
+     * @param token
+     * @return
+     */
+    Dto getGoodsList2(GoodsListVo goodsListVo, String token);
+
+    /**
      * 根据Id查询商品详情
       * @param goodsInfoVo
      * @param token
@@ -56,7 +65,7 @@ public interface GoodsService {
 
     /**
      * 修改商品信息
-     * @param registerGoods
+     * @param updateGoods
      * @param token
      * @return
      */
@@ -83,6 +92,14 @@ public interface GoodsService {
      * @return
      */
     Dto getGoodsTypes();
+
+    /**
+     * 收货 完成交易
+     * @param claimGoodsVo
+     * @param token
+     * @return
+     */
+    Dto claimGoods(ClaimGoodsVo claimGoodsVo, String token);
 
     /**
      * 商品下架

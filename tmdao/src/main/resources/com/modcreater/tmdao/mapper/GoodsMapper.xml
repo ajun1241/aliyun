@@ -39,15 +39,16 @@
     <delete id="cleanConsumablesList">
         delete from store_goodsconsumable where goodsId = #{goodsId}
     </delete>
-    <select id="getGoodsList" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
-        select * from store_goods where storeId=#{storeId}
+    <select id="getGoodsList" resultType="java.util.Map">
+        SELECT sg.*,sgs.`goodsPrice`,sgs.`stockNum` FROM store_goods sg
+        INNER JOIN store_goods_stock sgs
+        ON sg.id=sgs.`goodsId` WHERE sgs.storeId=#{storeId} AND sg.`goodsTypeId`=#{goodsTypeId}
         <if test=" goodsName != null and goodsName != ''" >
-            and goodsName like concat('%',#{goodsName},'%')
+            and sg.goodsName like concat('%',#{goodsName},'%')
         </if>
-        <if test=" goodsTypeId != null and goodsTypeId > 0 " >
-            and goodsTypeId = #{goodsTypeId}
+        <if test=" pageIndex >= 0 and pageSize >= 0 " >
+            limit #{pageIndex},#{pageSize}
         </if>
-        limit #{pageIndex},#{pageSize}
     </select>
     <insert id="addNewGoodsConsumable">
         insert into store_goodsconsumable (goodsId, consumableGoodsId,  registeredRatioIn,
@@ -59,7 +60,7 @@
         select * from store_goods where id = #{goodsId}
     </select>
     <select id="getGoodsTypeList" resultType="com.modcreater.tmbeans.pojo.StoreGoodsType">
-        select * from store_goods_type
+        select * from store_goods_type where id IN (SELECT goodsTypeId FROM store_goods WHERE storeId=#{storeId})
     </select>
     <select id="getGoodsStockList" resultType="com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo">
         select sg.id goodsId,sg.goodsPicture goodsPicture,sg.goodsName goodsName,
