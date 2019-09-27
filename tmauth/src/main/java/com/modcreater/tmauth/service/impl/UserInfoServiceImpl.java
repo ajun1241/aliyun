@@ -196,7 +196,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             return DtoUtil.getFalseDto("条件缺失", 40006);
         }
         //将符合规则的条件一一放入新对象等待查询
-        singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
+//        singleEventCondition.setIsOverdue(Long.valueOf(receivedEventConditions.getIsOverdue()));
         if (receivedEventConditions.getEventName() != null && !"".equals(receivedEventConditions.getEventName())) {
             singleEventCondition.setEventname(receivedEventConditions.getEventName());
         }
