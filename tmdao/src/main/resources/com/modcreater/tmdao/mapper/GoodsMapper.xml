@@ -116,4 +116,21 @@
     <select id="getGoodsUnit" resultType="java.util.Map">
         select id unitId,name unitName from store_goods_unit where type = 1 and (createBy = 100000 or createBy = #{userId}) order by createTime desc
     </select>
+    <select id="getCorRelation" resultType="java.lang.Integer">
+        select count(id) from store_goods_correlation where goodsParentId = #{corGoodsId}
+    </select>
+    <select id="getCorGoods" resultType="com.modcreater.tmbeans.show.goods.ShowConsumableGoods">
+        select id goodsId,goodsPicture,goodsName,
+        goodsUnit,goodsFUnit,faUnitNum
+        from store_goods
+        where storeId = #{storeId}
+        <if test="goodsName != '' and goodsName != null">
+            and
+            (goodsName like "%"#{goodsName}"%"
+            or goodsBrand like "%"#{goodsName}"%"
+            or goodsSpecifications like "%"#{goodsName}"%")
+        </if>
+        group by id
+        limit #{pageNum},#{pageSize}
+    </select>
 </mapper>

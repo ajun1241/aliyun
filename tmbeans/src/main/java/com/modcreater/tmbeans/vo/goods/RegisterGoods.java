@@ -67,5 +67,9 @@ public class RegisterGoods {
      * 消耗品清单
      */
     private ConsumablesList[] consumablesLists;
+    /**
+     * 转换商品Id
+     */
+    private String corGoodsId;
 
 }

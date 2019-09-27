@@ -156,9 +156,16 @@ public interface GoodsMapper {
     List<Map<String,Object>> getGoodsUnit(String userId);
 
     /**
-     * 添加商品单位
-     * @param goodsUnit
+     * 获取商品关系
+     * @param corGoodsId
      * @return
      */
-    int addGoodsUnit(String goodsUnit);
+    int getCorRelation(String corGoodsId);
+
+    /**
+     * 获取转换商品列表
+     * @param getGoodsStockList
+     * @return
+     */
+    List<ShowConsumableGoods> getCorGoods(GetGoodsStockList getGoodsStockList);
 }
