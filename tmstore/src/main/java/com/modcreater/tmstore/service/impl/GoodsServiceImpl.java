@@ -277,12 +277,12 @@ public class GoodsServiceImpl implements GoodsService {
             goodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
             for (Map<String,Object> storeGoods:goodsList) {
                 Map<String,Object> goodsMap=new HashMap<>(7);
-                goodsMap.put("goodsId",storeGoods.get("goodsId"));
+                goodsMap.put("goodsId",storeGoods.get("id"));
                 goodsMap.put("goodsPicture",storeGoods.get("goodsPicture"));
                 goodsMap.put("goodsName",storeGoods.get("goodsBrand"));
                 //周销量
                 goodsMap.put("weekSalesVolume",0);
-                goodsMap.put("goodsPrice",storeGoods.get("goodsPrice"));
+                goodsMap.put("goodsPrice",storeGoods.get("goodsPrice")==null ? 0 : storeGoods.get("goodsPrice"));
                 goodsMap.put("goodsUnit",storeGoods.get("goodsUnit"));
                 mapList.add(goodsMap);
             }
@@ -302,9 +302,9 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(goodsListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-//        goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
-        List<List<Map<String,Object>>> resultList=new ArrayList<>();
         List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList(goodsListVo.getStoreId());
+        List<Map<String,Object>> mapperGoodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),-1,-1);
+        List<List<Map<String,Object>>> resultList=new ArrayList<>();
         if ("1".equals(goodsListVo.getGoodsType())){
             //优惠
 //            goodsList=new ArrayList<>();

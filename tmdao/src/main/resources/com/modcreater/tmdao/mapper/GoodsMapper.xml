@@ -9,7 +9,7 @@
          #{goodsSpecifications},#{goodsAllergen},#{goodsUnit},#{goodsTypeId},#{goodsFUnit},#{faUnitNum})
     </insert>
     <insert id="addNewGoodsStock">
-        insert into store_goodsstock (goodsId, stockNum, goodsStatus)
+        insert into store_goods_stock (goodsId, stockNum, goodsStatus)
         values (#{goodsId},#{stockNum},#{goodsStatus})
     </insert>
     <update id="updateGoods">
@@ -28,7 +28,7 @@
         where id = #{storeId}
     </update>
     <update id="updateGoodsStock">
-        update store_goodsstock set stockNum = #{goodsStock} where goodsId = #{goodsId}
+        update store_goods_stock set stockNum = #{goodsStock} where goodsId = #{goodsId}
     </update>
     <update id="updateGoodsUnitPrice">
         update store_goods set goodsPrice = #{goodsPrice} where id = #{goodsId}
@@ -60,12 +60,15 @@
         select * from store_goods where id = #{goodsId}
     </select>
     <select id="getGoodsTypeList" resultType="com.modcreater.tmbeans.pojo.StoreGoodsType">
-        select * from store_goods_type where id IN (SELECT goodsTypeId FROM store_goods WHERE storeId=#{storeId})
+        select * from store_goods_type where id IN
+        (SELECT sg.goodsTypeId FROM store_goods sg
+        INNER JOIN store_goods_stock sgs
+        ON sg.id=sgs.`goodsId` WHERE sgs.storeId=10 )
     </select>
     <select id="getGoodsStockList" resultType="com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo">
         select sg.id goodsId,sg.goodsPicture goodsPicture,sg.goodsName goodsName,
         sgt.type goodsType,sg.goodsUnit goodsUnit,sum(sgk.stockNum) goodsStock
-        from store_goods sg,store_goodsstock sgk,store_goods_type sgt
+        from store_goods sg,store_goods_stock sgk,store_goods_type sgt
         where sg.id = sgk.goodsId and sgt.id = sg.goodsTypeId and sg.storeId = #{storeId}
         <if test="goodsName != '' and goodsName != null">
             and
