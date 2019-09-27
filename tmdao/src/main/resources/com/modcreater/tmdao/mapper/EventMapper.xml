@@ -319,9 +319,6 @@
             <if test="isOverdue != null and isOverdue != 1">
                 and isOverdue = #{isOverdue}
             </if>
-            <if test="isOverdue == null">
-                and flag != 5
-            </if>
             <if test="starttime != null and starttime != 0 and endtime != null and endtime != 0">
                 and ((startTime &gt;= #{starttime} and startTime &lt;= #{endtime}) or
                 (endTime &gt;= #{starttime} and endTime &lt;= #{endtime}) or
