@@ -110,4 +110,12 @@ public interface GoodsService {
      * @return
      */
     Dto goodsDownShelf(GoodsDownShelf goodsDownShelf, String token);
+
+    /**
+     * 获取商品详细信息
+     * @param receivedGoodsId
+     * @param token
+     * @return
+     */
+    Dto getMyGoodsInfo(ReceivedGoodsId receivedGoodsId, String token);
 }

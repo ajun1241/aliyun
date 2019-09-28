@@ -102,4 +102,10 @@ public class GoodsController {
     public Dto goodsDownShelf(@RequestBody GoodsDownShelf goodsDownShelf,HttpServletRequest request){
         return goodsService.goodsDownShelf(goodsDownShelf,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getmygoodsinfo")
+    @ApiOperation("获取我的商品详细信息")
+    public Dto getMyGoodsInfo(@RequestBody ReceivedGoodsId receivedGoodsId,HttpServletRequest request){
+        return goodsService.getMyGoodsInfo(receivedGoodsId,request.getHeader("token"));
+    }
 }

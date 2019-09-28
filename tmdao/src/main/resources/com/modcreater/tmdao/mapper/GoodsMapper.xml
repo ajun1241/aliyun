@@ -77,7 +77,7 @@
         select sg.id goodsId,sg.goodsPicture goodsPicture,sg.goodsName goodsName,
         sgt.type goodsType,sg.goodsUnit goodsUnit,sum(sgk.stockNum) goodsStock
         from store_goods sg,store_goods_stock sgk,store_goods_type sgt
-        where sg.id = sgk.goodsId and sgt.id = sg.goodsTypeId and sg.storeId = #{storeId}
+        where sg.id = sgk.goodsId and sgt.id = sg.goodsTypeId and sg.storeId = #{storeId} and sgk.goodsStatus = 1
         <if test="goodsName != '' and goodsName != null">
             and
             (sg.goodsName like "%"#{goodsName}"%"
@@ -91,7 +91,7 @@
         select sg.id goodsId,sg.goodsPicture goodsPicture,sg.goodsName goodsName,
         sgt.type goodsType,sg.goodsUnit goodsUnit,sgk.goodsPrice goodsPrice
         from store_goods sg,store_goods_type sgt,store_goods_stock sgk
-        where sgt.id = sg.goodsTypeId and sg.storeId = #{storeId}
+        where sgt.id = sg.goodsTypeId and sg.storeId = #{storeId} and sgk.goodsStatus = 1
         <if test="goodsName != '' and goodsName != null">
             and
             (sg.goodsName like "%"#{goodsName}"%"
@@ -111,7 +111,7 @@
         select sg.id goodsId,sg.goodsPicture,sg.goodsName,
         sg.goodsUnit,sgs.stockNum goodsStock,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType
         from store_goods sg,store_goods_stock sgs
-        where sg.id = sgs.goodsId and sg.storeId = #{storeId}
+        where sg.id = sgs.goodsId and sg.storeId = #{storeId} and sgk.goodsStatus = 1
         <if test="goodsName != '' and goodsName != null">
             and
             (sg.goodsName like "%"#{goodsName}"%"
@@ -131,7 +131,7 @@
         select sg.id goodsId,sg.goodsPicture,sg.goodsName,
         sg.goodsUnit,sgs.stockNum goodsStock,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType
         from store_goods sg,store_goods_stock sgs
-        where sg.id = sgs.goodsId and sg.storeId = #{getGoodsStockList.storeId} and sg.id not in (${corIds})
+        where sg.id = sgs.goodsId and sg.storeId = #{getGoodsStockList.storeId} and sg.id not in (${corIds}) and sgk.goodsStatus = 1
         <if test="getGoodsStockList.goodsName != '' and getGoodsStockList.goodsName != null">
             and
             (sg.goodsName like "%"#{getGoodsStockList.goodsName}"%"

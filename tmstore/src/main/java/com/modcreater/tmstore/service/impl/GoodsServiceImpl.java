@@ -239,6 +239,19 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    public Dto getMyGoodsInfo(ReceivedGoodsId receivedGoodsId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGoodsId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreGoods storeGoods = goodsMapper.getGoodsInfo(receivedGoodsId.getGoodsId());
+        if (!reg(receivedGoodsId.getUserId(), storeGoods.getStoreId().toString())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+
+        return null;
+    }
+
+    @Override
     public Dto getGoodsStockList(GetGoodsStockList getGoodsStockList, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsStockList.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);

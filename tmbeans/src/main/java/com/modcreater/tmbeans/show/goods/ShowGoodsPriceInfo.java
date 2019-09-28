@@ -25,4 +25,9 @@ public class ShowGoodsPriceInfo {
 
     private String goodsPrice;
 
+    /**
+     * 选中状态(前端用)
+     */
+    private Boolean selectStatus = false;
+
 }

@@ -21,8 +21,12 @@ public class ShowConsumableGoods {
 
     private String goodsUnit;
 
-    private Long goodsStock;
+    private Long stockNum;
 
     private String goodsType;
+    /**
+     * 选中状态(前端用)
+     */
+    private Boolean selectStatus = false;
 
 }
