@@ -19,7 +19,7 @@ public class ClaimGoodsVo implements Serializable {
     private String targetStoreId;
     private String sourceStoreId;
     /**
-     * 商品Id，数量
+     * 商品Id goodsId，数量goodsCount
      */
     private List<Map<String,String>> sourceGoods;
     private String transactionPrice;

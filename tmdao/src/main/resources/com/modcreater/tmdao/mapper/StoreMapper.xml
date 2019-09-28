@@ -4,6 +4,12 @@
     <insert id="insertStoreAttestation">
         insert into store_attestation (userId, businessLicense, exequatur, storeLogo) values (#{userId},#{businessLicense},#{exequatur},#{storeLogo})
     </insert>
+    <insert id="saveTradingRecord">
+        insert into store_purchase_records (orderNumber, goodsId, targetStoreId, sourceStoreId, transactionPrice, goodsCount, status) values
+        <foreach collection="list" item="sourceGoods" index="index" separator=",">
+            (#{orderNumber},#{sourceGoods.goodsId},#{targetStoreId},#{sourceStoreId},#{transactionPrice},#{sourceGoods.goodsCount},#{status})
+        </foreach>
+    </insert>
     <select id="getStoreInfo" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
         select * from store_info where id = #{storeId}
     </select>

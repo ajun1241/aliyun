@@ -1,37 +1,9 @@
 package com.modcreater.tmbiz;
 
 //import com.modcreater.tmbeans.pojo.TestSingEvent;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.modcreater.tmbeans.pojo.Informationsafety;
-import com.modcreater.tmbeans.pojo.SingleEvent;
 import com.modcreater.tmbiz.config.EventUtil;
-import com.modcreater.tmbiz.config.aop.InfoSafety;
 import com.modcreater.tmdao.mapper.BackerMapper;
 import com.modcreater.tmdao.mapper.EventMapper;
-import com.modcreater.tmutils.RongCloudMethodUtil;
-import com.modcreater.tmutils.RongCloudUtil;
-import com.modcreater.tmutils.SingleEventUtil;
-import com.modcreater.tmutils.messageutil.FriendCardMessage;
-import com.modcreater.tmutils.messageutil.InviteMessage;
-import com.modcreater.tmutils.messageutil.UpdateInviteMessage;
-import io.rong.RongCloud;
-import io.rong.methods.message._private.Private;
-import io.rong.methods.message.chatroom.Chatroom;
-import io.rong.methods.message.discussion.Discussion;
-import io.rong.methods.message.group.Group;
-import io.rong.methods.message.history.History;
-import io.rong.methods.message.system.MsgSystem;
-import io.rong.models.message.PrivateMessage;
-import io.rong.models.response.HistoryMessageResult;
-import io.rong.models.response.ResponseResult;
-import javapns.devices.Device;
-import javapns.devices.implementations.basic.BasicDevice;
-import javapns.notification.AppleNotificationServerBasicImpl;
-import javapns.notification.PushNotificationManager;
-import javapns.notification.PushNotificationPayload;
-import javapns.notification.PushedNotification;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -41,8 +13,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -80,12 +50,6 @@ public class TmbizApplicationTests {
         System.out.println(week);*/
     }
 
-    public static void main(String[] args) {
-       String s="";
-       String[] strings=s.split(",");
-        System.out.println(Arrays.toString(strings));
-    }
-
     @Test
     public void test1() {
         /*Informationsafety informationSafety=new Informationsafety();
@@ -109,8 +73,7 @@ public class TmbizApplicationTests {
      */
     @Test
     public void test2() {
-        /*String s="[1,2]".replace("[","").replace("]","");
-        System.out.println(Arrays.toString(s.split(",")));*/
+        System.out.println("sa");
     }
 
     @Test

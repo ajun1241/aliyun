@@ -7,7 +7,6 @@ import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
 import com.modcreater.tmbeans.vo.store.GoodsListVo;
 import com.modcreater.tmstore.config.annotation.Safety;
 import com.modcreater.tmstore.service.GoodsService;
-import com.modcreater.tmutils.DtoUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created with IntelliJ IDEA.
@@ -52,6 +50,13 @@ public class GoodsController {
     @ApiOperation("查询商品列表")
     public Dto getGoodsList(@RequestBody GoodsListVo goodsListVo, HttpServletRequest request){
         return goodsService.getGoodsList(goodsListVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "getgoodslist2")
+    @ApiOperation("查询全部商品列表")
+    public Dto getGoodsList2(@RequestBody GoodsListVo goodsListVo, HttpServletRequest request){
+        return goodsService.getGoodsList2(goodsListVo,request.getHeader("token"));
     }
 
     @Safety

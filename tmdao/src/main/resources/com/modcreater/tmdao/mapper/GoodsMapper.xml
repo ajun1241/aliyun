@@ -36,6 +36,9 @@
     <update id="updateGoodsStatus">
         update store_goods set goodsStatus = #{status} where id = #{goodsId}
     </update>
+    <update id="deductionStock">
+        update store_goods_stock set stockNum=(stockNum-#{stockNum})
+    </update>
     <delete id="cleanConsumablesList">
         delete from store_goodsconsumable where goodsId = #{goodsId}
     </delete>

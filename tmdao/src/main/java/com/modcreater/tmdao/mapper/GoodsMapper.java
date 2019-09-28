@@ -163,6 +163,15 @@ public interface GoodsMapper {
     int getCorRelation(String corGoodsId);
 
     /**
+     * 扣减商品库存
+     * @param sourceStoreId
+     * @param sourceGoods
+     * @return
+     */
+    int deductionStock(String sourceStoreId, List<Map<String, String>> sourceGoods);
+
+
+    /**
      * 获取转换商品列表
      * @param getGoodsStockList
      * @return

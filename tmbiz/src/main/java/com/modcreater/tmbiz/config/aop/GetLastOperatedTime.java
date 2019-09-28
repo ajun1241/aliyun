@@ -3,7 +3,6 @@ package com.modcreater.tmbiz.config.aop;
 import com.modcreater.tmbeans.pojo.UserStatistics;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AchievementMapper;
-import io.rong.messages.TxtMessage;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Aspect;

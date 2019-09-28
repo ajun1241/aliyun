@@ -1,8 +1,6 @@
 package com.modcreater.tmbiz.config;
 
 import com.modcreater.tmdao.mapper.EventMapper;
-import com.modcreater.tmutils.DateUtil;
-import com.modcreater.tmutils.SingleEventUtil;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

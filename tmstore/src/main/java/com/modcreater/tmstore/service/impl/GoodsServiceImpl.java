@@ -1,16 +1,11 @@
 package com.modcreater.tmstore.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.pojo.StoreGoods;
-import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
-import com.modcreater.tmbeans.pojo.StoreInfo;
+import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.goods.ShowConsumableGoods;
 import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
-import com.modcreater.tmbeans.pojo.StoreGoodsType;
-import com.modcreater.tmbeans.utils.Barcode;
 import com.modcreater.tmbeans.utils.GetBarcode;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.store.ClaimGoodsVo;
@@ -178,15 +173,38 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(claimGoodsVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        //查询商品库存
-        /*goodsMapper.getGoodsStock();
+        //判断商品库存
+        for (Map<String,String> map:claimGoodsVo.getSourceGoods()) {
+            long goodsStock=judgeGoodsStock(map.get("goodsId"));
+            if (goodsStock < Long.parseLong(map.get("goodsCount"))){
+                StoreGoods storeGoods=goodsMapper.getGoodsInfo(map.get("goodsId"));
+                return DtoUtil.getFalseDto("商品"+storeGoods.getGoodsName()+"库存不足,交易未完成",95001);
+            }
+        }
         //减去出货商家的库存
-        goodsMapper.deductionStock(claimGoodsVo.getSourceStoreId());*/
+        int a=goodsMapper.deductionStock(claimGoodsVo.getSourceStoreId(),claimGoodsVo.getSourceGoods());
         //收货商户添加一批货物
+        int flag=addGoodsStock(claimGoodsVo.getTargetStoreId(),claimGoodsVo.getSourceGoods());
         //保存交易记录
+        String orderNumber=(System.currentTimeMillis()/1000+claimGoodsVo.getSourceStoreId()+claimGoodsVo.getTargetStoreId());
+        int b=storeMapper.saveTradingRecord(claimGoodsVo.getSourceGoods(),claimGoodsVo.getSourceStoreId(),claimGoodsVo.getTargetStoreId(),claimGoodsVo.getTransactionPrice(),orderNumber,1);
         //反馈交易双方
         return null;
     }
+
+    public void test() {
+        List<Map<String,String>> mapList=new ArrayList<>();
+        Map<String,String> map1=new HashMap<>(2);
+        map1.put("goodsId","12");
+        map1.put("goodsCount","13");
+        Map<String,String> map2=new HashMap<>(2);
+        map2.put("goodsId","12");
+        map2.put("goodsCount","13");
+        mapList.add(map1);
+        mapList.add(map2);
+        storeMapper.saveTradingRecord(mapList,"21","12","200","12138",1);
+    }
+
 
     @Override
     public Dto goodsDownShelf(GoodsDownShelf goodsDownShelf, String token) {
@@ -285,7 +303,7 @@ public class GoodsServiceImpl implements GoodsService {
                 Map<String,Object> goodsMap=new HashMap<>(7);
                 goodsMap.put("goodsId",storeGoods.get("id"));
                 goodsMap.put("goodsPicture",storeGoods.get("goodsPicture"));
-                goodsMap.put("goodsName",storeGoods.get("goodsBrand"));
+                goodsMap.put("goodsName",storeGoods.get("goodsName"));
                 //周销量
                 goodsMap.put("weekSalesVolume",0);
                 goodsMap.put("goodsPrice",storeGoods.get("goodsPrice")==null ? 0 : storeGoods.get("goodsPrice"));
@@ -308,36 +326,15 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(goodsListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
+        List<Map<String,List<Map<String,Object>>>> resultList=new ArrayList<>();
         List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList(goodsListVo.getStoreId());
-        List<Map<String,Object>> mapperGoodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),-1,-1);
-        List<List<Map<String,Object>>> resultList=new ArrayList<>();
-        if ("1".equals(goodsListVo.getGoodsType())){
-            //优惠
-//            goodsList=new ArrayList<>();
-        }else if ("2".equals(goodsListVo.getGoodsType())){
-            //热销
-//            goodsList=new ArrayList<>();
-        }else {
-            //普通分类
-            if (StringUtils.isEmpty(goodsListVo.getGoodsType())){
-                goodsListVo.setGoodsType(goodsTypeList.size()>0?goodsTypeList.get(0).getId().toString():"");
-            }
-//            goodsList=
-            /*for (StoreGoods storeGoods:goodsList) {
-                Map<String,Object> goodsMap=new HashMap<>(7);
-                goodsMap.put("goodsId",storeGoods.getId());
-                goodsMap.put("goodsPicture",storeGoods.getGoodsPicture());
-                goodsMap.put("goodsName",storeGoods.getGoodsName()+storeGoods.getGoodsUnit()+"装");
-                goodsMap.put("weekSalesVolume",0);
-                goodsMap.put("goodsPrice",storeGoods.getGoodsPrice());
-                goodsMap.put("goodsUnit",storeGoods.getGoodsUnit());
-                mapList.add(goodsMap);
-            }*/
-        }
         for (StoreGoodsType storeGoodsType:goodsTypeList) {
-
+            Map<String,List<Map<String,Object>>> map=new HashMap<>();
+            List<Map<String,Object>> mapperGoodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),storeGoodsType.getId().toString(),-1,-1);
+            map.put(storeGoodsType.getType(),mapperGoodsList);
+            resultList.add(map);
         }
-        return null;
+        return DtoUtil.getSuccesWithDataDto("查询成功",resultList,100000);
     }
 
     /**
@@ -379,5 +376,25 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("获取失败",80004);
         }
         return DtoUtil.getSuccesWithDataDto("获取成功",getBarcode.getData(),100000);
+    }
+
+    /**
+     * 查询商品库存
+     * @param goodsId
+     * @return
+     */
+    private long judgeGoodsStock(String goodsId) {
+
+        return 0;
+    }
+
+    /**
+     * 添加或新增商品库存
+     * @param targetStoreId
+     * @param sourceGoods
+     * @return
+     */
+    private int addGoodsStock(String targetStoreId, List<Map<String, String>> sourceGoods) {
+        return 0;
     }
 }
