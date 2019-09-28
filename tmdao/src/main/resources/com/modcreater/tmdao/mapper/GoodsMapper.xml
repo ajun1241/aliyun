@@ -59,6 +59,9 @@
         values (#{goodsId},#{consumableGoodsId},#{registeredRatioIn},
         #{registeredRationInUnit},#{registeredRatioOut},#{registeredRationOutUnit},#{registeredTime});
     </insert>
+    <insert id="bindingGoods">
+        insert into store_goods_correlation (goodsParentId, goodsSonId) values (#{id},#{corId})
+    </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
     </select>
@@ -85,7 +88,7 @@
     <select id="getGoodsPriceList" resultType="com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo">
         select sg.id goodsId,sg.goodsPicture goodsPicture,sg.goodsName goodsName,
         sgt.type goodsType,sg.goodsUnit goodsUnit,sgk.goodsPrice goodsPrice
-        from store_goods sg,store_goods_type sgt,store_goods_stock sgk,
+        from store_goods sg,store_goods_type sgt,store_goods_stock sgk
         where sgt.id = sg.goodsTypeId and sg.storeId = #{storeId}
         <if test="goodsName != '' and goodsName != null">
             and
@@ -103,37 +106,39 @@
         select * from store_goods_type where id != 2
     </select>
     <select id="getConsumableGoods" resultType="com.modcreater.tmbeans.show.goods.ShowConsumableGoods">
-        select id goodsId,goodsPicture,goodsName,
-        goodsUnit,goodsFUnit,faUnitNum
-        from store_goods
-        where storeId = #{storeId}
+        select sg.id goodsId,sg.goodsPicture,sg.goodsName,
+        sg.goodsUnit,sgs.stockNum goodsStock,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType
+        from store_goods sg,store_goods_stock sgs
+        where sg.id = sgs.goodsId and sg.storeId = #{storeId}
         <if test="goodsName != '' and goodsName != null">
             and
-            (goodsName like "%"#{goodsName}"%"
-            or goodsBrand like "%"#{goodsName}"%"
-            or goodsSpecifications like "%"#{goodsName}"%")
+            (sg.goodsName like "%"#{goodsName}"%"
+            or sg.goodsBrand like "%"#{goodsName}"%"
+            or sg.goodsSpecifications like "%"#{goodsName}"%")
         </if>
-        group by id
+        group by sg.id
         limit #{pageNum},#{pageSize}
     </select>
     <select id="getGoodsUnit" resultType="java.util.Map">
         select id unitId,name unitName from store_goods_unit where type = 1 and (createBy = 100000 or createBy = #{userId}) order by createTime desc
     </select>
     <select id="getCorRelation" resultType="java.lang.Integer">
-        select count(id) from store_goods_correlation where goodsParentId = #{corGoodsId}
+        select count(id) from store_goods_correlation where (goodsParentId = #{corGoodsId} or goodsSonId =#{corGoodsId})
     </select>
     <select id="getCorGoods" resultType="com.modcreater.tmbeans.show.goods.ShowConsumableGoods">
-        select id goodsId,goodsPicture,goodsName,
-        goodsUnit,goodsFUnit,faUnitNum
-        from store_goods
-        where storeId = #{storeId}
-        <if test="goodsName != '' and goodsName != null">
+        select sg.id goodsId,sg.goodsPicture,sg.goodsName,
+        sg.goodsUnit,sgs.stockNum goodsStock,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType
+        from store_goods sg,store_goods_stock sgs
+        where sg.id = sgs.goodsId and sg.storeId = #{getGoodsStockList.storeId} and sg.id not in (${corIds})
+        <if test="getGoodsStockList.goodsName != '' and getGoodsStockList.goodsName != null">
             and
-            (goodsName like "%"#{goodsName}"%"
-            or goodsBrand like "%"#{goodsName}"%"
-            or goodsSpecifications like "%"#{goodsName}"%")
+            (sg.goodsName like "%"#{getGoodsStockList.goodsName}"%"
+            or sg.goodsBrand like "%"#{getGoodsStockList.goodsName}"%"
+            or sg.goodsSpecifications like "%"#{getGoodsStockList.goodsName}"%")
         </if>
-        group by id
-        limit #{pageNum},#{pageSize}
+        limit #{getGoodsStockList.pageNum},#{getGoodsStockList.pageSize}
+    </select>
+    <select id="getCorGoodsId" resultType="java.lang.String">
+        select goodsParentId goodsId from store_goods_correlation union select goodsSonId goodsId from store_goods_correlation
     </select>
 </mapper>

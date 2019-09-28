@@ -61,6 +61,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (goodsMapper.getCorRelation(registerGoods.getCorGoodsId()) >= 1){
             return DtoUtil.getFalseDto("当前选中的转换商品已被其他产品绑定",80006);
         }
+        goodsMapper.bindingGoods(registerGoods.getId(),registerGoods.getCorGoodsId());
         if (registerGoods.getConsumablesLists().length > 0) {
             NumberFormat nf = NumberFormat.getNumberInstance();
             nf.setRoundingMode(RoundingMode.HALF_UP);
@@ -248,7 +249,12 @@ public class GoodsServiceImpl implements GoodsService {
             result.put("goodsList", consumableGoods);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         } else if ("son".equals(getGoodsStockList.getGetType())) {
-            List<ShowConsumableGoods> consumableGoods = goodsMapper.getCorGoods(getGoodsStockList);
+            List<String> ids = goodsMapper.getCorGoodsId();
+            StringBuffer stringBuffer = new StringBuffer("0");
+            for (String s : ids){
+                stringBuffer.append(","+s);
+            }
+            List<ShowConsumableGoods> consumableGoods = goodsMapper.getCorGoods(getGoodsStockList,stringBuffer.toString());
             result.put("goodsList", consumableGoods);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         } else {

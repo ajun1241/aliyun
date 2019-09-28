@@ -174,7 +174,22 @@ public interface GoodsMapper {
     /**
      * 获取转换商品列表
      * @param getGoodsStockList
+     * @param corIds
      * @return
      */
-    List<ShowConsumableGoods> getCorGoods(GetGoodsStockList getGoodsStockList);
+    List<ShowConsumableGoods> getCorGoods(@Param("getGoodsStockList") GetGoodsStockList getGoodsStockList,@Param("corIds")String corIds);
+
+    /**
+     * 获取具有绑定关系的所有商品Id
+     * @return
+     */
+    List<String> getCorGoodsId();
+
+    /**
+     * 绑定商品转换关系
+     * @param id
+     * @param corGoodsId
+     * @return
+     */
+    int bindingGoods(@Param("id") String id,@Param("corId") String corGoodsId);
 }
