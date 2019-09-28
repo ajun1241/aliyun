@@ -2,6 +2,8 @@ package com.modcreater.tmbeans.vo.goods;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -66,7 +68,7 @@ public class RegisterGoods {
     /**
      * 消耗品清单
      */
-    private ConsumablesList[] consumablesLists;
+    private List<ConsumablesList> consumablesLists;
     /**
      * 转换商品Id
      */

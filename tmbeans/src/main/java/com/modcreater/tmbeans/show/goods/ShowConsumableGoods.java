@@ -21,7 +21,7 @@ public class ShowConsumableGoods {
 
     private String goodsUnit;
 
-    private Long stockNum;
+    private Long goodsStock;
 
     private String goodsType;
     /**

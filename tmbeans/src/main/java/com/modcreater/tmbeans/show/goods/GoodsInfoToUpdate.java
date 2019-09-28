@@ -3,6 +3,8 @@ package com.modcreater.tmbeans.show.goods;
 import com.modcreater.tmbeans.vo.goods.ConsumablesList;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -32,6 +34,6 @@ public class GoodsInfoToUpdate {
 
     private String goodsBarCode;
 
-    private ConsumablesList[] consumablesList;
+    private List<ConsumablesList> consumablesList;
 
 }

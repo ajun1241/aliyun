@@ -159,7 +159,12 @@
         select * from store_goods_correlation where goodsSonId = #{goodsId}
     </select>
     <select id="getGoodsInfoToUpdate" resultType="com.modcreater.tmbeans.show.goods.GoodsInfoToUpdate">
-        select
+        select sg.goodsName,sg.goodsBrand,sg.goodsPicture,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType,
+        sgs.stockNum,sg.goodsUnit,sg.goodsFUnit,sg.faUnitNum,sg.goodsBarCode
         from store_goods sg,store_goodsconsumable sgc,store_goods_stock sgs
+        where sg.id = sgc.goodsId and sg.id = sgs.goodsId and sg.id = #{goodsId}
+    </select>
+    <select id="getGoodsConsumablesList" resultType="com.modcreater.tmbeans.vo.goods.ConsumablesList">
+        select id,consumablesId,
     </select>
 </mapper>

@@ -60,19 +60,13 @@ public class GoodsServiceImpl implements GoodsService {
         if (StringUtils.hasText(registerGoods.getGoodsBarCode()) && goodsMapper.isBarCodeExists(registerGoods.getStoreId(),registerGoods.getGoodsBarCode()) >= 1){
             return DtoUtil.getFalseDto("请勿重复录入相同的条形码",90007);
         }
+        if (goodsMapper.getCorRelation(registerGoods.getCorGoodsId()) >= 1){
+            return DtoUtil.getFalseDto("当前选中的转换商品已被其他产品绑定",80006);
+        }
         goodsMapper.addNewGoods(registerGoods);
         goodsMapper.addNewGoodsStock(registerGoods.getId(),registerGoods.getStoreId(), registerGoods.getGoodsNum(),"1",registerGoods.getGoodsBarCode());
-        if (goodsMapper.getCorRelation(registerGoods.getCorGoodsId()) >= 1){
-            try {
-                throw new RuntimeException();
-            }catch (RuntimeException e){
-                e.printStackTrace();
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return DtoUtil.getFalseDto("当前选中的转换商品已被其他产品绑定",80006);
-            }
-        }
         goodsMapper.bindingGoods(registerGoods.getId(),registerGoods.getCorGoodsId());
-        if (registerGoods.getConsumablesLists().length > 0) {
+        if (registerGoods.getConsumablesLists().size() > 0) {
             NumberFormat nf = NumberFormat.getNumberInstance();
             nf.setRoundingMode(RoundingMode.HALF_UP);
             nf.setMaximumFractionDigits(2);
@@ -250,6 +244,8 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
         GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId());
+        List<ConsumablesList> consumablesList = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId());
+
         return null;
     }
 

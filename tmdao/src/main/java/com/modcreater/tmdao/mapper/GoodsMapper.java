@@ -238,4 +238,11 @@ public interface GoodsMapper {
      * @return
      */
     GoodsInfoToUpdate getGoodsInfoToUpdate(String goodsId);
+
+    /**
+     * 获取商品对应的消耗品
+     * @param goodsId
+     * @return
+     */
+    List<ConsumablesList> getGoodsConsumablesList(String goodsId);
 }
