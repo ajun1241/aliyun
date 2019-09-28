@@ -12,6 +12,7 @@ import lombok.Data;
  */
 @Data
 public class ShowConsumable {
+    private String consumableId;
 
     private String goodsId;
 

@@ -1,10 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.*;
-import com.modcreater.tmbeans.show.goods.GoodsInfoToUpdate;
-import com.modcreater.tmbeans.show.goods.ShowConsumableGoods;
-import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
-import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
+import com.modcreater.tmbeans.show.goods.*;
 import com.modcreater.tmbeans.vo.goods.ConsumablesList;
 import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
@@ -244,5 +241,5 @@ public interface GoodsMapper {
      * @param goodsId
      * @return
      */
-    List<ConsumablesList> getGoodsConsumablesList(String goodsId);
+    List<ShowConsumable> getGoodsConsumablesList(String goodsId);
 }

@@ -164,7 +164,10 @@
         from store_goods sg,store_goodsconsumable sgc,store_goods_stock sgs
         where sg.id = sgc.goodsId and sg.id = sgs.goodsId and sg.id = #{goodsId}
     </select>
-    <select id="getGoodsConsumablesList" resultType="com.modcreater.tmbeans.vo.goods.ConsumablesList">
-        select id,consumablesId,
+    <select id="getGoodsConsumablesList" resultType="com.modcreater.tmbeans.show.goods.ShowConsumable">
+        select sgc.id consumableId ,sgc.goodsId,sg.goodsName,sg.goodsPicture,sgc.registeredRatioIn,
+        sgc.registeredRationInUnit,sgc.registeredRatioOut,sgc.registeredRationOutUnit
+        from store_goodsconsumable sgc,store_goods sg
+        where sgc.goodsId = sg.id and goodsId = #{goodsId}
     </select>
 </mapper>

@@ -3,10 +3,7 @@ package com.modcreater.tmstore.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
-import com.modcreater.tmbeans.show.goods.GoodsInfoToUpdate;
-import com.modcreater.tmbeans.show.goods.ShowConsumableGoods;
-import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
-import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
+import com.modcreater.tmbeans.show.goods.*;
 import com.modcreater.tmbeans.utils.GetBarcode;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.store.ClaimGoodsVo;
@@ -53,7 +50,7 @@ public class GoodsServiceImpl implements GoodsService {
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public synchronized Dto registerGoods(RegisterGoods registerGoods, String token) {
+    public Dto registerGoods(RegisterGoods registerGoods, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(registerGoods.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -244,9 +241,9 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
         GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId());
-        List<ConsumablesList> consumablesList = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId());
-
-        return null;
+        List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId());
+        goodsInfoToUpdate.setShowConsumables(showConsumables);
+        return DtoUtil.getSuccesWithDataDto("查询成功",goodsInfoToUpdate,100000);
     }
 
     @Override

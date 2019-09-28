@@ -34,6 +34,6 @@ public class GoodsInfoToUpdate {
 
     private String goodsBarCode;
 
-    private List<ConsumablesList> consumablesList;
+    private List<ShowConsumable> showConsumables;
 
 }
