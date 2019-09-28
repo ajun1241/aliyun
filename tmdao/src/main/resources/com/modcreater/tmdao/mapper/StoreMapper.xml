@@ -6,8 +6,8 @@
     </insert>
     <insert id="saveTradingRecord">
         insert into store_purchase_records (orderNumber, goodsId, targetStoreId, sourceStoreId, transactionPrice, goodsCount, status) values
-        <foreach collection="list" item="sourceGoods" index="index" separator=",">
-            (#{orderNumber},#{sourceGoods.goodsId},#{targetStoreId},#{sourceStoreId},#{transactionPrice},#{sourceGoods.goodsCount},#{status})
+        <foreach collection="sourceGoods" item="sourceGoods" index="index" separator=",">
+            (#{orderNumber},#{sourceGoods.goodsId},#{targetStoreId},#{sourceStoreId},#{transactionPrice},#{sourceGoods.goodsNum},#{status})
         </foreach>
     </insert>
     <select id="getStoreInfo" resultType="com.modcreater.tmbeans.pojo.StoreInfo">

@@ -36,7 +36,9 @@
         update store_goods_stock set goodsStatus = #{status} where id = #{goodsId}
     </update>
     <update id="deductionStock">
-        update store_goods_stock set stockNum=(stockNum-#{stockNum})
+        <foreach collection="sourceGoods" item="sourceGoods" index="index" separator=";">
+            update store_goods_stock set stockNum = stockNum - #{sourceGoods.goodsNum} where storeId=#{sourceStoreId} and goodsId=#{sourceGoods.goodsId}
+        </foreach>
     </update>
     <delete id="cleanConsumablesList">
         delete from store_goodsconsumable where goodsId = #{goodsId}
@@ -48,6 +50,7 @@
         <if test=" goodsName != null and goodsName != ''" >
             and sg.goodsName like concat('%',#{goodsName},'%')
         </if>
+        and sgs.goodsStatus = 1
         <if test=" pageIndex >= 0 and pageSize >= 0 " >
             limit #{pageIndex},#{pageSize}
         </if>
@@ -64,11 +67,11 @@
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
     </select>
-    <select id="getGoodsTypeList" resultType="com.modcreater.tmbeans.pojo.StoreGoodsType">
+    <select id="getGoodsTypeList" resultType="java.util.Map">
         select * from store_goods_type where id IN
         (SELECT sg.goodsTypeId FROM store_goods sg
         INNER JOIN store_goods_stock sgs
-        ON sg.id=sgs.`goodsId` WHERE sgs.storeId=10 )
+        ON sg.id=sgs.`goodsId` WHERE sgs.storeId=#{storeId} and sgs.goodsStatus = 1)
     </select>
     <select id="getGoodsStockList" resultType="com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo">
         select sg.id goodsId,sg.goodsPicture goodsPicture,sg.goodsName goodsName,
@@ -145,5 +148,8 @@
     </select>
     <select id="getGoodsStock" resultType="com.modcreater.tmbeans.pojo.StoreGoodsStock">
         select * from store_goods_stock where goodsId = #{goodsId}
+    </select>
+    <select id="queryGoodsStock" resultType="java.lang.Long">
+        select stockNum from store_goods_stock where goodsId=#{goodsId} and storeId=#{storeId}
     </select>
 </mapper>

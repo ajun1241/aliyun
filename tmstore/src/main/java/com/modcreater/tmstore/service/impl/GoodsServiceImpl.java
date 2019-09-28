@@ -199,8 +199,8 @@ public class GoodsServiceImpl implements GoodsService {
         }
         //判断商品库存
         for (Map<String,String> map:claimGoodsVo.getSourceGoods()) {
-            long goodsStock=judgeGoodsStock(map.get("goodsId"));
-            if (goodsStock < Long.parseLong(map.get("goodsCount"))){
+            long goodsStock=goodsMapper.queryGoodsStock(map.get("goodsId"),claimGoodsVo.getSourceStoreId());
+            if (goodsStock < Long.parseLong(map.get("goodsNum"))){
                 StoreGoods storeGoods=goodsMapper.getGoodsInfo(map.get("goodsId"));
                 return DtoUtil.getFalseDto("商品"+storeGoods.getGoodsName()+"库存不足,交易未完成",95001);
             }
@@ -215,20 +215,6 @@ public class GoodsServiceImpl implements GoodsService {
         //反馈交易双方
         return null;
     }
-
-    public void test() {
-        List<Map<String,String>> mapList=new ArrayList<>();
-        Map<String,String> map1=new HashMap<>(2);
-        map1.put("goodsId","12");
-        map1.put("goodsCount","13");
-        Map<String,String> map2=new HashMap<>(2);
-        map2.put("goodsId","12");
-        map2.put("goodsCount","13");
-        mapList.add(map1);
-        mapList.add(map2);
-        storeMapper.saveTradingRecord(mapList,"21","12","200","12138",1);
-    }
-
 
     @Override
     public Dto goodsDownShelf(GoodsDownShelf goodsDownShelf, String token) {
@@ -317,7 +303,7 @@ public class GoodsServiceImpl implements GoodsService {
         int pageSize=Integer.parseInt(goodsListVo.getPageSize());
         int pageIndex=(Integer.parseInt(goodsListVo.getPageNumber())-1)*pageSize;
         Map<String,Object> map=new HashMap<>(2);
-        List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList(goodsListVo.getStoreId());
+        List<Map<String,Object>> goodsTypeList=goodsMapper.getGoodsTypeList(goodsListVo.getStoreId());
         List<Map<String,Object>> mapList=new ArrayList<>();
         map.put("goodsTypeList",goodsTypeList);
         List<Map<String,Object>> goodsList=null;
@@ -330,7 +316,7 @@ public class GoodsServiceImpl implements GoodsService {
         }else {
             //普通分类
             if (StringUtils.isEmpty(goodsListVo.getGoodsType())){
-                goodsListVo.setGoodsType(goodsTypeList.size()>0?goodsTypeList.get(0).getId().toString():"");
+                goodsListVo.setGoodsType(goodsTypeList.size()>0?goodsTypeList.get(0).get("id").toString():"");
             }
             goodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),goodsListVo.getGoodsType(),pageIndex,pageSize);
             for (Map<String,Object> storeGoods:goodsList) {
@@ -360,15 +346,24 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(goodsListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        List<Map<String,List<Map<String,Object>>>> resultList=new ArrayList<>();
-        List<StoreGoodsType> goodsTypeList=goodsMapper.getGoodsTypeList(goodsListVo.getStoreId());
-        for (StoreGoodsType storeGoodsType:goodsTypeList) {
-            Map<String,List<Map<String,Object>>> map=new HashMap<>();
-            List<Map<String,Object>> mapperGoodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),storeGoodsType.getId().toString(),-1,-1);
-            map.put(storeGoodsType.getType(),mapperGoodsList);
-            resultList.add(map);
+        List<Map<String,Object>> goodsTypeList=goodsMapper.getGoodsTypeList(goodsListVo.getStoreId());
+        for (Map<String,Object> storeGoodsType:goodsTypeList) {
+            List<Map<String,Object>> mapperGoodsList=goodsMapper.getGoodsList(goodsListVo.getStoreId(),goodsListVo.getGoodsName(),storeGoodsType.get("id").toString(),-1,-1);
+            List<Map<String,Object>> list=new ArrayList<>();
+            for (Map<String,Object> map:mapperGoodsList) {
+                Map<String,Object> goodsMap=new HashMap<>(7);
+                goodsMap.put("goodsId",map.get("id"));
+                goodsMap.put("goodsPicture",map.get("goodsPicture"));
+                goodsMap.put("goodsName",map.get("goodsName"));
+                //周销量
+                goodsMap.put("weekSalesVolume",0);
+                goodsMap.put("goodsPrice",map.get("goodsPrice")==null ? 0 : map.get("goodsPrice"));
+                goodsMap.put("goodsUnit",map.get("goodsUnit"));
+                list.add(goodsMap);
+            }
+            storeGoodsType.put("list",list);
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",resultList,100000);
+        return DtoUtil.getSuccesWithDataDto("查询成功",goodsTypeList,100000);
     }
 
     /**
@@ -413,22 +408,13 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     /**
-     * 查询商品库存
-     * @param goodsId
-     * @return
-     */
-    private long judgeGoodsStock(String goodsId) {
-
-        return 0;
-    }
-
-    /**
      * 添加或新增商品库存
      * @param targetStoreId
      * @param sourceGoods
      * @return
      */
     private int addGoodsStock(String targetStoreId, List<Map<String, String>> sourceGoods) {
+        //查询商品编码
         return 0;
     }
 }

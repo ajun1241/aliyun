@@ -484,7 +484,7 @@ public class EventServiceImpl implements EventService {
         if (eventMapper.updateDraft(singleEvent) == 0) {
             return DtoUtil.getFalseDto("修改草稿失败", 21112);
         }
-        return DtoUtil.getSuccessDto("修改草稿成功", 10000);
+        return DtoUtil.getSuccessDto("修改草稿成功", 100000);
     }
 
 

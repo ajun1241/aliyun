@@ -96,7 +96,7 @@ public interface GoodsMapper {
      * @param storeId
      * @return
      */
-    List<StoreGoodsType> getGoodsTypeList(String storeId);
+    List<Map<String,Object>> getGoodsTypeList(String storeId);
 
     /**
      * 修改商品基本信息
@@ -208,6 +208,15 @@ public interface GoodsMapper {
      * @return
      */
     StoreGoodsStock getGoodsStock(String goodsId);
+
+    /**
+     * 判断商品库存
+     * @param goodsId
+     * @param storeId
+     * @return
+     */
+    Long queryGoodsStock(String goodsId, String storeId);
+
 
     StoreGoodsCorrelation getSonGoodsInfo(String goodsId);
 
