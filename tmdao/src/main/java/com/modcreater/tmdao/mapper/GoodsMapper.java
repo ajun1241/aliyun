@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.*;
+import com.modcreater.tmbeans.show.goods.GoodsInfoToUpdate;
 import com.modcreater.tmbeans.show.goods.ShowConsumableGoods;
 import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
@@ -217,8 +218,24 @@ public interface GoodsMapper {
      */
     Long queryGoodsStock(String goodsId, String storeId);
 
-
+    /**
+     * 获取子商品信息
+     * @param goodsId
+     * @return
+     */
     StoreGoodsCorrelation getSonGoodsInfo(String goodsId);
 
+    /**
+     * 获取父商品信息
+     * @param goodsId
+     * @return
+     */
     StoreGoodsCorrelation getParentGoodsInfo(String goodsId);
+
+    /**
+     * 根据商品Id查询商品详情(修改商品信息)
+     * @param goodsId
+     * @return
+     */
+    GoodsInfoToUpdate getGoodsInfoToUpdate(String goodsId);
 }

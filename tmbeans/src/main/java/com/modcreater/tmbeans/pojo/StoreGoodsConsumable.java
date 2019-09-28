@@ -14,5 +14,6 @@ public class StoreGoodsConsumable {
   private long registeredRatioOut;
   private String registeredRationOutUnit;
   private long registeredTime;
+  private Double consumptionRate;
 
 }

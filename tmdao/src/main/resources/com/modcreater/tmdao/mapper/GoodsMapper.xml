@@ -91,7 +91,7 @@
         select sg.id goodsId,sg.goodsPicture goodsPicture,sg.goodsName goodsName,
         sgt.type goodsType,sg.goodsUnit goodsUnit,sgk.goodsPrice goodsPrice
         from store_goods sg,store_goods_type sgt,store_goods_stock sgk
-        where sgt.id = sg.goodsTypeId and sg.storeId = #{storeId} and sgk.goodsStatus = 1
+        where sgt.id = sg.goodsTypeId and sg.id = sgk.goodsId and sg.storeId = #{storeId} and sgk.goodsStatus = 1
         <if test="goodsName != '' and goodsName != null">
             and
             (sg.goodsName like "%"#{goodsName}"%"
@@ -111,7 +111,7 @@
         select sg.id goodsId,sg.goodsPicture,sg.goodsName,
         sg.goodsUnit,sgs.stockNum goodsStock,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType
         from store_goods sg,store_goods_stock sgs
-        where sg.id = sgs.goodsId and sg.storeId = #{storeId} and sgk.goodsStatus = 1
+        where sg.id = sgs.goodsId and sg.storeId = #{storeId} and sgs.goodsStatus = 1
         <if test="goodsName != '' and goodsName != null">
             and
             (sg.goodsName like "%"#{goodsName}"%"
@@ -131,7 +131,7 @@
         select sg.id goodsId,sg.goodsPicture,sg.goodsName,
         sg.goodsUnit,sgs.stockNum goodsStock,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType
         from store_goods sg,store_goods_stock sgs
-        where sg.id = sgs.goodsId and sg.storeId = #{getGoodsStockList.storeId} and sg.id not in (${corIds}) and sgk.goodsStatus = 1
+        where sg.id = sgs.goodsId and sg.storeId = #{getGoodsStockList.storeId} and sg.id not in (${corIds}) and sgs.goodsStatus = 1
         <if test="getGoodsStockList.goodsName != '' and getGoodsStockList.goodsName != null">
             and
             (sg.goodsName like "%"#{getGoodsStockList.goodsName}"%"
@@ -151,5 +151,15 @@
     </select>
     <select id="queryGoodsStock" resultType="java.lang.Long">
         select stockNum from store_goods_stock where goodsId=#{goodsId} and storeId=#{storeId}
+    </select>
+    <select id="getSonGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoodsCorrelation">
+        select * from store_goods_correlation where goodsParentId = #{goodsId}
+    </select>
+    <select id="getParentGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoodsCorrelation">
+        select * from store_goods_correlation where goodsSonId = #{goodsId}
+    </select>
+    <select id="getGoodsInfoToUpdate" resultType="com.modcreater.tmbeans.show.goods.GoodsInfoToUpdate">
+        select
+        from store_goods sg,store_goodsconsumable sgc,store_goods_stock sgs
     </select>
 </mapper>

@@ -3,6 +3,7 @@ package com.modcreater.tmstore.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
+import com.modcreater.tmbeans.show.goods.GoodsInfoToUpdate;
 import com.modcreater.tmbeans.show.goods.ShowConsumableGoods;
 import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
@@ -85,6 +86,7 @@ public class GoodsServiceImpl implements GoodsService {
                 consumable.setRegisteredRatioOut(Long.valueOf(consumablesList.getFinishedNum()));
                 consumable.setRegisteredRationOutUnit(registerGoods.getGoodsUnit());
                 consumable.setRegisteredTime(System.currentTimeMillis() / 1000);
+                consumable.setConsumptionRate(consumable.getRegisteredRatioIn()/consumable.getRegisteredRatioOut());
                 goodsMapper.addNewGoodsConsumable(consumable);
             }
         }
@@ -247,7 +249,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(receivedGoodsId.getUserId(), storeGoods.getStoreId().toString())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-
+        GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId());
         return null;
     }
 
