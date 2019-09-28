@@ -2,6 +2,7 @@ package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.StoreGoods;
 import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
+import com.modcreater.tmbeans.pojo.StoreGoodsStock;
 import com.modcreater.tmbeans.show.goods.ShowConsumableGoods;
 import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
@@ -192,4 +193,19 @@ public interface GoodsMapper {
      * @return
      */
     int bindingGoods(@Param("id") String id,@Param("corId") String corGoodsId);
+
+    /**
+     * 通过获取查询结果数量判断条形码是否已被商家录入过
+     * @param storeId
+     * @param goodsBarCode
+     * @return
+     */
+    int isBarCodeExists(@Param("storeId") String storeId, @Param("goodsBarCode") String goodsBarCode);
+
+    /**
+     * 查询商品库存信息
+     * @param goodsId
+     * @return
+     */
+    StoreGoodsStock getGoodsStock(String goodsId);
 }

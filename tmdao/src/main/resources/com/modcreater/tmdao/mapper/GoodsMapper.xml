@@ -31,10 +31,10 @@
         update store_goods_stock set stockNum = #{goodsStock} where goodsId = #{goodsId}
     </update>
     <update id="updateGoodsUnitPrice">
-        update store_goods set goodsPrice = #{goodsPrice} where id = #{goodsId}
+        update store_goods_stock set goodsPrice = #{goodsPrice} where goodsId = #{goodsId}
     </update>
     <update id="updateGoodsStatus">
-        update store_goods set goodsStatus = #{status} where id = #{goodsId}
+        update store_goods_stock set goodsStatus = #{status} where id = #{goodsId}
     </update>
     <update id="deductionStock">
         update store_goods_stock set stockNum=(stockNum-#{stockNum})
@@ -140,5 +140,11 @@
     </select>
     <select id="getCorGoodsId" resultType="java.lang.String">
         select goodsParentId goodsId from store_goods_correlation union select goodsSonId goodsId from store_goods_correlation
+    </select>
+    <select id="isBarCodeExists" resultType="java.lang.Integer">
+        select count(id) from store_goods where storeId = #{storeId} and goodsBarCode = #{goodsBarCode}
+    </select>
+    <select id="getGoodsStock" resultType="com.modcreater.tmbeans.pojo.StoreGoodsStock">
+        select * from store_goods_stock where goodsId = #{goodsId}
     </select>
 </mapper>

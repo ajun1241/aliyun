@@ -52,14 +52,23 @@ public class GoodsServiceImpl implements GoodsService {
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public Dto registerGoods(RegisterGoods registerGoods, String token) {
+    public synchronized Dto registerGoods(RegisterGoods registerGoods, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(registerGoods.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (StringUtils.hasText(registerGoods.getGoodsBarCode()) && goodsMapper.isBarCodeExists(registerGoods.getStoreId(),registerGoods.getGoodsBarCode()) >= 1){
+            return DtoUtil.getFalseDto("请勿重复录入相同的条形码",90007);
         }
         goodsMapper.addNewGoods(registerGoods);
         goodsMapper.addNewGoodsStock(registerGoods.getId(),registerGoods.getStoreId(), registerGoods.getGoodsNum(),"1");
         if (goodsMapper.getCorRelation(registerGoods.getCorGoodsId()) >= 1){
-            return DtoUtil.getFalseDto("当前选中的转换商品已被其他产品绑定",80006);
+            try {
+                throw new RuntimeException();
+            }catch (RuntimeException e){
+                e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("当前选中的转换商品已被其他产品绑定",80006);
+            }
         }
         goodsMapper.bindingGoods(registerGoods.getId(),registerGoods.getCorGoodsId());
         if (registerGoods.getConsumablesLists().length > 0) {
@@ -131,8 +140,8 @@ public class GoodsServiceImpl implements GoodsService {
         result.put("goodsName",goods.getGoodsName());
         result.put("goodsBrand",goods.getGoodsBrand());
         result.put("goodsUnit",goods.getGoodsUnit());
-        result.put("goodsFUnit",goods.getGoodsFUnit());
-        result.put("faUnitNum",goods.getFaUnitNum());
+        result.put("goodsFUnit",goods.getGoodsFUnit() == null ? "" : goods.getFaUnitNum());
+        result.put("faUnitNum",goods.getFaUnitNum() == null ? "" : goods.getFaUnitNum());
         return DtoUtil.getSuccesWithDataDto("操作成功",result,100000);
     }
 
@@ -142,10 +151,11 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         StoreGoods goods = goodsMapper.getGoodsInfo(updateGoodsPrice.getGoodsId());
+        StoreGoodsStock storeGoodsStock = goodsMapper.getGoodsStock(updateGoodsPrice.getGoodsId());
         if (!reg(updateGoodsPrice.getUserId(),goods.getStoreId().toString())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        /*if (goods.getGoodsPrice() == null || goods.getGoodsPrice() == 0){
+        /*if (storeGoodsStock.getGoodsPrice() == null || storeGoodsStock.getGoodsPrice() == 0){
             goodsMapper.updateGoodsStatus(updateGoodsPrice.getGoodsId(),1);
         }*/
         if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(),updateGoodsPrice.getUnitPrice()) != 1){
@@ -218,10 +228,15 @@ public class GoodsServiceImpl implements GoodsService {
         if (goodsDownShelf.getGoodsId() == null){
             return DtoUtil.getFalseDto("参数错误",90006);
         }
+        int i = 0;
         for (String goodsId : goodsDownShelf.getGoodsId()){
-//            goodsMapper.updateGoodsStatus(goodsId,);
+            i += goodsMapper.updateGoodsStatus(goodsId,0);
         }
-        return null;
+        if (i == goodsDownShelf.getGoodsId().length){
+            return DtoUtil.getSuccessDto("操作成功",100000);
+        }else {
+            return DtoUtil.getFalseDto("操作失败",90008);
+        }
     }
 
     @Override
