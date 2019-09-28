@@ -1,12 +1,9 @@
 package com.modcreater.tmdao.mapper;
 
-import com.modcreater.tmbeans.pojo.StoreGoods;
-import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
-import com.modcreater.tmbeans.pojo.StoreGoodsStock;
+import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.goods.ShowConsumableGoods;
 import com.modcreater.tmbeans.show.goods.ShowGoodsPriceInfo;
 import com.modcreater.tmbeans.show.goods.ShowGoodsStockInfo;
-import com.modcreater.tmbeans.pojo.StoreGoodsType;
 import com.modcreater.tmbeans.vo.goods.ConsumablesList;
 import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
 import com.modcreater.tmbeans.vo.goods.RegisterGoods;
@@ -51,9 +48,12 @@ public interface GoodsMapper {
      * @param id
      * @param goodsNum
      * @param goodsStatus
+     * @param goodsBarCode
      * @return
      */
-    Long addNewGoodsStock(@Param("goodsId") String id,@Param("storeId") String storeId, @Param("stockNum") Long goodsNum, @Param("goodsStatus") String goodsStatus);
+    Long addNewGoodsStock(@Param("goodsId") String id,@Param("storeId") String storeId,
+                          @Param("stockNum") Long goodsNum, @Param("goodsStatus") String goodsStatus,
+                          @Param("goodsBarCode") String goodsBarCode);
 
     /**
      * 添加商品消耗品清单
@@ -208,4 +208,8 @@ public interface GoodsMapper {
      * @return
      */
     StoreGoodsStock getGoodsStock(String goodsId);
+
+    StoreGoodsCorrelation getSonGoodsInfo(String goodsId);
+
+    StoreGoodsCorrelation getParentGoodsInfo(String goodsId);
 }

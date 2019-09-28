@@ -60,7 +60,7 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请勿重复录入相同的条形码",90007);
         }
         goodsMapper.addNewGoods(registerGoods);
-        goodsMapper.addNewGoodsStock(registerGoods.getId(),registerGoods.getStoreId(), registerGoods.getGoodsNum(),"1");
+        goodsMapper.addNewGoodsStock(registerGoods.getId(),registerGoods.getStoreId(), registerGoods.getGoodsNum(),"1",registerGoods.getGoodsBarCode());
         if (goodsMapper.getCorRelation(registerGoods.getCorGoodsId()) >= 1){
             try {
                 throw new RuntimeException();
@@ -99,8 +99,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (reg(updateGoods.getUserId(),updateGoods.getStoreId())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        //此处要知道,商品修改了除条形码外的所有信息,那该商品是否还是原来的商品
-        //相同的商品用什么来做标识,如果是条形码,不同的生产商条形码会不同导致商品不同
+        StoreGoods storeGoods = goodsMapper.getGoodsInfo(updateGoods.getGoodsId());
         goodsMapper.updateGoods(updateGoods);
         goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum());
         goodsMapper.cleanConsumablesList(updateGoods.getGoodsId());
@@ -150,17 +149,31 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(updateGoodsPrice.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        StoreGoods goods = goodsMapper.getGoodsInfo(updateGoodsPrice.getGoodsId());
         StoreGoodsStock storeGoodsStock = goodsMapper.getGoodsStock(updateGoodsPrice.getGoodsId());
-        if (!reg(updateGoodsPrice.getUserId(),goods.getStoreId().toString())){
+        if (!reg(updateGoodsPrice.getUserId(),storeGoodsStock.getStoreId().toString())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        /*if (storeGoodsStock.getGoodsPrice() == null || storeGoodsStock.getGoodsPrice() == 0){
-            goodsMapper.updateGoodsStatus(updateGoodsPrice.getGoodsId(),1);
+        /*StoreGoods goods = goodsMapper.getGoodsInfo(updateGoodsPrice.getGoodsId());
+        StoreGoodsCorrelation sonRelation = goodsMapper.getSonGoodsInfo(updateGoodsPrice.getGoodsId());
+        StoreGoodsCorrelation parRelation = goodsMapper.getParentGoodsInfo(updateGoodsPrice.getGoodsId());
+        //如果查到正在改价的商品有父商品,则按父商品绑定时的单位运算自动修改父商品的价格
+        if (!ObjectUtils.isEmpty(parRelation)){
+            StoreGoods parGoods = goodsMapper.getGoodsInfo(parRelation.getGoodsParentId().toString());
+            goodsMapper.updateGoodsUnitPrice(parGoods.getId().toString(),parGoods.getFaUnitNum() * updateGoodsPrice.getUnitPrice());
+        }
+        //如果查到正在改价的商品有子商品,则按父商品绑定时的单位运算自动修改子商品的价格
+        if (!ObjectUtils.isEmpty(sonRelation)){
+            StoreGoods sonGoods = goodsMapper.getGoodsInfo(parRelation.getGoodsParentId().toString());
+            goodsMapper.updateGoodsUnitPrice(sonGoods.getId().toString(),updateGoodsPrice.getUnitPrice() / goods.getFaUnitNum());
         }*/
         if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(),updateGoodsPrice.getUnitPrice()) != 1){
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return DtoUtil.getFalseDto("修改价格失败",80005);
+            try {
+                throw new RuntimeException();
+            }catch (RuntimeException e){
+                e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("修改价格失败",80005);
+            }
         }
         return DtoUtil.getSuccessDto("修改成功",100000);
     }

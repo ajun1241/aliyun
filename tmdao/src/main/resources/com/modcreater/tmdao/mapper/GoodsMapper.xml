@@ -9,8 +9,8 @@
          #{goodsSpecifications},#{goodsAllergen},#{goodsUnit},#{goodsTypeId},#{goodsFUnit},#{faUnitNum})
     </insert>
     <insert id="addNewGoodsStock">
-        insert into store_goods_stock (goodsId,storeId, stockNum, goodsStatus)
-        values (#{goodsId},#{storeId},#{stockNum},#{goodsStatus})
+        insert into store_goods_stock (goodsId,storeId, stockNum,goodsBarCode, goodsStatus)
+        values (#{goodsId},#{storeId},#{stockNum},#{goodsBarCode},#{goodsStatus})
     </insert>
     <update id="updateGoods">
         update store_goods set
@@ -20,7 +20,6 @@
         goodsBarCode = #{goodsBarCode},
         goodsSpecifications = #{goodsSpecifications},
         goodsAllergen = #{goodsAllergen},
-        goodsPrice = #{goodsPrice},
         goodsUnit = #{goodsUnit},
         goodsTypeId = #{goodsTypeId},
         goodsFUnit = #{goodsFUnit},

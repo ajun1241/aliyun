@@ -56,10 +56,6 @@ public class UpdateGoods {
      */
     private Long goodsNum;
     /**
-     * 来源0手动添加1进货
-     */
-    private String goodSource;
-    /**
      * 父单位
      */
     private String goodsFUnit;
@@ -71,5 +67,9 @@ public class UpdateGoods {
      * 消耗品清单
      */
     private ConsumablesList[] consumablesLists;
+    /**
+     * 转换商品Id
+     */
+    private String corGoodsId;
 
 }
