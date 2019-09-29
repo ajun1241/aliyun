@@ -103,9 +103,15 @@ public class GoodsController {
         return goodsService.goodsDownShelf(goodsDownShelf,request.getHeader("token"));
     }
 
-    @PostMapping(value = "getmygoodsinfo")
+    @PostMapping(value = "getupdategoodsinfo")
     @ApiOperation("获取我的商品详细信息")
-    public Dto getMyGoodsInfo(@RequestBody ReceivedGoodsId receivedGoodsId,HttpServletRequest request){
-        return goodsService.getMyGoodsInfo(receivedGoodsId,request.getHeader("token"));
+    public Dto getUpdateGoodsInfo(@RequestBody ReceivedGoodsId receivedGoodsId,HttpServletRequest request){
+        return goodsService.getUpdateGoodsInfo(receivedGoodsId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "getgoodsconsumables")
+    @ApiOperation("获取商品对应消耗品")
+    public Dto getGoodsConsumables(@RequestBody ReceivedGoodsId receivedGoodsId,HttpServletRequest request){
+        return goodsService.getGoodsConsumable(receivedGoodsId,request.getHeader("token"));
     }
 }

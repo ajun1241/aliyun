@@ -57,9 +57,9 @@
     </select>
     <insert id="addNewGoodsConsumable">
         insert into store_goodsconsumable (goodsId, consumableGoodsId,  registeredRatioIn,
-        registeredRationInUnit, registeredRatioOut, registeredRationOutUnit, registeredTime)
+        registeredRationInUnit, registeredRatioOut, registeredRationOutUnit, registeredTime, consumptionRate)
         values (#{goodsId},#{consumableGoodsId},#{registeredRatioIn},
-        #{registeredRationInUnit},#{registeredRatioOut},#{registeredRationOutUnit},#{registeredTime});
+        #{registeredRationInUnit},#{registeredRatioOut},#{registeredRationOutUnit},#{registeredTime},#{consumptionRate});
     </insert>
     <insert id="bindingGoods">
         insert into store_goods_correlation (goodsParentId, goodsSonId) values (#{id},#{corId})
@@ -159,15 +159,15 @@
         select * from store_goods_correlation where goodsSonId = #{goodsId}
     </select>
     <select id="getGoodsInfoToUpdate" resultType="com.modcreater.tmbeans.show.goods.GoodsInfoToUpdate">
-        select sg.goodsName,sg.goodsBrand,sg.goodsPicture,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType,
-        sgs.stockNum,sg.goodsUnit,sg.goodsFUnit,sg.faUnitNum,sg.goodsBarCode
+        select sg.id goodsId,sg.goodsName,sg.goodsBrand,sg.goodsPicture,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType,
+        sgs.stockNum goodsStock,sg.goodsUnit,sg.goodsFUnit,sg.faUnitNum,sg.goodsBarCode
         from store_goods sg,store_goodsconsumable sgc,store_goods_stock sgs
         where sg.id = sgc.goodsId and sg.id = sgs.goodsId and sg.id = #{goodsId}
     </select>
     <select id="getGoodsConsumablesList" resultType="com.modcreater.tmbeans.show.goods.ShowConsumable">
-        select sgc.id consumableId ,sgc.goodsId,sg.goodsName,sg.goodsPicture,sgc.registeredRatioIn,
+        select sgc.id consumableId ,sgc.consumableGoodsId goodsId,sg.goodsName,sg.goodsPicture,sgc.registeredRatioIn,
         sgc.registeredRationInUnit,sgc.registeredRatioOut,sgc.registeredRationOutUnit
         from store_goodsconsumable sgc,store_goods sg
-        where sgc.goodsId = sg.id and goodsId = #{goodsId}
+        where sgc.consumableGoodsId = sg.id and sgc.goodsId = #{goodsId}
     </select>
 </mapper>

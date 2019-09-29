@@ -117,5 +117,13 @@ public interface GoodsService {
      * @param token
      * @return
      */
-    Dto getMyGoodsInfo(ReceivedGoodsId receivedGoodsId, String token);
+    Dto getUpdateGoodsInfo(ReceivedGoodsId receivedGoodsId, String token);
+
+    /**
+     * 获取商品对应消耗品
+     * @param receivedGoodsId
+     * @param token
+     * @return
+     */
+    Dto getGoodsConsumable(ReceivedGoodsId receivedGoodsId, String token);
 }

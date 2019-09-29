@@ -15,6 +15,7 @@ import java.util.List;
  */
 @Data
 public class GoodsInfoToUpdate {
+    private String goodsId;
 
     private String goodsName;
 

@@ -232,7 +232,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public Dto getMyGoodsInfo(ReceivedGoodsId receivedGoodsId, String token) {
+    public Dto getUpdateGoodsInfo(ReceivedGoodsId receivedGoodsId, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGoodsId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -244,6 +244,14 @@ public class GoodsServiceImpl implements GoodsService {
         List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId());
         goodsInfoToUpdate.setShowConsumables(showConsumables);
         return DtoUtil.getSuccesWithDataDto("查询成功",goodsInfoToUpdate,100000);
+    }
+
+    @Override
+    public Dto getGoodsConsumable(ReceivedGoodsId receivedGoodsId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGoodsId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        return DtoUtil.getSuccesWithDataDto("获取成功",goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId()),100000);
     }
 
     @Override
