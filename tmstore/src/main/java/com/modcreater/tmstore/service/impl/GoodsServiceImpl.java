@@ -238,13 +238,17 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         StoreGoods storeGoods = goodsMapper.getGoodsInfo(receivedGoodsId.getGoodsId());
+        System.out.println(storeGoods.toString());
         if (!reg(receivedGoodsId.getUserId(), storeGoods.getStoreId().toString())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
         GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId());
         List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId());
         goodsInfoToUpdate.setShowConsumables(showConsumables);
-        goodsInfoToUpdate.setCorGoodsId(goodsMapper.getSonGoodsInfo(receivedGoodsId.getGoodsId()).getGoodsSonId().toString());
+        StoreGoodsCorrelation correlation =  goodsMapper.getSonGoodsInfo(receivedGoodsId.getGoodsId());
+        if (correlation != null){
+            goodsInfoToUpdate.setCorGoodsId(correlation.getGoodsSonId().toString());
+        }
         return DtoUtil.getSuccesWithDataDto("查询成功",goodsInfoToUpdate,100000);
     }
 
