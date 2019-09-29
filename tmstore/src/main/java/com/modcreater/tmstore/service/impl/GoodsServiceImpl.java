@@ -89,25 +89,37 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(updateGoods.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        if (reg(updateGoods.getUserId(),updateGoods.getStoreId())){
+        if (!reg(updateGoods.getUserId(),updateGoods.getStoreId())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        StoreGoods storeGoods = goodsMapper.getGoodsInfo(updateGoods.getGoodsId());
-        if (ObjectUtils.isEmpty(storeGoods)){
-            return DtoUtil.getFalseDto("商品未找到",90009);
-        }
-        if (StringUtils.hasText(storeGoods.getGoodsFUnit())){
-            StoreGoodsCorrelation correlation = goodsMapper.getSonGoodsInfo(storeGoods.getId().toString());
-            if (correlation.getGoodsSonId().toString().equals(updateGoods.getCorGoodsId())){
-
+        try {
+            StoreGoods storeGoods = goodsMapper.getGoodsInfo(updateGoods.getGoodsId());
+            if (ObjectUtils.isEmpty(storeGoods)){
+                return DtoUtil.getFalseDto("商品未找到",90009);
             }
-
+            if (StringUtils.hasText(updateGoods.getCorGoodsId())){
+                if (goodsMapper.updateCorRelation(storeGoods.getId().toString(),updateGoods.getCorGoodsId()) != 1){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("修改失败",90011);
+                }
+            }else if (!StringUtils.hasText(updateGoods.getGoodsFUnit())){
+                if (goodsMapper.deleteCorRelation(storeGoods.getId().toString()) != 1){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("修改失败",90011);
+                }
+            }
+            int updateGoodsResult = goodsMapper.updateGoods(updateGoods);
+            int updateGoodsStockResult = goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum(),updateGoods.getGoodsBarCode());
+            if (updateGoodsResult == 0 || updateGoodsStockResult == 0){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("修改失败",90011);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("修改失败",90011);
         }
-
-        goodsMapper.updateGoods(updateGoods);
-        goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum());
-        goodsMapper.cleanConsumablesList(updateGoods.getGoodsId());
-        return null;
+        return DtoUtil.getSuccessDto("操作成功",100000);
     }
 
     @Override
@@ -153,14 +165,9 @@ public class GoodsServiceImpl implements GoodsService {
             StoreGoods sonGoods = goodsMapper.getGoodsInfo(parRelation.getGoodsParentId().toString());
             goodsMapper.updateGoodsUnitPrice(sonGoods.getId().toString(),updateGoodsPrice.getUnitPrice() / goods.getFaUnitNum());
         }*/
-        if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(),updateGoodsPrice.getUnitPrice()) != 1){
-            try {
-                throw new RuntimeException();
-            }catch (RuntimeException e){
-                e.printStackTrace();
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return DtoUtil.getFalseDto("修改价格失败",80005);
-            }
+        if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(), updateGoodsPrice.getUnitPrice()) != 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("修改价格失败", 80005);
         }
         return DtoUtil.getSuccessDto("修改成功",100000);
     }

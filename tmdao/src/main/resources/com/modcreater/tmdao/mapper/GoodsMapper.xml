@@ -24,10 +24,10 @@
         goodsTypeId = #{goodsTypeId},
         goodsFUnit = #{goodsFUnit},
         faUnitNum = #{faUnitNum}
-        where id = #{storeId}
+        where id = #{goodsId}
     </update>
     <update id="updateGoodsStock">
-        update store_goods_stock set stockNum = #{goodsStock} where goodsId = #{goodsId}
+        update store_goods_stock set stockNum = #{goodsStock},goodsBarCode = #{goodsBarCode} where goodsId = #{goodsId}
     </update>
     <update id="updateGoodsUnitPrice">
         update store_goods_stock set goodsPrice = #{goodsPrice} where goodsId = #{goodsId}
@@ -47,11 +47,17 @@
         consumptionRate = #{consumptionRate}
         where id = #{consumableId}
     </update>
+    <update id="updateCorRelation">
+        update store_goods_correlation set goodsSonId = #{goodsSonId} where goodsParentId = #{goodsParentId}
+    </update>
     <delete id="cleanConsumablesList">
         delete from store_goodsconsumable where goodsId = #{goodsId}
     </delete>
     <delete id="deleteGoodsConsumable">
         delete from store_goodsconsumable where id = #{consumableId}
+    </delete>
+    <delete id="deleteCorRelation">
+        delete from store_goods_correlation where goodsParentId = #{goodsParentId}
     </delete>
     <select id="getGoodsList" resultType="java.util.Map">
         SELECT sg.*,sgs.`goodsPrice`,sgs.`stockNum` FROM store_goods sg

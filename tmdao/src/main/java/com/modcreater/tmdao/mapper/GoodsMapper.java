@@ -104,9 +104,10 @@ public interface GoodsMapper {
      * 修改商品库存
      * @param goodsId
      * @param goodsNum
+     * @param goodsBarcode
      * @return
      */
-    int updateGoodsStock(@Param("goodsId") String goodsId,@Param("goodsStock") Long goodsNum);
+    int updateGoodsStock(@Param("goodsId") String goodsId,@Param("goodsStock") Long goodsNum,@Param("goodsBarCode") String goodsBarcode);
 
     /**
      * 清除商品的所有消耗品
@@ -260,4 +261,19 @@ public interface GoodsMapper {
      * @return
      */
     int updateConsumable(UpdateConsumable updateConsumable);
+
+    /**
+     * 修改商品绑定关系
+     * @param goodsParentId
+     * @param goodsSonId
+     * @return
+     */
+    int updateCorRelation(@Param("goodsParentId") String goodsParentId,@Param("goodsSonId") String goodsSonId);
+
+    /**
+     * 删除商品绑定关系
+     * @param goodsParentId
+     * @return
+     */
+    int deleteCorRelation(String goodsParentId);
 }
