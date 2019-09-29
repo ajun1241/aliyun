@@ -62,7 +62,12 @@ public class GoodsServiceImpl implements GoodsService {
         }
         goodsMapper.addNewGoods(registerGoods);
         goodsMapper.addNewGoodsStock(registerGoods.getId(),registerGoods.getStoreId(), registerGoods.getGoodsNum(),"1",registerGoods.getGoodsBarCode());
-        goodsMapper.bindingGoods(registerGoods.getId(),registerGoods.getCorGoodsId());
+        if (StringUtils.hasText(registerGoods.getGoodsFUnit()) && !StringUtils.hasText(registerGoods.getCorGoodsId())){
+            return DtoUtil.getFalseDto("缺少绑定商品",90012);
+        }
+        if (StringUtils.hasText(registerGoods.getCorGoodsId())){
+            goodsMapper.bindingGoods(registerGoods.getId(),registerGoods.getCorGoodsId());
+        }
         if (registerGoods.getConsumablesLists().size() > 0) {
             NumberFormat nf = NumberFormat.getNumberInstance();
             nf.setRoundingMode(RoundingMode.HALF_UP);
