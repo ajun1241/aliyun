@@ -176,7 +176,7 @@
     </select>
     <select id="getGoodsInfoToUpdate" resultType="com.modcreater.tmbeans.show.goods.GoodsInfoToUpdate">
         select sg.id goodsId,sg.goodsName,sg.goodsBrand,sg.goodsPicture,(select type from store_goods_type sgt where sgt.id = sg.goodsTypeId) goodsType,
-        sgs.stockNum goodsStock,sg.goodsUnit,sg.goodsFUnit,sg.faUnitNum,sg.goodsBarCode
+        sgs.stockNum goodsStock,sg.goodsUnit,sg.goodsFUnit,sg.faUnitNum,sg.goodsBarCode,sg.goodsSpecifications
         from store_goods sg,store_goods_stock sgs
         where sg.id = sgs.goodsId and sg.id = #{goodsId}
     </select>
