@@ -237,9 +237,13 @@ public interface GoodsMapper {
     /**
      * 获取商品对应的消耗品
      * @param goodsId
+     * @param goodsName
+     * @param pageNum
+     * @param pageSize
      * @return
      */
-    List<ShowConsumable> getGoodsConsumablesList(String goodsId);
+    List<ShowConsumable> getGoodsConsumablesList(@Param("goodsId") String goodsId,@Param("goodsName") String goodsName,
+                                                 @Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
 
     /**
      * 删除商品对应消耗品

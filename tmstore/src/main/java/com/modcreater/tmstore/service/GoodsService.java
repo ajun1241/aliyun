@@ -122,11 +122,11 @@ public interface GoodsService {
 
     /**
      * 获取商品对应消耗品
-     * @param receivedGoodsId
+     * @param getGoodsConsumables
      * @param token
      * @return
      */
-    Dto getGoodsConsumable(ReceivedGoodsId receivedGoodsId, String token);
+    Dto getGoodsConsumable(GetGoodsConsumables getGoodsConsumables, String token);
 
     /**
      * 删除商品对应消耗品

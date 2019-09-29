@@ -185,6 +185,13 @@
         sgc.registeredRationInUnit,sgc.registeredRatioOut,sgc.registeredRationOutUnit
         from store_goodsconsumable sgc,store_goods sg
         where sgc.consumableGoodsId = sg.id and sgc.goodsId = #{goodsId}
+        <if test="goodsName != '' and goodsName != null">
+            and
+            (sg.goodsName like "%"#{goodsName}"%"
+            or sg.goodsBrand like "%"#{goodsName}"%"
+            or sg.goodsSpecifications like "%"#{goodsName}"%")
+        </if>
+        limit #{pageNum},#{pageSize}
     </select>
     <select id="getUpdateConsumableInfo" resultType="com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo">
         select sgc.id consumableId, sg.goodsName, sgc.registeredRatioIn, sgc.registeredRationInUnit, sgc.registeredRatioOut, sgc.registeredRationOutUnit

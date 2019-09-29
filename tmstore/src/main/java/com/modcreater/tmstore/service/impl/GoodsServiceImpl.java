@@ -243,7 +243,7 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
         GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId());
-        List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId());
+        List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId(),null,0L,3L);
         goodsInfoToUpdate.setShowConsumables(showConsumables);
         StoreGoodsCorrelation correlation =  goodsMapper.getSonGoodsInfo(receivedGoodsId.getGoodsId());
         if (correlation != null){
@@ -253,11 +253,16 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public Dto getGoodsConsumable(ReceivedGoodsId receivedGoodsId, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGoodsId.getUserId()))) {
+    public Dto getGoodsConsumable(GetGoodsConsumables getGoodsConsumables, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsConsumables.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        return DtoUtil.getSuccesWithDataDto("获取成功",goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId()),100000);
+        StoreInfo storeInfo = storeMapper.getStoreInfo(getGoodsConsumables.getStoreId());
+        getGoodsConsumables.setPageNum(getGoodsConsumables.getPageNum() - 1);
+        Map<String,Object> result = new HashMap<>();
+        result.put("storeName",storeInfo.getStoreName());
+        result.put("goodsList",goodsMapper.getGoodsConsumablesList(getGoodsConsumables.getGoodsId(),getGoodsConsumables.getGoodsName(),getGoodsConsumables.getPageNum(),getGoodsConsumables.getPageSize()));
+        return DtoUtil.getSuccesWithDataDto("获取成功",result,100000);
     }
 
     @Override

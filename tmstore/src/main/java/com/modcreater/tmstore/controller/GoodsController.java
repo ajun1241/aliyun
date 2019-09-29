@@ -112,8 +112,8 @@ public class GoodsController {
 
     @PostMapping(value = "getgoodsconsumables")
     @ApiOperation("获取商品对应消耗品")
-    public Dto getGoodsConsumables(@RequestBody ReceivedGoodsId receivedGoodsId,HttpServletRequest request){
-        return goodsService.getGoodsConsumable(receivedGoodsId,request.getHeader("token"));
+    public Dto getGoodsConsumables(@RequestBody GetGoodsConsumables getGoodsConsumables,HttpServletRequest request){
+        return goodsService.getGoodsConsumable(getGoodsConsumables,request.getHeader("token"));
     }
 
     @PostMapping(value = "deletegoodsconsumables")
