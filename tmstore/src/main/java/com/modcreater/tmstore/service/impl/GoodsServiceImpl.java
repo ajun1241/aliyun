@@ -93,26 +93,20 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
         StoreGoods storeGoods = goodsMapper.getGoodsInfo(updateGoods.getGoodsId());
+        if (ObjectUtils.isEmpty(storeGoods)){
+            return DtoUtil.getFalseDto("商品未找到",90009);
+        }
+        if (StringUtils.hasText(storeGoods.getGoodsFUnit())){
+            StoreGoodsCorrelation correlation = goodsMapper.getSonGoodsInfo(storeGoods.getId().toString());
+            if (correlation.getGoodsSonId().toString().equals(updateGoods.getCorGoodsId())){
+
+            }
+
+        }
+
         goodsMapper.updateGoods(updateGoods);
         goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum());
         goodsMapper.cleanConsumablesList(updateGoods.getGoodsId());
-        if (updateGoods.getConsumablesLists().length > 0){
-            NumberFormat nf = NumberFormat.getNumberInstance();
-            nf.setRoundingMode(RoundingMode.HALF_UP);
-            nf.setMaximumFractionDigits(2);
-            for (ConsumablesList consumablesList : updateGoods.getConsumablesLists()) {
-                StoreGoods goods = goodsMapper.getGoodsInfo(consumablesList.getConsumablesId());
-                StoreGoodsConsumable consumable = new StoreGoodsConsumable();
-                consumable.setGoodsId(Long.valueOf(updateGoods.getGoodsId()));
-                consumable.setRegisteredRatioIn(consumablesList.getConsumablesNum());
-                consumable.setConsumableGoodsId(Long.valueOf(consumablesList.getConsumablesId()));
-                consumable.setRegisteredRationInUnit(goods.getGoodsUnit());
-                consumable.setRegisteredRatioOut(Long.valueOf(consumablesList.getFinishedNum()));
-                consumable.setRegisteredTime(System.currentTimeMillis() / 1000);
-                consumable.setRegisteredRationOutUnit(updateGoods.getGoodsUnit());
-                goodsMapper.addNewGoodsConsumable(consumable);
-            }
-        }
         return null;
     }
 
@@ -243,6 +237,7 @@ public class GoodsServiceImpl implements GoodsService {
         GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId());
         List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId());
         goodsInfoToUpdate.setShowConsumables(showConsumables);
+        goodsInfoToUpdate.setCorGoodsId(goodsMapper.getSonGoodsInfo(receivedGoodsId.getGoodsId()).getGoodsSonId().toString());
         return DtoUtil.getSuccesWithDataDto("查询成功",goodsInfoToUpdate,100000);
     }
 

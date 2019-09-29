@@ -29,6 +29,8 @@ public class GoodsInfoToUpdate {
 
     private String goodsUnit;
 
+    private String goodsSpecifications;
+
     private String goodsFUnit;
 
     private String faUnitNum;
@@ -36,5 +38,7 @@ public class GoodsInfoToUpdate {
     private String goodsBarCode;
 
     private List<ShowConsumable> showConsumables;
+
+    private String corGoodsId;
 
 }
