@@ -255,6 +255,46 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    public Dto deleteGoodsConsumables(DeleteGoodsConsumables deleteGoodsConsumables, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(deleteGoodsConsumables.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        int i = 0;
+        for (String consumableId : deleteGoodsConsumables.getConsumableIds()){
+            i += goodsMapper.deleteGoodsConsumable(consumableId);
+        }
+        if (i == deleteGoodsConsumables.getConsumableIds().length){
+            return DtoUtil.getSuccessDto("删除成功",100000);
+        }
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        return DtoUtil.getFalseDto("删除失败",90008);
+    }
+
+    @Override
+    public Dto getUpdateConsumableInfo(ReceivedConsumableId receivedConsumableId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedConsumableId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        ShowUpdateConsumableInfo consumable = goodsMapper.getUpdateConsumableInfo(receivedConsumableId.getConsumableId());
+        if (ObjectUtils.isEmpty(consumable)){
+            return DtoUtil.getSuccessDto("暂无数据",200000);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",consumable,100000);
+    }
+
+    @Override
+    public Dto updateConsumable(UpdateConsumable updateConsumable, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(updateConsumable.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        updateConsumable.setConsumptionRate((double)updateConsumable.getRegisteredRatioIn()/updateConsumable.getRegisteredRatioOut());
+        if (goodsMapper.updateConsumable(updateConsumable) == 1){
+            return DtoUtil.getSuccessDto("修改成功",100000);
+        }
+        return DtoUtil.getFalseDto("修改失败",90008);
+    }
+
+    @Override
     public Dto getGoodsStockList(GetGoodsStockList getGoodsStockList, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsStockList.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);

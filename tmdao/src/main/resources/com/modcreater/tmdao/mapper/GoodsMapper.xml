@@ -40,8 +40,18 @@
             update store_goods_stock set stockNum = stockNum - #{sourceGoods.goodsNum} where storeId=#{sourceStoreId} and goodsId=#{sourceGoods.goodsId}
         </foreach>
     </update>
+    <update id="updateConsumable">
+        update store_goodsconsumable
+        set registeredRatioIn = #{registeredRatioIn},
+        registeredRatioOut = #{registeredRatioOut},
+        consumptionRate = #{consumptionRate}
+        where id = #{consumableId}
+    </update>
     <delete id="cleanConsumablesList">
         delete from store_goodsconsumable where goodsId = #{goodsId}
+    </delete>
+    <delete id="deleteGoodsConsumable">
+        delete from store_goodsconsumable where id = #{consumableId}
     </delete>
     <select id="getGoodsList" resultType="java.util.Map">
         SELECT sg.*,sgs.`goodsPrice`,sgs.`stockNum` FROM store_goods sg
@@ -169,5 +179,10 @@
         sgc.registeredRationInUnit,sgc.registeredRatioOut,sgc.registeredRationOutUnit
         from store_goodsconsumable sgc,store_goods sg
         where sgc.consumableGoodsId = sg.id and sgc.goodsId = #{goodsId}
+    </select>
+    <select id="getUpdateConsumableInfo" resultType="com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo">
+        select sgc.id consumableId, sg.goodsName, sgc.registeredRatioIn, sgc.registeredRationInUnit, sgc.registeredRatioOut, sgc.registeredRationOutUnit
+        from store_goodsconsumable sgc,store_goods sg
+        where sgc.id = #{consumableId} and sgc.goodsId = sg.id
     </select>
 </mapper>

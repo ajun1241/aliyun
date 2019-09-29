@@ -2,10 +2,7 @@ package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.goods.*;
-import com.modcreater.tmbeans.vo.goods.ConsumablesList;
-import com.modcreater.tmbeans.vo.goods.GetGoodsStockList;
-import com.modcreater.tmbeans.vo.goods.RegisterGoods;
-import com.modcreater.tmbeans.vo.goods.UpdateGoods;
+import com.modcreater.tmbeans.vo.goods.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -242,4 +239,25 @@ public interface GoodsMapper {
      * @return
      */
     List<ShowConsumable> getGoodsConsumablesList(String goodsId);
+
+    /**
+     * 删除商品对应消耗品
+     * @param consumableId
+     * @return
+     */
+    int deleteGoodsConsumable(String consumableId);
+
+    /**
+     * 获取修改消耗品信息
+     * @param consumableId
+     * @return
+     */
+    ShowUpdateConsumableInfo getUpdateConsumableInfo(String consumableId);
+
+    /**
+     * 修改消耗品
+     * @param updateConsumable
+     * @return
+     */
+    int updateConsumable(UpdateConsumable updateConsumable);
 }

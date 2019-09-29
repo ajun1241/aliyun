@@ -1,6 +1,7 @@
 package com.modcreater.tmstore.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
@@ -113,5 +114,23 @@ public class GoodsController {
     @ApiOperation("获取商品对应消耗品")
     public Dto getGoodsConsumables(@RequestBody ReceivedGoodsId receivedGoodsId,HttpServletRequest request){
         return goodsService.getGoodsConsumable(receivedGoodsId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "deletegoodsconsumables")
+    @ApiOperation("删除商品对应消耗品")
+    public Dto deleteGoodsConsumables(@RequestBody DeleteGoodsConsumables deleteGoodsConsumables,HttpServletRequest request){
+        return goodsService.deleteGoodsConsumables(deleteGoodsConsumables,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "getupdateconsumableinfo")
+    @ApiOperation("修改消耗品信息")
+    public Dto getUpdateConsumableInfo(@RequestBody ReceivedConsumableId receivedConsumableId,HttpServletRequest request){
+        return goodsService.getUpdateConsumableInfo(receivedConsumableId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "updateconsumable")
+    @ApiOperation("获取修改消耗品信息")
+    public Dto updateConsumable(@RequestBody UpdateConsumable updateConsumable, HttpServletRequest request){
+        return goodsService.updateConsumable(updateConsumable,request.getHeader("token"));
     }
 }

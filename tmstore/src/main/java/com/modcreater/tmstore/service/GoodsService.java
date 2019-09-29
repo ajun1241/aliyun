@@ -1,6 +1,7 @@
 package com.modcreater.tmstore.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.store.ClaimGoodsVo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
@@ -126,4 +127,28 @@ public interface GoodsService {
      * @return
      */
     Dto getGoodsConsumable(ReceivedGoodsId receivedGoodsId, String token);
+
+    /**
+     * 删除商品对应消耗品
+     * @param deleteGoodsConsumables
+     * @param token
+     * @return
+     */
+    Dto deleteGoodsConsumables(DeleteGoodsConsumables deleteGoodsConsumables, String token);
+
+    /**
+     * 获取修改消耗品信息
+     * @param receivedConsumableId
+     * @param token
+     * @return
+     */
+    Dto getUpdateConsumableInfo(ReceivedConsumableId receivedConsumableId, String token);
+
+    /**
+     * 修改消耗品
+     * @param updateConsumable
+     * @param token
+     * @return
+     */
+    Dto updateConsumable(UpdateConsumable updateConsumable, String token);
 }

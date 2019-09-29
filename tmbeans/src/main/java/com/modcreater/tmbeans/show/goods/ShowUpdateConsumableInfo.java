@@ -7,18 +7,15 @@ import lombok.Data;
  * Description:
  *
  * @Author: Goku_yi
- * @Date: 2019-09-28
- * Time: 17:07
+ * @Date: 2019-09-29
+ * Time: 9:55
  */
 @Data
-public class ShowConsumable {
+public class ShowUpdateConsumableInfo {
+
     private String consumableId;
 
-    private String goodsId;
-
     private String goodsName;
-
-    private String goodsPicture;
 
     private String registeredRatioOut;
 
@@ -27,7 +24,5 @@ public class ShowConsumable {
     private String registeredRatioIn;
 
     private String registeredRationInUnit;
-
-    private Boolean selectStatus = false;
 
 }
