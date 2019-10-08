@@ -123,14 +123,20 @@ public class GoodsController {
     }
 
     @PostMapping(value = "getupdateconsumableinfo")
-    @ApiOperation("修改消耗品信息")
+    @ApiOperation("获取修改消耗品信息")
     public Dto getUpdateConsumableInfo(@RequestBody ReceivedConsumableId receivedConsumableId,HttpServletRequest request){
         return goodsService.getUpdateConsumableInfo(receivedConsumableId,request.getHeader("token"));
     }
 
     @PostMapping(value = "updateconsumable")
-    @ApiOperation("获取修改消耗品信息")
+    @ApiOperation("修改消耗品信息")
     public Dto updateConsumable(@RequestBody UpdateConsumable updateConsumable, HttpServletRequest request){
         return goodsService.updateConsumable(updateConsumable,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "addnewconsumable")
+    @ApiOperation("添加消耗品")
+    public Dto addNewConsumable(@RequestBody AddNewConsumable addNewConsumable,HttpServletRequest request){
+        return goodsService.addNewConsumable(addNewConsumable,request.getHeader("token"));
     }
 }

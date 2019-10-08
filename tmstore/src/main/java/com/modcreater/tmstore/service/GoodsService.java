@@ -151,4 +151,12 @@ public interface GoodsService {
      * @return
      */
     Dto updateConsumable(UpdateConsumable updateConsumable, String token);
+
+    /**
+     * 添加消耗品
+     * @param addNewConsumable
+     * @param token
+     * @return
+     */
+    Dto addNewConsumable(AddNewConsumable addNewConsumable, String token);
 }

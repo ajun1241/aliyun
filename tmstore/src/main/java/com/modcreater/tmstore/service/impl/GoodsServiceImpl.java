@@ -311,6 +311,29 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    public Dto addNewConsumable(AddNewConsumable addNewConsumable, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(addNewConsumable.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreGoods consumableInfo = goodsMapper.getGoodsInfo(addNewConsumable.getConsumablesId());
+        StoreGoods goods = goodsMapper.getGoodsInfo(addNewConsumable.getGoodsId());
+        StoreGoodsConsumable consumable = new StoreGoodsConsumable();
+        consumable.setGoodsId(Long.valueOf(addNewConsumable.getGoodsId()));
+        consumable.setConsumableGoodsId(Long.valueOf(addNewConsumable.getConsumablesId()));
+        consumable.setRegisteredRationInUnit(consumableInfo.getGoodsUnit());
+        consumable.setRegisteredRatioIn(addNewConsumable.getConsumablesNum());
+        consumable.setRegisteredRationOutUnit(goods.getGoodsUnit());
+        consumable.setRegisteredRatioOut(Long.valueOf(addNewConsumable.getFinishedNum()));
+        consumable.setRegisteredTime(System.currentTimeMillis() / 1000);
+        consumable.setConsumptionRate(consumable.getRegisteredRatioIn()/consumable.getRegisteredRatioOut());
+        if (goodsMapper.addNewGoodsConsumable(consumable) == 1){
+            return DtoUtil.getSuccessDto("添加成功",100000);
+        }else {
+            return DtoUtil.getFalseDto("添加失败",90013);
+        }
+    }
+
+    @Override
     public Dto getGoodsStockList(GetGoodsStockList getGoodsStockList, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsStockList.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
