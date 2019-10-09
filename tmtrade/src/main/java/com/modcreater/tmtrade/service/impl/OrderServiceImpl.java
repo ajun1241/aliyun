@@ -1,5 +1,7 @@
 package com.modcreater.tmtrade.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
@@ -11,20 +13,19 @@ import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
+import com.modcreater.tmbeans.show.goods.ShowConsumable;
 import com.modcreater.tmbeans.show.order.ShowUserOrders;
 import com.modcreater.tmbeans.values.FinalValues;
 import com.modcreater.tmbeans.vo.trade.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import com.modcreater.tmdao.mapper.GroupMapper;
-import com.modcreater.tmdao.mapper.OrderMapper;
-import com.modcreater.tmdao.mapper.UserServiceMapper;
-import com.modcreater.tmtrade.config.WxPayConfig;
+import com.modcreater.tmdao.mapper.*;
+import com.modcreater.tmutils.pay.PayUtil;
+import com.modcreater.tmutils.payconfig.WxPayConfig;
 import com.modcreater.tmtrade.service.OrderService;
 import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
-import com.modcreater.tmutils.RandomNumber;
-import com.modcreater.tmtrade.config.wxconfig.WxConfig;
-import com.modcreater.tmtrade.config.wxconfig.WxMD5Util;
+import com.modcreater.tmutils.payconfig.wxconfig.WxConfig;
+import com.modcreater.tmutils.payconfig.wxconfig.WxMD5Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -45,7 +46,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.modcreater.tmtrade.config.AliPayConfig.*;
+import static com.modcreater.tmutils.payconfig.AliPayConfig.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -67,6 +68,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Resource
     private GroupMapper groupMapper;
+
+    @Resource
+    private GoodsMapper goodsMapper;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -238,23 +242,28 @@ public class OrderServiceImpl implements OrderService {
             //只处理支付成功的订单: 修改交易表状态,支付成功
             //支付完成
             if (tradeStatus.equals("TRADE_SUCCESS")) {
-                UserOrders userOrders = getUserOrderById(outTradeNo);
-                userOrders.setOrderStatus("1");
-                userOrders.setPayTime(String.valueOf(System.currentTimeMillis() / 1000));
-                userOrders.setPayChannel("支付宝支付");
-                userOrders.setOutTradeNo(tradeNo);
-                //更新交易表中状态
-                int returnResult = updateOrderStatusToPrepaid(userOrders);
-                if (returnResult > 0) {
-                    if (!makeOrderSuccess(outTradeNo)) {
-                        orderMapper.updateOrderStatus(outTradeNo, 4);
-                    }
-                    //将用户优惠券状态改为已使用
-                    orderMapper.updateDiscountStatus(outTradeNo);
-                    return "success";
-                } else {
-                    logger.info("订单状态修改失败");
+                if (outTradeNo.startsWith("sot")){
+                    //此处处理商铺模块用户线下扫码支付
                     return "fail";
+                }else {
+                    UserOrders userOrders = getUserOrderById(outTradeNo);
+                    userOrders.setOrderStatus("1");
+                    userOrders.setPayTime(String.valueOf(System.currentTimeMillis() / 1000));
+                    userOrders.setPayChannel("支付宝支付");
+                    userOrders.setOutTradeNo(tradeNo);
+                    //更新交易表中状态
+                    int returnResult = updateOrderStatusToPrepaid(userOrders);
+                    if (returnResult > 0) {
+                        if (!makeOrderSuccess(outTradeNo)) {
+                            orderMapper.updateOrderStatus(outTradeNo, 4);
+                        }
+                        //将用户优惠券状态改为已使用
+                        orderMapper.updateDiscountStatus(outTradeNo);
+                        return "success";
+                    } else {
+                        logger.info("订单状态修改失败");
+                        return "fail";
+                    }
                 }
             } else {
                 logger.info("支付失败");
@@ -315,83 +324,7 @@ public class OrderServiceImpl implements OrderService {
             return dto;
         }
         UserOrders userOrder = (UserOrders) dto.getData();
-        /*以上为订单生成*/
-        /*------------------------------------------------------------*/
-
-        WxMD5Util md5Util = new WxMD5Util();
-        Map<String, String> returnMap = new HashMap<>();
-        WxConfig config = new WxConfig();
-        WXPay wxpay = new WXPay(config);
-        Map<String, String> data = new HashMap<>();
-
-        /*以上为创建所需对象*/
-        /*------------------------------------------------------------*/
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        String sTime = simpleDateFormat.format(calendar.getTime());
-        calendar.set(Calendar.SECOND,300);
-        String exTime = simpleDateFormat.format(calendar.getTime());
-        data.put("appid", WxPayConfig.APP_ID);
-        data.put("mch_id", WxPayConfig.MCH_ID);
-        data.put("nonce_str", WXPayUtil.generateNonceStr());
-        data.put("body", "您花费" + userOrder.getPaymentAmount() + "元");
-        data.put("out_trade_no", userOrder.getId());
-        data.put("total_fee", String.valueOf(Math.round(userOrder.getPaymentAmount() * 100)));
-        data.put("spbill_create_ip", WxPayConfig.SPBILL_CREATE_IP);
-        data.put("notify_url", WxPayConfig.NOTIFY_URL);
-        data.put("trade_type", WxPayConfig.TRADE_TYPE);
-        data.put("time_start",sTime);
-        data.put("time_expire",exTime);
-        String sign = md5Util.getSign(data);
-        data.put("sign", sign);
-        /*以上为为调用微信支付接口设置参数*/
-        /*------------------------------------------------------------*/
-        try {
-            //使用官方API请求预付订单
-            Map<String, String> response = wxpay.unifiedOrder(data);
-            logger.info(response.toString());
-            String returnCode = response.get("return_code");
-            //若返回码为SUCCESS，则会返回一个result_code,再对该result_code进行判断
-            if (returnCode.equals("SUCCESS")) {
-                String resultCode = response.get("result_code");
-                returnMap.put("appid", response.get("appid"));
-                returnMap.put("mch_id", response.get("mch_id"));
-                returnMap.put("nonce_str", response.get("nonce_str"));
-                returnMap.put("sign", response.get("sign"));
-                //resultCode 为SUCCESS，才会返回prepay_id和trade_type
-                if ("SUCCESS".equals(resultCode)) {
-                    //获取预支付交易回话标志
-                    returnMap.put("trade_type", response.get("trade_type"));
-                    returnMap.put("prepay_id", response.get("prepay_id"));
-                    /*以上为从微信端获取的返回数据*/
-                    /*------------------------------------------------------------*/
-                    Map<String, String> appResult = new HashMap<>();
-                    appResult.put("appid", returnMap.get("appid"));
-                    appResult.put("partnerid", returnMap.get("mch_id"));
-                    appResult.put("prepayid", returnMap.get("prepay_id"));
-                    appResult.put("package", "Sign=WXPay");
-                    appResult.put("noncestr", returnMap.get("nonce_str"));
-                    //单位为秒
-                    appResult.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
-                    //这里不要使用请求预支付订单时返回的签名
-                    appResult.put("sign", md5Util.getSign(appResult));
-                    appResult.put("tradeNo", userOrder.getId());
-                    /*以上为返回给APP数据赋值*/
-                    /*------------------------------------------------------------*/
-                    return DtoUtil.getSuccesWithDataDto("获取预付单成功", appResult, 100000);
-                } else {
-                    //此时返回没有预付订单的数据
-                    return DtoUtil.getFalseDto("没有预付订单的数据from resultCode=FAIL", 60013);
-                }
-            } else {
-                return DtoUtil.getFalseDto("没有预付订单的数据from returnCode=FAIL", 60013);
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-            //系统等其他错误的时候
-        }
-        return DtoUtil.getFalseDto("没有预付订单的数据from未进入微信API调用", 60013);
+        return PayUtil.wxOrderMaker(userOrder.getId(),userOrder.getPaymentAmount());
     }
 
     @Override
@@ -421,8 +354,12 @@ public class OrderServiceImpl implements OrderService {
             String result = payBack(resXml);
             Map<String, String> notifyMap = WXPayUtil.xmlToMap(resXml);
             String tradeNo = notifyMap.get("out_trade_no");
-            if (!makeOrderSuccess(tradeNo)) {
-                orderMapper.updateOrderStatus(tradeNo, 4);
+            if (tradeNo.startsWith("sot")){
+
+            }else {
+                if (!makeOrderSuccess(tradeNo)) {
+                    orderMapper.updateOrderStatus(tradeNo, 4);
+                }
             }
             return result;
         } catch (Exception e) {
@@ -455,31 +392,51 @@ public class OrderServiceImpl implements OrderService {
                 //微信支付流水号
                 String transactionId = notifyMap.get("transaction_id");
                 if (returnCode.equals("SUCCESS")) {
-                    UserOrders userOrders = orderMapper.getUserOrder(tradeNo);
-                    if (!ObjectUtils.isEmpty(userOrders)) {
-                        // 注意特殊情况：订单已经退款，但收到了支付结果成功的通知，不应把商户的订单状态从退款改成支付成功
-                        // 注意特殊情况：微信服务端同样的通知可能会多次发送给商户系统，所以数据持久化之前需要检查是否已经处理过了，处理了直接返回成功标志
-                        //业务数据持久化
-                        if (userOrders.getOrderStatus().equals("1")) {
-                            return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                    if (tradeNo.startsWith("sot")){
+                        StoreOfflineOrders offlineOrder = goodsMapper.getOfflineOrder(tradeNo);
+                        if (!ObjectUtils.isEmpty(offlineOrder)){
+                            if (offlineOrder.getOrderStatus() == 1) {
+                                return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                            }
+                            offlineOrder.setOrderStatus(1L);
+                            offlineOrder.setPayTime(System.currentTimeMillis());
+                            offlineOrder.setPayChannel("微信支付");
+                            offlineOrder.setOutTradeNo(transactionId);
+                            goodsMapper.updateOfflineOrder(offlineOrder);
+                            logger.info("支付成功");
+                            logger.info("微信手机支付回调成功订单号:{}", tradeNo);
+                            xmlBack = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                        } else {
+                            logger.info("微信手机支付回调失败订单号:{}", tradeNo);
+                            xmlBack = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
                         }
-                        userOrders.setOrderStatus("1");
-                        userOrders.setPayTime(String.valueOf(System.currentTimeMillis() / 1000));
-                        userOrders.setPayChannel("微信支付");
-                        userOrders.setOutTradeNo(transactionId);
-                        //更新交易表中状态
-                        int returnResult = updateOrderStatusToPrepaid(userOrders);
-                        //将用户优惠券状态改为已使用
-                        orderMapper.updateDiscountStatus(tradeNo);
-                        if (returnResult == 0) {
-                            return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                    }else {
+                        UserOrders userOrders = orderMapper.getUserOrder(tradeNo);
+                        if (!ObjectUtils.isEmpty(userOrders)) {
+                            // 注意特殊情况：订单已经退款，但收到了支付结果成功的通知，不应把商户的订单状态从退款改成支付成功
+                            // 注意特殊情况：微信服务端同样的通知可能会多次发送给商户系统，所以数据持久化之前需要检查是否已经处理过了，处理了直接返回成功标志
+                            //业务数据持久化
+                            if (userOrders.getOrderStatus().equals("1")) {
+                                return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                            }
+                            userOrders.setOrderStatus("1");
+                            userOrders.setPayTime(String.valueOf(System.currentTimeMillis() / 1000));
+                            userOrders.setPayChannel("微信支付");
+                            userOrders.setOutTradeNo(transactionId);
+                            //更新交易表中状态
+                            int returnResult = updateOrderStatusToPrepaid(userOrders);
+                            //将用户优惠券状态改为已使用
+                            orderMapper.updateDiscountStatus(tradeNo);
+                            if (returnResult == 0) {
+                                return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                            }
+                            logger.info("支付成功");
+                            logger.info("微信手机支付回调成功订单号:{}", tradeNo);
+                            xmlBack = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                        } else {
+                            logger.info("微信手机支付回调失败订单号:{}", tradeNo);
+                            xmlBack = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
                         }
-                        logger.info("支付成功");
-                        logger.info("微信手机支付回调成功订单号:{}", tradeNo);
-                        xmlBack = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
-                    } else {
-                        logger.info("微信手机支付回调失败订单号:{}", tradeNo);
-                        xmlBack = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
                     }
                 }
                 return xmlBack;
@@ -854,5 +811,51 @@ public class OrderServiceImpl implements OrderService {
             return orderMapper.updateUserOrder(userOrders) > 0;
         }
         return false;
+    }
+
+    /**
+     * 减少库存并存储到临时表中
+     * @param tradeNo
+     * @return false:消耗库存失败
+     */
+    public String makeGoodsStockReduce(String tradeNo){
+        StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(tradeNo);
+        if (ObjectUtils.isEmpty(offlineOrders)){
+            return "订单未找到";
+        }
+        String storeId = offlineOrders.getSourceStoreId().toString();
+        String codeContent = goodsMapper.getCodeContent(offlineOrders.getGoodsListId());
+        List<Map> result = JSONObject.parseArray(codeContent,Map.class);
+        List<Map<String,Object>> temStocks = new ArrayList<>();
+        for (Map map : result){
+            String goodsId = map.get("goodsId").toString();
+            StoreGoods goodsInfo = goodsMapper.getGoodsInfo(goodsId);
+            Long num = Long.valueOf(map.get("num").toString());
+            StoreGoodsStock goodsStock = goodsMapper.getGoodsStock(goodsId);
+            List<StoreGoodsConsumable> consumablesList = goodsMapper.getGoodsAllConsumablesList(goodsId);
+            Map<String ,Object> temStock = new HashMap<>();
+            temStock.put("storeId",storeId);
+            temStock.put("goodsBarCode",goodsStock.getGoodsBarCode());
+            temStock.put("num",num);
+            temStocks.add(temStock);
+            if (consumablesList.size() == 0){
+                long resNum =  goodsStock.getStockNum()-num;
+                if (resNum < 0){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return "商品\"" + map.get("goodsName").toString() + "\"库存不足,请及时联系店员添加商品";
+                }
+                goodsMapper.updateGoodsStockNum(goodsId,resNum,storeId);
+            }else {
+                //此处补全减少绑定消耗品的库存
+            }
+        }
+        if (temStocks.size() != 0){
+            goodsMapper.addNewTemStock(JSON.toJSONString(temStocks));
+        }
+        return "success";
+    }
+
+    private void reduceContinuously(){
+
     }
 }

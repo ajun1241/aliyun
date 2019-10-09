@@ -6,14 +6,14 @@ import lombok.Data;
 @Data
 public class StoreGoodsConsumable {
 
-  private long id;
-  private long goodsId;
-  private long consumableGoodsId;
+  private Long id;
+  private Long goodsId;
+  private Long consumableGoodsId;
   private Double registeredRatioIn;
   private String registeredRationInUnit;
-  private long registeredRatioOut;
+  private Long registeredRatioOut;
   private String registeredRationOutUnit;
-  private long registeredTime;
+  private Long registeredTime;
   private Double consumptionRate;
 
 }

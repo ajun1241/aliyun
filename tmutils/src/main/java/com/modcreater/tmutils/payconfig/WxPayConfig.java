@@ -1,4 +1,4 @@
-package com.modcreater.tmtrade.config;
+package com.modcreater.tmutils.payconfig;
 
 /**
  * Created with IntelliJ IDEA.

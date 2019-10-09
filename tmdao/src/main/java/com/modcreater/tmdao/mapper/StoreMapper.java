@@ -1,9 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
-import com.modcreater.tmbeans.pojo.StoreAttestation;
-import com.modcreater.tmbeans.pojo.StoreGoods;
-import com.modcreater.tmbeans.pojo.StoreInfo;
-import com.modcreater.tmbeans.pojo.StorePurchaseRecords;
+import com.modcreater.tmbeans.pojo.*;
 
 import java.util.List;
 import java.util.Map;

@@ -105,9 +105,11 @@ public interface GoodsMapper {
      * @param goodsId
      * @param goodsNum
      * @param goodsBarcode
+     * @param storeId
      * @return
      */
-    int updateGoodsStock(@Param("goodsId") String goodsId,@Param("goodsStock") Long goodsNum,@Param("goodsBarCode") String goodsBarcode);
+    int updateGoodsStock(@Param("goodsId") String goodsId,@Param("goodsStock") Long goodsNum,
+                         @Param("goodsBarCode") String goodsBarcode,@Param("storeId") String storeId);
 
     /**
      * 清除商品的所有消耗品
@@ -120,17 +122,19 @@ public interface GoodsMapper {
      * 修改商品单价
      * @param goodsId
      * @param unitPrice
+     * @param storeId
      * @return
      */
-    int updateGoodsUnitPrice(@Param("goodsId") String goodsId,@Param("goodsPrice") Double unitPrice);
+    int updateGoodsUnitPrice(@Param("goodsId") String goodsId,@Param("goodsPrice") Double unitPrice,@Param("storeId") Long storeId);
 
     /**
      * 修改商品状态
      * @param goodsId
      * @param status
+     * @param storeId
      * @return
      */
-    int updateGoodsStatus(@Param("goodsId") String goodsId,@Param("status") int status);
+    int updateGoodsStatus(@Param("goodsId") String goodsId,@Param("status") int status,@Param("storeId") String storeId);
 
     /**
      * 获取商品全部
@@ -331,4 +335,47 @@ public interface GoodsMapper {
      */
     int saveStoreOfflineOrders(StoreOfflineOrders storeOfflineOrders);
 
+    /**
+     * 根据单号查询订单
+     * @param tradeNo
+     * @return
+     */
+    StoreOfflineOrders getOfflineOrder(String tradeNo);
+
+    /**
+     * 修改订单信息
+     * @param offlineOrder
+     * @return
+     */
+    int updateOfflineOrder(StoreOfflineOrders offlineOrder);
+
+    /**
+     * 获取线下交易商品清单
+     * @param goodsListId
+     * @return
+     */
+    String getCodeContent(String goodsListId);
+
+    /**
+     * 获取商品下的所有消耗品
+     * @param goodsId
+     * @return
+     */
+    List<StoreGoodsConsumable> getGoodsAllConsumablesList(String goodsId);
+
+    /**
+     * 修改库存数量
+     * @param goodsId
+     * @param resNum
+     * @param storeId
+     * @return
+     */
+    int updateGoodsStockNum(@Param("goodsId") String goodsId,@Param("stockNum") long resNum,@Param("storeId") String storeId);
+
+    /**
+     * 添加
+     * @param temStock
+     * @return
+     */
+    int addNewTemStock(String temStock);
 }

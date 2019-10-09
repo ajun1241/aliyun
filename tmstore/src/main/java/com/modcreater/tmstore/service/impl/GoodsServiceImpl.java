@@ -120,7 +120,7 @@ public class GoodsServiceImpl implements GoodsService {
                 }
             }
             int updateGoodsResult = goodsMapper.updateGoods(updateGoods);
-            int updateGoodsStockResult = goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum(),updateGoods.getGoodsBarCode());
+            int updateGoodsStockResult = goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum(),updateGoods.getGoodsBarCode(),updateGoods.getStoreId());
             if (updateGoodsResult == 0 || updateGoodsStockResult == 0){
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return DtoUtil.getFalseDto("修改失败",90011);
@@ -176,7 +176,7 @@ public class GoodsServiceImpl implements GoodsService {
             StoreGoods sonGoods = goodsMapper.getGoodsInfo(parRelation.getGoodsParentId().toString());
             goodsMapper.updateGoodsUnitPrice(sonGoods.getId().toString(),updateGoodsPrice.getUnitPrice() / goods.getFaUnitNum());
         }*/
-        if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(), updateGoodsPrice.getUnitPrice()) != 1) {
+        if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(), updateGoodsPrice.getUnitPrice(), storeGoodsStock.getStoreId()) != 1) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DtoUtil.getFalseDto("修改价格失败", 80005);
         }
@@ -328,7 +328,7 @@ public class GoodsServiceImpl implements GoodsService {
         }
         int i = 0;
         for (String goodsId : goodsDownShelf.getGoodsId()){
-            i += goodsMapper.updateGoodsStatus(goodsId,0);
+            i += goodsMapper.updateGoodsStatus(goodsId,0,goodsDownShelf.getStoreId());
         }
         if (i == goodsDownShelf.getGoodsId().length){
             return DtoUtil.getSuccessDto("操作成功",100000);

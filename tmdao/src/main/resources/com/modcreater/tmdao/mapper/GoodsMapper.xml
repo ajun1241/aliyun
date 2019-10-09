@@ -27,13 +27,13 @@
         where id = #{goodsId}
     </update>
     <update id="updateGoodsStock">
-        update store_goods_stock set stockNum = #{goodsStock},goodsBarCode = #{goodsBarCode} where goodsId = #{goodsId}
+        update store_goods_stock set stockNum = #{goodsStock},goodsBarCode = #{goodsBarCode} where goodsId = #{goodsId} and storeId = #{storeId}
     </update>
     <update id="updateGoodsUnitPrice">
-        update store_goods_stock set goodsPrice = #{goodsPrice} where goodsId = #{goodsId}
+        update store_goods_stock set goodsPrice = #{goodsPrice} where goodsId = #{goodsId} and storeId = #{storeId}
     </update>
     <update id="updateGoodsStatus">
-        update store_goods_stock set goodsStatus = #{status} where id = #{goodsId}
+        update store_goods_stock set goodsStatus = #{status} where id = #{goodsId} and storeId = #{storeId}
     </update>
     <update id="deductionStock">
         <foreach collection="sourceGoods" item="sourceGoods" index="index" separator=";">
@@ -95,6 +95,9 @@
     <insert id="saveStoreOfflineOrders">
         insert into store_offline_orders (orderNumber, sourceStoreId, userId, goodsListId, paymentAmount,  payTime, payChannel, outTradeNo, orderStatus)
         values (#{orderNumber},#{sourceStoreId},#{userId},#{goodsListId},#{paymentAmount},#{payTime},#{payChannel},#{outTradeNo},#{orderStatus})
+    </insert>
+    <insert id="addNewTemStock">
+        insert into store_goods_temstock (temStockContent) values (#{temStock})
     </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
@@ -210,7 +213,9 @@
             or sg.goodsBrand like "%"#{goodsName}"%"
             or sg.goodsSpecifications like "%"#{goodsName}"%")
         </if>
-        limit #{pageNum},#{pageSize}
+        <if test="pageNum != 0">
+            limit #{pageNum},#{pageSize}
+        </if>
     </select>
     <select id="queryQrCodeContent" resultType="java.lang.String">
         select codeContent from store_qr_code where id=#{code}
@@ -219,5 +224,25 @@
         select sgc.id consumableId, sg.goodsName, sgc.registeredRatioIn, sgc.registeredRationInUnit, sgc.registeredRatioOut, sgc.registeredRationOutUnit
         from store_goodsconsumable sgc,store_goods sg
         where sgc.id = #{consumableId} and sgc.goodsId = sg.id
+    </select>
+    <update id="updateOfflineOrder">
+        update store_offline_orders set
+        payTime = #{payTime},
+        payChannel = #{payChannel},
+        outTradeNo = #{outTradeNo},
+        orderStatus = #{orderStatus}
+        where orderNumber = #{orderNumber}
+    </update>
+    <update id="updateGoodsStockNum">
+        update store_goods_stock set stockNum = #{stockNum} where storeId = #{storeId} and storeId = #{storeId}
+    </update>
+    <select id="getOfflineOrder" resultType="com.modcreater.tmbeans.pojo.StoreOfflineOrders">
+        select * from store_offline_orders where orderNumber = #{tradeNo}
+    </select>
+    <select id="getCodeContent" resultType="java.lang.String">
+        select codeContent from store_qr_code where id = #{goodsListId}
+    </select>
+    <select id="getGoodsAllConsumablesList" resultType="com.modcreater.tmbeans.pojo.StoreGoodsConsumable">
+        select * from store_goodsconsumable where goodsId = #{goodsId}
     </select>
 </mapper>
