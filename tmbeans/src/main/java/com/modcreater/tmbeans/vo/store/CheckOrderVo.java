@@ -6,13 +6,11 @@ import lombok.Data;
  * Description:
  *
  * @Author: AJun
- * @Date: 2019/10/9 11:21
+ * @Date: 2019/10/9 15:24
  */
 @Data
-public class CreateOfflineOrderVo {
+public class CheckOrderVo {
     private String userId;
+    private String targetId;
     private String appType;
-    private String codeContent;
-    private String storeId;
-    private String paymentAmount;
 }

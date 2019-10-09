@@ -8,11 +8,13 @@ import com.modcreater.tmbeans.utils.GetBarcode;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmbeans.vo.uservo.UserFriendVo;
 import com.modcreater.tmdao.mapper.GoodsMapper;
 import com.modcreater.tmdao.mapper.StoreMapper;
 import com.modcreater.tmstore.service.GoodsService;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
+import com.modcreater.tmutils.messageutil.GoodsListMsg;
 import com.modcreater.tmutils.messageutil.RefreshMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -472,17 +474,53 @@ public class GoodsServiceImpl implements GoodsService {
         }
         //存下商品信息列表
         StoreQrCode storeQrCode=new StoreQrCode();
-        storeQrCode.setId("SOT"+createOfflineOrderVo.getUserId()+System.currentTimeMillis());
+        storeQrCode.setId("SQR"+createOfflineOrderVo.getUserId()+System.currentTimeMillis());
         storeQrCode.setCodeContent(createOfflineOrderVo.getCodeContent());
-        goodsMapper.saveQrCode(storeQrCode);
+        int i=goodsMapper.saveQrCode(storeQrCode);
         //生成订单信息
         StoreOfflineOrders storeOfflineOrders=new StoreOfflineOrders();
-
-        int i=goodsMapper.saveStoreOfflineOrders(storeOfflineOrders);
+        storeOfflineOrders.setOrderNumber("sot"+createOfflineOrderVo.getUserId()+System.currentTimeMillis());
+        storeOfflineOrders.setSourceStoreId(Long.valueOf(createOfflineOrderVo.getStoreId()));
+        storeOfflineOrders.setUserId(Long.valueOf(createOfflineOrderVo.getUserId()));
+        storeOfflineOrders.setGoodsListId(storeQrCode.getId());
+        storeOfflineOrders.setPaymentAmount(Double.valueOf(createOfflineOrderVo.getPaymentAmount()));
+        int j=goodsMapper.saveStoreOfflineOrders(storeOfflineOrders);
         //发送自定义消息给商家
+        if ( i>0 && j>0 ){
+            try {
+                RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+                GoodsListMsg goodsListMsg=new GoodsListMsg(createOfflineOrderVo.getCodeContent(),"1","");
+                StoreInfo storeInfo=storeMapper.getStoreInfo(createOfflineOrderVo.getStoreId());
+                rongCloudMethodUtil.sendPrivateMsg(createOfflineOrderVo.getUserId(),new String[]{storeInfo.getUserId().toString()},0,goodsListMsg);
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                return DtoUtil.getFalseDto("发送消息失败",95400);
+            }
+        }
+        return DtoUtil.getFalseDto("生成订单信息失败",95401);
+    }
 
-
-        return null;
+    /**
+     * 商家确认订单
+     * @param checkOrderVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto checkOrder(CheckOrderVo checkOrderVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(checkOrderVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //发送信息让用户去支付
+        try {
+            RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+            GoodsListMsg goodsListMsg=new GoodsListMsg("","2","");
+            rongCloudMethodUtil.sendPrivateMsg(checkOrderVo.getUserId(),new String[]{checkOrderVo.getTargetId()},0,goodsListMsg);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return DtoUtil.getFalseDto("发送消息失败",95400);
+        }
+        return DtoUtil.getSuccessDto("发送成功",100000);
     }
 
     /**
