@@ -173,8 +173,20 @@ public class GoodsController {
         return goodsService.getGoodsInfoByBarCode(getGoodsInfoVo,request.getHeader("token"));
     }
 
+    @PostMapping(value = "createofflineorder")
+    @ApiOperation("线下交易生成订单")
+    public Dto createOfflineOrder(@RequestBody CreateOfflineOrderVo createOfflineOrderVo, HttpServletRequest request){
+        return goodsService.createOfflineOrder(createOfflineOrderVo,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "checkorder")
+    @ApiOperation("线下交易生成订单")
+    public Dto checkOrder(@RequestBody CheckOrderVo checkOrderVo, HttpServletRequest request){
+        return goodsService.checkOrder(checkOrderVo,request.getHeader("token"));
+    }
+
     @PostMapping(value = "finishdeal")
-    @ApiOperation("到店结算订单")
+    @ApiOperation("商家确认订单")
     public Dto finishDeal(@RequestBody FinishDealVo finishDealVo, HttpServletRequest request){
         return goodsService.finishDeal(finishDealVo,request.getHeader("token"));
     }

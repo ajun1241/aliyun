@@ -93,8 +93,8 @@
         insert into store_qr_code (id,codeContent) values (#{id},#{codeContent})
     </insert>
     <insert id="saveStoreOfflineOrders">
-        insert into store_offline_orders (orderNumber, sourceStoreId, userId, goodsListId, paymentAmount,  payTime, payChannel, outTradeNo, orderStatus)
-        values (#{orderNumber},#{sourceStoreId},#{userId},#{goodsListId},#{paymentAmount},#{payTime},#{payChannel},#{outTradeNo},#{orderStatus})
+        insert into store_offline_orders (orderNumber, sourceStoreId, userId, goodsListId, paymentAmount,  payTime, payChannel, outTradeNo)
+        values (#{orderNumber},#{sourceStoreId},#{userId},#{goodsListId},#{paymentAmount},#{payTime},#{payChannel},#{outTradeNo})
     </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}

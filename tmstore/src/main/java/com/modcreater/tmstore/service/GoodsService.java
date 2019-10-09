@@ -5,6 +5,7 @@ import com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
+import com.modcreater.tmbeans.vo.uservo.UserFriendVo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -197,6 +198,15 @@ public interface GoodsService {
      * @return
      */
     Dto createOfflineOrder(CreateOfflineOrderVo createOfflineOrderVo,String token);
+
+    /**
+     * 商家确认订单
+     * @param checkOrderVo
+     * @param token
+     * @return
+     */
+    Dto checkOrder(CheckOrderVo checkOrderVo, String token);
+
 
     /**
      * 商家确认订单
