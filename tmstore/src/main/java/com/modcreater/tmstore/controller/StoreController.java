@@ -29,6 +29,7 @@ public class StoreController {
     public Dto queryAccountInfo(@RequestBody ApproveInfoVo approveInfoVo, HttpServletRequest request){
         return storeService.queryAccountInfo(approveInfoVo,request.getHeader("token"));
     }
+
     @Safety
     @PostMapping("uploadapproveinfo")
     @ApiOperation("上传商铺认证信息")

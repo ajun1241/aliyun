@@ -11,6 +11,6 @@ public class StoreGoodsStock {
   private Double goodsPrice;
   private Long stockNum;
   private Long goodsStatus;
-  private Long goodsBarCode;
+  private String goodsBarCode;
 
 }

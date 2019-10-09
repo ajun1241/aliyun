@@ -1,6 +1,7 @@
 package com.modcreater.tmdao.mapper;
 
 import com.modcreater.tmbeans.pojo.StoreAttestation;
+import com.modcreater.tmbeans.pojo.StoreGoods;
 import com.modcreater.tmbeans.pojo.StoreInfo;
 import com.modcreater.tmbeans.pojo.StorePurchaseRecords;
 
@@ -54,4 +55,18 @@ public interface StoreMapper {
      * @return
      */
     int saveTradingRecord(List<Map<String, String>> sourceGoods, String sourceStoreId, String targetStoreId, String transactionPrice, String orderNumber, int status);
+
+    /**
+     * 根据条码查询商品信息
+     * @param goodsBarCode
+     * @return
+     */
+    Map<String,Object> getStoreInfoByBarCode(String goodsBarCode,String storeId);
+
+    /**
+     * 查询商铺列表
+     * @return
+     */
+    List<StoreInfo> getGoodsList();
+
 }

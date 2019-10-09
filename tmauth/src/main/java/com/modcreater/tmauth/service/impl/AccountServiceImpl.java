@@ -361,7 +361,7 @@ public class AccountServiceImpl implements AccountService {
             return DtoUtil.getFalseDto("不能自己加自己",17007);
         }
         //不是第一次添加
-        if (!ObjectUtils.isEmpty(friendship)|| !ObjectUtils.isEmpty(friendship1)){
+        if (!ObjectUtils.isEmpty(friendship) || !ObjectUtils.isEmpty(friendship1)){
             //判断有没有被对方拉黑
             if (friendship1.getFlag()==1L){
                 return DtoUtil.getFalseDto("发送失败，对方可能对你设置了权限",10220);
@@ -402,10 +402,14 @@ public class AccountServiceImpl implements AccountService {
                     count=systemMsgRecordList.size()+1;
                 }
                 ContactNtfMessage contactNtfMessage=new ContactNtfMessage("1",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
-                result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
-                if (result.getCode()!=200){
-                    logger.info("融云消息异常"+result.toString());
-                    return DtoUtil.getFalseDto("发送请求失败",17002);
+                if (appTypeMapper.queryAppType(sendFriendRequestVo.getFriendId()).getAppType()==1) {
+                    result = rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(), friendId, contactNtfMessage, "", "");
+                    if (result.getCode() != 200) {
+                        logger.info("融云消息异常" + result.toString());
+                        return DtoUtil.getFalseDto("发送请求失败", 17002);
+                    }
+                }else if (appTypeMapper.queryAppType(sendFriendRequestVo.getFriendId()).getAppType()==2){
+
                 }
                 //消息保存在服务器
                 map.put("userId",sendFriendRequestVo.getFriendId());
@@ -458,12 +462,17 @@ public class AccountServiceImpl implements AccountService {
                 }else {
                     count=systemMsgRecordList.size()+1;
                 }
-                ContactNtfMessage contactNtfMessage=new ContactNtfMessage("1",count.toString(),sendFriendRequestVo.getUserId(),sendFriendRequestVo.getFriendId(),sendFriendRequestVo.getContent());
-                result=rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(),friendId, contactNtfMessage, "","");
-                if (result.getCode()!=200){
-                    logger.info("融云消息异常"+result.toString());
-                    return DtoUtil.getFalseDto("发送请求失败",17002);
+                ContactNtfMessage contactNtfMessage = new ContactNtfMessage("1", count.toString(), sendFriendRequestVo.getUserId(), sendFriendRequestVo.getFriendId(), sendFriendRequestVo.getContent());
+                if (appTypeMapper.queryAppType(sendFriendRequestVo.getFriendId()).getAppType()==1) {
+                    result = rongCloudMethodUtil.sendSystemMessage(sendFriendRequestVo.getUserId(), friendId, contactNtfMessage, "", "");
+                    if (result.getCode() != 200) {
+                        logger.info("融云消息异常" + result.toString());
+                        return DtoUtil.getFalseDto("发送请求失败", 17002);
+                    }
+                }else if (appTypeMapper.queryAppType(sendFriendRequestVo.getFriendId()).getAppType()==2){
+
                 }
+
                 //消息保存在服务器
                 map.put("userId",sendFriendRequestVo.getFriendId());
                 map.put("msgContent",contactNtfMessage.getMessage());
@@ -527,11 +536,13 @@ public class AccountServiceImpl implements AccountService {
         String extra = "";
         try {
             String[] friendId={sendFriendResponseVo.getFriendId()};
-            ContactNtfMessage contactNtfMessage=new ContactNtfMessage("2",extra,sendFriendResponseVo.getUserId(), sendFriendResponseVo.getFriendId(), "我是"+user.getUserName()+"，我已经同意你的好友请求了");
-            ResponseResult result=rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),friendId,contactNtfMessage,"","");
-            if (result.getCode()!=200){
-                logger.info("融云消息异常"+result.toString());
-                return DtoUtil.getFalseDto("发送请求失败",17002);
+            if (appTypeMapper.queryAppType(sendFriendResponseVo.getFriendId()).getAppType()==1){
+                ContactNtfMessage contactNtfMessage=new ContactNtfMessage("2",extra,sendFriendResponseVo.getUserId(), sendFriendResponseVo.getFriendId(), "我是"+user.getUserName()+"，我已经同意你的好友请求了");
+                ResponseResult result=rongCloudMethodUtil.sendSystemMessage(sendFriendResponseVo.getUserId(),friendId,contactNtfMessage,"","");
+                if (result.getCode()!=200){
+                    logger.info("融云消息异常"+result.toString());
+                    return DtoUtil.getFalseDto("发送请求失败",17002);
+                }
             }
             //发送文本消息
             ResponseResult result2=rongCloudMethodUtil.sendPrivateMsg(sendFriendResponseVo.getUserId(),new String[]{sendFriendResponseVo.getFriendId()},0,new TxtMessage("我通过了你的朋友验证请求，现在我们可以开始聊天了",""));

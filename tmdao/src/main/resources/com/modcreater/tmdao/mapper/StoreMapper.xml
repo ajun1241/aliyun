@@ -7,7 +7,7 @@
     <insert id="saveTradingRecord">
         insert into store_purchase_records (orderNumber, goodsId, targetStoreId, sourceStoreId, transactionPrice, goodsCount, status) values
         <foreach collection="sourceGoods" item="sourceGoods" index="index" separator=",">
-            (#{orderNumber},#{sourceGoods.goodsId},#{targetStoreId},#{sourceStoreId},#{transactionPrice},#{sourceGoods.goodsNum},#{status})
+            (#{orderNumber},#{sourceGoods.goodsId},#{targetStoreId},#{sourceStoreId},#{transactionPrice},#{sourceGoods.num},#{status})
         </foreach>
     </insert>
     <select id="getStoreInfo" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
@@ -18,5 +18,11 @@
     </select>
     <select id="getStoreInfoByAttestationId" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
         select * from store_info where attestationId=#{attestationId}
+    </select>
+    <select id="getStoreInfoByBarCode" resultType="java.util.Map">
+        SELECT g.*,s.* FROM  store_goods g INNER JOIN  store_goods_stock s ON g.id=s.goodsId WHERE s.goodsBarCode=#{goodsBarCode} AND s.storeId=#{storeId}
+    </select>
+    <select id="getGoodsList" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
+        select * from store_info where status=1
     </select>
 </mapper>

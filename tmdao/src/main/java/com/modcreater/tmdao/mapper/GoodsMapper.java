@@ -211,7 +211,7 @@ public interface GoodsMapper {
      * @param storeId
      * @return
      */
-    Long queryGoodsStock(String goodsId, String storeId);
+    StoreGoodsStock queryGoodsStock(String goodsId, String storeId);
 
     /**
      * 获取子商品信息
@@ -226,6 +226,28 @@ public interface GoodsMapper {
      * @return
      */
     StoreGoodsCorrelation getParentGoodsInfo(String goodsId);
+
+    /**
+     * 按商品条形码获取商品库存信息
+     * @param storeId
+     * @param goodsBarCode
+     * @return
+     */
+    StoreGoodsStock getGoodsStockByGoodsBarCode(String storeId, String goodsBarCode);
+
+    /**
+     * 添加商品库存信息
+     * @param storeGoodsStock
+     * @return
+     */
+    int insertStoreGoodsStock(StoreGoodsStock storeGoodsStock);
+
+    /**
+     * 修改商品库存
+     * @param storeGoodsStock
+     * @return
+     */
+    int updGoodsStock(StoreGoodsStock storeGoodsStock);
 
     /**
      * 根据商品Id查询商品详情(修改商品信息)
@@ -244,6 +266,27 @@ public interface GoodsMapper {
      */
     List<ShowConsumable> getGoodsConsumablesList(@Param("goodsId") String goodsId,@Param("goodsName") String goodsName,
                                                  @Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
+
+    /**
+     * 根据条形码修改商品库存
+     * @param storeGoodsStock
+     * @return
+     */
+    int updateGoodsStockByBarCode(StoreGoodsStock storeGoodsStock);
+
+    /**
+     * 保存二维码
+     * @param storeQrCode
+     * @return
+     */
+    int saveQrCode(StoreQrCode storeQrCode);
+
+    /**
+     * 查询二维码内容
+     * @param code
+     * @return
+     */
+    String queryQrCodeContent(String code);
 
     /**
      * 删除商品对应消耗品
@@ -280,4 +323,12 @@ public interface GoodsMapper {
      * @return
      */
     int deleteCorRelation(String goodsParentId);
+
+    /**
+     * 生成线下交易订单
+     * @param storeOfflineOrders
+     * @return
+     */
+    int saveStoreOfflineOrders(StoreOfflineOrders storeOfflineOrders);
+
 }

@@ -6,14 +6,16 @@ import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.goods.*;
 import com.modcreater.tmbeans.utils.GetBarcode;
 import com.modcreater.tmbeans.vo.goods.*;
-import com.modcreater.tmbeans.vo.store.ClaimGoodsVo;
+import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
-import com.modcreater.tmbeans.vo.store.GoodsListVo;
 import com.modcreater.tmdao.mapper.GoodsMapper;
 import com.modcreater.tmdao.mapper.StoreMapper;
 import com.modcreater.tmstore.service.GoodsService;
 import com.modcreater.tmutils.DtoUtil;
+import com.modcreater.tmutils.RongCloudMethodUtil;
+import com.modcreater.tmutils.messageutil.RefreshMsg;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,8 @@ import javax.annotation.Resource;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.*;
+
+import static com.mysql.cj.conf.PropertyKey.logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,6 +52,8 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    private Logger logger = LoggerFactory.getLogger(GoodsServiceImpl.class);
 
     @Override
     public Dto registerGoods(RegisterGoods registerGoods, String token) {
@@ -195,24 +201,118 @@ public class GoodsServiceImpl implements GoodsService {
     public synchronized Dto claimGoods(ClaimGoodsVo claimGoodsVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(claimGoodsVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
-        }
-        //判断商品库存
-        for (Map<String,String> map:claimGoodsVo.getSourceGoods()) {
-            long goodsStock=goodsMapper.queryGoodsStock(map.get("goodsId"),claimGoodsVo.getSourceStoreId());
-            if (goodsStock < Long.parseLong(map.get("goodsNum"))){
-                StoreGoods storeGoods=goodsMapper.getGoodsInfo(map.get("goodsId"));
-                return DtoUtil.getFalseDto("商品"+storeGoods.getGoodsName()+"库存不足,交易未完成",95001);
+        }try {
+            //判断商品库存
+            for (Map<String,String> map:claimGoodsVo.getSourceGoods()) {
+                StoreGoodsStock goodsStock=goodsMapper.queryGoodsStock(map.get("goodsId"),claimGoodsVo.getSourceStoreId());
+                if (goodsStock.getStockNum() < Long.parseLong(map.get("num"))){
+                    StoreGoods storeGoods=goodsMapper.getGoodsInfo(map.get("goodsId"));
+                    return DtoUtil.getFalseDto("商品"+storeGoods.getGoodsName()+"库存不足,交易未完成",95001);
+                }
             }
+            //减去出货商家的库存
+            int a=goodsMapper.deductionStock(claimGoodsVo.getSourceStoreId(),claimGoodsVo.getSourceGoods());
+            //收货商户添加一批货物
+            addGoodsStock(claimGoodsVo.getTargetStoreId(),claimGoodsVo.getSourceGoods());
+            //保存交易记录
+            String orderNumber=(System.currentTimeMillis()/1000+claimGoodsVo.getSourceStoreId()+claimGoodsVo.getTargetStoreId());
+            int b=storeMapper.saveTradingRecord(claimGoodsVo.getSourceGoods(),claimGoodsVo.getSourceStoreId(),claimGoodsVo.getTargetStoreId(),claimGoodsVo.getTransactionPrice(),orderNumber,1);
+            if (a<=0 || b<=0){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("交易异常",94014);
+            }
+            //反馈交易双方
+            StoreInfo storeInfo=storeMapper.getStoreInfo(claimGoodsVo.getSourceStoreId());
+            RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
+            RefreshMsg refreshMsg=new RefreshMsg("2");
+            rongCloudMethodUtil.sendSystemMessage(claimGoodsVo.getUserId(),new String[]{storeInfo.getUserId().toString()},refreshMsg,"","");
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return DtoUtil.getFalseDto("交易异常",94014);
         }
-        //减去出货商家的库存
-        int a=goodsMapper.deductionStock(claimGoodsVo.getSourceStoreId(),claimGoodsVo.getSourceGoods());
-        //收货商户添加一批货物
-        int flag=addGoodsStock(claimGoodsVo.getTargetStoreId(),claimGoodsVo.getSourceGoods());
-        //保存交易记录
-        String orderNumber=(System.currentTimeMillis()/1000+claimGoodsVo.getSourceStoreId()+claimGoodsVo.getTargetStoreId());
-        int b=storeMapper.saveTradingRecord(claimGoodsVo.getSourceGoods(),claimGoodsVo.getSourceStoreId(),claimGoodsVo.getTargetStoreId(),claimGoodsVo.getTransactionPrice(),orderNumber,1);
-        //反馈交易双方
-        return null;
+        return DtoUtil.getSuccessDto("收货成功",100000);
+    }
+
+    /**
+     * 单位转换
+     * @param conversionUnitVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto conversionUnit(ConversionUnitVo conversionUnitVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(conversionUnitVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreGoods storeGoods=goodsMapper.getGoodsInfo(conversionUnitVo.getGoodsId());
+        if (ObjectUtils.isEmpty(storeGoods)){
+            return DtoUtil.getFalseDto("转换失败",91016);
+        }
+        StoreGoods targetStoreGoods;
+        Map<String,String> map=new HashMap<>(3);
+        if (StringUtils.isEmpty(storeGoods.getGoodsFUnit())){
+            //如果没有子单位则自己是子单位
+            /*StoreGoodsCorrelation goodsCorrelation=goodsMapper.getParentGoodsInfo(conversionUnitVo.getGoodsId());
+            targetStoreGoods=goodsMapper.getGoodsInfo(goodsCorrelation.getGoodsParentId().toString());
+            //则转换数量在转换后的商品信息里
+            map.put("convertNum",ObjectUtils.isEmpty(targetStoreGoods) ? "" : String.valueOf((Long.parseLong(conversionUnitVo.getNum())/targetStoreGoods.getFaUnitNum())));*/
+            return DtoUtil.getFalseDto("该商品已是最小单位，不能转换",95012);
+        }else {
+            //如果有子单位则自己是父单位
+            StoreGoodsCorrelation goodsCorrelation=goodsMapper.getSonGoodsInfo(conversionUnitVo.getGoodsId());
+            targetStoreGoods=goodsMapper.getGoodsInfo(goodsCorrelation.getGoodsSonId().toString());
+            //则转换数量在转换前的商品信息中
+            map.put("convertNum",ObjectUtils.isEmpty(storeGoods) ? "" :String.valueOf((storeGoods.getFaUnitNum()*Long.parseLong(conversionUnitVo.getNum()))));
+        }
+        if (ObjectUtils.isEmpty(targetStoreGoods)){
+            return DtoUtil.getFalseDto("转换失败",91016);
+        }else {
+            map.put("goodsId",targetStoreGoods.getId().toString());
+            map.put("goodsName",targetStoreGoods.getGoodsName());
+            map.put("goodsUnit",targetStoreGoods.getGoodsUnit());
+            return DtoUtil.getSuccesWithDataDto("操作成功",map,100000);
+        }
+    }
+
+    /**
+     * 保存订单信息
+     * @param orderInfoVo
+     * @param token
+     * @return
+     */
+    @Override
+    public synchronized Dto saveOrderInfo(OrderInfoVo orderInfoVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(orderInfoVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreQrCode storeQrCode=new StoreQrCode();
+        storeQrCode.setId("OQR"+orderInfoVo.getUserId()+System.currentTimeMillis());
+        storeQrCode.setCodeContent(orderInfoVo.getCodeContent());
+        int i=goodsMapper.saveQrCode(storeQrCode);
+        Map<String,String> map=new HashMap<>(1);
+        map.put("code",storeQrCode.getId().toString());
+        if (i>0){
+            return DtoUtil.getSuccesWithDataDto("请求成功",map,100000);
+        }
+        return DtoUtil.getFalseDto("亲求失败",91011);
+    }
+
+    /**
+     * 查询订单二维码信息
+     * @param orderInfoVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto queryOrderQrInfo(OrderInfoVo orderInfoVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(orderInfoVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        String codeContent=goodsMapper.queryQrCodeContent(orderInfoVo.getCode());
+        Map<String,String> map=new HashMap<>(1);
+        map.put("codeContent",codeContent);
+        return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
     }
 
     @Override
@@ -308,6 +408,92 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getSuccessDto("修改成功",100000);
         }
         return DtoUtil.getFalseDto("修改失败",90008);
+    }
+
+    /**
+     * 查询商铺列表
+     * @param getStoreListVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto getStoreList(GetStoreListVo getStoreListVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getStoreListVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        List<StoreInfo> storeList=storeMapper.getGoodsList();
+        List<Map<String,String>> resultMapList=new ArrayList<>();
+        for (StoreInfo storeInfo:storeList) {
+            Map<String,String> map=new HashMap<>();
+            map.put("storeId",storeInfo.getId().toString());
+            map.put("storeName",storeInfo.getStoreName());
+            map.put("storePicture",storeInfo.getStorePicture());
+            map.put("storeAddress",storeInfo.getStoreAddress());
+            resultMapList.add(map);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",resultMapList,100000);
+    }
+
+    /**
+     * 扫描条形码获取商品信息
+     * @param getGoodsInfoVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto getGoodsInfoByBarCode(GetGoodsInfoVo getGoodsInfoVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsInfoVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (StringUtils.isEmpty(getGoodsInfoVo.getGoodsBarCode())){
+            return DtoUtil.getFalseDto("商品条码格式不正确",91001);
+        }
+        Map<String,Object> goods=storeMapper.getStoreInfoByBarCode(getGoodsInfoVo.getGoodsBarCode(),getGoodsInfoVo.getStoreId());
+        if (ObjectUtils.isEmpty(goods)){
+            return DtoUtil.getFalseDto("商品暂未录入",91002);
+        }
+        Map<String,String> map=new HashMap<>();
+        map.put("goodsId",goods.get("id").toString());
+        map.put("goodsName",goods.get("goodsName").toString());
+        map.put("goodsPrice",goods.get("goodsPrice").toString());
+        return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
+    }
+
+    /**
+     * 线下交易生成订单
+     * @param createOfflineOrderVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto createOfflineOrder(CreateOfflineOrderVo createOfflineOrderVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(createOfflineOrderVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        //存下商品信息列表
+        StoreQrCode storeQrCode=new StoreQrCode();
+        storeQrCode.setId("SOT"+createOfflineOrderVo.getUserId()+System.currentTimeMillis());
+        storeQrCode.setCodeContent(createOfflineOrderVo.getCodeContent());
+        goodsMapper.saveQrCode(storeQrCode);
+        //生成订单信息
+        StoreOfflineOrders storeOfflineOrders=new StoreOfflineOrders();
+
+        int i=goodsMapper.saveStoreOfflineOrders(storeOfflineOrders);
+        //发送自定义消息给商家
+
+
+        return null;
+    }
+
+    /**
+     * 到店结算订单
+     * @param finishDealVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto finishDeal(FinishDealVo finishDealVo, String token) {
+        return null;
     }
 
     @Override
@@ -508,8 +694,52 @@ public class GoodsServiceImpl implements GoodsService {
      * @param sourceGoods
      * @return
      */
-    private int addGoodsStock(String targetStoreId, List<Map<String, String>> sourceGoods) {
-        //查询商品编码
-        return 0;
+    private void addGoodsStock(String targetStoreId, List<Map<String, String>> sourceGoods) {
+        try {
+            for (Map<String,String> map:sourceGoods) {
+                int a=0;
+                //查询商品编码
+                StoreGoods storeGoods=goodsMapper.getGoodsInfo(map.get("goodsId"));
+                //如果有条形码
+                if (!StringUtils.isEmpty(storeGoods.getGoodsBarCode())){
+                    //判断是新增还是修改库存
+                    StoreGoodsStock storeGoodsStock=goodsMapper.getGoodsStockByGoodsBarCode(targetStoreId,storeGoods.getGoodsBarCode());
+                    if (ObjectUtils.isEmpty(storeGoodsStock)){
+                        //新增
+                        storeGoodsStock=new StoreGoodsStock();
+                        storeGoodsStock.setGoodsId(Long.valueOf(map.get("goodsId")));
+                        storeGoodsStock.setStoreId(Long.valueOf(targetStoreId));
+                        storeGoodsStock.setStockNum(Long.valueOf(map.get("num")));
+                        storeGoodsStock.setGoodsBarCode(storeGoods.getGoodsBarCode());
+                        storeGoodsStock.setGoodsStatus(1L);
+                        a=goodsMapper.insertStoreGoodsStock(storeGoodsStock);
+                    }else {
+                        //修改
+                        storeGoodsStock.setStockNum(storeGoodsStock.getStockNum()+Long.valueOf(map.get("num")));
+                        storeGoodsStock.setGoodsBarCode(storeGoods.getGoodsBarCode());
+                        a=goodsMapper.updateGoodsStockByBarCode(storeGoodsStock);
+                    }
+                }else {//没有条形码
+                    StoreGoodsStock storeGoodsStock=goodsMapper.queryGoodsStock(map.get("goodsId"),targetStoreId);
+                    //判断是新增还是修改库存
+                    if (ObjectUtils.isEmpty(storeGoodsStock)){
+                        //新增
+                        storeGoodsStock=new StoreGoodsStock();
+                        storeGoodsStock.setGoodsId(Long.valueOf(map.get("goodsId")));
+                        storeGoodsStock.setStoreId(Long.valueOf(targetStoreId));
+                        storeGoodsStock.setStockNum(Long.valueOf(map.get("num")));
+                        storeGoodsStock.setGoodsStatus(1L);
+                        a=goodsMapper.insertStoreGoodsStock(storeGoodsStock);
+                    }else {
+                        //修改
+                        storeGoodsStock.setStockNum(storeGoodsStock.getStockNum()+Long.valueOf(map.get("num")));
+                        a=goodsMapper.updGoodsStock(storeGoodsStock);
+                    }
+                }
+            }
+        } catch (NumberFormatException e) {
+            logger.error(e.getMessage(),e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
     }
 }

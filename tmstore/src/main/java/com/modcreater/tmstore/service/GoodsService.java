@@ -3,10 +3,8 @@ package com.modcreater.tmstore.service;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo;
 import com.modcreater.tmbeans.vo.goods.*;
-import com.modcreater.tmbeans.vo.store.ClaimGoodsVo;
+import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
-import com.modcreater.tmbeans.vo.store.GoodsListVo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -105,6 +103,30 @@ public interface GoodsService {
     Dto claimGoods(ClaimGoodsVo claimGoodsVo, String token);
 
     /**
+     * 单位转换
+     * @param conversionUnitVo
+     * @param token
+     * @return
+     */
+    Dto conversionUnit(ConversionUnitVo conversionUnitVo, String token);
+
+    /**
+     * 保存订单二维码信息
+     * @param orderInfoVo
+     * @param token
+     * @return
+     */
+    Dto saveOrderInfo(OrderInfoVo orderInfoVo, String token);
+
+    /**
+     * 查询订单二维码信息
+     * @param orderInfoVo
+     * @param token
+     * @return
+     */
+    Dto queryOrderQrInfo(OrderInfoVo orderInfoVo, String token);
+
+    /**
      * 商品下架
      * @param goodsDownShelf
      * @param token
@@ -153,10 +175,42 @@ public interface GoodsService {
     Dto updateConsumable(UpdateConsumable updateConsumable, String token);
 
     /**
+     * 查询商铺列表
+     * @param getStoreListVo
+     * @param token
+     * @return
+     */
+    Dto getStoreList(GetStoreListVo getStoreListVo,String token);
+
+    /**
+     * 扫描条形码获取商品信息
+     * @param getGoodsInfoVo
+     * @param token
+     * @return
+     */
+    Dto getGoodsInfoByBarCode(GetGoodsInfoVo getGoodsInfoVo,String token);
+
+    /**
+     * 线下交易生成订单
+     * @param createOfflineOrderVo
+     * @param token
+     * @return
+     */
+    Dto createOfflineOrder(CreateOfflineOrderVo createOfflineOrderVo,String token);
+
+    /**
+     * 商家确认订单
+     * @param finishDealVo
+     * @param token
+     * @return
+     */
+    Dto finishDeal(FinishDealVo finishDealVo,String token);
+    /**
      * 添加消耗品
      * @param addNewConsumable
      * @param token
      * @return
      */
     Dto addNewConsumable(AddNewConsumable addNewConsumable, String token);
+
 }

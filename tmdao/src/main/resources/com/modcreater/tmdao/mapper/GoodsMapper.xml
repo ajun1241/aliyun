@@ -37,8 +37,14 @@
     </update>
     <update id="deductionStock">
         <foreach collection="sourceGoods" item="sourceGoods" index="index" separator=";">
-            update store_goods_stock set stockNum = stockNum - #{sourceGoods.goodsNum} where storeId=#{sourceStoreId} and goodsId=#{sourceGoods.goodsId}
+            update store_goods_stock set stockNum = stockNum - #{sourceGoods.num} where storeId=#{sourceStoreId} and goodsId=#{sourceGoods.goodsId}
         </foreach>
+    </update>
+    <update id="updGoodsStock">
+        update store_goods_stock set stockNum=#{stockNum} where goodsId=#{goodsId} and storeId=#{storeId}
+    </update>
+    <update id="updateGoodsStockByBarCode">
+        update store_goods_stock set stockNum =#{stockNum} where storeId=#{storeId} and goodsBarCode=#{goodsBarCode}
     </update>
     <update id="updateConsumable">
         update store_goodsconsumable
@@ -79,6 +85,16 @@
     </insert>
     <insert id="bindingGoods">
         insert into store_goods_correlation (goodsParentId, goodsSonId) values (#{id},#{corId})
+    </insert>
+    <insert id="insertStoreGoodsStock">
+        insert into  store_goods_stock (goodsId, storeId, stockNum, goodsStatus,goodsBarCode) values (#{goodsId},#{storeId},#{stockNum},#{goodsStatus},#{goodsBarCode})
+    </insert>
+    <insert id="saveQrCode" useGeneratedKeys="true" keyProperty="id">
+        insert into store_qr_code (id,codeContent) values (#{id},#{codeContent})
+    </insert>
+    <insert id="saveStoreOfflineOrders">
+        insert into store_offline_orders (orderNumber, sourceStoreId, userId, goodsListId, paymentAmount,  payTime, payChannel, outTradeNo, orderStatus)
+        values (#{orderNumber},#{sourceStoreId},#{userId},#{goodsListId},#{paymentAmount},#{payTime},#{payChannel},#{outTradeNo},#{orderStatus})
     </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
@@ -165,8 +181,11 @@
     <select id="getGoodsStock" resultType="com.modcreater.tmbeans.pojo.StoreGoodsStock">
         select * from store_goods_stock where goodsId = #{goodsId}
     </select>
-    <select id="queryGoodsStock" resultType="java.lang.Long">
-        select stockNum from store_goods_stock where goodsId=#{goodsId} and storeId=#{storeId}
+    <select id="queryGoodsStock" resultType="com.modcreater.tmbeans.pojo.StoreGoodsStock">
+        select * from store_goods_stock where goodsId=#{goodsId} and storeId=#{storeId}
+    </select>
+    <select id="getGoodsStockByGoodsBarCode" resultType="com.modcreater.tmbeans.pojo.StoreGoodsStock">
+        select * from store_goods_stock where storeId=#{storeId} and goodsBarCode=#{goodsBarCode}
     </select>
     <select id="getSonGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoodsCorrelation">
         select * from store_goods_correlation where goodsParentId = #{goodsId}
@@ -192,6 +211,9 @@
             or sg.goodsSpecifications like "%"#{goodsName}"%")
         </if>
         limit #{pageNum},#{pageSize}
+    </select>
+    <select id="queryQrCodeContent" resultType="java.lang.String">
+        select codeContent from store_qr_code where id=#{code}
     </select>
     <select id="getUpdateConsumableInfo" resultType="com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo">
         select sgc.id consumableId, sg.goodsName, sgc.registeredRatioIn, sgc.registeredRationInUnit, sgc.registeredRatioOut, sgc.registeredRationOutUnit

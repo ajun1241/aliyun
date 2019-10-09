@@ -3,9 +3,8 @@ package com.modcreater.tmstore.controller;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo;
 import com.modcreater.tmbeans.vo.goods.*;
+import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import com.modcreater.tmbeans.vo.store.GoodsInfoVo;
-import com.modcreater.tmbeans.vo.store.GoodsListVo;
 import com.modcreater.tmstore.config.annotation.Safety;
 import com.modcreater.tmstore.service.GoodsService;
 import io.swagger.annotations.ApiOperation;
@@ -79,6 +78,34 @@ public class GoodsController {
         return goodsService.updateGoodsInfo(updateGoods,request.getHeader("token"));
     }
 
+    @Safety
+    @PostMapping(value = "saveorderinfo")
+    @ApiOperation("保存订单二维码信息")
+    public Dto saveOrderInfo(@RequestBody OrderInfoVo orderInfoVo, HttpServletRequest request){
+        return goodsService.saveOrderInfo(orderInfoVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "queryorderqrinfo")
+    @ApiOperation("查询订单二维码信息")
+    public Dto queryOrderQrInfo(@RequestBody OrderInfoVo orderInfoVo, HttpServletRequest request){
+        return goodsService.queryOrderQrInfo(orderInfoVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "conversionunit")
+    @ApiOperation("单位转换")
+    public Dto conversionUnit(@RequestBody ConversionUnitVo conversionUnitVo, HttpServletRequest request){
+        return goodsService.conversionUnit(conversionUnitVo,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "claimgoods")
+    @ApiOperation("收货 完成交易")
+    public Dto claimGoods(@RequestBody ClaimGoodsVo claimGoodsVo, HttpServletRequest request){
+        return goodsService.claimGoods(claimGoodsVo,request.getHeader("token"));
+    }
+
     @PostMapping(value = "getupdatepriceinfo")
     @ApiOperation("获取修改价格信息")
     public Dto getUpdatePriceInfo(@RequestBody ReceivedGoodsId receivedGoodsId, HttpServletRequest request){
@@ -132,6 +159,24 @@ public class GoodsController {
     @ApiOperation("修改消耗品信息")
     public Dto updateConsumable(@RequestBody UpdateConsumable updateConsumable, HttpServletRequest request){
         return goodsService.updateConsumable(updateConsumable,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "getstorelist")
+    @ApiOperation("查询商店列表")
+    public Dto getStoreList(@RequestBody GetStoreListVo getStoreListVo, HttpServletRequest request){
+        return goodsService.getStoreList(getStoreListVo,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "getgoodsinfobybarcode")
+    @ApiOperation("根据条码获取商品信息")
+    public Dto getGoodsInfoByBarCode(@RequestBody GetGoodsInfoVo getGoodsInfoVo, HttpServletRequest request){
+        return goodsService.getGoodsInfoByBarCode(getGoodsInfoVo,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "finishdeal")
+    @ApiOperation("到店结算订单")
+    public Dto finishDeal(@RequestBody FinishDealVo finishDealVo, HttpServletRequest request){
+        return goodsService.finishDeal(finishDealVo,request.getHeader("token"));
     }
 
     @PostMapping(value = "addnewconsumable")

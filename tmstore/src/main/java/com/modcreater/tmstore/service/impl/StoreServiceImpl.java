@@ -5,10 +5,12 @@ import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.Account;
 import com.modcreater.tmbeans.pojo.StoreAttestation;
 import com.modcreater.tmbeans.pojo.StoreInfo;
+import com.modcreater.tmbeans.pojo.SuperAdministrator;
 import com.modcreater.tmbeans.vo.store.ApproveInfoVo;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.StoreMapper;
+import com.modcreater.tmdao.mapper.SuperAdminMapper;
 import com.modcreater.tmstore.service.StoreService;
 import com.modcreater.tmutils.*;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -40,6 +43,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Resource
     private AccountMapper accountMapper;
+
+    @Resource
+    private SuperAdminMapper superAdminMapper;
 
     RongCloudMethodUtil rongCloudMethodUtil =new RongCloudMethodUtil();
 
@@ -90,6 +96,18 @@ public class StoreServiceImpl implements StoreService {
         if (i==0){
             return DtoUtil.getFalseDto("上传商铺认证信息失败",21022);
         }
+        //通知管理员
+        List<SuperAdministrator> superAdministrators=superAdminMapper.querySuperAdmins();
+        List<String> emails=new ArrayList<>();
+        String title="【智袖】";
+        String content="有新的【商铺认证】等待您的确认！";
+        for (SuperAdministrator administrators : superAdministrators) {
+            if (!StringUtils.isEmpty(administrators.getEmail())){
+                emails.add(administrators.getEmail());
+            }
+        }
+        System.out.println("接收的邮箱"+emails);
+        SendMsgUtil.asynSendEmail(title,content,emails);
         return DtoUtil.getSuccessDto("上传商铺认证信息成功，请耐心等待",100000);
     }
 
@@ -123,13 +141,18 @@ public class StoreServiceImpl implements StoreService {
             resultMap.put("disposeStatus",3);
         }
         //查询商铺信息
-        StoreInfo storeInfo=storeMapper.getStoreInfoByAttestationId(storeAttestation.getId());
-        Map<String,Object> storeMap=new HashMap<>(3);
-        if (!ObjectUtils.isEmpty(storeInfo)){
-            storeMap.put("storeId",storeInfo.getId());
-            storeMap.put("storeName",storeInfo.getStoreName());
-            storeMap.put("storeAddress",storeInfo.getStoreAddress());
+        StoreInfo storeInfo=new StoreInfo();
+        if (!ObjectUtils.isEmpty(storeAttestation)){
+            storeInfo=storeMapper.getStoreInfoByAttestationId(storeAttestation.getId());
         }
+        if (ObjectUtils.isEmpty(storeInfo)){
+            storeInfo=new StoreInfo();
+        }
+        Map<String,Object> storeMap=new HashMap<>(3);
+        storeMap.put("storeId",storeInfo.getId());
+        storeMap.put("storeName",storeInfo.getStoreName());
+        storeMap.put("storePicture",storeInfo.getStorePicture());
+        storeMap.put("storeAddress",storeInfo.getStoreAddress());
         resultMap.put("storeInfo",storeMap);
         return DtoUtil.getSuccesWithDataDto("查询成功",resultMap,100000);
     }

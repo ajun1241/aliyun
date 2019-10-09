@@ -125,7 +125,6 @@ public class TimerConfig {
 
     @Scheduled(cron = "0 * * * * ?")
     public void pushTask() {
-//        IOSPushUtil.APNSPush("c83be9ffcbe7128a0248d78268b8be2f9ccc226c9afb65edaebabfa162d1d242","IOS,推送测试",1);
         logger.info("推送提醒");
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         //今天
