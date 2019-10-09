@@ -351,21 +351,10 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
             resXml = sb.toString();
-            String result = payBack(resXml);
-            Map<String, String> notifyMap = WXPayUtil.xmlToMap(resXml);
-            String tradeNo = notifyMap.get("out_trade_no");
-            if (tradeNo.startsWith("sot")){
-
-            }else {
-                if (!makeOrderSuccess(tradeNo)) {
-                    orderMapper.updateOrderStatus(tradeNo, 4);
-                }
-            }
-            return result;
+            return payBack(resXml);
         } catch (Exception e) {
             logger.info("微信手机支付失败:" + e.getMessage());
-            String result = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
-            return result;
+            return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
         }
     }
 
@@ -392,52 +381,8 @@ public class OrderServiceImpl implements OrderService {
                 //微信支付流水号
                 String transactionId = notifyMap.get("transaction_id");
                 if (returnCode.equals("SUCCESS")) {
-                    if (tradeNo.startsWith("sot")){
-                        StoreOfflineOrders offlineOrder = goodsMapper.getOfflineOrder(tradeNo);
-                        if (!ObjectUtils.isEmpty(offlineOrder)){
-                            if (offlineOrder.getOrderStatus() == 1) {
-                                return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
-                            }
-                            offlineOrder.setOrderStatus(1L);
-                            offlineOrder.setPayTime(System.currentTimeMillis());
-                            offlineOrder.setPayChannel("微信支付");
-                            offlineOrder.setOutTradeNo(transactionId);
-                            goodsMapper.updateOfflineOrder(offlineOrder);
-                            logger.info("支付成功");
-                            logger.info("微信手机支付回调成功订单号:{}", tradeNo);
-                            xmlBack = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
-                        } else {
-                            logger.info("微信手机支付回调失败订单号:{}", tradeNo);
-                            xmlBack = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
-                        }
-                    }else {
-                        UserOrders userOrders = orderMapper.getUserOrder(tradeNo);
-                        if (!ObjectUtils.isEmpty(userOrders)) {
-                            // 注意特殊情况：订单已经退款，但收到了支付结果成功的通知，不应把商户的订单状态从退款改成支付成功
-                            // 注意特殊情况：微信服务端同样的通知可能会多次发送给商户系统，所以数据持久化之前需要检查是否已经处理过了，处理了直接返回成功标志
-                            //业务数据持久化
-                            if (userOrders.getOrderStatus().equals("1")) {
-                                return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
-                            }
-                            userOrders.setOrderStatus("1");
-                            userOrders.setPayTime(String.valueOf(System.currentTimeMillis() / 1000));
-                            userOrders.setPayChannel("微信支付");
-                            userOrders.setOutTradeNo(transactionId);
-                            //更新交易表中状态
-                            int returnResult = updateOrderStatusToPrepaid(userOrders);
-                            //将用户优惠券状态改为已使用
-                            orderMapper.updateDiscountStatus(tradeNo);
-                            if (returnResult == 0) {
-                                return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
-                            }
-                            logger.info("支付成功");
-                            logger.info("微信手机支付回调成功订单号:{}", tradeNo);
-                            xmlBack = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
-                        } else {
-                            logger.info("微信手机支付回调失败订单号:{}", tradeNo);
-                            xmlBack = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
-                        }
-                    }
+                    //此处填写验签成功后的业务逻辑
+                    xmlBack = wxPaySignSuccess(tradeNo,transactionId);
                 }
                 return xmlBack;
             } else {
@@ -813,49 +758,56 @@ public class OrderServiceImpl implements OrderService {
         return false;
     }
 
-    /**
-     * 减少库存并存储到临时表中
-     * @param tradeNo
-     * @return false:消耗库存失败
-     */
-    public String makeGoodsStockReduce(String tradeNo){
-        StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(tradeNo);
-        if (ObjectUtils.isEmpty(offlineOrders)){
-            return "订单未找到";
-        }
-        String storeId = offlineOrders.getSourceStoreId().toString();
-        String codeContent = goodsMapper.getCodeContent(offlineOrders.getGoodsListId());
-        List<Map> result = JSONObject.parseArray(codeContent,Map.class);
-        List<Map<String,Object>> temStocks = new ArrayList<>();
-        for (Map map : result){
-            String goodsId = map.get("goodsId").toString();
-            StoreGoods goodsInfo = goodsMapper.getGoodsInfo(goodsId);
-            Long num = Long.valueOf(map.get("num").toString());
-            StoreGoodsStock goodsStock = goodsMapper.getGoodsStock(goodsId);
-            List<StoreGoodsConsumable> consumablesList = goodsMapper.getGoodsAllConsumablesList(goodsId);
-            Map<String ,Object> temStock = new HashMap<>();
-            temStock.put("storeId",storeId);
-            temStock.put("goodsBarCode",goodsStock.getGoodsBarCode());
-            temStock.put("num",num);
-            temStocks.add(temStock);
-            if (consumablesList.size() == 0){
-                long resNum =  goodsStock.getStockNum()-num;
-                if (resNum < 0){
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return "商品\"" + map.get("goodsName").toString() + "\"库存不足,请及时联系店员添加商品";
+    private String wxPaySignSuccess(String tradeNo,String transactionId){
+        if (tradeNo.startsWith("sot")){
+            StoreOfflineOrders offlineOrder = goodsMapper.getOfflineOrder(tradeNo);
+            if (!ObjectUtils.isEmpty(offlineOrder)){
+                if (offlineOrder.getOrderStatus() == 1) {
+                    return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
                 }
-                goodsMapper.updateGoodsStockNum(goodsId,resNum,storeId);
-            }else {
-                //此处补全减少绑定消耗品的库存
+                offlineOrder.setOrderStatus(1L);
+                offlineOrder.setPayTime(System.currentTimeMillis());
+                offlineOrder.setPayChannel("微信支付");
+                offlineOrder.setOutTradeNo(transactionId);
+                goodsMapper.updateOfflineOrder(offlineOrder);
+                logger.info("支付成功");
+                logger.info("微信手机支付回调成功订单号:{}", tradeNo);
+                return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+            } else {
+                logger.info("微信手机支付回调失败订单号:{}", tradeNo);
+                return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+            }
+        }else {
+            UserOrders userOrders = orderMapper.getUserOrder(tradeNo);
+            if (!ObjectUtils.isEmpty(userOrders)) {
+                // 注意特殊情况：订单已经退款，但收到了支付结果成功的通知，不应把商户的订单状态从退款改成支付成功
+                // 注意特殊情况：微信服务端同样的通知可能会多次发送给商户系统，所以数据持久化之前需要检查是否已经处理过了，处理了直接返回成功标志
+                //业务数据持久化
+                if (userOrders.getOrderStatus().equals("1")) {
+                    return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                }
+                userOrders.setOrderStatus("1");
+                userOrders.setPayTime(String.valueOf(System.currentTimeMillis() / 1000));
+                userOrders.setPayChannel("微信支付");
+                userOrders.setOutTradeNo(transactionId);
+                //更新交易表中状态
+                int returnResult = updateOrderStatusToPrepaid(userOrders);
+                //将用户优惠券状态改为已使用
+                orderMapper.updateDiscountStatus(tradeNo);
+                if (returnResult == 0) {
+                    return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                }
+                if (!makeOrderSuccess(userOrders.getId())) {
+                    orderMapper.updateOrderStatus(tradeNo, 4);
+                    return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                }
+                logger.info("支付成功");
+                logger.info("微信手机支付回调成功订单号:{}", tradeNo);
+                return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+            } else {
+                logger.info("微信手机支付回调失败订单号:{}", tradeNo);
+                return "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>" + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
             }
         }
-        if (temStocks.size() != 0){
-            goodsMapper.addNewTemStock(JSON.toJSONString(temStocks));
-        }
-        return "success";
-    }
-
-    private void reduceContinuously(){
-
     }
 }
