@@ -188,14 +188,24 @@ public class OrderServiceImpl implements OrderService {
         if (!StringUtils.hasText(receivedVerifyInfo.getId())) {
             return DtoUtil.getFalseDto("未获取到订单号", 60004);
         }
-        UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
-        if (userOrders.getOrderStatus().equals("3")) {
-            return DtoUtil.getFalseDto("订单已过期", 60021);
+        if (receivedVerifyInfo.getId().startsWith("sot")){
+            StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(receivedVerifyInfo.getId());
+            if (offlineOrders.getOrderStatus() == 3) {
+                return DtoUtil.getFalseDto("订单已过期", 60021);
+            }
+            if (offlineOrders.getOrderStatus() == 2) {
+                return DtoUtil.getSuccessDto("订单支付成功", 100000);
+            }
+        }else {
+            UserOrders userOrders = orderMapper.getUserOrder(receivedVerifyInfo.getId());
+            if ("3".equals(userOrders.getOrderStatus())) {
+                return DtoUtil.getFalseDto("订单已过期", 60021);
+            }
+            if ("2".equals(userOrders.getOrderStatus())) {
+                return DtoUtil.getSuccessDto("订单支付成功", 100000);
+            }
         }
-        if (userOrders.getOrderStatus().equals("2")) {
-            return DtoUtil.getSuccessDto("订单支付成功", 100000);
-        }
-        return DtoUtil.getFalseDto("订单支付失败", 60003);
+        return DtoUtil.getFalseDto("订单异常", 60003);
     }
 
     @Override
