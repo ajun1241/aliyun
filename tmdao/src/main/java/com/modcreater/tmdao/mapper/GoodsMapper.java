@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.vo.goods.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -378,4 +379,35 @@ public interface GoodsMapper {
      * @return
      */
     int addNewTemStock(String temStock);
+
+    /**
+     * 获取超时订单
+     * @param seconds
+     * @return
+     */
+    List<StoreOfflineOrders> getTimeOutOrders(@Param("seconds") Long seconds);
+
+    /**
+     * 修改超时订单状态
+     * @param seconds
+     * @param orderNum
+     * @return
+     */
+    int makeOrderFailed(@Param("seconds")Long seconds,@Param("orderNum") String orderNum);
+
+    /**
+     * 查询临时库存表
+     * @param orderNumber
+     * @return
+     */
+    String getTemStock(String orderNumber);
+
+    /**
+     * 恢复商品库存
+     * @param storeId
+     * @param goodsBarCode
+     * @param num
+     * @return
+     */
+    int resumeStock(@Param("storeId") String storeId,@Param("goodsBarCode") String goodsBarCode,@Param("num") Long num);
 }

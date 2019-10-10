@@ -244,7 +244,13 @@ public class OrderServiceImpl implements OrderService {
             if (tradeStatus.equals("TRADE_SUCCESS")) {
                 if (outTradeNo.startsWith("sot")){
                     //此处处理商铺模块用户线下扫码支付
-                    return "fail";
+                    StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(outTradeNo);
+                    offlineOrders.setOrderStatus(1L);
+                    offlineOrders.setPayTime(System.currentTimeMillis());
+                    offlineOrders.setPayChannel("支付宝支付");
+                    offlineOrders.setOutTradeNo(tradeNo);
+                    goodsMapper.updateOfflineOrder(offlineOrders);
+                    return "success";
                 }else {
                     UserOrders userOrders = getUserOrderById(outTradeNo);
                     userOrders.setOrderStatus("1");

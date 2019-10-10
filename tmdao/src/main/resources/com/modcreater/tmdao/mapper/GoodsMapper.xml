@@ -236,6 +236,12 @@
     <update id="updateGoodsStockNum">
         update store_goods_stock set stockNum = #{stockNum} where storeId = #{storeId} and storeId = #{storeId}
     </update>
+    <update id="makeOrderFailed">
+        update store_offline_orders set orderStatus = 3 where orderNumber = #{orderNum} and orderStatus = 0 and now() - createDate >= #{seconds}
+    </update>
+    <update id="resumeStock">
+        update store_goods_stock set stockNum = stockNum + #{num} where storeId = #{storeId} and goodsBarCode = #{goodsBarCode}
+    </update>
     <select id="getOfflineOrder" resultType="com.modcreater.tmbeans.pojo.StoreOfflineOrders">
         select * from store_offline_orders where orderNumber = #{tradeNo}
     </select>
@@ -244,5 +250,11 @@
     </select>
     <select id="getGoodsAllConsumablesList" resultType="com.modcreater.tmbeans.pojo.StoreGoodsConsumable">
         select * from store_goodsconsumable where goodsId = #{goodsId}
+    </select>
+    <select id="getTimeOutOrders" resultType="com.modcreater.tmbeans.pojo.StoreOfflineOrders">
+        select * from store_offline_orders where orderStatus = 0 and now() - createDate >= #{seconds}
+    </select>
+    <select id="getTemStock" resultType="java.lang.String">
+        select temStockContent from store_goods_temstock where offlineOrderNum = #{orderNumber}
     </select>
 </mapper>
