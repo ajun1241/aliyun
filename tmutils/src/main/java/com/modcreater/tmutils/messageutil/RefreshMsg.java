@@ -14,6 +14,7 @@ public class RefreshMsg extends BaseMessage {
      * 刷新类型
      * 1：加入邀请事件
      * 2: 出货成功通知
+     * 3: 商家确认商品成功
      */
     private String genre;
 

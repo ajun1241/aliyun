@@ -200,6 +200,14 @@ public interface GoodsService {
     Dto createOfflineOrder(CreateOfflineOrderVo createOfflineOrderVo,String token);
 
     /**
+     * 商家确认商品信息
+     * @param orderInfoVo
+     * @param token
+     * @return
+     */
+    Dto checkGoodsList(OrderInfoVo orderInfoVo, String token);
+
+    /**
      * 商家确认订单
      * @param checkOrderVo
      * @param token
@@ -208,13 +216,6 @@ public interface GoodsService {
     Dto checkOrder(CheckOrderVo checkOrderVo, String token);
 
 
-    /**
-     * 商家确认订单
-     * @param finishDealVo
-     * @param token
-     * @return
-     */
-    Dto finishDeal(FinishDealVo finishDealVo,String token);
     /**
      * 添加消耗品
      * @param addNewConsumable

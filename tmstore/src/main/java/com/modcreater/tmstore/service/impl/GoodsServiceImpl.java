@@ -1,5 +1,6 @@
 package com.modcreater.tmstore.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
@@ -8,13 +9,11 @@ import com.modcreater.tmbeans.utils.GetBarcode;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import com.modcreater.tmbeans.vo.uservo.UserFriendVo;
 import com.modcreater.tmdao.mapper.GoodsMapper;
 import com.modcreater.tmdao.mapper.StoreMapper;
 import com.modcreater.tmstore.service.GoodsService;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
-import com.modcreater.tmutils.messageutil.GoodsListMsg;
 import com.modcreater.tmutils.messageutil.RefreshMsg;
 import com.modcreater.tmutils.pay.PayUtil;
 import org.slf4j.Logger;
@@ -32,8 +31,6 @@ import javax.annotation.Resource;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.*;
-
-import static com.mysql.cj.conf.PropertyKey.logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -459,6 +456,7 @@ public class GoodsServiceImpl implements GoodsService {
         map.put("goodsId",goods.get("id").toString());
         map.put("goodsName",goods.get("goodsName").toString());
         map.put("goodsPrice",goods.get("goodsPrice").toString());
+        map.put("goodsPicture",goods.get("goodsPicture").toString());
         return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
     }
 
@@ -486,19 +484,43 @@ public class GoodsServiceImpl implements GoodsService {
         storeOfflineOrders.setGoodsListId(storeQrCode.getId());
         storeOfflineOrders.setPaymentAmount(Double.valueOf(createOfflineOrderVo.getPaymentAmount()));
         int j=goodsMapper.saveStoreOfflineOrders(storeOfflineOrders);
-        //发送自定义消息给商家
-        if ( i>0 && j>0 ){
-            try {
-                RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
-                GoodsListMsg goodsListMsg=new GoodsListMsg(createOfflineOrderVo.getCodeContent(),"1","");
-                StoreInfo storeInfo=storeMapper.getStoreInfo(createOfflineOrderVo.getStoreId());
-                rongCloudMethodUtil.sendPrivateMsg(createOfflineOrderVo.getUserId(),new String[]{storeInfo.getUserId().toString()},0,goodsListMsg);
-            } catch (Exception e) {
-                logger.error(e.getMessage(),e);
-                return DtoUtil.getFalseDto("发送消息失败",95400);
+        //商品添加进购物车
+        String result=makeGoodsStockReduce(storeOfflineOrders.getOrderNumber(),storeQrCode.getCodeContent());
+        if ("success".equals(result)){
+            Map<String,String> map=new HashMap<>(1);
+            map.put("code",storeQrCode.getId());
+            map.put("orderNumber",storeOfflineOrders.getOrderNumber());
+            //发送自定义消息给商家
+            if ( i>0 && j>0 ){
+                return DtoUtil.getSuccesWithDataDto("下单成功",map,100000);
             }
         }
-        return DtoUtil.getFalseDto("生成订单信息失败",95401);
+        return DtoUtil.getFalseDto(result,95401);
+    }
+
+    /**
+     * 商家确认商品信息
+     * @param orderInfoVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto checkGoodsList(OrderInfoVo orderInfoVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(orderInfoVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        String codeContent=goodsMapper.queryQrCodeContent(orderInfoVo.getCode());
+        Map goods=JSONObject.parseObject(codeContent,Map.class);
+        StoreInfo storeInfo=storeMapper.getStoreInfo(goods.get("storeId").toString());
+        if (!ObjectUtils.isEmpty(storeInfo)){
+            if (orderInfoVo.getUserId().equals(storeInfo.getUserId().toString())){
+                Map<String,String> map=new HashMap<>(1);
+                map.put("codeContent",codeContent);
+                return DtoUtil.getSuccesWithDataDto("查询成功",map,100000);
+            }
+            return DtoUtil.getFalseDto("扫码失败,您不是店主",98013);
+        }
+        return DtoUtil.getFalseDto("扫码失败，商店信息不存在",98012);
     }
 
     /**
@@ -515,8 +537,8 @@ public class GoodsServiceImpl implements GoodsService {
         //发送信息让用户去支付
         try {
             RongCloudMethodUtil rongCloudMethodUtil=new RongCloudMethodUtil();
-            GoodsListMsg goodsListMsg=new GoodsListMsg("","2","");
-            rongCloudMethodUtil.sendPrivateMsg(checkOrderVo.getUserId(),new String[]{checkOrderVo.getTargetId()},0,goodsListMsg);
+            RefreshMsg refreshMsg=new RefreshMsg("3");
+            rongCloudMethodUtil.sendSystemMessage(checkOrderVo.getUserId(),new String[]{checkOrderVo.getTargetId()},refreshMsg,"","");
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             return DtoUtil.getFalseDto("发送消息失败",95400);
@@ -524,16 +546,6 @@ public class GoodsServiceImpl implements GoodsService {
         return DtoUtil.getSuccessDto("发送成功",100000);
     }
 
-    /**
-     * 到店结算订单
-     * @param finishDealVo
-     * @param token
-     * @return
-     */
-    @Override
-    public Dto finishDeal(FinishDealVo finishDealVo, String token) {
-        return null;
-    }
 
     @Override
     public Dto addNewConsumable(AddNewConsumable addNewConsumable, String token) {
@@ -808,5 +820,48 @@ public class GoodsServiceImpl implements GoodsService {
             logger.error(e.getMessage(),e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
+    }
+
+    /**
+     * 减少库存并存储到临时表中
+     * @param tradeNo
+     * @return false:消耗库存失败
+     */
+    public String makeGoodsStockReduce(String tradeNo,String goodsList){
+        StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(tradeNo);
+        if (ObjectUtils.isEmpty(offlineOrders)){
+            return "订单未找到";
+        }
+        String storeId = offlineOrders.getSourceStoreId().toString();
+//        String codeContent = goodsMapper.getCodeContent(offlineOrders.getGoodsListId());
+        Map goods=JSONObject.parseObject(goodsList,Map.class);
+        List<Map> result = JSONObject.parseArray(JSON.toJSONString(goods.get("goodsBeanArray")),Map.class);
+        List<Map<String,Object>> temStocks = new ArrayList<>();
+        for (Map map : result){
+            String goodsId = map.get("goodsId").toString();
+//            StoreGoods goodsInfo = goodsMapper.getGoodsInfo(goodsId);
+            Long num = Long.valueOf(map.get("num").toString());
+            StoreGoodsStock goodsStock = goodsMapper.getGoodsStock(goodsId);
+            List<StoreGoodsConsumable> consumablesList = goodsMapper.getGoodsAllConsumablesList(goodsId);
+            Map<String ,Object> temStock = new HashMap<>();
+            temStock.put("storeId",storeId);
+            temStock.put("goodsBarCode",goodsStock.getGoodsBarCode());
+            temStock.put("num",num);
+            temStocks.add(temStock);
+            if (consumablesList.size() == 0){
+                long resNum =  goodsStock.getStockNum()-num;
+                if (resNum < 0){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return "商品\"" + map.get("goodsName").toString() + "\"库存不足,请及时联系店员添加商品";
+                }
+                goodsMapper.updateGoodsStockNum(goodsId,resNum,storeId);
+            }else {
+                //此处补全减少绑定消耗品的库存
+            }
+        }
+        if (temStocks.size() != 0){
+            goodsMapper.addNewTemStock(JSON.toJSONString(temStocks),tradeNo);
+        }
+        return "success";
     }
 }

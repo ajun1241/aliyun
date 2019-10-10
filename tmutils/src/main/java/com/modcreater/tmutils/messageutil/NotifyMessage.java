@@ -23,6 +23,7 @@ public class NotifyMessage extends BaseMessage {
     public String getType() {
         return "ZX:NotifyMsg";
     }
+
     public String getContent() {
         return content;
     }

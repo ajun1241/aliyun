@@ -1,8 +1,6 @@
 package com.modcreater.tmstore.config;
 
 import com.alibaba.fastjson.JSONObject;
-import com.modcreater.tmbeans.pojo.StoreGoodsConsumable;
-import com.modcreater.tmbeans.pojo.StoreGoodsStock;
 import com.modcreater.tmbeans.pojo.StoreOfflineOrders;
 import com.modcreater.tmdao.mapper.GoodsMapper;
 import org.slf4j.Logger;
@@ -12,10 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -51,7 +47,7 @@ public class TimingScan {
                 for (Map map : result){
                     String storeId = (String) map.get("storeId");
                     String goodsBarCode = (String) map.get("goodsBarCode");
-                    Long num = (Long) map.get("num");
+                    Object num = map.get("num");
                     goodsMapper.resumeStock(storeId,goodsBarCode,num);
                 }
                 i += goodsMapper.makeOrderFailed(timeOut,orders.getOrderNumber());

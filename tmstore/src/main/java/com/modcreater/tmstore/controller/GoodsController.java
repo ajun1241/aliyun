@@ -179,17 +179,18 @@ public class GoodsController {
         return goodsService.createOfflineOrder(createOfflineOrderVo,request.getHeader("token"));
     }
 
+    @PostMapping(value = "checkgoodslist")
+    @ApiOperation("商家确认商品信息")
+    public Dto checkGoodsList(@RequestBody OrderInfoVo orderInfoVo, HttpServletRequest request){
+        return goodsService.checkGoodsList(orderInfoVo,request.getHeader("token"));
+    }
+
     @PostMapping(value = "checkorder")
-    @ApiOperation("线下交易生成订单")
+    @ApiOperation("商家确认订单")
     public Dto checkOrder(@RequestBody CheckOrderVo checkOrderVo, HttpServletRequest request){
         return goodsService.checkOrder(checkOrderVo,request.getHeader("token"));
     }
 
-    @PostMapping(value = "finishdeal")
-    @ApiOperation("商家确认订单")
-    public Dto finishDeal(@RequestBody FinishDealVo finishDealVo, HttpServletRequest request){
-        return goodsService.finishDeal(finishDealVo,request.getHeader("token"));
-    }
 
     @PostMapping(value = "addnewconsumable")
     @ApiOperation("添加消耗品")

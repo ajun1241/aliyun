@@ -97,7 +97,7 @@
         values (#{orderNumber},#{sourceStoreId},#{userId},#{goodsListId},#{paymentAmount},#{payTime},#{payChannel},#{outTradeNo})
     </insert>
     <insert id="addNewTemStock">
-        insert into store_goods_temstock (temStockContent) values (#{temStock})
+        insert into store_goods_temstock (temStockContent,offlineOrderNum) values (#{temStock},#{offlineOrderNum})
     </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
