@@ -149,7 +149,7 @@ public class GoodsServiceImpl implements GoodsService {
         result.put("goodsName",goods.getGoodsName());
         result.put("goodsBrand",goods.getGoodsBrand());
         result.put("goodsUnit",goods.getGoodsUnit());
-        result.put("goodsFUnit",goods.getGoodsFUnit() == null ? "" : goods.getFaUnitNum());
+        result.put("goodsFUnit",goods.getGoodsFUnit() == null ? "" : goods.getGoodsFUnit());
         result.put("faUnitNum",goods.getFaUnitNum() == null ? "" : goods.getFaUnitNum());
         return DtoUtil.getSuccesWithDataDto("操作成功",result,100000);
     }
