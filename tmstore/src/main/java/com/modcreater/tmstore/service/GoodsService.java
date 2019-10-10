@@ -223,4 +223,19 @@ public interface GoodsService {
      */
     Dto addNewConsumable(AddNewConsumable addNewConsumable, String token);
 
+    /**
+     * 微信线下支付
+     * @param receivedOrderNumber
+     * @param token
+     * @return
+     */
+    Dto wxOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token);
+
+    /**
+     * 支付宝线下支付
+     * @param receivedOrderNumber
+     * @param token
+     * @return
+     */
+    Dto aliOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token);
 }

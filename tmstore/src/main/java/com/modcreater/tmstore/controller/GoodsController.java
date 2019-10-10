@@ -196,4 +196,16 @@ public class GoodsController {
     public Dto addNewConsumable(@RequestBody AddNewConsumable addNewConsumable,HttpServletRequest request){
         return goodsService.addNewConsumable(addNewConsumable,request.getHeader("token"));
     }
+
+    @PostMapping(value = "wxofflinepay")
+    @ApiOperation("线下微信支付")
+    public Dto wxOfflinePay(@RequestBody ReceivedOrderNumber receivedOrderNumber,HttpServletRequest request){
+        return goodsService.wxOfflinePay(receivedOrderNumber,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "aliofflinepay")
+    @ApiOperation("线下支付宝支付")
+    public Dto aliOfflinePay(@RequestBody ReceivedOrderNumber receivedOrderNumber,HttpServletRequest request){
+        return goodsService.aliOfflinePay(receivedOrderNumber,request.getHeader("token"));
+    }
 }

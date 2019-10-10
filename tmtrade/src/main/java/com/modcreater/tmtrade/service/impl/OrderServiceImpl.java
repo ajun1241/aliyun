@@ -281,37 +281,12 @@ public class OrderServiceImpl implements OrderService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderInfo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY, sign_type);
-        AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
         Dto dto = createNewOrder(receivedOrderInfo);
         if (dto.getResCode() != 100000) {
             return dto;
         }
         UserOrders userOrder = (UserOrders) dto.getData();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.set(Calendar.SECOND,300);
-        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
-        model.setOutTradeNo(userOrder.getId());
-        model.setSubject("手机端" + userOrder.getOrderTitle() + "移动支付");
-        model.setTotalAmount(userOrder.getPaymentAmount().toString());
-        model.setBody("您花费" + userOrder.getPaymentAmount() + "元");
-        model.setTimeExpire(simpleDateFormat.format(calendar.getTime()));
-        model.setProductCode("QUICK_MSECURITY_PAY");
-        request.setNotifyUrl(NOTIFY_URL);
-        logger.info(model.toString());
-        request.setBizModel(model);
-        try {
-            //这里和普通的接口调用不同，使用的是sdkExecute
-            AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
-            if (response.isSuccess()) {
-                return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功", response.getBody(), 100000);
-            }
-        } catch (AlipayApiException e) {
-            e.printStackTrace();
-        }
-        return DtoUtil.getFalseDto("支付宝订单创建异常", 60001);
+        return PayUtil.aliOrderMaker(userOrder.getId(),userOrder.getOrderTitle(),userOrder.getPaymentAmount());
     }
 
     @Override

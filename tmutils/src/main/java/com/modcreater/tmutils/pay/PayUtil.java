@@ -1,8 +1,15 @@
 package com.modcreater.tmutils.pay;
 
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.pojo.UserOrders;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.payconfig.WxPayConfig;
 import com.modcreater.tmutils.payconfig.wxconfig.WxConfig;
@@ -13,6 +20,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.modcreater.tmutils.payconfig.AliPayConfig.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -106,5 +115,33 @@ public class PayUtil {
             //系统等其他错误的时候
         }
         return DtoUtil.getFalseDto("没有预付订单的数据from未进入微信API调用", 60013);
+    }
+
+    public static Dto aliOrderMaker(String tradeNo, String orderTitle, Double paymentAmount){
+        AlipayClient alipayClient = new DefaultAlipayClient(url, APP_ID, APP_PRIVATE_KEY, "json", CHARSET, ALIPAY_PUBLIC_KEY, sign_type);
+        AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.SECOND,300);
+        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+        model.setOutTradeNo(tradeNo);
+        model.setSubject("手机端" + orderTitle + "移动支付");
+        model.setTotalAmount(paymentAmount.toString());
+        model.setBody("您花费" + paymentAmount + "元");
+        model.setTimeExpire(simpleDateFormat.format(calendar.getTime()));
+        model.setProductCode("QUICK_MSECURITY_PAY");
+        request.setNotifyUrl(NOTIFY_URL);
+        request.setBizModel(model);
+        try {
+            //这里和普通的接口调用不同，使用的是sdkExecute
+            AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
+            if (response.isSuccess()) {
+                return DtoUtil.getSuccesWithDataDto("支付宝订单创建成功", response.getBody(), 100000);
+            }
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+        return DtoUtil.getFalseDto("支付宝订单创建异常", 60001);
     }
 }

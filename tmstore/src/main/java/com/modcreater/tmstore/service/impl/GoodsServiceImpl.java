@@ -16,6 +16,7 @@ import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
 import com.modcreater.tmutils.messageutil.GoodsListMsg;
 import com.modcreater.tmutils.messageutil.RefreshMsg;
+import com.modcreater.tmutils.pay.PayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -555,6 +556,34 @@ public class GoodsServiceImpl implements GoodsService {
         }else {
             return DtoUtil.getFalseDto("添加失败",90013);
         }
+    }
+
+    @Override
+    public Dto wxOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderNumber.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(receivedOrderNumber.getOrderNumber());
+        try {
+            return PayUtil.wxOrderMaker(offlineOrders.getOrderNumber(),offlineOrders.getPaymentAmount());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DtoUtil.getFalseDto("生成订单异常",60013);
+    }
+
+    @Override
+    public Dto aliOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderNumber.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(receivedOrderNumber.getOrderNumber());
+        try {
+            return PayUtil.aliOrderMaker(offlineOrders.getOrderNumber(),"线下",offlineOrders.getPaymentAmount());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DtoUtil.getFalseDto("生成订单异常",60013);
     }
 
     @Override
