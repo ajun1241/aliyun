@@ -258,7 +258,7 @@ public class OrderServiceImpl implements OrderService {
                 if (outTradeNo.startsWith("sot")){
                     //此处处理商铺模块用户线下扫码支付
                     StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(outTradeNo);
-                    offlineOrders.setOrderStatus(1L);
+                    offlineOrders.setOrderStatus(2L);
                     offlineOrders.setPayTime(System.currentTimeMillis());
                     offlineOrders.setPayChannel("支付宝支付");
                     offlineOrders.setOutTradeNo(tradeNo);
@@ -761,7 +761,7 @@ public class OrderServiceImpl implements OrderService {
                 if (offlineOrder.getOrderStatus() == 1) {
                     return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
                 }
-                offlineOrder.setOrderStatus(1L);
+                offlineOrder.setOrderStatus(2L);
                 offlineOrder.setPayTime(System.currentTimeMillis());
                 offlineOrder.setPayChannel("微信支付");
                 offlineOrder.setOutTradeNo(transactionId);
