@@ -10,6 +10,9 @@
             (#{orderNumber},#{sourceGoods.goodsId},#{targetStoreId},#{sourceStoreId},#{transactionPrice},#{sourceGoods.num},#{status})
         </foreach>
     </insert>
+    <update id="updWallet">
+        update store_info set wallet=wallet+#{paymentAmount} where id=#{storeId}
+    </update>
     <select id="getStoreInfo" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
         select * from store_info where id = #{storeId}
     </select>

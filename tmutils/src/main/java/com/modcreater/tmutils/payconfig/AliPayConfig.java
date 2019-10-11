@@ -18,5 +18,5 @@ public class AliPayConfig {
     public static String sign_type="RSA2";
     public static String CHARSET="utf-8";
     public static String url = "https://openapi.alipay.com/gateway.do";
-    public static String NOTIFY_URL = "http://tqdvsc.natappfree.cc/pay/alipay/notify_in_ali_with_mct";
+    public static String NOTIFY_URL = "118.24.171.109/pay/alipay/notify_in_ali_with_mct";
 }

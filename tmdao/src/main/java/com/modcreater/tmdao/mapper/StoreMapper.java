@@ -66,4 +66,11 @@ public interface StoreMapper {
      */
     List<StoreInfo> getGoodsList();
 
+    /**
+     * 修改商铺余额
+     * @param paymentAmount
+     * @param storeId
+     * @return
+     */
+    int updWallet(Double paymentAmount, Long storeId);
 }

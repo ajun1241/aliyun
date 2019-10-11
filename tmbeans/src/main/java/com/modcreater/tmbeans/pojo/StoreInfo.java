@@ -17,5 +17,6 @@ public class StoreInfo {
   private String createDate;
   private Long status;
   private Long attestationId;
+  private Double wallet;
 
 }

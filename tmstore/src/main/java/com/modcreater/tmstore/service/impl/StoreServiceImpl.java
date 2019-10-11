@@ -127,8 +127,6 @@ public class StoreServiceImpl implements StoreService {
         Account account=accountMapper.queryAccount(receivedId.getUserId());
         Map<String,Object> accountMap=new HashMap<>(2);
         accountMap.put("userName",account.getUserName());
-        accountMap.put("balance", 0);
-        resultMap.put("account",accountMap);
         //查询认证状态  0:未认证；1：认证中；2：已认证；3：未通过
         StoreAttestation storeAttestation=storeMapper.getDisposeStatus(receivedId.getUserId());
         if (ObjectUtils.isEmpty(storeAttestation)){
@@ -153,6 +151,9 @@ public class StoreServiceImpl implements StoreService {
         storeMap.put("storeName",storeInfo.getStoreName());
         storeMap.put("storePicture",storeInfo.getStorePicture());
         storeMap.put("storeAddress",storeInfo.getStoreAddress());
+        //查询余额
+        accountMap.put("balance", storeInfo.getWallet());
+        resultMap.put("account",accountMap);
         resultMap.put("storeInfo",storeMap);
         return DtoUtil.getSuccesWithDataDto("查询成功",resultMap,100000);
     }

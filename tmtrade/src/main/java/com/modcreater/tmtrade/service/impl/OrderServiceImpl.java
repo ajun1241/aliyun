@@ -73,6 +73,9 @@ public class OrderServiceImpl implements OrderService {
     private GoodsMapper goodsMapper;
 
     @Resource
+    private StoreMapper storeMapper;
+
+    @Resource
     private StringRedisTemplate stringRedisTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger("trade");
@@ -260,6 +263,8 @@ public class OrderServiceImpl implements OrderService {
                     offlineOrders.setPayChannel("支付宝支付");
                     offlineOrders.setOutTradeNo(tradeNo);
                     goodsMapper.updateOfflineOrder(offlineOrders);
+                    //支付成功增加商铺余额
+                    storeMapper.updWallet(offlineOrders.getPaymentAmount(),offlineOrders.getSourceStoreId());
                     return "success";
                 }else {
                     UserOrders userOrders = getUserOrderById(outTradeNo);
@@ -761,6 +766,8 @@ public class OrderServiceImpl implements OrderService {
                 offlineOrder.setPayChannel("微信支付");
                 offlineOrder.setOutTradeNo(transactionId);
                 goodsMapper.updateOfflineOrder(offlineOrder);
+                //支付成功增加商铺余额
+                storeMapper.updWallet(offlineOrder.getPaymentAmount(),offlineOrder.getSourceStoreId());
                 logger.info("支付成功");
                 logger.info("微信手机支付回调成功订单号:{}", tradeNo);
                 return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
