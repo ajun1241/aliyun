@@ -205,9 +205,10 @@ public interface GoodsMapper {
     /**
      * 查询商品库存信息
      * @param goodsId
+     * @param storeId
      * @return
      */
-    StoreGoodsStock getGoodsStock(String goodsId);
+    StoreGoodsStock getGoodsStock(@Param("goodsId") String goodsId,@Param("storeId") String storeId);
 
     /**
      * 判断商品库存
@@ -256,9 +257,10 @@ public interface GoodsMapper {
     /**
      * 根据商品Id查询商品详情(修改商品信息)
      * @param goodsId
+     * @param storeId
      * @return
      */
-    GoodsInfoToUpdate getGoodsInfoToUpdate(String goodsId);
+    GoodsInfoToUpdate getGoodsInfoToUpdate(@Param("goodsId") String goodsId,@Param("storeId") Long storeId);
 
     /**
      * 获取商品对应的消耗品

@@ -21,4 +21,6 @@ public class UpdateGoodsPrice {
 
     private Double unitPrice;
 
+    private String storeId;
+
 }

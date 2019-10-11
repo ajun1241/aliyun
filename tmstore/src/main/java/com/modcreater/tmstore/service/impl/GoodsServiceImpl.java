@@ -159,7 +159,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(updateGoodsPrice.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        StoreGoodsStock storeGoodsStock = goodsMapper.getGoodsStock(updateGoodsPrice.getGoodsId());
+        StoreGoodsStock storeGoodsStock = goodsMapper.getGoodsStock(updateGoodsPrice.getGoodsId(),updateGoodsPrice.getStoreId());
         if (!reg(updateGoodsPrice.getUserId(),storeGoodsStock.getStoreId().toString())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
@@ -347,7 +347,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(receivedGoodsId.getUserId(), storeGoods.getStoreId().toString())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId());
+        GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId(),storeGoods.getStoreId());
         List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId(),null,0L,3L);
         goodsInfoToUpdate.setShowConsumables(showConsumables);
         StoreGoodsCorrelation correlation =  goodsMapper.getSonGoodsInfo(receivedGoodsId.getGoodsId());
@@ -841,7 +841,7 @@ public class GoodsServiceImpl implements GoodsService {
             String goodsId = map.get("goodsId").toString();
 //            StoreGoods goodsInfo = goodsMapper.getGoodsInfo(goodsId);
             Long num = Long.valueOf(map.get("num").toString());
-            StoreGoodsStock goodsStock = goodsMapper.getGoodsStock(goodsId);
+            StoreGoodsStock goodsStock = goodsMapper.getGoodsStock(goodsId,storeId);
             List<StoreGoodsConsumable> consumablesList = goodsMapper.getGoodsAllConsumablesList(goodsId);
             Map<String ,Object> temStock = new HashMap<>();
             temStock.put("storeId",storeId);
