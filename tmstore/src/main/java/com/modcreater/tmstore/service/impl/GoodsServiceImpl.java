@@ -66,6 +66,12 @@ public class GoodsServiceImpl implements GoodsService {
         if (goodsMapper.getCorRelation(registerGoods.getCorGoodsId()) >= 1){
             return DtoUtil.getFalseDto("当前选中的转换商品已被其他产品绑定",80006);
         }
+        if (registerGoods.getFaUnitNum() == null){
+            registerGoods.setFaUnitNum(0L);
+        }
+        if (!StringUtils.hasText(registerGoods.getGoodsFUnit())){
+            registerGoods.setGoodsFUnit("");
+        }
         goodsMapper.addNewGoods(registerGoods);
         goodsMapper.addNewGoodsStock(registerGoods.getId(),registerGoods.getStoreId(), registerGoods.getGoodsNum(),"1",registerGoods.getGoodsBarCode());
         if (StringUtils.hasText(registerGoods.getGoodsFUnit()) && !StringUtils.hasText(registerGoods.getCorGoodsId())){
