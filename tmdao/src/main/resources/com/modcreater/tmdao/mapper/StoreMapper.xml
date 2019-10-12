@@ -7,7 +7,11 @@
     <insert id="saveTradingRecord">
         insert into store_purchase_records (orderNumber, goodsId, targetStoreId, sourceStoreId, transactionPrice, goodsCount, status) values
         <foreach collection="sourceGoods" item="sourceGoods" index="index" separator=",">
-            (#{orderNumber},#{sourceGoods.goodsId},#{targetStoreId},#{sourceStoreId},#{transactionPrice},#{sourceGoods.num},#{status})
+            (#{orderNumber},#{sourceGoods.goodsId},#{targetStoreId},#{sourceStoreId},#{transactionPrice},#{sourceGoods.num},#{status}
+                <if test="sourceGoods.changeGoodsNum != null and sourceGoods.changeGoodsNum != '0' ">
+                    ,#{sourceGoods.changeGoodsId}
+                </if>
+            )
         </foreach>
     </insert>
     <update id="updWallet">

@@ -14,5 +14,6 @@ public class StorePurchaseRecords {
   private String createDate;
   private Long goodsCount;
   private Long status;
+  private Long changeGoodsId;
 
 }

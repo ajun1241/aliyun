@@ -92,12 +92,12 @@ public class GoodsController {
         return goodsService.queryOrderQrInfo(orderInfoVo,request.getHeader("token"));
     }
 
-    @Safety
+    /*@Safety
     @PostMapping(value = "conversionunit")
     @ApiOperation("单位转换")
     public Dto conversionUnit(@RequestBody ConversionUnitVo conversionUnitVo, HttpServletRequest request){
         return goodsService.conversionUnit(conversionUnitVo,request.getHeader("token"));
-    }
+    }*/
 
     @Safety
     @PostMapping(value = "claimgoods")

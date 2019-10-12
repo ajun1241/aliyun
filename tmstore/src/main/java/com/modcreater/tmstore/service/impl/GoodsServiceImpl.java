@@ -725,6 +725,15 @@ public class GoodsServiceImpl implements GoodsService {
                 goodsMap.put("weekSalesVolume",0);
                 goodsMap.put("goodsPrice",map.get("goodsPrice")==null ? 0 : map.get("goodsPrice"));
                 goodsMap.put("goodsUnit",map.get("goodsUnit"));
+                //商品库存
+                goodsMap.put("goodsStock",map.get("stockNum"));
+                //可转换商品的Id
+                StoreGoodsCorrelation storeGoodsCorrelation=goodsMapper.getSonGoodsInfo(map.get("id").toString());
+                goodsMap.put("changeGoodsId", ObjectUtils.isEmpty(storeGoodsCorrelation.getGoodsSonId()) ? "" : storeGoodsCorrelation.getGoodsSonId().toString());
+                //转换商品的比例
+                goodsMap.put("conversionRatio",map.get("faUnitNum"));
+                //转换商品的单位
+                goodsMap.put("changeGoodsUnit",map.get("goodsFUnit"));
                 list.add(goodsMap);
             }
             storeGoodsType.put("list",list);
@@ -784,7 +793,17 @@ public class GoodsServiceImpl implements GoodsService {
             for (Map<String,String> map:sourceGoods) {
                 int a=0;
                 //查询商品编码
-                StoreGoods storeGoods=goodsMapper.getGoodsInfo(map.get("goodsId"));
+                Long goodsId;
+                Long num;
+                //判断是否转换
+                if ("0".equals(map.get("changeGoodsNum"))){
+                    goodsId= Long.valueOf(map.get("goodsId"));
+                    num= Long.valueOf(map.get("num"));
+                }else {
+                    goodsId= Long.valueOf(map.get("changeGoodsId"));
+                    num= Long.valueOf(map.get("changeGoodsNum"));
+                }
+                StoreGoods storeGoods=goodsMapper.getGoodsInfo(goodsId.toString());
                 //如果有条形码
                 if (!StringUtils.isEmpty(storeGoods.getGoodsBarCode())){
                     //判断是新增还是修改库存
@@ -792,37 +811,37 @@ public class GoodsServiceImpl implements GoodsService {
                     if (ObjectUtils.isEmpty(storeGoodsStock)){
                         //新增
                         storeGoodsStock=new StoreGoodsStock();
-                        storeGoodsStock.setGoodsId(Long.valueOf(map.get("goodsId")));
+                        storeGoodsStock.setGoodsId(goodsId);
                         storeGoodsStock.setStoreId(Long.valueOf(targetStoreId));
-                        storeGoodsStock.setStockNum(Long.valueOf(map.get("num")));
+                        storeGoodsStock.setStockNum(num);
                         storeGoodsStock.setGoodsBarCode(storeGoods.getGoodsBarCode());
                         storeGoodsStock.setGoodsStatus(1L);
                         a=goodsMapper.insertStoreGoodsStock(storeGoodsStock);
                     }else {
                         //修改
-                        storeGoodsStock.setStockNum(storeGoodsStock.getStockNum()+Long.valueOf(map.get("num")));
+                        storeGoodsStock.setStockNum(storeGoodsStock.getStockNum()+num);
                         storeGoodsStock.setGoodsBarCode(storeGoods.getGoodsBarCode());
                         a=goodsMapper.updateGoodsStockByBarCode(storeGoodsStock);
                     }
                 }else {//没有条形码
-                    StoreGoodsStock storeGoodsStock=goodsMapper.queryGoodsStock(map.get("goodsId"),targetStoreId);
+                    StoreGoodsStock storeGoodsStock=goodsMapper.queryGoodsStock(goodsId.toString(),targetStoreId);
                     //判断是新增还是修改库存
                     if (ObjectUtils.isEmpty(storeGoodsStock)){
                         //新增
                         storeGoodsStock=new StoreGoodsStock();
-                        storeGoodsStock.setGoodsId(Long.valueOf(map.get("goodsId")));
+                        storeGoodsStock.setGoodsId(goodsId);
                         storeGoodsStock.setStoreId(Long.valueOf(targetStoreId));
-                        storeGoodsStock.setStockNum(Long.valueOf(map.get("num")));
+                        storeGoodsStock.setStockNum(num);
                         storeGoodsStock.setGoodsStatus(1L);
                         a=goodsMapper.insertStoreGoodsStock(storeGoodsStock);
                     }else {
                         //修改
-                        storeGoodsStock.setStockNum(storeGoodsStock.getStockNum()+Long.valueOf(map.get("num")));
+                        storeGoodsStock.setStockNum(storeGoodsStock.getStockNum()+num);
                         a=goodsMapper.updGoodsStock(storeGoodsStock);
                     }
                 }
             }
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(),e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
