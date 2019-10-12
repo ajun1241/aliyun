@@ -73,4 +73,11 @@ public interface StoreMapper {
      * @return
      */
     int updWallet(Double paymentAmount, Long storeId);
+
+    /**
+     * 根据用户Id查询商户Id
+     * @param userId
+     * @return
+     */
+    Long getStoreIdByUserId(String userId);
 }

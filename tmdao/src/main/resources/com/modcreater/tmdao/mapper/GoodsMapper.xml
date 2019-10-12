@@ -258,4 +258,16 @@
     <select id="getTemStock" resultType="java.lang.String">
         select temStockContent from store_goods_temstock where offlineOrderNum = #{orderNumber}
     </select>
+    <select id="getTradedStoreIds" resultType="java.lang.String">
+        select targetStoreId from store_purchase_records where sourceStoreId = #{storeId} group by targetStoreId
+    </select>
+    <select id="getOrderGoodsList" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
+        select * from store_purchase_records where sourceStoreId = #{sourceStoreId} and targetStoreId = #{targetStoreId}
+        <if test="condition == 'binded'">
+            and changeGoodsId is not null
+        </if>
+        <if test="condition == 'unbinded'">
+            and changeGoodsId is null
+        </if>
+    </select>
 </mapper>

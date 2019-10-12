@@ -209,4 +209,10 @@ public class GoodsController {
     public Dto aliOfflinePay(@RequestBody ReceivedOrderNumber receivedOrderNumber,HttpServletRequest request){
         return goodsService.aliOfflinePay(receivedOrderNumber,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getgoodstracking")
+    @ApiOperation("出货跟踪")
+    public Dto getGoodsTracking(@RequestBody ReceivedStoreId receivedStoreId ,HttpServletRequest request){
+        return goodsService.getGoodsTracking(receivedStoreId,request.getHeader("token"));
+    }
 }

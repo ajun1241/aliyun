@@ -348,12 +348,9 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedGoodsId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        StoreGoods storeGoods = goodsMapper.getGoodsInfo(receivedGoodsId.getGoodsId());
-        System.out.println(storeGoods.toString());
-        if (!reg(receivedGoodsId.getUserId(), storeGoods.getStoreId().toString())) {
-            return DtoUtil.getFalseDto("违规操作!", 90001);
-        }
-        GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId(),storeGoods.getStoreId());
+        //如果店铺和用户不是一对一,此处需要传storeId
+        Long storeId = storeMapper.getStoreIdByUserId(receivedGoodsId.getUserId());
+        GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId(),storeId);
         List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId(),null,0L,3L);
         goodsInfoToUpdate.setShowConsumables(showConsumables);
         StoreGoodsCorrelation correlation =  goodsMapper.getSonGoodsInfo(receivedGoodsId.getGoodsId());
@@ -602,6 +599,27 @@ public class GoodsServiceImpl implements GoodsService {
             e.printStackTrace();
         }
         return DtoUtil.getFalseDto("生成订单异常",60013);
+    }
+
+    @Override
+    public Dto getGoodsTracking(ReceivedStoreId receivedStoreId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedStoreId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(receivedStoreId.getUserId(),receivedStoreId.getStoreId())){
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        List<Map> result = new ArrayList<>();
+        List<String> storeIds = goodsMapper.getTradedStoreIds(receivedStoreId.getStoreId());
+        for (String storeId :storeIds){
+            Map<String,Object> storeList = new HashMap<>();
+            StoreInfo storeInfo = storeMapper.getStoreInfo(storeId);
+            storeList.put("storePicture",storeInfo.getStorePicture());
+            storeList.put("storeName",storeInfo.getStoreName());
+            List<StorePurchaseRecords> goodsList =  goodsMapper.getOrderGoodsList(receivedStoreId.getStoreId(),storeId,"binded");
+
+        }
+        return null;
     }
 
     @Override

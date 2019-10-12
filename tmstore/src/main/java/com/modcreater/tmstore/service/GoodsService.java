@@ -239,4 +239,12 @@ public interface GoodsService {
      * @return
      */
     Dto aliOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token);
+
+    /**
+     * 获取出货跟踪列表
+     * @param receivedStoreId
+     * @param token
+     * @return
+     */
+    Dto getGoodsTracking(ReceivedStoreId receivedStoreId, String token);
 }

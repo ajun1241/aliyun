@@ -411,4 +411,20 @@ public interface GoodsMapper {
      * @return
      */
     int resumeStock(@Param("storeId") String storeId,@Param("goodsBarCode") String goodsBarCode,@Param("num") Object num);
+
+    /**
+     * 查询与该商店有交易来往的店铺Id
+     * @param storeId
+     * @return
+     */
+    List<String> getTradedStoreIds(String storeId);
+
+    /**
+     * 根据条件查询订单内的商品列表
+     * @param sourceStoreId
+     * @param targetStoreId
+     * @param condition
+     * @return
+     */
+    List<StorePurchaseRecords> getOrderGoodsList(@Param("sourceStoreId") String sourceStoreId,@Param("targetStoreId") String targetStoreId,@Param("condition") String condition);
 }
