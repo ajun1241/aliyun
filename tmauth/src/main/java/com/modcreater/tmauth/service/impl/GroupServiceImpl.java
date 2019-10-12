@@ -1399,7 +1399,7 @@ public class GroupServiceImpl implements GroupService {
         map.put("headImgUrl", account.getHeadImgUrl());
         map.put("userName", account.getUserName());
         map.put("friendId", account.getId());
-        map.put("gender", account.getGender());
+        map.put("gender", account.getGender().toString());
         map.put("userCode", account.getUserCode());
         return map;
     }
