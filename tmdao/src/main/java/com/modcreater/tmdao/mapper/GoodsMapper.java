@@ -460,11 +460,11 @@ public interface GoodsMapper {
 
     /**
      * 根据时间获取销量
-     * @param orderNumber
+     * @param goodsId
      * @param time
      * @return
      */
-    Map getSalesVolumeByCreateTime(@Param("orderNumber") String orderNumber,@Param("time") Date time);
+    Map getSalesVolumeByCreateTime(@Param("goodsId") String goodsId,@Param("time") Date time);
 
     /**
      * 根据商店Id和商品Id获取两个商店第一次交易该商品的时间
@@ -474,4 +474,11 @@ public interface GoodsMapper {
      * @return
      */
     Date getGoodsFirstPurchaseTime(@Param("sourceStoreId") String sourceStoreId,@Param("targetStoreId") String targetStoreId,@Param("goodsId") Long goodsId);
+
+    /**
+     * 根据订单号查询出货单
+     * @param orderNumber
+     * @return
+     */
+    StorePurchaseRecords getPurchaseRecordsByOrderNumber(String orderNumber);
 }

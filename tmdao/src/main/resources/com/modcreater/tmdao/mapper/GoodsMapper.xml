@@ -274,7 +274,25 @@
         </if>
     </select>
     <select id="getCurrentOrderGoodsList" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
-        select * from store_purchase_records where orderNumber = #{orderNumber}
+        select * from
+        (select spr.goodsId,sum(spr.goodsCount) goodsCount,spr.orderNumber,spr.changeGoodsId
+        from store_purchase_records spr ,store_goods sg
+        where spr.goodsId = sg.id
+        and spr.changeGoodsId is null
+        and orderNumber = #{orderNumber}
+		and `status` = 1
+        group by goodsId
+        order by goodsCount desc) a
+        union all
+        select * from
+        (select spr.changeGoodsId goodsId,sum(spr.goodsCount * sg.faUnitNum) goodsCount,spr.orderNumber,spr.changeGoodsId
+        from store_purchase_records spr ,store_goods sg
+        where spr.goodsId = sg.id
+        and spr.changeGoodsId is not null
+        and orderNumber = #{orderNumber}
+		and `status` = 1
+        group by goodsId
+        order by goodsCount desc) b
     </select>
     <select id="getCurrentOrder" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
         select * from store_purchase_records where targetStoreId = #{targetStoreId} and sourceStoreId = #{sourceStoreId}
@@ -300,7 +318,7 @@
         order by totalNum desc) b
     </select>
     <select id="getSalesVolumeByCreateTime" resultType="java.util.Map">
-        select orderNumber,goodsId,sum(num) num,createTime from store_sales_volume where orderNumber = #{orderNumber} and createTime >= #{time} group by goodsId
+        select orderNumber,goodsId,sum(num) num,createTime from store_sales_volume where goodsId = #{goodsId} and createTime >= DATE_FORMAT(#{time},'%Y-%m-%d %H:%i:%S') group by goodsId
     </select>
     <select id="getGoodsFirstPurchaseTime" resultType="java.util.Date">
         select createDate from store_purchase_records
@@ -309,5 +327,8 @@
         and goodsId = #{goodsId}
         order by createDate asc
         limit 0,1
+    </select>
+    <select id="getPurchaseRecordsByOrderNumber" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
+        select * from store_purchase_records where orderNumber = #{orderNumber}
     </select>
 </mapper>
