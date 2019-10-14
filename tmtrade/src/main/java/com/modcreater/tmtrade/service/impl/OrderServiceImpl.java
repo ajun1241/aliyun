@@ -265,6 +265,17 @@ public class OrderServiceImpl implements OrderService {
                     goodsMapper.updateOfflineOrder(offlineOrders);
                     //支付成功增加商铺余额
                     storeMapper.updWallet(offlineOrders.getPaymentAmount(),offlineOrders.getSourceStoreId());
+                    //订单成功后解析已卖出商品并将数量记录到销量表中
+                    //(因为要根据时间计算商品销量,所以该表中同一商铺下会有多个商品及对应数量)
+                    List<Map> goodsList = JSONObject.parseArray(goodsMapper.getTemStock(outTradeNo),Map.class);
+                    for (Map goods : goodsList){
+                        StoreSalesVolume storeSalesVolume = new StoreSalesVolume();
+                        storeSalesVolume.setGoodsId(goodsMapper.getGoodsStockByGoodsBarCode(offlineOrders.getSourceStoreId().toString(),goods.get("goodsBarCode").toString()).getGoodsId().toString());
+                        storeSalesVolume.setNum(Long.valueOf(goods.get("num").toString()));
+                        storeSalesVolume.setStoreId(offlineOrders.getSourceStoreId().toString());
+                        storeSalesVolume.setOrderNumber(outTradeNo);
+                        goodsMapper.addNewSalesVolume(storeSalesVolume);
+                    }
                     return "success";
                 }else {
                     UserOrders userOrders = getUserOrderById(outTradeNo);
@@ -768,6 +779,17 @@ public class OrderServiceImpl implements OrderService {
                 goodsMapper.updateOfflineOrder(offlineOrder);
                 //支付成功增加商铺余额
                 storeMapper.updWallet(offlineOrder.getPaymentAmount(),offlineOrder.getSourceStoreId());
+                //订单成功后解析已卖出商品并将数量记录到销量表中
+                //(因为要根据时间计算商品销量,所以该表中同一商铺下会有多个商品及对应数量)
+                List<Map> goodsList = JSONObject.parseArray(goodsMapper.getTemStock(tradeNo),Map.class);
+                for (Map goods : goodsList){
+                    StoreSalesVolume storeSalesVolume = new StoreSalesVolume();
+                    storeSalesVolume.setGoodsId(goodsMapper.getGoodsStockByGoodsBarCode(offlineOrder.getSourceStoreId().toString(),goods.get("goodsBarCode").toString()).getGoodsId().toString());
+                    storeSalesVolume.setNum(Long.valueOf(goods.get("num").toString()));
+                    storeSalesVolume.setStoreId(offlineOrder.getSourceStoreId().toString());
+                    storeSalesVolume.setOrderNumber(tradeNo);
+                    goodsMapper.addNewSalesVolume(storeSalesVolume);
+                }
                 logger.info("支付成功");
                 logger.info("微信手机支付回调成功订单号:{}", tradeNo);
                 return "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";

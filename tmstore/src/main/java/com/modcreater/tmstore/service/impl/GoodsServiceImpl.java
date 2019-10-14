@@ -12,8 +12,10 @@ import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.GoodsMapper;
 import com.modcreater.tmdao.mapper.StoreMapper;
 import com.modcreater.tmstore.service.GoodsService;
+import com.modcreater.tmutils.DateUtil;
 import com.modcreater.tmutils.DtoUtil;
 import com.modcreater.tmutils.RongCloudMethodUtil;
+import com.modcreater.tmutils.SingleEventUtil;
 import com.modcreater.tmutils.messageutil.RefreshMsg;
 import com.modcreater.tmutils.pay.PayUtil;
 import org.slf4j.Logger;
@@ -30,6 +32,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.Resource;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -609,17 +613,70 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(receivedStoreId.getUserId(),receivedStoreId.getStoreId())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<Map> result = new ArrayList<>();
         List<String> storeIds = goodsMapper.getTradedStoreIds(receivedStoreId.getStoreId());
         for (String storeId :storeIds){
-            Map<String,Object> storeList = new HashMap<>();
+            Map<String,Object> storeGoodsList = new HashMap<>();
             StoreInfo storeInfo = storeMapper.getStoreInfo(storeId);
-            storeList.put("storePicture",storeInfo.getStorePicture());
-            storeList.put("storeName",storeInfo.getStoreName());
-            List<StorePurchaseRecords> goodsList =  goodsMapper.getOrderGoodsList(receivedStoreId.getStoreId(),storeId,"binded");
+            storeGoodsList.put("storePicture",storeInfo.getStorePicture());
+            storeGoodsList.put("storeName",storeInfo.getStoreName());
+            //获取最新进货单信息
+            StorePurchaseRecords storePurchaseRecords = goodsMapper.getCurrentOrder(receivedStoreId.getStoreId(),storeId);
+            //获取最新进货单的当前商品列表
+            List<StorePurchaseRecords> newOrderGoodsList = goodsMapper.getCurrentOrderGoodsList(storePurchaseRecords.getOrderNumber());
+            //完善逻辑(根据销量对要显示的商品排序)
+            List<Map> salesVolumes = new ArrayList<>();
+            for (StorePurchaseRecords records : newOrderGoodsList) {
+                Date time = goodsMapper.getGoodsFirstPurchaseTime(receivedStoreId.getStoreId(), storeId, records.getGoodsId());
+                if (ObjectUtils.isEmpty(time)) {
+                    continue;
+                }
+                Map salesVolume = goodsMapper.getSalesVolumeByCreateTime(storePurchaseRecords.getOrderNumber(), time);
+                if (ObjectUtils.isEmpty(salesVolume)) {
+                    continue;
+                }
+                salesVolumes.add(salesVolume);
 
+            }
+            if (salesVolumes.size() > 0) {
+                Map temp;
+                for (int i = 0; i < salesVolumes.size() - 1; i++) {
+                    for (int j = 0; j < salesVolumes.size() - i - 1; j++) {
+                        if (Long.valueOf(salesVolumes.get(j + 1).get("num").toString()) < Long.valueOf(salesVolumes.get(j).get("num").toString())) {
+                            temp = salesVolumes.get(j);
+                            salesVolumes.set(j, salesVolumes.get(j + 1));
+                            salesVolumes.set(j + 1, temp);
+                        }
+                    }
+                }
+                Map sv = salesVolumes.get(0);
+                StoreGoods goods = goodsMapper.getGoodsInfo(sv.get("goodsId").toString());
+                goodsMapper.getOfflineOrder(sv.get("orderNumber").toString());
+                storeGoodsList.put("goodsName", goods.getGoodsName());
+                storeGoodsList.put("goodsId", goods.getId());
+                storeGoodsList.put("createTime", sv.get("createTime"));
+                //进货数量
+                storeGoodsList.put("purchaseNum", storePurchaseRecords.getGoodsCount());
+                storeGoodsList.put("purchaseUnit", goods.getGoodsUnit());
+                //已卖出数量
+                storeGoodsList.put("soldNum", Long.valueOf(sv.get("num").toString()) / goods.getFaUnitNum());
+                storeGoodsList.put("soldUnit", goods.getGoodsUnit());
+            } else {
+                StoreGoods goods = goodsMapper.getGoodsInfo(newOrderGoodsList.get(0).getGoodsId().toString());
+                storeGoodsList.put("goodsId", goods.getId());
+                storeGoodsList.put("goodsName", goods.getGoodsName());
+                storeGoodsList.put("createTime", storePurchaseRecords.getCreateDate());
+                //进货数量
+                storeGoodsList.put("purchaseNum", storePurchaseRecords.getGoodsCount());
+                storeGoodsList.put("purchaseUnit", goods.getGoodsUnit());
+                //已卖出数量
+                storeGoodsList.put("soldNum", 0);
+                storeGoodsList.put("soldUnit", goods.getGoodsUnit());
+            }
+            result.add(storeGoodsList);
         }
-        return null;
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
     @Override

@@ -99,6 +99,9 @@
     <insert id="addNewTemStock">
         insert into store_goods_temstock (temStockContent,offlineOrderNum) values (#{temStock},#{offlineOrderNum})
     </insert>
+    <insert id="addNewSalesVolume">
+        insert into store_sales_volume (orderNumber, storeId, goodsId, num) values (#{orderNumber},#{storeId},#{goodsId},#{num})
+    </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
     </select>
@@ -269,5 +272,42 @@
         <if test="condition == 'unbinded'">
             and changeGoodsId is null
         </if>
+    </select>
+    <select id="getCurrentOrderGoodsList" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
+        select * from store_purchase_records where orderNumber = #{orderNumber}
+    </select>
+    <select id="getCurrentOrder" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
+        select * from store_purchase_records where targetStoreId = #{targetStoreId} and sourceStoreId = #{sourceStoreId}
+        group by createDate order by createDate desc limit 0,1
+    </select>
+    <select id="getOrderGoodsIds" resultType="java.util.Map">
+        select * from
+        (select spr.goodsId,sum(spr.goodsCount) totalNum,sg.goodsUnit unit
+        from store_purchase_records spr ,store_goods sg
+        where spr.goodsId = sg.id
+        and spr.changeGoodsId is null
+        and targetStoreId = #{storeId}
+        group by goodsId
+        order by totalNum desc) a
+        union all
+        select * from
+        (select spr.goodsId,sum(spr.goodsCount * sg.faUnitNum) totalNum,sg.goodsFUnit unit
+        from store_purchase_records spr ,store_goods sg
+        where spr.goodsId = sg.id
+        and spr.changeGoodsId is not null
+        and targetStoreId = #{storeId}
+        group by goodsId
+        order by totalNum desc) b
+    </select>
+    <select id="getSalesVolumeByCreateTime" resultType="java.util.Map">
+        select orderNumber,goodsId,sum(num) num,createTime from store_sales_volume where orderNumber = #{orderNumber} and createTime >= #{time} group by goodsId
+    </select>
+    <select id="getGoodsFirstPurchaseTime" resultType="java.util.Date">
+        select createDate from store_purchase_records
+        where sourceStoreId = #{sourceStoreId}
+        and targetStoreId = #{targetStoreId}
+        and goodsId = #{goodsId}
+        order by createDate asc
+        limit 0,1
     </select>
 </mapper>

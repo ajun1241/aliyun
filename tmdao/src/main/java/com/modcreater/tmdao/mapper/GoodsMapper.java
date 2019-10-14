@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.vo.goods.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -427,4 +428,50 @@ public interface GoodsMapper {
      * @return
      */
     List<StorePurchaseRecords> getOrderGoodsList(@Param("sourceStoreId") String sourceStoreId,@Param("targetStoreId") String targetStoreId,@Param("condition") String condition);
+
+    /**
+     * 获取商店最新的订单
+     * @param orderNumber
+     * @return
+     */
+    List<StorePurchaseRecords> getCurrentOrderGoodsList(String orderNumber);
+
+    /**
+     * 获取商店最新的订单
+     * @param sourceStoreId
+     * @param targetStoreId
+     * @return
+     */
+    StorePurchaseRecords getCurrentOrder(@Param("sourceStoreId") String sourceStoreId,@Param("targetStoreId") String targetStoreId);
+
+    /**
+     * 获取订单列表内改商店进货的商品Id
+     * @param storeId
+     * @return
+     */
+    List<Map<String,Object>> getOrderGoodsIds(String storeId);
+
+    /**
+     * 添加商品销量
+     * @param storeSalesVolume
+     * @return
+     */
+    int addNewSalesVolume(StoreSalesVolume storeSalesVolume);
+
+    /**
+     * 根据时间获取销量
+     * @param orderNumber
+     * @param time
+     * @return
+     */
+    Map getSalesVolumeByCreateTime(@Param("orderNumber") String orderNumber,@Param("time") Date time);
+
+    /**
+     * 根据商店Id和商品Id获取两个商店第一次交易该商品的时间
+     * @param sourceStoreId
+     * @param targetStoreId
+     * @param goodsId
+     * @return
+     */
+    Date getGoodsFirstPurchaseTime(@Param("sourceStoreId") String sourceStoreId,@Param("targetStoreId") String targetStoreId,@Param("goodsId") Long goodsId);
 }
