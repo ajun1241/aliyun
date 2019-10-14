@@ -656,7 +656,7 @@ public class GoodsServiceImpl implements GoodsService {
                 goodsMapper.getOfflineOrder(sv.get("pOrderNumber").toString());
                 storeGoodsList.put("goodsName", goods.getGoodsName());
                 storeGoodsList.put("goodsId", goods.getId());
-                storeGoodsList.put("createTime", sv.get("createTime"));
+                storeGoodsList.put("createTime", simpleDateFormat.format(sv.get("createTime")));
                 //进货数量
                 storeGoodsList.put("purchaseNum", storePurchaseRecords.getGoodsCount());
                 storeGoodsList.put("purchaseUnit", goods.getGoodsUnit());
