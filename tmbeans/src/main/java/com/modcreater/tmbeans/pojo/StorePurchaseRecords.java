@@ -6,7 +6,7 @@ import lombok.Data;
 public class StorePurchaseRecords {
 
   private Long id;
-  private String orderNumber;
+  private Long orderNumber;
   private Long goodsId;
   private Long targetStoreId;
   private Long sourceStoreId;

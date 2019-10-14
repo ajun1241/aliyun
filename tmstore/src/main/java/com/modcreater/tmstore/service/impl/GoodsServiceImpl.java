@@ -624,7 +624,7 @@ public class GoodsServiceImpl implements GoodsService {
             //获取最新进货单信息
             StorePurchaseRecords storePurchaseRecords = goodsMapper.getCurrentOrder(receivedStoreId.getStoreId(),storeId);
             //获取最新进货单的当前商品列表
-            List<StorePurchaseRecords> newOrderGoodsList = goodsMapper.getCurrentOrderGoodsList(storePurchaseRecords.getOrderNumber());
+            List<StorePurchaseRecords> newOrderGoodsList = goodsMapper.getCurrentOrderGoodsList(storePurchaseRecords.getOrderNumber().toString());
             //完善逻辑(根据销量对要显示的商品排序)
             List<Map> salesVolumes = new ArrayList<>();
             for (StorePurchaseRecords records : newOrderGoodsList) {
@@ -632,7 +632,7 @@ public class GoodsServiceImpl implements GoodsService {
                 if (ObjectUtils.isEmpty(time)) {
                     continue;
                 }
-                Map salesVolume = goodsMapper.getSalesVolumeByCreateTime(storePurchaseRecords.getOrderNumber(), time);
+                Map salesVolume = goodsMapper.getSalesVolumeByCreateTime(storePurchaseRecords.getOrderNumber().toString(), time);
                 if (ObjectUtils.isEmpty(salesVolume)) {
                     continue;
                 }
