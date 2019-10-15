@@ -1,7 +1,6 @@
 package com.modcreater.tmstore.controller;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
@@ -214,5 +213,11 @@ public class GoodsController {
     @ApiOperation("出货跟踪")
     public Dto getGoodsTracking(@RequestBody ReceivedStoreId receivedStoreId ,HttpServletRequest request){
         return goodsService.getGoodsTracking(receivedStoreId,request.getHeader("token"));
+    }
+
+    @PostMapping(value = "getgoodstrackinginstore")
+    @ApiOperation("出货跟踪商店")
+    public Dto getGoodsTrackingInStore(@RequestBody GetGoodsTrackingInStore getGoodsTrackingInStore, HttpServletRequest request){
+        return goodsService.getGoodsTrackingInStore(getGoodsTrackingInStore,request.getHeader("token"));
     }
 }

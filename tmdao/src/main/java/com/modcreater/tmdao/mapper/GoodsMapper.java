@@ -481,4 +481,12 @@ public interface GoodsMapper {
      * @return
      */
     StorePurchaseRecords getPurchaseRecordsByOrderNumber(String orderNumber);
+
+    /**
+     * 获取订单列表
+     * @param sourceStoreId
+     * @param targetStoreId
+     * @return
+     */
+    List<StorePurchaseRecords> getCurrentOrders(@Param("sourceStoreId") String sourceStoreId,@Param("targetStoreId") String targetStoreId);
 }

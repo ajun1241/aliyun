@@ -275,7 +275,7 @@
     </select>
     <select id="getCurrentOrderGoodsList" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
         select * from
-        (select spr.goodsId,sum(spr.goodsCount) goodsCount,spr.orderNumber,spr.goodsId changeGoodsId
+        (select spr.goodsId,sum(spr.goodsCount) goodsCount,spr.orderNumber,spr.createDate,spr.goodsId changeGoodsId
         from store_purchase_records spr ,store_goods sg
         where spr.goodsId = sg.id
         and spr.changeGoodsId is null
@@ -285,7 +285,7 @@
         order by goodsCount desc) a
         union all
         select * from
-        (select spr.goodsId,sum(spr.goodsCount * sg.faUnitNum) goodsCount,spr.orderNumber,spr.changeGoodsId
+        (select spr.goodsId,sum(spr.goodsCount * sg.faUnitNum) goodsCount,spr.orderNumber,spr.createDate,spr.changeGoodsId
         from store_purchase_records spr ,store_goods sg
         where spr.goodsId = sg.id
         and spr.changeGoodsId is not null
@@ -330,5 +330,9 @@
     </select>
     <select id="getPurchaseRecordsByOrderNumber" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
         select * from store_purchase_records where orderNumber = #{orderNumber}
+    </select>
+    <select id="getCurrentOrders" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
+        select * from store_purchase_records where targetStoreId = #{targetStoreId} and sourceStoreId = #{sourceStoreId}
+        group by createDate order by createDate desc
     </select>
 </mapper>

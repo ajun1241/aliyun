@@ -613,6 +613,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(receivedStoreId.getUserId(),receivedStoreId.getStoreId())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<Map> result = new ArrayList<>();
         List<String> storeIds = goodsMapper.getTradedStoreIds(receivedStoreId.getStoreId());
         for (String storeId : storeIds){
@@ -651,7 +652,7 @@ public class GoodsServiceImpl implements GoodsService {
                 StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
                 storeFirstGoods.put("goodsId",goods.getId());
                 storeFirstGoods.put("goodsName",goods.getGoodsName());
-                storeFirstGoods.put("createTime",records.getCreateDate());
+                storeFirstGoods.put("createTime",simpleDateFormat.format(records.getCreateDate()));
                 if (records.getGoodsId().equals(records.getChangeGoodsId())){
                     storeFirstGoods.put("purchaseUnit",goods.getGoodsUnit());
                     storeFirstGoods.put("soldUnit",goods.getGoodsUnit());
@@ -668,7 +669,7 @@ public class GoodsServiceImpl implements GoodsService {
                 StorePurchaseRecords records = newOrderGoodsList.get(0);
                 StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
                 storeFirstGoods.put("goodsId", goods.getId());
-                storeFirstGoods.put("createTime", records.getCreateDate());
+                storeFirstGoods.put("createTime", simpleDateFormat.format(records.getCreateDate()));
                 storeFirstGoods.put("goodsName", goods.getGoodsName());
                 if (records.getGoodsId().equals(records.getChangeGoodsId())) {
                     storeFirstGoods.put("soldUnit", goods.getGoodsUnit());
@@ -686,6 +687,93 @@ public class GoodsServiceImpl implements GoodsService {
             result.add(storeFirstGoods);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
+    @Override
+    public Dto getGoodsTrackingInStore(GetGoodsTrackingInStore getGoodsTrackingInStore, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsTrackingInStore.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(getGoodsTrackingInStore.getUserId(),getGoodsTrackingInStore.getStoreId())){
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        String storeId = getGoodsTrackingInStore.getTargetStoreId();
+        Map<String, Object> storeGoodsList = new HashMap<>();
+        StoreInfo storeInfo = storeMapper.getStoreInfo(storeId);
+        storeGoodsList.put("storeName", storeInfo.getStoreName());
+        storeGoodsList.put("storePicture", storeInfo.getStorePicture());
+        List<Map<String,Object>> goodsList = new ArrayList<>();
+        List<StorePurchaseRecords> storePurchaseRecordsList = goodsMapper.getCurrentOrders(getGoodsTrackingInStore.getStoreId(), storeId);
+        for (StorePurchaseRecords storePurchaseRecords : storePurchaseRecordsList){
+            Map<String,Object> storeFirstGoods = new HashMap<>();
+            List<StorePurchaseRecords> newOrderGoodsList = goodsMapper.getCurrentOrderGoodsList(storePurchaseRecords.getOrderNumber().toString());
+            List<Map> salesVolumes = new ArrayList<>();
+            for (StorePurchaseRecords records : newOrderGoodsList) {
+                Date time = goodsMapper.getGoodsFirstPurchaseTime(getGoodsTrackingInStore.getStoreId(), storeId, records.getGoodsId());
+                if (ObjectUtils.isEmpty(time)) {
+                    continue;
+                }
+                Map salesVolume = goodsMapper.getSalesVolumeByCreateTime(records.getChangeGoodsId().toString(), time);
+                if (ObjectUtils.isEmpty(salesVolume)) {
+                    continue;
+                }
+                salesVolume.put("records", records);
+                salesVolumes.add(salesVolume);
+            }
+            if (salesVolumes.size() > 0) {
+                Map temp;
+                for (int i = 0; i < salesVolumes.size() - 1; i++) {
+                    for (int j = 0; j < salesVolumes.size() - i - 1; j++) {
+                        if (Long.valueOf(salesVolumes.get(j + 1).get("num").toString()) < Long.valueOf(salesVolumes.get(j).get("num").toString())) {
+                            temp = salesVolumes.get(j);
+                            salesVolumes.set(j, salesVolumes.get(j + 1));
+                            salesVolumes.set(j + 1, temp);
+                        }
+                    }
+                }
+                Map sv = salesVolumes.get(0);
+                StorePurchaseRecords records = (StorePurchaseRecords) sv.get("records");
+                StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
+                storeFirstGoods.put("goodsId", goods.getId());
+                storeFirstGoods.put("goodsName", goods.getGoodsName());
+                storeFirstGoods.put("createTime", records.getCreateDate());
+                if (records.getGoodsId().equals(records.getChangeGoodsId())) {
+                    storeFirstGoods.put("purchaseUnit", goods.getGoodsUnit());
+                    storeFirstGoods.put("soldUnit", goods.getGoodsUnit());
+                } else {
+                    StoreGoods g = goodsMapper.getGoodsInfo(records.getGoodsId().toString());
+                    storeFirstGoods.put("purchaseUnit", g.getGoodsFUnit());
+                    storeFirstGoods.put("soldUnit", g.getGoodsFUnit());
+                }
+                storeFirstGoods.put("purchaseNum", records.getGoodsCount());
+                storeFirstGoods.put("soldNum", sv.get("num"));
+                StoreGoodsStock stock = goodsMapper.getGoodsStock(sv.get("goodsId").toString(), storeId);
+                storeFirstGoods.put("stock", ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
+                storeFirstGoods.put("orderNumber",records.getOrderNumber());
+            } else {
+                StorePurchaseRecords records = newOrderGoodsList.get(0);
+                StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
+                storeFirstGoods.put("goodsId", goods.getId());
+                storeFirstGoods.put("createTime", records.getCreateDate());
+                storeFirstGoods.put("goodsName", goods.getGoodsName());
+                if (records.getGoodsId().equals(records.getChangeGoodsId())) {
+                    storeFirstGoods.put("soldUnit", goods.getGoodsUnit());
+                    storeFirstGoods.put("purchaseUnit", goods.getGoodsUnit());
+                } else {
+                    StoreGoods g = goodsMapper.getGoodsInfo(records.getGoodsId().toString());
+                    storeFirstGoods.put("soldUnit", g.getGoodsFUnit());
+                    storeFirstGoods.put("purchaseUnit", g.getGoodsFUnit());
+                }
+                storeFirstGoods.put("purchaseNum", records.getGoodsCount());
+                storeFirstGoods.put("soldNum", 0);
+                StoreGoodsStock stock = goodsMapper.getGoodsStock(records.getChangeGoodsId().toString(), storeId);
+                storeFirstGoods.put("stock", ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
+                storeFirstGoods.put("orderNumber",records.getOrderNumber());
+            }
+            goodsList.add(storeFirstGoods);
+        }
+        storeGoodsList.put("goodsList",goodsList);
+        return DtoUtil.getSuccesWithDataDto("查询成功",storeGoodsList , 100000);
     }
 
     @Override

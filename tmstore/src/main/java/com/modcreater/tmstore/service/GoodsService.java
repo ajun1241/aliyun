@@ -1,11 +1,9 @@
 package com.modcreater.tmstore.service;
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.show.goods.ShowUpdateConsumableInfo;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
-import com.modcreater.tmbeans.vo.uservo.UserFriendVo;
 
 /**
  * Created with IntelliJ IDEA.
@@ -247,4 +245,12 @@ public interface GoodsService {
      * @return
      */
     Dto getGoodsTracking(ReceivedStoreId receivedStoreId, String token);
+
+    /**
+     * 根据商店Id获取出货跟踪列表
+     * @param getGoodsTrackingInStore
+     * @param token
+     * @return
+     */
+    Dto getGoodsTrackingInStore(GetGoodsTrackingInStore getGoodsTrackingInStore, String token);
 }
