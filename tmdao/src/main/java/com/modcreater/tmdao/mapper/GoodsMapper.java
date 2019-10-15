@@ -416,9 +416,13 @@ public interface GoodsMapper {
     /**
      * 查询与该商店有交易来往的店铺Id
      * @param storeId
+     * @param storeName
+     * @param pageNum
+     * @param pageSize
      * @return
      */
-    List<String> getTradedStoreIds(String storeId);
+    List<String> getTradedStoreIds(@Param("storeId") String storeId,@Param("storeName") String storeName,
+                                   @Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
 
     /**
      * 根据条件查询订单内的商品列表
@@ -432,9 +436,13 @@ public interface GoodsMapper {
     /**
      * 获取商店最新的订单
      * @param orderNumber
+     * @param goodsName
+     * @param pageNum
+     * @param pageSize
      * @return
      */
-    List<StorePurchaseRecords> getCurrentOrderGoodsList(String orderNumber);
+    List<StorePurchaseRecords> getCurrentOrderGoodsList(@Param("orderNumber") String orderNumber,@Param("goodsName") String goodsName,
+                                                        @Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
 
     /**
      * 获取商店最新的订单

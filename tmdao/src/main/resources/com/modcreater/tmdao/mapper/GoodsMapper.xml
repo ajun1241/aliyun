@@ -262,7 +262,12 @@
         select temStockContent from store_goods_temstock where offlineOrderNum = #{orderNumber}
     </select>
     <select id="getTradedStoreIds" resultType="java.lang.String">
-        select targetStoreId from store_purchase_records where sourceStoreId = #{storeId} group by targetStoreId
+        select spr.targetStoreId from store_purchase_records spr ,store_info si
+        where spr.sourceStoreId = #{storeId} and spr.targetStoreId = si.id
+        <if test="storeName != null and storeName != ''">
+            and si.storeName like "%"#{storeName}"%"
+        </if>
+        group by spr.targetStoreId limit #{pageNum},#{pageSize}
     </select>
     <select id="getOrderGoodsList" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
         select * from store_purchase_records where sourceStoreId = #{sourceStoreId} and targetStoreId = #{targetStoreId}
@@ -279,20 +284,29 @@
         from store_purchase_records spr ,store_goods sg
         where spr.goodsId = sg.id
         and spr.changeGoodsId is null
-        and orderNumber = #{orderNumber}
-		and `status` = 1
-        group by goodsId
-        order by goodsCount desc) a
+        and spr.orderNumber = #{orderNumber}
+		and spr.status = 1
+        <if test="goodsName != null and goodsName != ''">
+            and sg.goodsName like "%"#{goodsName}"%"
+        </if>
+        group by spr.goodsId
+        order by spr.goodsCount desc) a
         union all
         select * from
         (select spr.goodsId,sum(spr.goodsCount * sg.faUnitNum) goodsCount,spr.orderNumber,spr.createDate,spr.changeGoodsId
         from store_purchase_records spr ,store_goods sg
         where spr.goodsId = sg.id
         and spr.changeGoodsId is not null
-        and orderNumber = #{orderNumber}
-		and `status` = 1
-        group by goodsId
-        order by goodsCount desc) b
+        and spr.orderNumber = #{orderNumber}
+		and spr.status = 1
+        <if test="goodsName != null and goodsName != ''">
+            and sg.goodsName like "%"#{goodsName}"%"
+        </if>
+        group by spr.goodsId
+        order by spr.goodsCount desc) b
+        <if test="pageNum != null">
+            limit #{pageNum},#{pageSize}
+        </if>
     </select>
     <select id="getCurrentOrder" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
         select * from store_purchase_records where targetStoreId = #{targetStoreId} and sourceStoreId = #{sourceStoreId}

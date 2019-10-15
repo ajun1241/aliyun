@@ -240,11 +240,11 @@ public interface GoodsService {
 
     /**
      * 获取出货跟踪列表
-     * @param receivedStoreId
+     * @param getGoodsTracking
      * @param token
      * @return
      */
-    Dto getGoodsTracking(ReceivedStoreId receivedStoreId, String token);
+    Dto getGoodsTracking(GetGoodsTracking getGoodsTracking, String token);
 
     /**
      * 根据商店Id获取出货跟踪列表

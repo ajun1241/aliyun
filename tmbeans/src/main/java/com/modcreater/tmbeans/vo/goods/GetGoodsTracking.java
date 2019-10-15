@@ -8,23 +8,21 @@ import lombok.Data;
  *
  * @Author: Goku_yi
  * @Date: 2019-10-15
- * Time: 13:52
+ * Time: 16:50
  */
 @Data
-public class GetGoodsTrackingInStore {
+public class GetGoodsTracking {
 
     private String userId;
 
-    private String storeId;
-
     private String appType;
 
-    private String targetStoreId;
-
-    private String goodsName;
+    private String storeId;
 
     private Long pageNum;
 
     private Long pageSize;
+
+    private String storeName;
 
 }

@@ -211,8 +211,8 @@ public class GoodsController {
 
     @PostMapping(value = "getgoodstracking")
     @ApiOperation("出货跟踪")
-    public Dto getGoodsTracking(@RequestBody ReceivedStoreId receivedStoreId ,HttpServletRequest request){
-        return goodsService.getGoodsTracking(receivedStoreId,request.getHeader("token"));
+    public Dto getGoodsTracking(@RequestBody GetGoodsTracking getGoodsTracking ,HttpServletRequest request){
+        return goodsService.getGoodsTracking(getGoodsTracking,request.getHeader("token"));
     }
 
     @PostMapping(value = "getgoodstrackinginstore")
