@@ -623,68 +623,7 @@ public class GoodsServiceImpl implements GoodsService {
             storeFirstGoods.put("storeName",storeInfo.getStoreName());
             StorePurchaseRecords storePurchaseRecords = goodsMapper.getCurrentOrder(receivedStoreId.getStoreId(),storeId);
             List<StorePurchaseRecords> newOrderGoodsList = goodsMapper.getCurrentOrderGoodsList(storePurchaseRecords.getOrderNumber().toString());
-            List<Map> salesVolumes = new ArrayList<>();
-            for (StorePurchaseRecords records : newOrderGoodsList){
-                Date time = goodsMapper.getGoodsFirstPurchaseTime(receivedStoreId.getStoreId(), storeId, records.getGoodsId());
-                if (ObjectUtils.isEmpty(time)) {
-                    continue;
-                }
-                Map salesVolume = goodsMapper.getSalesVolumeByCreateTime(records.getChangeGoodsId().toString(), time);
-                if (ObjectUtils.isEmpty(salesVolume)) {
-                    continue;
-                }
-                salesVolume.put("records",records);
-                salesVolumes.add(salesVolume);
-            }
-            if (salesVolumes.size() > 0){
-                Map temp;
-                for (int i = 0; i < salesVolumes.size() - 1; i++) {
-                    for (int j = 0; j < salesVolumes.size() - i - 1; j++) {
-                        if (Long.valueOf(salesVolumes.get(j + 1).get("num").toString()) < Long.valueOf(salesVolumes.get(j).get("num").toString())) {
-                            temp = salesVolumes.get(j);
-                            salesVolumes.set(j, salesVolumes.get(j + 1));
-                            salesVolumes.set(j + 1, temp);
-                        }
-                    }
-                }
-                Map sv = salesVolumes.get(0);
-                StorePurchaseRecords records = (StorePurchaseRecords) sv.get("records");
-                StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
-                storeFirstGoods.put("goodsId",goods.getId());
-                storeFirstGoods.put("goodsName",goods.getGoodsName());
-                storeFirstGoods.put("createTime",simpleDateFormat.format(records.getCreateDate()));
-                if (records.getGoodsId().equals(records.getChangeGoodsId())){
-                    storeFirstGoods.put("purchaseUnit",goods.getGoodsUnit());
-                    storeFirstGoods.put("soldUnit",goods.getGoodsUnit());
-                }else {
-                    StoreGoods g = goodsMapper.getGoodsInfo(records.getGoodsId().toString());
-                    storeFirstGoods.put("purchaseUnit",g.getGoodsFUnit());
-                    storeFirstGoods.put("soldUnit",g.getGoodsFUnit());
-                }
-                storeFirstGoods.put("purchaseNum",records.getGoodsCount());
-                storeFirstGoods.put("soldNum",sv.get("num"));
-                StoreGoodsStock stock = goodsMapper.getGoodsStock(sv.get("goodsId").toString(),storeId);
-                storeFirstGoods.put("stock",ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
-            }else {
-                StorePurchaseRecords records = newOrderGoodsList.get(0);
-                StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
-                storeFirstGoods.put("goodsId", goods.getId());
-                storeFirstGoods.put("createTime", simpleDateFormat.format(records.getCreateDate()));
-                storeFirstGoods.put("goodsName", goods.getGoodsName());
-                if (records.getGoodsId().equals(records.getChangeGoodsId())) {
-                    storeFirstGoods.put("soldUnit", goods.getGoodsUnit());
-                    storeFirstGoods.put("purchaseUnit", goods.getGoodsUnit());
-                } else {
-                    StoreGoods g = goodsMapper.getGoodsInfo(records.getGoodsId().toString());
-                    storeFirstGoods.put("soldUnit", g.getGoodsFUnit());
-                    storeFirstGoods.put("purchaseUnit", g.getGoodsFUnit());
-                }
-                storeFirstGoods.put("purchaseNum", records.getGoodsCount());
-                storeFirstGoods.put("soldNum", 0);
-                StoreGoodsStock stock = goodsMapper.getGoodsStock(records.getChangeGoodsId().toString(),storeId);
-                storeFirstGoods.put("stock",ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
-            }
-            result.add(storeFirstGoods);
+            result.add(getStoreFirstGoods(storeFirstGoods,newOrderGoodsList,receivedStoreId.getStoreId(),storeId,1));
         }
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
@@ -707,70 +646,7 @@ public class GoodsServiceImpl implements GoodsService {
         for (StorePurchaseRecords storePurchaseRecords : storePurchaseRecordsList){
             Map<String,Object> storeFirstGoods = new HashMap<>();
             List<StorePurchaseRecords> newOrderGoodsList = goodsMapper.getCurrentOrderGoodsList(storePurchaseRecords.getOrderNumber().toString());
-            List<Map> salesVolumes = new ArrayList<>();
-            for (StorePurchaseRecords records : newOrderGoodsList) {
-                Date time = goodsMapper.getGoodsFirstPurchaseTime(getGoodsTrackingInStore.getStoreId(), storeId, records.getGoodsId());
-                if (ObjectUtils.isEmpty(time)) {
-                    continue;
-                }
-                Map salesVolume = goodsMapper.getSalesVolumeByCreateTime(records.getChangeGoodsId().toString(), time);
-                if (ObjectUtils.isEmpty(salesVolume)) {
-                    continue;
-                }
-                salesVolume.put("records", records);
-                salesVolumes.add(salesVolume);
-            }
-            if (salesVolumes.size() > 0) {
-                Map temp;
-                for (int i = 0; i < salesVolumes.size() - 1; i++) {
-                    for (int j = 0; j < salesVolumes.size() - i - 1; j++) {
-                        if (Long.valueOf(salesVolumes.get(j + 1).get("num").toString()) < Long.valueOf(salesVolumes.get(j).get("num").toString())) {
-                            temp = salesVolumes.get(j);
-                            salesVolumes.set(j, salesVolumes.get(j + 1));
-                            salesVolumes.set(j + 1, temp);
-                        }
-                    }
-                }
-                Map sv = salesVolumes.get(0);
-                StorePurchaseRecords records = (StorePurchaseRecords) sv.get("records");
-                StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
-                storeFirstGoods.put("goodsId", goods.getId());
-                storeFirstGoods.put("goodsName", goods.getGoodsName());
-                storeFirstGoods.put("createTime", records.getCreateDate());
-                if (records.getGoodsId().equals(records.getChangeGoodsId())) {
-                    storeFirstGoods.put("purchaseUnit", goods.getGoodsUnit());
-                    storeFirstGoods.put("soldUnit", goods.getGoodsUnit());
-                } else {
-                    StoreGoods g = goodsMapper.getGoodsInfo(records.getGoodsId().toString());
-                    storeFirstGoods.put("purchaseUnit", g.getGoodsFUnit());
-                    storeFirstGoods.put("soldUnit", g.getGoodsFUnit());
-                }
-                storeFirstGoods.put("purchaseNum", records.getGoodsCount());
-                storeFirstGoods.put("soldNum", sv.get("num"));
-                StoreGoodsStock stock = goodsMapper.getGoodsStock(sv.get("goodsId").toString(), storeId);
-                storeFirstGoods.put("stock", ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
-                storeFirstGoods.put("orderNumber",records.getOrderNumber());
-            } else {
-                StorePurchaseRecords records = newOrderGoodsList.get(0);
-                StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
-                storeFirstGoods.put("goodsId", goods.getId());
-                storeFirstGoods.put("createTime", records.getCreateDate());
-                storeFirstGoods.put("goodsName", goods.getGoodsName());
-                if (records.getGoodsId().equals(records.getChangeGoodsId())) {
-                    storeFirstGoods.put("soldUnit", goods.getGoodsUnit());
-                    storeFirstGoods.put("purchaseUnit", goods.getGoodsUnit());
-                } else {
-                    StoreGoods g = goodsMapper.getGoodsInfo(records.getGoodsId().toString());
-                    storeFirstGoods.put("soldUnit", g.getGoodsFUnit());
-                    storeFirstGoods.put("purchaseUnit", g.getGoodsFUnit());
-                }
-                storeFirstGoods.put("purchaseNum", records.getGoodsCount());
-                storeFirstGoods.put("soldNum", 0);
-                StoreGoodsStock stock = goodsMapper.getGoodsStock(records.getChangeGoodsId().toString(), storeId);
-                storeFirstGoods.put("stock", ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
-                storeFirstGoods.put("orderNumber",records.getOrderNumber());
-            }
-            goodsList.add(storeFirstGoods);
+            goodsList.add(getStoreFirstGoods(storeFirstGoods,newOrderGoodsList,getGoodsTrackingInStore.getStoreId(),storeId,2));
         }
         storeGoodsList.put("goodsList",goodsList);
         return DtoUtil.getSuccesWithDataDto("查询成功",storeGoodsList , 100000);
@@ -1060,5 +936,78 @@ public class GoodsServiceImpl implements GoodsService {
             goodsMapper.addNewTemStock(JSON.toJSONString(temStocks),tradeNo);
         }
         return "success";
+    }
+
+    private Map<String,Object> getStoreFirstGoods(Map<String,Object> storeFirstGoods,List<StorePurchaseRecords> newOrderGoodsList,
+                                                  String sourceStoreId,String targetStoreId,int status){
+        List<Map> salesVolumes = new ArrayList<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (StorePurchaseRecords records : newOrderGoodsList){
+            Date time = goodsMapper.getGoodsFirstPurchaseTime(sourceStoreId, targetStoreId, records.getGoodsId());
+            if (ObjectUtils.isEmpty(time)) {
+                continue;
+            }
+            Map salesVolume = goodsMapper.getSalesVolumeByCreateTime(records.getChangeGoodsId().toString(), time);
+            if (ObjectUtils.isEmpty(salesVolume)) {
+                continue;
+            }
+            salesVolume.put("records",records);
+            salesVolumes.add(salesVolume);
+        }
+        if (salesVolumes.size() > 0){
+            Map temp;
+            for (int i = 0; i < salesVolumes.size() - 1; i++) {
+                for (int j = 0; j < salesVolumes.size() - i - 1; j++) {
+                    if (Long.valueOf(salesVolumes.get(j + 1).get("num").toString()) < Long.valueOf(salesVolumes.get(j).get("num").toString())) {
+                        temp = salesVolumes.get(j);
+                        salesVolumes.set(j, salesVolumes.get(j + 1));
+                        salesVolumes.set(j + 1, temp);
+                    }
+                }
+            }
+            Map sv = salesVolumes.get(0);
+            StorePurchaseRecords records = (StorePurchaseRecords) sv.get("records");
+            StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
+            storeFirstGoods.put("goodsId",goods.getId());
+            storeFirstGoods.put("goodsName",goods.getGoodsName());
+            storeFirstGoods.put("createTime",simpleDateFormat.format(records.getCreateDate()));
+            if (records.getGoodsId().equals(records.getChangeGoodsId())){
+                storeFirstGoods.put("purchaseUnit",goods.getGoodsUnit());
+                storeFirstGoods.put("soldUnit",goods.getGoodsUnit());
+            }else {
+                StoreGoods g = goodsMapper.getGoodsInfo(records.getGoodsId().toString());
+                storeFirstGoods.put("purchaseUnit",g.getGoodsFUnit());
+                storeFirstGoods.put("soldUnit",g.getGoodsFUnit());
+            }
+            storeFirstGoods.put("purchaseNum",records.getGoodsCount());
+            storeFirstGoods.put("soldNum",sv.get("num"));
+            StoreGoodsStock stock = goodsMapper.getGoodsStock(sv.get("goodsId").toString(),targetStoreId);
+            storeFirstGoods.put("stock",ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
+            if (status != 1){
+                storeFirstGoods.put("orderNumber",records.getOrderNumber());
+            }
+        }else {
+            StorePurchaseRecords records = newOrderGoodsList.get(0);
+            StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
+            storeFirstGoods.put("goodsId", goods.getId());
+            storeFirstGoods.put("createTime", simpleDateFormat.format(records.getCreateDate()));
+            storeFirstGoods.put("goodsName", goods.getGoodsName());
+            if (records.getGoodsId().equals(records.getChangeGoodsId())) {
+                storeFirstGoods.put("soldUnit", goods.getGoodsUnit());
+                storeFirstGoods.put("purchaseUnit", goods.getGoodsUnit());
+            } else {
+                StoreGoods g = goodsMapper.getGoodsInfo(records.getGoodsId().toString());
+                storeFirstGoods.put("soldUnit", g.getGoodsFUnit());
+                storeFirstGoods.put("purchaseUnit", g.getGoodsFUnit());
+            }
+            storeFirstGoods.put("purchaseNum", records.getGoodsCount());
+            storeFirstGoods.put("soldNum", 0);
+            StoreGoodsStock stock = goodsMapper.getGoodsStock(records.getChangeGoodsId().toString(),targetStoreId);
+            storeFirstGoods.put("stock",ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
+            if (status != 1){
+                storeFirstGoods.put("orderNumber",records.getOrderNumber());
+            }
+        }
+        return storeFirstGoods;
     }
 }
