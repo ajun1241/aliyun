@@ -2,6 +2,8 @@ package com.modcreater.tmbeans.pojo;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class StorePurchaseRecords {
 
@@ -11,7 +13,7 @@ public class StorePurchaseRecords {
   private Long targetStoreId;
   private Long sourceStoreId;
   private Double transactionPrice;
-  private String createDate;
+  private Date createDate;
   private Long goodsCount;
   private Long status;
   private Long changeGoodsId;

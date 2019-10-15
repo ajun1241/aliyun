@@ -275,7 +275,7 @@
     </select>
     <select id="getCurrentOrderGoodsList" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
         select * from
-        (select spr.goodsId,sum(spr.goodsCount) goodsCount,spr.orderNumber,spr.changeGoodsId
+        (select spr.goodsId,sum(spr.goodsCount) goodsCount,spr.orderNumber,spr.goodsId changeGoodsId
         from store_purchase_records spr ,store_goods sg
         where spr.goodsId = sg.id
         and spr.changeGoodsId is null
@@ -285,7 +285,7 @@
         order by goodsCount desc) a
         union all
         select * from
-        (select spr.changeGoodsId goodsId,sum(spr.goodsCount * sg.faUnitNum) goodsCount,spr.orderNumber,spr.changeGoodsId
+        (select spr.goodsId,sum(spr.goodsCount * sg.faUnitNum) goodsCount,spr.orderNumber,spr.changeGoodsId
         from store_purchase_records spr ,store_goods sg
         where spr.goodsId = sg.id
         and spr.changeGoodsId is not null
