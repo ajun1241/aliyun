@@ -21,6 +21,8 @@ public class GetGoodsTrackingInStore {
 
     private String targetStoreId;
 
+    private String orderNumber;
+
     private String goodsName;
 
     private Long pageNum;

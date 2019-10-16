@@ -605,7 +605,7 @@ public class GoodsServiceImpl implements GoodsService {
         return DtoUtil.getFalseDto("生成订单异常",60013);
     }
 
-    @Override
+    /*@Override
     public Dto getGoodsTracking(GetGoodsTracking getGoodsTracking, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsTracking.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
@@ -649,6 +649,74 @@ public class GoodsServiceImpl implements GoodsService {
             List<StorePurchaseRecords> newOrderGoodsList = goodsMapper.getCurrentOrderGoodsList(storePurchaseRecords.getOrderNumber().toString(),
                     getGoodsTrackingInStore.getGoodsName(),getGoodsTrackingInStore.getPageNum() - 1,getGoodsTrackingInStore.getPageSize());
             goodsList.add(getStoreFirstGoods(storeFirstGoods,newOrderGoodsList,getGoodsTrackingInStore.getStoreId(),storeId,2));
+        }
+        storeGoodsList.put("goodsList",goodsList);
+        return DtoUtil.getSuccesWithDataDto("查询成功",storeGoodsList , 100000);
+    }*/
+
+    @Override
+    public Dto getGoodsTracking(GetGoodsTracking getGoodsTracking, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsTracking.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(getGoodsTracking.getUserId(),getGoodsTracking.getStoreId())){
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        List<Map> result = new ArrayList<>();
+        List<StorePurchaseRecords> orderNumbers = goodsMapper.getOrderNumbersGroupByOrderNumber(getGoodsTracking.getStoreId(),getGoodsTracking.getStoreName(),
+                getGoodsTracking.getPageNum() - 1,getGoodsTracking.getPageSize());
+        for (StorePurchaseRecords records : orderNumbers){
+            List<StorePurchaseRecords> recordsList = goodsMapper.getPurchaseRecordsByOrderNumber(records.getOrderNumber().toString(),null,null,null);
+            StoreInfo storeInfo = storeMapper.getStoreInfo(records.getTargetStoreId().toString());
+            Map<String,Object> order = new HashMap<>();
+            order.put("storeName",storeInfo.getStoreName());
+            order.put("storePicture",storeInfo.getStorePicture());
+            result.add(getStoreFirstGoods(order,recordsList,getGoodsTracking.getStoreId(),storeInfo.getId().toString()));
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
+    @Override
+    public Dto getGoodsTrackingInStore(GetGoodsTrackingInStore getGoodsTrackingInStore, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsTrackingInStore.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(getGoodsTrackingInStore.getUserId(),getGoodsTrackingInStore.getStoreId())){
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        Map<String ,Object> storeGoodsList = new HashMap<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        StoreInfo storeInfo = storeMapper.getStoreInfo(getGoodsTrackingInStore.getTargetStoreId());
+        storeGoodsList.put("storeName",storeInfo.getStoreName());
+        storeGoodsList.put("storePicture",storeInfo.getStorePicture());
+        List<StorePurchaseRecords> records = goodsMapper.getPurchaseRecordsByOrderNumber(getGoodsTrackingInStore.getOrderNumber(),getGoodsTrackingInStore.getGoodsName(),
+                getGoodsTrackingInStore.getPageNum(),getGoodsTrackingInStore.getPageSize());
+        List<Map<String,Object>> goodsList = new ArrayList<>();
+        StorePurchaseRecords temp;
+        for (int i = 0; i < records.size() - 1; i++) {
+            for (int j = 0; j < records.size() - i - 1; j++) {
+                if (Long.valueOf(records.get(j + 1).getGoodsCount().toString()) < Long.valueOf(records.get(j).getGoodsCount().toString())) {
+                    temp = records.get(j);
+                    records.set(j, records.get(j + 1));
+                    records.set(j + 1, temp);
+                }
+            }
+        }
+        for (StorePurchaseRecords record : records){
+            Map<String,Object> goods = new HashMap<>();
+            Date time = goodsMapper.getGoodsFirstPurchaseTime(getGoodsTrackingInStore.getStoreId(),getGoodsTrackingInStore.getTargetStoreId(),record.getGoodsId());
+            StoreGoodsStock storeGoodsStock = goodsMapper.getGoodsStock(record.getGoodsId().toString(),getGoodsTrackingInStore.getTargetStoreId());
+            StoreGoods storeGoods = goodsMapper.getGoodsInfo(record.getChangeGoodsId().toString());
+            Map salesValume = goodsMapper.getSalesVolumeByCreateTime(record.getChangeGoodsId().toString(), time);
+            goods.put("goodsId",storeGoods.getId());
+            goods.put("goodsName",storeGoods.getGoodsName());
+            goods.put("purchaseNum",record.getGoodsCount());
+            goods.put("purchaseUnit",storeGoods.getFaUnitNum() == 0 ? storeGoods.getGoodsUnit() : storeGoods.getGoodsFUnit());
+            goods.put("soldNum",ObjectUtils.isEmpty(salesValume) ? 0 : salesValume.get("num"));
+            goods.put("soldUnit",storeGoods.getFaUnitNum() == 0 ? storeGoods.getGoodsUnit() : storeGoods.getGoodsFUnit());
+            goods.put("stock",ObjectUtils.isEmpty(storeGoodsStock) ? 0 : storeGoodsStock.getStockNum());
+            goods.put("createTime",simpleDateFormat.format(record.getCreateDate()));
+            goodsList.add(goods);
         }
         storeGoodsList.put("goodsList",goodsList);
         return DtoUtil.getSuccesWithDataDto("查询成功",storeGoodsList , 100000);
@@ -941,7 +1009,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     private Map<String,Object> getStoreFirstGoods(Map<String,Object> storeFirstGoods,List<StorePurchaseRecords> newOrderGoodsList,
-                                                  String sourceStoreId,String targetStoreId,int status){
+                                                  String sourceStoreId,String targetStoreId){
         List<Map> salesVolumes = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (StorePurchaseRecords records : newOrderGoodsList){
@@ -985,9 +1053,8 @@ public class GoodsServiceImpl implements GoodsService {
             storeFirstGoods.put("soldNum",sv.get("num"));
             StoreGoodsStock stock = goodsMapper.getGoodsStock(sv.get("goodsId").toString(),targetStoreId);
             storeFirstGoods.put("stock",ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
-            if (status != 1){
-                storeFirstGoods.put("orderNumber",records.getOrderNumber());
-            }
+            storeFirstGoods.put("targetStoreId",records.getTargetStoreId());
+            storeFirstGoods.put("orderNumber",records.getOrderNumber());
         }else {
             if (newOrderGoodsList.size() == 0){
                 return storeFirstGoods;
@@ -1009,9 +1076,8 @@ public class GoodsServiceImpl implements GoodsService {
             storeFirstGoods.put("soldNum", 0);
             StoreGoodsStock stock = goodsMapper.getGoodsStock(records.getChangeGoodsId().toString(),targetStoreId);
             storeFirstGoods.put("stock",ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
-            if (status != 1){
-                storeFirstGoods.put("orderNumber",records.getOrderNumber());
-            }
+            storeFirstGoods.put("orderNumber",records.getOrderNumber());
+            storeFirstGoods.put("targetStoreId",records.getTargetStoreId());
         }
         return storeFirstGoods;
     }

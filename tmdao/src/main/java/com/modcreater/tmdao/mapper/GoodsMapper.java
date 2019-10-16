@@ -486,9 +486,13 @@ public interface GoodsMapper {
     /**
      * 根据订单号查询出货单
      * @param orderNumber
+     * @param goodsName
+     * @param pageNum
+     * @param pageSize
      * @return
      */
-    StorePurchaseRecords getPurchaseRecordsByOrderNumber(String orderNumber);
+    List<StorePurchaseRecords> getPurchaseRecordsByOrderNumber(@Param("orderNumber") String orderNumber,@Param("goodsName") String goodsName,
+                                                               @Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
 
     /**
      * 获取订单列表
@@ -497,4 +501,15 @@ public interface GoodsMapper {
      * @return
      */
     List<StorePurchaseRecords> getCurrentOrders(@Param("sourceStoreId") String sourceStoreId,@Param("targetStoreId") String targetStoreId);
+
+    /**
+     * 根据订单号分组查询订单
+     * @param storeId
+     * @param storeName
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    List<StorePurchaseRecords> getOrderNumbersGroupByOrderNumber(@Param("storeId") String storeId,@Param("storeName") String storeName,
+                                                   @Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
 }

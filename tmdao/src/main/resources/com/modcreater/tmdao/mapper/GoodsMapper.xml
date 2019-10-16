@@ -343,10 +343,50 @@
         limit 0,1
     </select>
     <select id="getPurchaseRecordsByOrderNumber" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
-        select * from store_purchase_records where orderNumber = #{orderNumber}
+        select * from
+        (select spr.goodsId,sum(spr.goodsCount) goodsCount,spr.orderNumber,spr.createDate,spr.goodsId changeGoodsId,spr.targetStoreId,spr.sourceStoreId
+        from store_purchase_records spr ,store_goods sg
+        where spr.goodsId = sg.id
+        and spr.changeGoodsId is null
+        and spr.orderNumber = #{orderNumber}
+        and spr.status = 1
+        <if test="goodsName != null and goodsName != ''">
+            and sg.goodsName like "%"#{goodsName}"%"
+        </if>
+        group by spr.goodsId
+        order by spr.goodsCount desc) a
+        union all
+        select * from
+        (select spr.goodsId,sum(spr.goodsCount * sg.faUnitNum) goodsCount,spr.orderNumber,spr.createDate,spr.changeGoodsId,spr.targetStoreId,spr.sourceStoreId
+        from store_purchase_records spr ,store_goods sg
+        where spr.goodsId = sg.id
+        and spr.changeGoodsId is not null
+        and spr.orderNumber = #{orderNumber}
+        and spr.status = 1
+        <if test="goodsName != null and goodsName != ''">
+            and sg.goodsName like "%"#{goodsName}"%"
+        </if>
+        group by spr.goodsId
+        order by spr.goodsCount desc) b
+        <if test="pageNum != null">
+            limit #{pageNum},#{pageSize}
+        </if>
     </select>
     <select id="getCurrentOrders" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
         select * from store_purchase_records where targetStoreId = #{targetStoreId} and sourceStoreId = #{sourceStoreId}
         group by createDate order by createDate desc
+    </select>
+    <select id="getOrderNumbersGroupByOrderNumber" resultType="com.modcreater.tmbeans.pojo.StorePurchaseRecords">
+        select * from store_purchase_records spr ,store_info si
+        where si.id = spr.targetStoreId and spr.sourceStoreId = #{storeId}
+        <if test="storeName != null and storeName != ''">
+            and si.storeName like "%"#{storeName}"%"
+        </if>
+        and spr.status = 1
+        group by orderNumber
+        order by orderNumber
+        <if test="pageNum != null">
+            limit #{pageNum},#{pageSize}
+        </if>
     </select>
 </mapper>
