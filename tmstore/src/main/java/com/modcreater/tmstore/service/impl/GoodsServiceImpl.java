@@ -684,11 +684,8 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(getGoodsTrackingInStore.getUserId(),getGoodsTrackingInStore.getStoreId())){
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        Map<String ,Object> storeGoodsList = new HashMap<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         StoreInfo storeInfo = storeMapper.getStoreInfo(getGoodsTrackingInStore.getTargetStoreId());
-        storeGoodsList.put("storeName",storeInfo.getStoreName());
-        storeGoodsList.put("storePicture",storeInfo.getStorePicture());
         List<StorePurchaseRecords> records = goodsMapper.getPurchaseRecordsByOrderNumber(getGoodsTrackingInStore.getOrderNumber(),getGoodsTrackingInStore.getGoodsName(),
                 getGoodsTrackingInStore.getPageNum(),getGoodsTrackingInStore.getPageSize());
         List<Map<String,Object>> goodsList = new ArrayList<>();
@@ -718,8 +715,7 @@ public class GoodsServiceImpl implements GoodsService {
             goods.put("createTime",simpleDateFormat.format(record.getCreateDate()));
             goodsList.add(goods);
         }
-        storeGoodsList.put("goodsList",goodsList);
-        return DtoUtil.getSuccesWithDataDto("查询成功",storeGoodsList , 100000);
+        return DtoUtil.getSuccesWithDataDto("查询成功", goodsList, 100000);
     }
 
     @Override
