@@ -60,7 +60,7 @@ public class GoodsServiceImpl implements GoodsService {
     private Logger logger = LoggerFactory.getLogger(GoodsServiceImpl.class);
 
     @Override
-    public Dto registerGoods(RegisterGoods registerGoods, String token) {
+    public synchronized Dto registerGoods(RegisterGoods registerGoods, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(registerGoods.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -550,7 +550,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 
     @Override
-    public Dto addNewConsumable(AddNewConsumable addNewConsumable, String token) {
+    public synchronized Dto addNewConsumable(AddNewConsumable addNewConsumable, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(addNewConsumable.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -573,7 +573,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public Dto wxOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
+    public synchronized Dto wxOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderNumber.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -587,7 +587,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public Dto aliOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
+    public synchronized Dto aliOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderNumber.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
