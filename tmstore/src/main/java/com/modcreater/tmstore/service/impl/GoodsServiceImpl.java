@@ -124,10 +124,7 @@ public class GoodsServiceImpl implements GoodsService {
                     return DtoUtil.getFalseDto("修改失败", 90011);
                 }
             } else if (!StringUtils.hasText(updateGoods.getGoodsFUnit())) {
-                if (goodsMapper.deleteCorRelation(storeGoods.getId().toString()) != 1) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return DtoUtil.getFalseDto("修改失败", 90011);
-                }
+                goodsMapper.deleteCorRelation(storeGoods.getId().toString());
             }
             int updateGoodsResult = goodsMapper.updateGoods(updateGoods);
             int updateGoodsStockResult = goodsMapper.updateGoodsStock(updateGoods.getGoodsId(), updateGoods.getGoodsNum(), updateGoods.getGoodsBarCode(), updateGoods.getStoreId());
