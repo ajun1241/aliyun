@@ -64,25 +64,25 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(registerGoods.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        if (StringUtils.hasText(registerGoods.getGoodsBarCode()) && goodsMapper.isBarCodeExists(registerGoods.getStoreId(),registerGoods.getGoodsBarCode()) >= 1){
-            return DtoUtil.getFalseDto("请勿重复录入相同的条形码",90007);
+        if (StringUtils.hasText(registerGoods.getGoodsBarCode()) && goodsMapper.isBarCodeExists(registerGoods.getStoreId(), registerGoods.getGoodsBarCode()) >= 1) {
+            return DtoUtil.getFalseDto("请勿重复录入相同的条形码", 90007);
         }
-        if (goodsMapper.getCorRelation(registerGoods.getCorGoodsId()) >= 1){
-            return DtoUtil.getFalseDto("当前选中的转换商品已被其他产品绑定",80006);
+        if (goodsMapper.getCorRelation(registerGoods.getCorGoodsId()) >= 1) {
+            return DtoUtil.getFalseDto("当前选中的转换商品已被其他产品绑定", 80006);
         }
-        if (registerGoods.getFaUnitNum() == null){
+        if (registerGoods.getFaUnitNum() == null) {
             registerGoods.setFaUnitNum(0L);
         }
-        if (!StringUtils.hasText(registerGoods.getGoodsFUnit())){
+        if (!StringUtils.hasText(registerGoods.getGoodsFUnit())) {
             registerGoods.setGoodsFUnit("");
         }
         goodsMapper.addNewGoods(registerGoods);
-        goodsMapper.addNewGoodsStock(registerGoods.getId(),registerGoods.getStoreId(), registerGoods.getGoodsNum(),"1",registerGoods.getGoodsBarCode());
-        if (StringUtils.hasText(registerGoods.getGoodsFUnit()) && !StringUtils.hasText(registerGoods.getCorGoodsId())){
-            return DtoUtil.getFalseDto("缺少绑定商品",90012);
+        goodsMapper.addNewGoodsStock(registerGoods.getId(), registerGoods.getStoreId(), registerGoods.getGoodsNum(), "1", registerGoods.getGoodsBarCode());
+        if (StringUtils.hasText(registerGoods.getGoodsFUnit()) && !StringUtils.hasText(registerGoods.getCorGoodsId())) {
+            return DtoUtil.getFalseDto("缺少绑定商品", 90012);
         }
-        if (StringUtils.hasText(registerGoods.getCorGoodsId())){
-            goodsMapper.bindingGoods(registerGoods.getId(),registerGoods.getCorGoodsId());
+        if (StringUtils.hasText(registerGoods.getCorGoodsId())) {
+            goodsMapper.bindingGoods(registerGoods.getId(), registerGoods.getCorGoodsId());
         }
         if (registerGoods.getConsumablesLists().size() > 0) {
             NumberFormat nf = NumberFormat.getNumberInstance();
@@ -98,7 +98,7 @@ public class GoodsServiceImpl implements GoodsService {
                 consumable.setRegisteredRatioOut(Long.valueOf(consumablesList.getFinishedNum()));
                 consumable.setRegisteredRationOutUnit(registerGoods.getGoodsUnit());
                 consumable.setRegisteredTime(System.currentTimeMillis() / 1000);
-                consumable.setConsumptionRate(consumable.getRegisteredRatioIn()/consumable.getRegisteredRatioOut());
+                consumable.setConsumptionRate(consumable.getRegisteredRatioIn() / consumable.getRegisteredRatioOut());
                 goodsMapper.addNewGoodsConsumable(consumable);
             }
         }
@@ -110,34 +110,34 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(updateGoods.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        if (!reg(updateGoods.getUserId(),updateGoods.getStoreId())){
+        if (!reg(updateGoods.getUserId(), updateGoods.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
         try {
             StoreGoods storeGoods = goodsMapper.getGoodsInfo(updateGoods.getGoodsId());
-            if (ObjectUtils.isEmpty(storeGoods)){
-                return DtoUtil.getFalseDto("商品未找到",90009);
+            if (ObjectUtils.isEmpty(storeGoods)) {
+                return DtoUtil.getFalseDto("商品未找到", 90009);
             }
-            if (StringUtils.hasText(updateGoods.getCorGoodsId())){
-                if (goodsMapper.updateCorRelation(storeGoods.getId().toString(),updateGoods.getCorGoodsId()) != 1){
+            if (StringUtils.hasText(updateGoods.getCorGoodsId())) {
+                if (goodsMapper.updateCorRelation(storeGoods.getId().toString(), updateGoods.getCorGoodsId()) != 1) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return DtoUtil.getFalseDto("修改失败",90011);
+                    return DtoUtil.getFalseDto("修改失败", 90011);
                 }
             }else if (!StringUtils.hasText(updateGoods.getGoodsFUnit())){
                 goodsMapper.deleteCorRelation(storeGoods.getId().toString());
             }
             int updateGoodsResult = goodsMapper.updateGoods(updateGoods);
-            int updateGoodsStockResult = goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum(),updateGoods.getGoodsBarCode(),updateGoods.getStoreId());
-            if (updateGoodsResult == 0 || updateGoodsStockResult == 0){
+            int updateGoodsStockResult = goodsMapper.updateGoodsStock(updateGoods.getGoodsId(), updateGoods.getGoodsNum(), updateGoods.getGoodsBarCode(), updateGoods.getStoreId());
+            if (updateGoodsResult == 0 || updateGoodsStockResult == 0) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return DtoUtil.getFalseDto("修改失败",90011);
+                return DtoUtil.getFalseDto("修改失败", 90011);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return DtoUtil.getFalseDto("修改失败",90011);
+            return DtoUtil.getFalseDto("修改失败", 90011);
         }
-        return DtoUtil.getSuccessDto("操作成功",100000);
+        return DtoUtil.getSuccessDto("操作成功", 100000);
     }
 
     @Override
@@ -146,19 +146,19 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         StoreGoods goods = goodsMapper.getGoodsInfo(receivedGoodsId.getGoodsId());
-        if (ObjectUtils.isEmpty(goods)){
-            return DtoUtil.getFalseDto("商品信息未查到",90004);
+        if (ObjectUtils.isEmpty(goods)) {
+            return DtoUtil.getFalseDto("商品信息未查到", 90004);
         }
-        if (!reg(receivedGoodsId.getUserId(),goods.getStoreId().toString())){
+        if (!reg(receivedGoodsId.getUserId(), goods.getStoreId().toString())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        Map<String,Object> result = new HashMap<>();
-        result.put("goodsName",goods.getGoodsName());
-        result.put("goodsBrand",goods.getGoodsBrand());
-        result.put("goodsUnit",goods.getGoodsUnit());
-        result.put("goodsFUnit",goods.getGoodsFUnit() == null ? "" : goods.getGoodsFUnit());
-        result.put("faUnitNum",goods.getFaUnitNum() == null ? "" : goods.getFaUnitNum());
-        return DtoUtil.getSuccesWithDataDto("操作成功",result,100000);
+        Map<String, Object> result = new HashMap<>();
+        result.put("goodsName", goods.getGoodsName());
+        result.put("goodsBrand", goods.getGoodsBrand());
+        result.put("goodsUnit", goods.getGoodsUnit());
+        result.put("goodsFUnit", goods.getGoodsFUnit() == null ? "" : goods.getGoodsFUnit());
+        result.put("faUnitNum", goods.getFaUnitNum() == null ? "" : goods.getFaUnitNum());
+        return DtoUtil.getSuccesWithDataDto("操作成功", result, 100000);
     }
 
     @Override
@@ -166,28 +166,16 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(updateGoodsPrice.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        StoreGoodsStock storeGoodsStock = goodsMapper.getGoodsStock(updateGoodsPrice.getGoodsId(),updateGoodsPrice.getStoreId());
-        if (!reg(updateGoodsPrice.getUserId(),storeGoodsStock.getStoreId().toString())){
+        StoreGoodsStock storeGoodsStock = goodsMapper.getGoodsStock(updateGoodsPrice.getGoodsId(), updateGoodsPrice.getStoreId());
+        if (!reg(updateGoodsPrice.getUserId(), storeGoodsStock.getStoreId().toString())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        /*StoreGoods goods = goodsMapper.getGoodsInfo(updateGoodsPrice.getGoodsId());
-        StoreGoodsCorrelation sonRelation = goodsMapper.getSonGoodsInfo(updateGoodsPrice.getGoodsId());
-        StoreGoodsCorrelation parRelation = goodsMapper.getParentGoodsInfo(updateGoodsPrice.getGoodsId());
-        //如果查到正在改价的商品有父商品,则按父商品绑定时的单位运算自动修改父商品的价格
-        if (!ObjectUtils.isEmpty(parRelation)){
-            StoreGoods parGoods = goodsMapper.getGoodsInfo(parRelation.getGoodsParentId().toString());
-            goodsMapper.updateGoodsUnitPrice(parGoods.getId().toString(),parGoods.getFaUnitNum() * updateGoodsPrice.getUnitPrice());
-        }
-        //如果查到正在改价的商品有子商品,则按父商品绑定时的单位运算自动修改子商品的价格
-        if (!ObjectUtils.isEmpty(sonRelation)){
-            StoreGoods sonGoods = goodsMapper.getGoodsInfo(parRelation.getGoodsParentId().toString());
-            goodsMapper.updateGoodsUnitPrice(sonGoods.getId().toString(),updateGoodsPrice.getUnitPrice() / goods.getFaUnitNum());
-        }*/
+        //注意父子商品之间价格的影响关系
         if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(), updateGoodsPrice.getUnitPrice(), storeGoodsStock.getStoreId()) != 1) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DtoUtil.getFalseDto("修改价格失败", 80005);
         }
-        return DtoUtil.getSuccessDto("修改成功",100000);
+        return DtoUtil.getSuccessDto("修改成功", 100000);
     }
 
     @Override
@@ -195,7 +183,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        return DtoUtil.getSuccesWithDataDto("获取成功",goodsMapper.getGoodsAllTypeList(),100000);
+        return DtoUtil.getSuccesWithDataDto("获取成功", goodsMapper.getGoodsAllTypeList(), 100000);
     }
 
     /**
@@ -334,17 +322,17 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(goodsDownShelf.getUserId(), goodsDownShelf.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        if (goodsDownShelf.getGoodsId() == null){
-            return DtoUtil.getFalseDto("参数错误",90006);
+        if (goodsDownShelf.getGoodsId() == null) {
+            return DtoUtil.getFalseDto("参数错误", 90006);
         }
         int i = 0;
-        for (String goodsId : goodsDownShelf.getGoodsId()){
-            i += goodsMapper.updateGoodsStatus(goodsId,0,goodsDownShelf.getStoreId());
+        for (String goodsId : goodsDownShelf.getGoodsId()) {
+            i += goodsMapper.updateGoodsStatus(goodsId, 0, goodsDownShelf.getStoreId());
         }
-        if (i == goodsDownShelf.getGoodsId().length){
-            return DtoUtil.getSuccessDto("操作成功",100000);
-        }else {
-            return DtoUtil.getFalseDto("操作失败",90008);
+        if (i == goodsDownShelf.getGoodsId().length) {
+            return DtoUtil.getSuccessDto("操作成功", 100000);
+        } else {
+            return DtoUtil.getFalseDto("操作失败", 90008);
         }
     }
 
@@ -355,14 +343,17 @@ public class GoodsServiceImpl implements GoodsService {
         }
         //如果店铺和用户不是一对一,此处需要传storeId
         Long storeId = storeMapper.getStoreIdByUserId(receivedGoodsId.getUserId());
-        GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId(),storeId);
-        List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId(),null,0L,3L);
+        GoodsInfoToUpdate goodsInfoToUpdate = goodsMapper.getGoodsInfoToUpdate(receivedGoodsId.getGoodsId(), storeId);
+        if (ObjectUtils.isEmpty(goodsInfoToUpdate)) {
+            return DtoUtil.getSuccessDto("未查询到数据", 200000);
+        }
+        List<ShowConsumable> showConsumables = goodsMapper.getGoodsConsumablesList(receivedGoodsId.getGoodsId(), null, 0L, 3L);
         goodsInfoToUpdate.setShowConsumables(showConsumables);
-        StoreGoodsCorrelation correlation =  goodsMapper.getSonGoodsInfo(receivedGoodsId.getGoodsId());
-        if (correlation != null){
+        StoreGoodsCorrelation correlation = goodsMapper.getSonGoodsInfo(receivedGoodsId.getGoodsId());
+        if (correlation != null) {
             goodsInfoToUpdate.setCorGoodsId(correlation.getGoodsSonId().toString());
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",goodsInfoToUpdate,100000);
+        return DtoUtil.getSuccesWithDataDto("查询成功", goodsInfoToUpdate, 100000);
     }
 
     @Override
@@ -372,10 +363,14 @@ public class GoodsServiceImpl implements GoodsService {
         }
         StoreInfo storeInfo = storeMapper.getStoreInfo(getGoodsConsumables.getStoreId());
         getGoodsConsumables.setPageNum(getGoodsConsumables.getPageNum() - 1);
-        Map<String,Object> result = new HashMap<>();
-        result.put("storeName",storeInfo.getStoreName());
-        result.put("goodsList",goodsMapper.getGoodsConsumablesList(getGoodsConsumables.getGoodsId(),getGoodsConsumables.getGoodsName(),getGoodsConsumables.getPageNum(),getGoodsConsumables.getPageSize()));
-        return DtoUtil.getSuccesWithDataDto("获取成功",result,100000);
+        Map<String, Object> result = new HashMap<>();
+        result.put("storeName", storeInfo.getStoreName());
+        List<ShowConsumable> consumables = goodsMapper.getGoodsConsumablesList(getGoodsConsumables.getGoodsId(), getGoodsConsumables.getGoodsName(), getGoodsConsumables.getPageNum(), getGoodsConsumables.getPageSize());
+        if (consumables.size() == 0) {
+            return DtoUtil.getSuccessDto("未找到消耗品", 200000);
+        }
+        result.put("goodsList", consumables);
+        return DtoUtil.getSuccesWithDataDto("获取成功", result, 100000);
     }
 
     @Override
@@ -384,14 +379,14 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         int i = 0;
-        for (String consumableId : deleteGoodsConsumables.getConsumableIds()){
+        for (String consumableId : deleteGoodsConsumables.getConsumableIds()) {
             i += goodsMapper.deleteGoodsConsumable(consumableId);
         }
-        if (i == deleteGoodsConsumables.getConsumableIds().length){
-            return DtoUtil.getSuccessDto("删除成功",100000);
+        if (i == deleteGoodsConsumables.getConsumableIds().length) {
+            return DtoUtil.getSuccessDto("删除成功", 100000);
         }
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        return DtoUtil.getFalseDto("删除失败",90008);
+        return DtoUtil.getFalseDto("删除失败", 90008);
     }
 
     @Override
@@ -400,10 +395,10 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         ShowUpdateConsumableInfo consumable = goodsMapper.getUpdateConsumableInfo(receivedConsumableId.getConsumableId());
-        if (ObjectUtils.isEmpty(consumable)){
-            return DtoUtil.getSuccessDto("暂无数据",200000);
+        if (ObjectUtils.isEmpty(consumable)) {
+            return DtoUtil.getSuccessDto("暂无数据", 200000);
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",consumable,100000);
+        return DtoUtil.getSuccesWithDataDto("查询成功", consumable, 100000);
     }
 
     @Override
@@ -411,11 +406,11 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(updateConsumable.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        updateConsumable.setConsumptionRate((double)updateConsumable.getRegisteredRatioIn()/updateConsumable.getRegisteredRatioOut());
-        if (goodsMapper.updateConsumable(updateConsumable) == 1){
-            return DtoUtil.getSuccessDto("修改成功",100000);
+        updateConsumable.setConsumptionRate((double) updateConsumable.getRegisteredRatioIn() / updateConsumable.getRegisteredRatioOut());
+        if (goodsMapper.updateConsumable(updateConsumable) == 1) {
+            return DtoUtil.getSuccessDto("修改成功", 100000);
         }
-        return DtoUtil.getFalseDto("修改失败",90008);
+        return DtoUtil.getFalseDto("修改失败", 90008);
     }
 
     /**
@@ -556,7 +551,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 
     @Override
-    public Dto addNewConsumable(AddNewConsumable addNewConsumable, String token) {
+    public synchronized Dto addNewConsumable(AddNewConsumable addNewConsumable, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(addNewConsumable.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -570,111 +565,65 @@ public class GoodsServiceImpl implements GoodsService {
         consumable.setRegisteredRationOutUnit(goods.getGoodsUnit());
         consumable.setRegisteredRatioOut(Long.valueOf(addNewConsumable.getFinishedNum()));
         consumable.setRegisteredTime(System.currentTimeMillis() / 1000);
-        consumable.setConsumptionRate(consumable.getRegisteredRatioIn()/consumable.getRegisteredRatioOut());
-        if (goodsMapper.addNewGoodsConsumable(consumable) == 1){
-            return DtoUtil.getSuccessDto("添加成功",100000);
-        }else {
-            return DtoUtil.getFalseDto("添加失败",90013);
+        consumable.setConsumptionRate(consumable.getRegisteredRatioIn() / consumable.getRegisteredRatioOut());
+        if (goodsMapper.addNewGoodsConsumable(consumable) == 1) {
+            return DtoUtil.getSuccessDto("添加成功", 100000);
+        } else {
+            return DtoUtil.getFalseDto("添加失败", 90013);
         }
     }
 
     @Override
-    public Dto wxOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
+    public synchronized Dto wxOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderNumber.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(receivedOrderNumber.getOrderNumber());
         try {
-            return PayUtil.wxOrderMaker(offlineOrders.getOrderNumber(),offlineOrders.getPaymentAmount());
+            return PayUtil.wxOrderMaker(offlineOrders.getOrderNumber(), offlineOrders.getPaymentAmount());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return DtoUtil.getFalseDto("生成订单异常",60013);
+        return DtoUtil.getFalseDto("生成订单异常", 60013);
     }
 
     @Override
-    public Dto aliOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
+    public synchronized Dto aliOfflinePay(ReceivedOrderNumber receivedOrderNumber, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedOrderNumber.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrder(receivedOrderNumber.getOrderNumber());
         try {
-            return PayUtil.aliOrderMaker(offlineOrders.getOrderNumber(),"线下",offlineOrders.getPaymentAmount());
+            return PayUtil.aliOrderMaker(offlineOrders.getOrderNumber(), "线下", offlineOrders.getPaymentAmount());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return DtoUtil.getFalseDto("生成订单异常",60013);
+        return DtoUtil.getFalseDto("生成订单异常", 60013);
     }
-
-    /*@Override
-    public Dto getGoodsTracking(GetGoodsTracking getGoodsTracking, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsTracking.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21014);
-        }
-        if (!reg(getGoodsTracking.getUserId(),getGoodsTracking.getStoreId())){
-            return DtoUtil.getFalseDto("违规操作!", 90001);
-        }
-        List<Map> result = new ArrayList<>();
-        List<String> storeIds = goodsMapper.getTradedStoreIds(getGoodsTracking.getStoreId(),getGoodsTracking.getStoreName(),
-                getGoodsTracking.getPageNum() - 1,getGoodsTracking.getPageSize());
-        for (String storeId : storeIds){
-            Map<String,Object> storeFirstGoods = new HashMap<>();
-            StoreInfo storeInfo = storeMapper.getStoreInfo(storeId);
-            storeFirstGoods.put("storePicture",storeInfo.getStorePicture());
-            storeFirstGoods.put("storeName",storeInfo.getStoreName());
-            StorePurchaseRecords storePurchaseRecords = goodsMapper.getCurrentOrder(getGoodsTracking.getStoreId(),storeId);
-            List<StorePurchaseRecords> newOrderGoodsList = goodsMapper.getCurrentOrderGoodsList(storePurchaseRecords.getOrderNumber().toString(),
-                    null,null,null);
-            result.add(getStoreFirstGoods(storeFirstGoods,newOrderGoodsList,getGoodsTracking.getStoreId(),storeId,1));
-        }
-        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
-    }
-
-    @Override
-    public Dto getGoodsTrackingInStore(GetGoodsTrackingInStore getGoodsTrackingInStore, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsTrackingInStore.getUserId()))) {
-            return DtoUtil.getFalseDto("请重新登录", 21014);
-        }
-        if (!reg(getGoodsTrackingInStore.getUserId(),getGoodsTrackingInStore.getStoreId())){
-            return DtoUtil.getFalseDto("违规操作!", 90001);
-        }
-        String storeId = getGoodsTrackingInStore.getTargetStoreId();
-        Map<String, Object> storeGoodsList = new HashMap<>();
-        StoreInfo storeInfo = storeMapper.getStoreInfo(storeId);
-        storeGoodsList.put("storeName", storeInfo.getStoreName());
-        storeGoodsList.put("storePicture", storeInfo.getStorePicture());
-        List<Map<String,Object>> goodsList = new ArrayList<>();
-        List<StorePurchaseRecords> storePurchaseRecordsList = goodsMapper.getCurrentOrders(getGoodsTrackingInStore.getStoreId(), storeId);
-        for (StorePurchaseRecords storePurchaseRecords : storePurchaseRecordsList){
-            Map<String,Object> storeFirstGoods = new HashMap<>();
-            List<StorePurchaseRecords> newOrderGoodsList = goodsMapper.getCurrentOrderGoodsList(storePurchaseRecords.getOrderNumber().toString(),
-                    getGoodsTrackingInStore.getGoodsName(),getGoodsTrackingInStore.getPageNum() - 1,getGoodsTrackingInStore.getPageSize());
-            goodsList.add(getStoreFirstGoods(storeFirstGoods,newOrderGoodsList,getGoodsTrackingInStore.getStoreId(),storeId,2));
-        }
-        storeGoodsList.put("goodsList",goodsList);
-        return DtoUtil.getSuccesWithDataDto("查询成功",storeGoodsList , 100000);
-    }*/
 
     @Override
     public Dto getGoodsTracking(GetGoodsTracking getGoodsTracking, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsTracking.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        if (!reg(getGoodsTracking.getUserId(),getGoodsTracking.getStoreId())){
+        if (!reg(getGoodsTracking.getUserId(), getGoodsTracking.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
         List<Map> result = new ArrayList<>();
-        List<StorePurchaseRecords> orderNumbers = goodsMapper.getOrderNumbersGroupByOrderNumber(getGoodsTracking.getStoreId(),getGoodsTracking.getStoreName(),
-                getGoodsTracking.getPageNum() - 1,getGoodsTracking.getPageSize());
-        for (StorePurchaseRecords records : orderNumbers){
-            List<StorePurchaseRecords> recordsList = goodsMapper.getPurchaseRecordsByOrderNumber(records.getOrderNumber().toString(),null,null,null);
+        List<StorePurchaseRecords> orderNumbers = goodsMapper.getOrderNumbersGroupByOrderNumber(getGoodsTracking.getStoreId(), getGoodsTracking.getStoreName(),
+                getGoodsTracking.getPageNum() - 1, getGoodsTracking.getPageSize());
+        if (orderNumbers.size() == 0) {
+            return DtoUtil.getSuccessDto("暂无数据", 200000);
+        }
+        for (StorePurchaseRecords records : orderNumbers) {
+            List<StorePurchaseRecords> recordsList = goodsMapper.getPurchaseRecordsByOrderNumber(records.getOrderNumber().toString(), null, null, null);
             StoreInfo storeInfo = storeMapper.getStoreInfo(records.getTargetStoreId().toString());
-            Map<String,Object> order = new HashMap<>();
-            order.put("storeName",storeInfo.getStoreName());
-            order.put("storePicture",storeInfo.getStorePicture());
-            result.add(getStoreFirstGoods(order,recordsList,getGoodsTracking.getStoreId(),storeInfo.getId().toString()));
+            Map<String, Object> order = new HashMap<>();
+            order.put("storeName", storeInfo.getStoreName());
+            order.put("storePicture", storeInfo.getStorePicture());
+            result.add(getStoreFirstGoods(order, recordsList, getGoodsTracking.getStoreId(), storeInfo.getId().toString()));
         }
-        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+        return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
     }
 
     @Override
@@ -682,17 +631,16 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsTrackingInStore.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        if (!reg(getGoodsTrackingInStore.getUserId(),getGoodsTrackingInStore.getStoreId())){
+        if (!reg(getGoodsTrackingInStore.getUserId(), getGoodsTrackingInStore.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        Map<String ,Object> storeGoodsList = new HashMap<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        StoreInfo storeInfo = storeMapper.getStoreInfo(getGoodsTrackingInStore.getTargetStoreId());
-        storeGoodsList.put("storeName",storeInfo.getStoreName());
-        storeGoodsList.put("storePicture",storeInfo.getStorePicture());
-        List<StorePurchaseRecords> records = goodsMapper.getPurchaseRecordsByOrderNumber(getGoodsTrackingInStore.getOrderNumber(),getGoodsTrackingInStore.getGoodsName(),
-                getGoodsTrackingInStore.getPageNum(),getGoodsTrackingInStore.getPageSize());
-        List<Map<String,Object>> goodsList = new ArrayList<>();
+        List<StorePurchaseRecords> records = goodsMapper.getPurchaseRecordsByOrderNumber(getGoodsTrackingInStore.getOrderNumber(), getGoodsTrackingInStore.getGoodsName(),
+                getGoodsTrackingInStore.getPageNum(), getGoodsTrackingInStore.getPageSize());
+        if (records.size() == 0) {
+            return DtoUtil.getSuccessDto("暂无数据", 200000);
+        }
+        List<Map<String, Object>> goodsList = new ArrayList<>();
         StorePurchaseRecords temp;
         for (int i = 0; i < records.size() - 1; i++) {
             for (int j = 0; j < records.size() - i - 1; j++) {
@@ -703,24 +651,23 @@ public class GoodsServiceImpl implements GoodsService {
                 }
             }
         }
-        for (StorePurchaseRecords record : records){
-            Map<String,Object> goods = new HashMap<>();
-            Date time = goodsMapper.getGoodsFirstPurchaseTime(getGoodsTrackingInStore.getStoreId(),getGoodsTrackingInStore.getTargetStoreId(),record.getGoodsId());
-            StoreGoodsStock storeGoodsStock = goodsMapper.getGoodsStock(record.getGoodsId().toString(),getGoodsTrackingInStore.getTargetStoreId());
+        for (StorePurchaseRecords record : records) {
+            Map<String, Object> goods = new HashMap<>();
+            Date time = goodsMapper.getGoodsFirstPurchaseTime(getGoodsTrackingInStore.getStoreId(), getGoodsTrackingInStore.getTargetStoreId(), record.getGoodsId());
+            StoreGoodsStock storeGoodsStock = goodsMapper.getGoodsStock(record.getGoodsId().toString(), getGoodsTrackingInStore.getTargetStoreId());
             StoreGoods storeGoods = goodsMapper.getGoodsInfo(record.getChangeGoodsId().toString());
-            Map salesValume = goodsMapper.getSalesVolumeByCreateTime(record.getChangeGoodsId().toString(), time);
-            goods.put("goodsId",storeGoods.getId());
-            goods.put("goodsName",storeGoods.getGoodsName());
-            goods.put("purchaseNum",record.getGoodsCount());
-            goods.put("purchaseUnit",storeGoods.getFaUnitNum() == 0 ? storeGoods.getGoodsUnit() : storeGoods.getGoodsFUnit());
-            goods.put("soldNum",ObjectUtils.isEmpty(salesValume) ? 0 : salesValume.get("num"));
-            goods.put("soldUnit",storeGoods.getFaUnitNum() == 0 ? storeGoods.getGoodsUnit() : storeGoods.getGoodsFUnit());
-            goods.put("stock",ObjectUtils.isEmpty(storeGoodsStock) ? 0 : storeGoodsStock.getStockNum());
-            goods.put("createTime",simpleDateFormat.format(record.getCreateDate()));
+            Map salesVolume = goodsMapper.getSalesVolumeByCreateTime(record.getChangeGoodsId().toString(), time);
+            goods.put("goodsId", storeGoods.getId());
+            goods.put("goodsName", storeGoods.getGoodsName());
+            goods.put("purchaseNum", record.getGoodsCount());
+            goods.put("purchaseUnit", storeGoods.getFaUnitNum() == 0 ? storeGoods.getGoodsUnit() : storeGoods.getGoodsFUnit());
+            goods.put("soldNum", ObjectUtils.isEmpty(salesVolume) ? 0 : salesVolume.get("num"));
+            goods.put("soldUnit", storeGoods.getFaUnitNum() == 0 ? storeGoods.getGoodsUnit() : storeGoods.getGoodsFUnit());
+            goods.put("stock", ObjectUtils.isEmpty(storeGoodsStock) ? 0 : storeGoodsStock.getStockNum());
+            goods.put("createTime", simpleDateFormat.format(record.getCreateDate()));
             goodsList.add(goods);
         }
-        storeGoodsList.put("goodsList",goodsList);
-        return DtoUtil.getSuccesWithDataDto("查询成功",storeGoodsList , 100000);
+        return DtoUtil.getSuccesWithDataDto("查询成功", goodsList, 100000);
     }
 
     @Override
@@ -737,23 +684,35 @@ public class GoodsServiceImpl implements GoodsService {
         result.put("storeName", storeInfo.getStoreName());
         if ("stock".equals(getGoodsStockList.getGetType())) {
             List<ShowGoodsStockInfo> goodsStockInfos = goodsMapper.getGoodsStockList(getGoodsStockList);
+            if (goodsStockInfos.size() == 0) {
+                return DtoUtil.getSuccessDto("暂无数据", 200000);
+            }
             result.put("goodsList", goodsStockInfos);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         } else if ("price".equals(getGoodsStockList.getGetType())) {
             List<ShowGoodsPriceInfo> goodsPriceList = goodsMapper.getGoodsPriceList(getGoodsStockList);
+            if (goodsPriceList.size() == 0) {
+                return DtoUtil.getSuccessDto("暂无数据", 200000);
+            }
             result.put("goodsList", goodsPriceList);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         } else if ("consumable".equals(getGoodsStockList.getGetType())) {
             List<ShowConsumableGoods> consumableGoods = goodsMapper.getConsumableGoods(getGoodsStockList);
+            if (consumableGoods.size() == 0) {
+                return DtoUtil.getSuccessDto("暂无数据", 200000);
+            }
             result.put("goodsList", consumableGoods);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         } else if ("son".equals(getGoodsStockList.getGetType())) {
             List<String> ids = goodsMapper.getCorGoodsId();
             StringBuffer stringBuffer = new StringBuffer("0");
-            for (String s : ids){
-                stringBuffer.append(","+s);
+            for (String s : ids) {
+                stringBuffer.append("," + s);
             }
-            List<ShowConsumableGoods> consumableGoods = goodsMapper.getCorGoods(getGoodsStockList,stringBuffer.toString());
+            List<ShowConsumableGoods> consumableGoods = goodsMapper.getCorGoods(getGoodsStockList, stringBuffer.toString());
+            if (consumableGoods.size() == 0) {
+                return DtoUtil.getSuccessDto("暂无数据", 200000);
+            }
             result.put("goodsList", consumableGoods);
             return DtoUtil.getSuccesWithDataDto("查询成功", result, 100000);
         } else {
@@ -888,17 +847,17 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public Dto getBarcodeInfo(String barcode) {
-        if (!StringUtils.hasText(barcode)){
-            return DtoUtil.getFalseDto("barcode不存在",90003);
+        if (!StringUtils.hasText(barcode)) {
+            return DtoUtil.getFalseDto("barcode不存在", 90003);
         }
-        String url = "https://www.mxnzp.com/api/barcode/goods/details?barcode="+barcode;
+        String url = "https://www.mxnzp.com/api/barcode/goods/details?barcode=" + barcode;
         RestTemplate template = new RestTemplate();
-        ResponseEntity responseEntity = template.getForEntity(url,String.class);
-        GetBarcode getBarcode= JSONObject.parseObject(responseEntity.getBody().toString(),GetBarcode.class);
-        if ("0".equals(getBarcode.getCode())){
-            return DtoUtil.getFalseDto("获取失败",80004);
+        ResponseEntity responseEntity = template.getForEntity(url, String.class);
+        GetBarcode getBarcode = JSONObject.parseObject(responseEntity.getBody().toString(), GetBarcode.class);
+        if ("0".equals(getBarcode.getCode())) {
+            return DtoUtil.getFalseDto("获取失败", 80004);
         }
-        return DtoUtil.getSuccesWithDataDto("获取成功",getBarcode.getData(),100000);
+        return DtoUtil.getSuccesWithDataDto("获取成功", getBarcode.getData(), 100000);
     }
 
     /**
@@ -1009,11 +968,11 @@ public class GoodsServiceImpl implements GoodsService {
         return "success";
     }
 
-    private Map<String,Object> getStoreFirstGoods(Map<String,Object> storeFirstGoods,List<StorePurchaseRecords> newOrderGoodsList,
-                                                  String sourceStoreId,String targetStoreId){
+    private Map<String, Object> getStoreFirstGoods(Map<String, Object> storeFirstGoods, List<StorePurchaseRecords> newOrderGoodsList,
+                                                   String sourceStoreId, String targetStoreId) {
         List<Map> salesVolumes = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        for (StorePurchaseRecords records : newOrderGoodsList){
+        for (StorePurchaseRecords records : newOrderGoodsList) {
             Date time = goodsMapper.getGoodsFirstPurchaseTime(sourceStoreId, targetStoreId, records.getGoodsId());
             if (ObjectUtils.isEmpty(time)) {
                 continue;
@@ -1022,10 +981,10 @@ public class GoodsServiceImpl implements GoodsService {
             if (ObjectUtils.isEmpty(salesVolume)) {
                 continue;
             }
-            salesVolume.put("records",records);
+            salesVolume.put("records", records);
             salesVolumes.add(salesVolume);
         }
-        if (salesVolumes.size() > 0){
+        if (salesVolumes.size() > 0) {
             Map temp;
             for (int i = 0; i < salesVolumes.size() - 1; i++) {
                 for (int j = 0; j < salesVolumes.size() - i - 1; j++) {
@@ -1036,28 +995,41 @@ public class GoodsServiceImpl implements GoodsService {
                     }
                 }
             }
-            Map sv = salesVolumes.get(0);
+            Map sv = new HashMap();
+            if (salesVolumes.size() >= 2) {
+                if (salesVolumes.get(0).get("num").toString().equals(salesVolumes.get(1).get("num").toString())) {
+                    StorePurchaseRecords r1 = (StorePurchaseRecords) salesVolumes.get(0).get("records");
+                    StorePurchaseRecords r2 = (StorePurchaseRecords) salesVolumes.get(1).get("records");
+                    Long n1 = ObjectUtils.isEmpty(r1.getChangeGoodsId()) ? r1.getGoodsCount() : goodsMapper.getGoodsInfo(r1.getGoodsId().toString()).getFaUnitNum() * r1.getGoodsCount();
+                    Long n2 = ObjectUtils.isEmpty(r2.getChangeGoodsId()) ? r2.getGoodsCount() : goodsMapper.getGoodsInfo(r2.getGoodsId().toString()).getFaUnitNum() * r2.getGoodsCount();
+                    if (n1 < n2) {
+                        sv = salesVolumes.get(1);
+                    }
+                }
+            } else {
+                sv = salesVolumes.get(0);
+            }
             StorePurchaseRecords records = (StorePurchaseRecords) sv.get("records");
             StoreGoods goods = goodsMapper.getGoodsInfo(records.getChangeGoodsId().toString());
-            storeFirstGoods.put("goodsId",goods.getId());
-            storeFirstGoods.put("goodsName",goods.getGoodsName());
-            storeFirstGoods.put("createTime",simpleDateFormat.format(records.getCreateDate()));
-            if (records.getGoodsId().equals(records.getChangeGoodsId())){
-                storeFirstGoods.put("purchaseUnit",goods.getGoodsUnit());
-                storeFirstGoods.put("soldUnit",goods.getGoodsUnit());
-            }else {
+            storeFirstGoods.put("goodsId", goods.getId());
+            storeFirstGoods.put("goodsName", goods.getGoodsName());
+            storeFirstGoods.put("createTime", simpleDateFormat.format(records.getCreateDate()));
+            if (records.getGoodsId().equals(records.getChangeGoodsId())) {
+                storeFirstGoods.put("purchaseUnit", goods.getGoodsUnit());
+                storeFirstGoods.put("soldUnit", goods.getGoodsUnit());
+            } else {
                 StoreGoods g = goodsMapper.getGoodsInfo(records.getGoodsId().toString());
-                storeFirstGoods.put("purchaseUnit",g.getGoodsFUnit());
-                storeFirstGoods.put("soldUnit",g.getGoodsFUnit());
+                storeFirstGoods.put("purchaseUnit", g.getGoodsFUnit());
+                storeFirstGoods.put("soldUnit", g.getGoodsFUnit());
             }
-            storeFirstGoods.put("purchaseNum",records.getGoodsCount());
-            storeFirstGoods.put("soldNum",sv.get("num"));
-            StoreGoodsStock stock = goodsMapper.getGoodsStock(sv.get("goodsId").toString(),targetStoreId);
-            storeFirstGoods.put("stock",ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
-            storeFirstGoods.put("targetStoreId",records.getTargetStoreId());
-            storeFirstGoods.put("orderNumber",records.getOrderNumber());
-        }else {
-            if (newOrderGoodsList.size() == 0){
+            storeFirstGoods.put("purchaseNum", records.getGoodsCount());
+            storeFirstGoods.put("soldNum", sv.get("num"));
+            StoreGoodsStock stock = goodsMapper.getGoodsStock(sv.get("goodsId").toString(), targetStoreId);
+            storeFirstGoods.put("stock", ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
+            storeFirstGoods.put("targetStoreId", records.getTargetStoreId());
+            storeFirstGoods.put("orderNumber", records.getOrderNumber());
+        } else {
+            if (newOrderGoodsList.size() == 0) {
                 return storeFirstGoods;
             }
             StorePurchaseRecords records = newOrderGoodsList.get(0);
@@ -1075,10 +1047,10 @@ public class GoodsServiceImpl implements GoodsService {
             }
             storeFirstGoods.put("purchaseNum", records.getGoodsCount());
             storeFirstGoods.put("soldNum", 0);
-            StoreGoodsStock stock = goodsMapper.getGoodsStock(records.getChangeGoodsId().toString(),targetStoreId);
-            storeFirstGoods.put("stock",ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
-            storeFirstGoods.put("orderNumber",records.getOrderNumber());
-            storeFirstGoods.put("targetStoreId",records.getTargetStoreId());
+            StoreGoodsStock stock = goodsMapper.getGoodsStock(records.getChangeGoodsId().toString(), targetStoreId);
+            storeFirstGoods.put("stock", ObjectUtils.isEmpty(stock) ? 0 : stock.getStockNum());
+            storeFirstGoods.put("orderNumber", records.getOrderNumber());
+            storeFirstGoods.put("targetStoreId", records.getTargetStoreId());
         }
         return storeFirstGoods;
     }
