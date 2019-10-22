@@ -512,4 +512,20 @@ public interface GoodsMapper {
      */
     List<StorePurchaseRecords> getOrderNumbersGroupByOrderNumber(@Param("storeId") String storeId,@Param("storeName") String storeName,
                                                    @Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
+
+    /**
+     * 查询单个商品周销量
+     * @param storeId
+     * @param goodsId
+     * @return
+     */
+    Long getGoodsSalesVolume(String storeId,String goodsId,String toDay,String targetDay);
+
+    /**
+     * 获取商品的库存数量
+     * @param goodsId
+     * @param StoreId
+     * @return
+     */
+    Long getGoodsStockNum(String goodsId, String StoreId);
 }

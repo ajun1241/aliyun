@@ -1198,7 +1198,7 @@ public class GroupServiceImpl implements GroupService {
         GroupInfo groupInfo = groupMapper.queryGroupInfo(receivedGroupId.getGroupId());
         int b1 = groupMapper.deleteGroup(receivedGroupId.getGroupId());
         int b2 = groupMapper.deleteAllMembers(receivedGroupId.getGroupId());
-        if (b1 == 1 && b2 >= 3){
+        if (b1 == 1 && b2 >= 1){
             List<String> allMembersId = groupMapper.getMembersIdExceptSelf(receivedGroupId.getGroupId(),receivedGroupId.getUserId());
             allMembersId.add(receivedGroupId.getUserId());
             try {

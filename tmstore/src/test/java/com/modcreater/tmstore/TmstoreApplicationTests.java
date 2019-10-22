@@ -31,15 +31,5 @@ public class TmstoreApplicationTests {
 
     @Test
     public void test1() {
-        List<Map<String, String>> mapList = new ArrayList<>();
-        Map<String, String> map1 = new HashMap<>(2);
-        map1.put("goodsId", "13");
-        map1.put("goodsNum", "100");
-        Map<String, String> map2 = new HashMap<>(2);
-        map2.put("goodsId", "17");
-        map2.put("goodsNum", "500");
-        mapList.add(map1);
-        mapList.add(map2);
-//        goodsMapper.deductionStock("10",mapList);
     }
 }

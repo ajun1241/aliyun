@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.alipay.api.domain.GoodsInfo;
 import com.modcreater.tmbeans.pojo.*;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Map;
 public interface StoreMapper {
 
     /**
-     * 上传实名信息
+     * 上传商铺信息
      * @param storeAttestation
      * @return
      */
@@ -64,7 +65,7 @@ public interface StoreMapper {
      * 查询商铺列表
      * @return
      */
-    List<StoreInfo> getGoodsList();
+    List<StoreInfo> getStoreList();
 
     /**
      * 修改商铺余额
@@ -80,4 +81,91 @@ public interface StoreMapper {
      * @return
      */
     Long getStoreIdByUserId(String userId);
+
+    /**
+     * 查询所有商品规格
+     * @param goodsKeyWords
+     * @param screenType
+     * @return
+     */
+    List<StoreGoods> getGoodsAllType(String goodsKeyWords,String screenType);
+
+    /**
+     * 查询包含此商品的店铺
+     * @param goodsId
+     * @return
+     */
+    List<Map<String,String>> getStoreListByGoods(Long goodsId);
+
+    /**
+     * 收藏店铺
+     * @param userId
+     * @param storeId
+     * @return
+     */
+    int collectStore(String userId, String storeId);
+
+    /**
+     * 移除收藏
+     * @param userId
+     * @param storeId
+     * @return
+     */
+    int deleteCollectStore(String userId, String storeId);
+
+    /**
+     * 查询收藏店铺列表
+     * @param userId
+     * @return
+     */
+    List<StoreInfo> getCollectStoreList(String userId);
+
+    /**
+     * 查询商铺认证状态（0：未收藏；1：已收藏）
+     * @param userId
+     * @param storeId
+     * @return
+     */
+    int getStoreCollectStatus(String userId, Long storeId);
+
+    /**
+     * 查询商铺收藏量
+     * @param storeId
+     * @return
+     */
+    int getStoreCollectNum(Long storeId);
+
+    /**
+     * 按条件获取商店列表
+     * @param storeTypeId
+     * @param storeStatusId
+     * @return
+     */
+    List<StoreInfo> getStoreListByCondition(String storeTypeId, String storeStatusId);
+
+    /**
+     * 通过搜索条件获取​​商店列表
+     * @param goodsKeyWords
+     * @param screenType
+     * @return
+     */
+    List<Map<String, String>> getStoreListBySearch(String goodsKeyWords, String screenType);
+
+    /**
+     * 通过搜索获取​​商品清单
+     * @param goodsKeyWords
+     * @param screenType
+     * @param storeId
+     * @return
+     */
+    List<StoreGoods> getGoodsListBySearch(String goodsKeyWords, String screenType, String storeId);
+
+    /**
+     * 查询商铺周销量
+     * @param storeId
+     * @param toDay
+     * @param targetDay
+     * @return
+     */
+    Long getStoreWeekSalesVolume(String storeId, String toDay, String targetDay);
 }

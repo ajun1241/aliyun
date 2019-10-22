@@ -13,6 +13,8 @@ public class StoreInfo {
   private String storeName;
   private String storePicture;
   private String storeAddress;
+  private Double longitude;
+  private Double latitude;
   private String businessScope;
   private String createDate;
   private Long status;
