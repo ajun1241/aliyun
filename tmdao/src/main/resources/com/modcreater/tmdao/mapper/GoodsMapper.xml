@@ -389,4 +389,10 @@
             limit #{pageNum},#{pageSize}
         </if>
     </select>
+    <select id="getGoodsSalesVolume" resultType="java.lang.Long">
+        select IFNULL(sum(num), 0) from store_sales_volume where storeId=#{storeId} and goodsId=#{goodsId} and createTime between #{toDay} and #{targetDay}
+    </select>
+    <select id="getGoodsStockNum" resultType="java.lang.Long">
+        select stockNum from store_goods_stock where goodsId=#{goodsId} and storeId=#{storeId}
+    </select>
 </mapper>

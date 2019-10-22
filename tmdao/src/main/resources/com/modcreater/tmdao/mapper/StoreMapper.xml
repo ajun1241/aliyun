@@ -2,21 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.StoreMapper">
     <insert id="insertStoreAttestation">
-        insert into store_attestation (userId, businessLicense, exequatur, storeLogo) values (#{userId},#{businessLicense},#{exequatur},#{storeLogo})
+        insert into store_attestation (userId, businessLicense, exequatur, storeLogo,address,longitude,latitude)
+        values (#{userId},#{businessLicense},#{exequatur},#{storeLogo},#{address},#{longitude},#{latitude})
     </insert>
     <insert id="saveTradingRecord">
-        insert into store_purchase_records (orderNumber, goodsId, targetStoreId, sourceStoreId, transactionPrice, goodsCount, status) values
+        insert into store_purchase_records (orderNumber, goodsId, targetStoreId, sourceStoreId, transactionPrice, goodsCount, status,changeGoodsId) values
         <foreach collection="sourceGoods" item="sourceGoods" index="index" separator=",">
             (#{orderNumber},#{sourceGoods.goodsId},#{targetStoreId},#{sourceStoreId},#{transactionPrice},#{sourceGoods.num},#{status}
-                <if test="sourceGoods.changeGoodsNum != null and sourceGoods.changeGoodsNum != '0' ">
+                <if test="sourceGoods.changeGoodsNum != null and sourceGoods.changeGoodsNum != 0 and sourceGoods.changeGoodsNum != '' ">
                     ,#{sourceGoods.changeGoodsId}
+                </if>
+                <if test="sourceGoods.changeGoodsNum == null or sourceGoods.changeGoodsNum == 0 or sourceGoods.changeGoodsNum == '' ">
+                    ,null
                 </if>
             )
         </foreach>
     </insert>
+    <insert id="collectStore">
+        insert into  store_my_favorite(userId, storeId) values (#{userId},#{storeId})
+    </insert>
     <update id="updWallet">
         update store_info set wallet=wallet+#{paymentAmount} where id=#{storeId}
     </update>
+    <delete id="deleteCollectStore">
+        delete from store_my_favorite where userId=#{userId} and storeId=#{storeId}
+    </delete>
     <select id="getStoreInfo" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
         select * from store_info where id = #{storeId}
     </select>
@@ -29,10 +39,75 @@
     <select id="getStoreInfoByBarCode" resultType="java.util.Map">
         SELECT g.*,s.* FROM  store_goods g INNER JOIN  store_goods_stock s ON g.id=s.goodsId WHERE s.goodsBarCode=#{goodsBarCode} AND s.storeId=#{storeId}
     </select>
-    <select id="getGoodsList" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
-        select * from store_info where status=1
+    <select id="getStoreList" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
+        select * from store_info where status &lt;&gt; 0
     </select>
     <select id="getStoreIdByUserId" resultType="java.lang.Long">
         select id from store_info where userId = #{userId}
+    </select>
+    <select id="getGoodsAllType" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
+        select * from store_goods
+        <where>
+            <if test="goodsKeyWords != null and goodsKeyWords != '' ">
+                and goodsName like concat('%',#{goodsKeyWords},'%')
+            </if>
+            <if test="screenType != null and screenType != '' and screenType >= 0 ">
+                and goodsTypeId = #{screenType}
+            </if>
+        </where>
+    </select>
+    <select id="getStoreListByGoods" resultType="java.util.Map">
+        select si.*,sgs.goodsId,sgs.goodsPrice,sgs.storeId,sgs.stockNum,sgs.goodsStatus,sgs.goodsBarCode
+        from store_info si inner join store_goods_stock sgs on si.id=sgs.storeId
+        where sgs.goodsId=#{goodsId} and si.status &lt;&gt; 0
+    </select>
+    <select id="getCollectStoreList" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
+        select * from store_info where id in (select storeId from store_my_favorite where userId=#{userId})
+    </select>
+    <select id="getStoreCollectStatus" resultType="java.lang.Integer">
+        select count(id) from store_my_favorite where userId=#{userId} and storeId=#{storeId}
+    </select>
+    <select id="getStoreCollectNum" resultType="java.lang.Integer">
+        select count(id) from store_my_favorite where storeId=#{storeId}
+    </select>
+    <select id="getStoreListByCondition" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
+        select * from store_info
+        <where>
+            <if test="storeStatusId != null and storeStatusId != '' and storeStatusId >= 0">
+
+            </if>
+            <if test="storeStatusId != null and storeStatusId != '' and storeStatusId >= 0">
+                and status=#{storeStatusId}
+            </if>
+        </where>
+    </select>
+    <select id="getStoreListBySearch" resultType="java.util.Map">
+        select si.*,sgs.goodsId,sgs.goodsPrice,sgs.storeId,sgs.stockNum,sgs.goodsStatus,sgs.goodsBarCode
+        from store_info si inner join store_goods_stock sgs on si.id=sgs.storeId
+        where sgs.goodsId in (select id from store_goods
+                              <where>
+                                <if test="goodsKeyWords != null and goodsKeyWords != '' ">
+                                    and goodsName like concat('%',#{goodsKeyWords},'%')
+                                </if>
+                                <if test="screenType != null and screenType != '' and screenType >= 0 ">
+                                    and goodsTypeId = #{screenType}
+                                </if>
+                             </where>)
+        and si.status &lt;&gt; 0 group by si.id
+    </select>
+    <select id="getGoodsListBySearch" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
+        select * from store_goods
+        <where>
+            <if test="goodsKeyWords != null and goodsKeyWords != '' ">
+                and goodsName like concat('%',#{goodsKeyWords},'%')
+            </if>
+            <if test="screenType != null and screenType != '' and screenType >= 0 ">
+                and goodsTypeId = #{screenType}
+            </if>
+            and storeId=#{storeId}
+        </where>
+    </select>
+    <select id="getStoreWeekSalesVolume" resultType="java.lang.Long">
+        select IFNULL(sum(num), 0) from store_sales_volume where storeId=#{storeId} and createTime between #{toDay} and #{targetDay}
     </select>
 </mapper>

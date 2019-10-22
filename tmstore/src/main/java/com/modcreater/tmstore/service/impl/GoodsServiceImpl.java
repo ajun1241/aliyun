@@ -60,7 +60,7 @@ public class GoodsServiceImpl implements GoodsService {
     private Logger logger = LoggerFactory.getLogger(GoodsServiceImpl.class);
 
     @Override
-    public Dto registerGoods(RegisterGoods registerGoods, String token) {
+    public synchronized Dto registerGoods(RegisterGoods registerGoods, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(registerGoods.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -124,10 +124,7 @@ public class GoodsServiceImpl implements GoodsService {
                 return DtoUtil.getFalseDto("修改失败",90011);
                 }
             }else if (!StringUtils.hasText(updateGoods.getGoodsFUnit())){
-                if (goodsMapper.deleteCorRelation(storeGoods.getId().toString()) != 1){
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return DtoUtil.getFalseDto("修改失败",90011);
-                }
+                goodsMapper.deleteCorRelation(storeGoods.getId().toString());
             }
             int updateGoodsResult = goodsMapper.updateGoods(updateGoods);
             int updateGoodsStockResult = goodsMapper.updateGoodsStock(updateGoods.getGoodsId(),updateGoods.getGoodsNum(),updateGoods.getGoodsBarCode(),updateGoods.getStoreId());
@@ -211,7 +208,11 @@ public class GoodsServiceImpl implements GoodsService {
     public synchronized Dto claimGoods(ClaimGoodsVo claimGoodsVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(claimGoodsVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
-        }try {
+        }
+        if (claimGoodsVo.getSourceStoreId().equals(claimGoodsVo.getTargetStoreId())){
+            return DtoUtil.getFalseDto("不能与自己交易",95016);
+        }
+        try {
             //判断商品库存
             for (Map<String,String> map:claimGoodsVo.getSourceGoods()) {
                 StoreGoodsStock goodsStock=goodsMapper.queryGoodsStock(map.get("goodsId"),claimGoodsVo.getSourceStoreId());
@@ -428,7 +429,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getStoreListVo.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
-        List<StoreInfo> storeList=storeMapper.getGoodsList();
+        List<StoreInfo> storeList=storeMapper.getStoreList();
         List<Map<String,String>> resultMapList=new ArrayList<>();
         for (StoreInfo storeInfo:storeList) {
             Map<String,String> map=new HashMap<>();
@@ -847,7 +848,7 @@ public class GoodsServiceImpl implements GoodsService {
                 goodsMap.put("goodsStock",map.get("stockNum"));
                 //可转换商品的Id
                 StoreGoodsCorrelation storeGoodsCorrelation=goodsMapper.getSonGoodsInfo(map.get("id").toString());
-                goodsMap.put("changeGoodsId", ObjectUtils.isEmpty(storeGoodsCorrelation.getGoodsSonId()) ? "" : storeGoodsCorrelation.getGoodsSonId().toString());
+                goodsMap.put("changeGoodsId", ObjectUtils.isEmpty(storeGoodsCorrelation) ? "" : storeGoodsCorrelation.getGoodsSonId().toString());
                 //转换商品的比例
                 goodsMap.put("conversionRatio",map.get("faUnitNum"));
                 //转换商品的单位
