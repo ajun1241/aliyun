@@ -77,7 +77,7 @@ public class GoodsServiceImpl implements GoodsService {
             registerGoods.setGoodsFUnit("");
         }
         goodsMapper.addNewGoods(registerGoods);
-        goodsMapper.addNewGoodsStock(registerGoods.getId(), registerGoods.getStoreId(), registerGoods.getGoodsNum(), "1", registerGoods.getGoodsBarCode());
+        goodsMapper.addNewGoodsStock(registerGoods.getId(), registerGoods.getStoreId(), registerGoods.getGoodsNum(), "3", registerGoods.getGoodsBarCode());
         if (StringUtils.hasText(registerGoods.getGoodsFUnit()) && !StringUtils.hasText(registerGoods.getCorGoodsId())) {
             return DtoUtil.getFalseDto("缺少绑定商品", 90012);
         }
@@ -170,8 +170,11 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(updateGoodsPrice.getUserId(), storeGoodsStock.getStoreId().toString())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
+        if (updateGoodsPrice.getUnitPrice() <= 0){
+            return DtoUtil.getFalseDto("价格不能小于0",80015);
+        }
         //注意父子商品之间价格的影响关系
-        if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(), updateGoodsPrice.getUnitPrice(), storeGoodsStock.getStoreId()) != 1) {
+        if (goodsMapper.updateGoodsUnitPrice(updateGoodsPrice.getGoodsId(), updateGoodsPrice.getUnitPrice(), storeGoodsStock.getStoreId(),storeGoodsStock.getGoodsPrice() == 0 ? 1 : null) != 1) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return DtoUtil.getFalseDto("修改价格失败", 80005);
         }
@@ -668,6 +671,20 @@ public class GoodsServiceImpl implements GoodsService {
             goodsList.add(goods);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功", goodsList, 100000);
+    }
+
+    @Override
+    public Dto getManageGoods(ReceivedStoreId receivedStoreId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedStoreId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(receivedStoreId.getUserId(), receivedStoreId.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        Map<String,Object> result = new HashMap<>();
+        result.put("forSale",goodsMapper.getForSaleGoodsNum(receivedStoreId.getStoreId()));
+            result.put("soldOut",goodsMapper.getSoldOutGoodsNum(receivedStoreId.getStoreId()));
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
     @Override

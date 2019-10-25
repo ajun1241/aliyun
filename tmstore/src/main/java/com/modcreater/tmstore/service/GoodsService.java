@@ -253,4 +253,12 @@ public interface GoodsService {
      * @return
      */
     Dto getGoodsTrackingInStore(GetGoodsTrackingInStore getGoodsTrackingInStore, String token);
+
+    /**
+     * 获取商品管理主界面信息
+     * @param receivedStoreId
+     * @param token
+     * @return
+     */
+    Dto getManageGoods(ReceivedStoreId receivedStoreId, String token);
 }

@@ -124,9 +124,10 @@ public interface GoodsMapper {
      * @param goodsId
      * @param unitPrice
      * @param storeId
+     * @param status
      * @return
      */
-    int updateGoodsUnitPrice(@Param("goodsId") String goodsId,@Param("goodsPrice") Double unitPrice,@Param("storeId") Long storeId);
+    int updateGoodsUnitPrice(@Param("goodsId") String goodsId,@Param("goodsPrice") Double unitPrice,@Param("storeId") Long storeId,@Param("status") int status);
 
     /**
      * 修改商品状态
@@ -528,4 +529,18 @@ public interface GoodsMapper {
      * @return
      */
     Long getGoodsStockNum(String goodsId, String StoreId);
+
+    /**
+     * 获取出售中的商品的数量
+     * @param storeId
+     * @return
+     */
+    Long getForSaleGoodsNum(String storeId);
+
+    /**
+     * 获取已售尽商品的数量
+     * @param storeId
+     * @return
+     */
+    Long getSoldOutGoodsNum(String storeId);
 }

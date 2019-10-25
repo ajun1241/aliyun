@@ -220,4 +220,10 @@ public class GoodsController {
     public Dto getGoodsTrackingInStore(@RequestBody GetGoodsTrackingInStore getGoodsTrackingInStore, HttpServletRequest request){
         return goodsService.getGoodsTrackingInStore(getGoodsTrackingInStore,request.getHeader("token"));
     }
+
+    @PostMapping(value = "getmanagegoods")
+    @ApiOperation("获取商品管理主界面")
+    public Dto getManageGoods(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
+        return goodsService.getManageGoods(receivedStoreId,request.getHeader("token"));
+    }
 }

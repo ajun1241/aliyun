@@ -30,7 +30,11 @@
         update store_goods_stock set stockNum = #{goodsStock},goodsBarCode = #{goodsBarCode} where goodsId = #{goodsId} and storeId = #{storeId}
     </update>
     <update id="updateGoodsUnitPrice">
-        update store_goods_stock set goodsPrice = #{goodsPrice} where goodsId = #{goodsId} and storeId = #{storeId}
+        update store_goods_stock set goodsPrice = #{goodsPrice}
+        <if test="status != null">
+            ,goodsStatus = #{status}
+        </if>
+         where goodsId = #{goodsId} and storeId = #{storeId}
     </update>
     <update id="updateGoodsStatus">
         update store_goods_stock set goodsStatus = #{status} where id = #{goodsId} and storeId = #{storeId}
@@ -394,5 +398,11 @@
     </select>
     <select id="getGoodsStockNum" resultType="java.lang.Long">
         select stockNum from store_goods_stock where goodsId=#{goodsId} and storeId=#{storeId}
+    </select>
+    <select id="getForSaleGoodsNum" resultType="java.lang.Long">
+        select count(1) from store_goods_stock where storeId = #{storeId} and goodsStatus = 1 and stockNum != 0
+    </select>
+    <select id="getSoldOutGoodsNum" resultType="java.lang.Long">
+        select count(1) from store_goods_stock where storeId = #{storeId} and stockNum = 0
     </select>
 </mapper>
