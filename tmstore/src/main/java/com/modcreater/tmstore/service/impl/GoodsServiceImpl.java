@@ -683,7 +683,7 @@ public class GoodsServiceImpl implements GoodsService {
         }
         Map<String,Object> result = new HashMap<>();
         result.put("forSale",goodsMapper.getForSaleGoodsNum(receivedStoreId.getStoreId()));
-            result.put("soldOut",goodsMapper.getSoldOutGoodsNum(receivedStoreId.getStoreId()));
+        result.put("soldOut",goodsMapper.getSoldOutGoodsNum(receivedStoreId.getStoreId()));
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
