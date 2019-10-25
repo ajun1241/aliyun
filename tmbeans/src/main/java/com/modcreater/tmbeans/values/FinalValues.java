@@ -1,6 +1,5 @@
 package com.modcreater.tmbeans.values;
 
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 
 import java.util.Calendar;
 import java.util.Date;

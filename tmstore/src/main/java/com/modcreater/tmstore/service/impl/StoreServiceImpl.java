@@ -103,10 +103,17 @@ public class StoreServiceImpl implements StoreService {
         storeAttestation.setBusinessLicense(approveInfoVo.getBusinessLicense());
         storeAttestation.setExequatur(JSON.toJSONString(approveInfoVo.getExequatur()));
         storeAttestation.setStoreLogo(approveInfoVo.getStoreLogo());
-        storeAttestation.setUserId(approveInfoVo.getUserId());
+        storeAttestation.setUserId(Long.valueOf(approveInfoVo.getUserId()));
         storeAttestation.setAddress(approveInfoVo.getAddress());
         storeAttestation.setLongitude(Double.valueOf(approveInfoVo.getLongitude()));
         storeAttestation.setLatitude(Double.valueOf(approveInfoVo.getLatitude()));
+        storeAttestation.setBusinessScope(Long.valueOf(approveInfoVo.getBusinessScope()));
+        storeAttestation.setDetailAddress(approveInfoVo.getDetailAddress());
+        storeAttestation.setStoreName(approveInfoVo.getStoreName());
+        storeAttestation.setStorefrontPicture(approveInfoVo.getStorefrontPicture());
+        storeAttestation.setOpenStoreHours(approveInfoVo.getOpenStoreHours());
+        storeAttestation.setCloseStoreHours(approveInfoVo.getCloseStoreHours());
+        storeAttestation.setPhoneNumber(approveInfoVo.getPhoneNumber());
         int i=storeMapper.insertStoreAttestation(storeAttestation);
         if (i==0){
             return DtoUtil.getFalseDto("上传商铺认证信息失败",21022);
@@ -199,7 +206,7 @@ public class StoreServiceImpl implements StoreService {
                 map.put("storeId",storeInfo.getId().toString());
                 map.put("storeName",storeInfo.getStoreName());
                 map.put("storePicture",storeInfo.getStorePicture());
-                map.put("contactWay","123456789");
+                map.put("contactWay",storeInfo.getPhoneNumber());
                 //查询商铺周销量
                 map.put("weekSalesVolume",storeMapper.getStoreWeekSalesVolume(storeInfo.getId().toString(),new SimpleDateFormat("yyyyMMdd").format(new Date()),DateUtil.getDay(-7)).toString());
                 map.put("storeAddress",storeInfo.getStoreAddress());
@@ -211,6 +218,9 @@ public class StoreServiceImpl implements StoreService {
                 //查询该店铺收藏数量
                 map.put("collectNum", String.valueOf(storeMapper.getStoreCollectNum(storeInfo.getId())));
                 map.put("status",storeInfo.getStatus().toString());
+                map.put("detailAddress",storeInfo.getDetailAddress());
+                map.put("businessHouse",storeInfo.getOpenStoreHours()+"-"+storeInfo.getCloseStoreHours());
+                map.put("businessScope",storeInfo.getBusinessScope().toString());
                 mapList.add(map);
             }
         }
@@ -259,7 +269,6 @@ public class StoreServiceImpl implements StoreService {
         }
         //查询商品列表
         Map<String,Object> resultMap=new HashMap<>(2);
-        List<Map<String,Object>> storeMapList=new ArrayList<>();
         List<StoreGoods> goodsList=storeMapper.getGoodsAllType(searchDiscoverVo.getGoodsKeyWords(),searchDiscoverVo.getScreenType());
         List<Map<String,Object>> goodsMapList=new ArrayList<>();
         for (StoreGoods goodsInfo:goodsList) {
@@ -277,6 +286,7 @@ public class StoreServiceImpl implements StoreService {
             Long sumGoodsStock=0L;
             //查询包含此商品指定范围内的店铺
             List<Map<String,String>> storeList=storeMapper.getStoreListByGoods(goodsInfo.getId());
+            List<Map<String,Object>> storeMapList=new ArrayList<>();
             for (Map map:storeList) {
                 Map<String,Object> storeMap=new HashMap<>();
                 storeMap.put("storeId",map.get("id"));
@@ -299,6 +309,9 @@ public class StoreServiceImpl implements StoreService {
                 storeMap.put("goodsStock",goodsStockNum);
                 storeMap.put("distance",distance);
                 storeMap.put("status",map.get("status"));
+                storeMap.put("businessScope",map.get("businessScope"));
+                storeMap.put("businessHouse",map.get("openStoreHours")+"-"+map.get("closeStoreHours"));
+                storeMap.put("detailAddress",map.get("detailAddress"));
                 //营业时间
                 storeMapList.add(storeMap);
             }
@@ -326,7 +339,7 @@ public class StoreServiceImpl implements StoreService {
         //3、综合排序
         //4、销量最多
         //5、收藏最多
-        if (!StringUtils.isEmpty(searchDiscoverVo.getSortType())&&storeMapList.size()>0){
+        if (!StringUtils.isEmpty(searchDiscoverVo.getSortType())){
             Integer type=Integer.parseInt(searchDiscoverVo.getSortType());
             if (type == 1){
                 Collections.sort(goodsMapList, new Comparator<Map<String, Object>>() {
@@ -357,9 +370,9 @@ public class StoreServiceImpl implements StoreService {
                     @Override
                     public int compare(Map<String, Object> o1, Map<String, Object> o2) {
                         //name1是从你list里面拿出来的一个
-                        Integer distance1 = Integer.valueOf(o1.get("goodsPrice").toString()) ;
+                        Double distance1 = Double.valueOf(o1.get("goodsPrice").toString()) ;
                         //name1是从你list里面拿出来的第二个name
-                        Integer distance2 = Integer.valueOf(o2.get("goodsPrice").toString()) ;
+                        Double distance2 = Double.valueOf(o2.get("goodsPrice").toString()) ;
                         return distance1.compareTo(distance2);
                     }
                 });
@@ -418,8 +431,11 @@ public class StoreServiceImpl implements StoreService {
             storeMap.put("longitude",map.get("longitude"));
             storeMap.put("latitude",map.get("latitude"));
             storeMap.put("storeScore","4.8");
+            storeMap.put("collectNum", String.valueOf(storeMapper.getStoreCollectNum(Long.parseLong(map.get("id").toString()))));
             storeMap.put("status",map.get("status"));
             Long weekSalesVolume=0L;
+            Long sumGoodsStock=0L;
+            String goodsUnit="";
             //查询商品列表
             List<Map<String,String>> goodsMapList=new ArrayList<>();
             List<StoreGoods> goodsList=storeMapper.getGoodsListBySearch(searchDiscoverVo.getGoodsKeyWords(),searchDiscoverVo.getScreenType(),map.get("id").toString());
@@ -431,10 +447,17 @@ public class StoreServiceImpl implements StoreService {
                 StoreGoodsStock goodsStock=goodsMapper.getGoodsStock(storeGoods.getId().toString(),map.get("id").toString());
                 goodsMap.put("goodsPrice",goodsStock.getGoodsPrice().toString());
                 goodsMap.put("goodsUnit",storeGoods.getGoodsUnit());
+                goodsUnit=goodsUnit+storeGoods.getGoodsUnit();
+                //查询销量
                 weekSalesVolume=goodsMapper.getGoodsSalesVolume(map.get("id").toString(),storeGoods.getId().toString(),new SimpleDateFormat("yyyyMMdd").format(new Date()),DateUtil.getDay(-7));
+                //查询该商铺该商品的库存
+                Long goodsStockNum=goodsMapper.getGoodsStockNum(storeGoods.getId().toString(),map.get("id").toString());
+                sumGoodsStock=sumGoodsStock+goodsStockNum;
                 goodsMapList.add(goodsMap);
             }
             storeMap.put("weekSalesVolume",weekSalesVolume);
+            storeMap.put("goodsUnit",goodsUnit);
+            storeMap.put("goodsStock",sumGoodsStock);
             storeMap.put("goodsList",goodsMapList);
             storeMapList.add(storeMap);
         }
@@ -442,12 +465,22 @@ public class StoreServiceImpl implements StoreService {
         //排序方式:
         //1、库存数量
         //2、距离最近
-        //3、销量最多
-        //4、收藏最多
+        //3、综合排序
+        //4、销量最多
+        //5、收藏最多
         if (!StringUtils.isEmpty(searchDiscoverVo.getSortType())) {
             Integer type = Integer.parseInt(searchDiscoverVo.getSortType());
             if (type == 1) {
-
+                Collections.sort(storeMapList, new Comparator<Map<String, Object>>() {
+                    @Override
+                    public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                        //name1是从你list里面拿出来的一个
+                        Integer distance1 = Integer.valueOf(o1.get("goodsStock").toString());
+                        //name1是从你list里面拿出来的第二个name
+                        Integer distance2 = Integer.valueOf(o2.get("goodsStock").toString());
+                        return distance1.compareTo(distance2);
+                    }
+                });
             } else if (type == 2) {
                 Collections.sort(storeMapList, new Comparator<Map<String, Object>>() {
                     @Override
@@ -460,9 +493,38 @@ public class StoreServiceImpl implements StoreService {
                     }
                 });
             } else if (type == 3) {
-
+                Collections.sort(storeMapList, new Comparator<Map<String, Object>>() {
+                    @Override
+                    public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                        //name1是从你list里面拿出来的一个
+                        Double distance1 = Double.valueOf(o1.get("storeScore").toString());
+                        //name1是从你list里面拿出来的第二个name
+                        Double distance2 = Double.valueOf(o2.get("storeScore").toString());
+                        return distance1.compareTo(distance2);
+                    }
+                });
             } else if (type == 4) {
-
+                Collections.sort(storeMapList, new Comparator<Map<String, Object>>() {
+                    @Override
+                    public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                        //name1是从你list里面拿出来的一个
+                        Integer distance1 = Integer.valueOf(o1.get("weekSalesVolume").toString());
+                        //name1是从你list里面拿出来的第二个name
+                        Integer distance2 = Integer.valueOf(o2.get("weekSalesVolume").toString());
+                        return distance1.compareTo(distance2);
+                    }
+                });
+            }else if (type == 5) {
+                Collections.sort(storeMapList, new Comparator<Map<String, Object>>() {
+                    @Override
+                    public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                        //name1是从你list里面拿出来的一个
+                        Integer distance1 = Integer.valueOf(o1.get("collectNum").toString());
+                        //name1是从你list里面拿出来的第二个name
+                        Integer distance2 = Integer.valueOf(o2.get("collectNum").toString());
+                        return distance1.compareTo(distance2);
+                    }
+                });
             }
         }
         resultMap.put("nearByShop",storeMapList);
@@ -514,8 +576,8 @@ public class StoreServiceImpl implements StoreService {
         List<Map> resultMapList=new ArrayList<>();
         for (Map map:mapList) {
             Map<String,String> map1=new HashMap<>();
-            map1.put("ScreenTypeId",map.get("id").toString());
-            map1.put("ScreenType",map.get("type").toString());
+            map1.put("screenTypeId",map.get("id").toString());
+            map1.put("screenType",map.get("type").toString());
             map1.put("select","false");
             resultMapList.add(map1);
         }

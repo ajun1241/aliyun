@@ -525,10 +525,10 @@ public interface GoodsMapper {
     /**
      * 获取商品的库存数量
      * @param goodsId
-     * @param StoreId
+     * @param storeId
      * @return
      */
-    Long getGoodsStockNum(String goodsId, String StoreId);
+    Long getGoodsStockNum(String goodsId, String storeId);
 
     /**
      * 获取出售中的商品的数量

@@ -2,9 +2,6 @@ package com.modcreater.tmbeans.pojo;
 
 import lombok.Data;
 
-/**
- * @Author: AJun
- */
 @Data
 public class StoreInfo {
 
@@ -15,10 +12,15 @@ public class StoreInfo {
   private String storeAddress;
   private Double longitude;
   private Double latitude;
-  private String businessScope;
+  private Long businessScope;
+  private Double wallet;
   private String createDate;
   private Long status;
   private Long attestationId;
-  private Double wallet;
+  private String detailAddress;
+  private String openStoreHours;
+  private String closeStoreHours;
+  private String phoneNumber;
+
 
 }

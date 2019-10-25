@@ -1841,8 +1841,13 @@ public class EventServiceImpl implements EventService {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         MsgStatus msgStatus = msgStatusMapper.queryMsg(queryMsgStatusVo.getMsgId());
-        if (ObjectUtils.isEmpty(msgStatus)) {
-            return DtoUtil.getFalseDto("查询消息状态失败", 200000);
+        if (!ObjectUtils.isEmpty(msgStatus)) {
+            Map<String, String> map = new HashMap<>();
+            map.put("id", msgStatus.getId().toString());
+            map.put("userId", msgStatus.getUserId().toString());
+            map.put("status", msgStatus.getStatus().toString());
+            map.put("type", msgStatus.getType().toString());
+            return DtoUtil.getSuccesWithDataDto("查询消息状态成功", map, 100000);
         }
         //查询群聊消息状态
         GroupInviteMsgStatus msgStatusList=groupMapper.queryGroupInviteMsgStatus(msgStatus.getId(),queryMsgStatusVo.getUserId());
@@ -1854,12 +1859,7 @@ public class EventServiceImpl implements EventService {
             map.put("type", msgStatus.getType().toString());
             return DtoUtil.getSuccesWithDataDto("查询消息状态成功", map, 100000);
         }
-        Map<String, String> map = new HashMap<>();
-        map.put("id", msgStatus.getId().toString());
-        map.put("userId", msgStatus.getUserId().toString());
-        map.put("status", msgStatus.getStatus().toString());
-        map.put("type", msgStatus.getType().toString());
-        return DtoUtil.getSuccesWithDataDto("查询消息状态成功", map, 100000);
+        return DtoUtil.getFalseDto("查询消息状态失败", 200000);
     }
 
     @Override

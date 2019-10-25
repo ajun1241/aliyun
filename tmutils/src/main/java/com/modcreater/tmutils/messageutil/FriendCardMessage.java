@@ -1,6 +1,5 @@
 package com.modcreater.tmutils.messageutil;
 
-import com.sun.jndi.toolkit.url.Uri;
 import io.rong.messages.BaseMessage;
 import io.rong.util.GsonUtil;
 

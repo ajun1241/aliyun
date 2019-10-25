@@ -225,6 +225,7 @@ public class EventController {
      * @param request
      * @return
      */
+    @Safety
     @PostMapping(value = "querymsgstatus")
     @ApiOperation("查询一条消息状态")
     public Dto queryMsgStatus(@RequestBody QueryMsgStatusVo queryMsgStatusVo, HttpServletRequest request){

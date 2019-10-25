@@ -2,8 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.modcreater.tmdao.mapper.StoreMapper">
     <insert id="insertStoreAttestation">
-        insert into store_attestation (userId, businessLicense, exequatur, storeLogo,address,longitude,latitude)
-        values (#{userId},#{businessLicense},#{exequatur},#{storeLogo},#{address},#{longitude},#{latitude})
+        insert into store_attestation (userId, businessLicense, exequatur, storeLogo,address,longitude,latitude,
+                storefrontPicture,businessScope,detailAddress,openStoreHours,closeStoreHours,phoneNumber,storeName)
+        values (#{userId},#{businessLicense},#{exequatur},#{storeLogo},#{address},#{longitude},#{latitude},
+        #{storefrontPicture},#{businessScope},#{detailAddress},#{openStoreHours},#{closeStoreHours},#{phoneNumber},#{storeName})
     </insert>
     <insert id="saveTradingRecord">
         insert into store_purchase_records (orderNumber, goodsId, targetStoreId, sourceStoreId, transactionPrice, goodsCount, status,changeGoodsId) values
@@ -73,8 +75,8 @@
     <select id="getStoreListByCondition" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
         select * from store_info
         <where>
-            <if test="storeStatusId != null and storeStatusId != '' and storeStatusId >= 0">
-
+            <if test="storeTypeId != null and storeTypeId != '' and storeTypeId >= 0">
+                and businessScope=#{storeTypeId}
             </if>
             <if test="storeStatusId != null and storeStatusId != '' and storeStatusId >= 0">
                 and status=#{storeStatusId}
