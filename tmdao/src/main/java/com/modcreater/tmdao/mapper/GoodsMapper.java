@@ -127,7 +127,7 @@ public interface GoodsMapper {
      * @param status
      * @return
      */
-    int updateGoodsUnitPrice(@Param("goodsId") String goodsId,@Param("goodsPrice") Double unitPrice,@Param("storeId") Long storeId,@Param("status") int status);
+    int updateGoodsUnitPrice(@Param("goodsId") String goodsId,@Param("goodsPrice") Double unitPrice,@Param("storeId") Long storeId,@Param("status") Object status);
 
     /**
      * 修改商品状态
