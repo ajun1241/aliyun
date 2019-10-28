@@ -65,6 +65,7 @@ public class GoodsController {
         return goodsService.getGoodsInfo(goodsInfoVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping("getbarcodeinfo")
     @ApiOperation("获取条形码内信息")
     public Dto getBarcodeInfo(@RequestBody String barcode){
@@ -73,6 +74,7 @@ public class GoodsController {
 
     @Safety
     @PostMapping(value = "updategoodsinfo")
+    @ApiOperation("修改商品信息")
     public Dto updateGoodsInfo(@RequestBody UpdateGoods updateGoods, HttpServletRequest request){
         return goodsService.updateGoodsInfo(updateGoods,request.getHeader("token"));
     }
@@ -105,85 +107,98 @@ public class GoodsController {
         return goodsService.claimGoods(claimGoodsVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getupdatepriceinfo")
     @ApiOperation("获取修改价格信息")
     public Dto getUpdatePriceInfo(@RequestBody ReceivedGoodsId receivedGoodsId, HttpServletRequest request){
         return goodsService.getUpdatePriceInfo(receivedGoodsId,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "udpategoodsprice")
     @ApiOperation("修改单价")
     public Dto updateGoodsPrice(@RequestBody UpdateGoodsPrice updateGoodsPrice,HttpServletRequest request){
         return goodsService.updateGoodsPrice(updateGoodsPrice,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getgoodstypes")
     @ApiOperation("获取商品类型")
     public Dto getGoodsTypes(@RequestBody ReceivedId receivedId,HttpServletRequest request){
         return goodsService.getGoodsTypes(receivedId,request.getHeader("token"));
     }
 
-
+    @Safety
     @PostMapping(value = "goodsdownshelf")
     @ApiOperation("商品下架")
     public Dto goodsDownShelf(@RequestBody GoodsDownShelf goodsDownShelf,HttpServletRequest request){
         return goodsService.goodsDownShelf(goodsDownShelf,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getupdategoodsinfo")
     @ApiOperation("获取我的商品详细信息")
     public Dto getUpdateGoodsInfo(@RequestBody ReceivedGoodsId receivedGoodsId,HttpServletRequest request){
         return goodsService.getUpdateGoodsInfo(receivedGoodsId,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getgoodsconsumables")
     @ApiOperation("获取商品对应消耗品")
     public Dto getGoodsConsumables(@RequestBody GetGoodsConsumables getGoodsConsumables,HttpServletRequest request){
         return goodsService.getGoodsConsumable(getGoodsConsumables,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "deletegoodsconsumables")
     @ApiOperation("删除商品对应消耗品")
     public Dto deleteGoodsConsumables(@RequestBody DeleteGoodsConsumables deleteGoodsConsumables,HttpServletRequest request){
         return goodsService.deleteGoodsConsumables(deleteGoodsConsumables,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getupdateconsumableinfo")
     @ApiOperation("获取修改消耗品信息")
     public Dto getUpdateConsumableInfo(@RequestBody ReceivedConsumableId receivedConsumableId,HttpServletRequest request){
         return goodsService.getUpdateConsumableInfo(receivedConsumableId,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "updateconsumable")
     @ApiOperation("修改消耗品信息")
     public Dto updateConsumable(@RequestBody UpdateConsumable updateConsumable, HttpServletRequest request){
         return goodsService.updateConsumable(updateConsumable,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getstorelist")
     @ApiOperation("查询商店列表")
     public Dto getStoreList(@RequestBody GetStoreListVo getStoreListVo, HttpServletRequest request){
         return goodsService.getStoreList(getStoreListVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getgoodsinfobybarcode")
     @ApiOperation("根据条码获取商品信息")
     public Dto getGoodsInfoByBarCode(@RequestBody GetGoodsInfoVo getGoodsInfoVo, HttpServletRequest request){
         return goodsService.getGoodsInfoByBarCode(getGoodsInfoVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "createofflineorder")
     @ApiOperation("线下交易生成订单")
     public Dto createOfflineOrder(@RequestBody CreateOfflineOrderVo createOfflineOrderVo, HttpServletRequest request){
         return goodsService.createOfflineOrder(createOfflineOrderVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "checkgoodslist")
     @ApiOperation("商家确认商品信息")
     public Dto checkGoodsList(@RequestBody OrderInfoVo orderInfoVo, HttpServletRequest request){
         return goodsService.checkGoodsList(orderInfoVo,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "checkorder")
     @ApiOperation("商家确认订单")
     public Dto checkOrder(@RequestBody CheckOrderVo checkOrderVo, HttpServletRequest request){
@@ -191,36 +206,42 @@ public class GoodsController {
     }
 
 
+    @Safety
     @PostMapping(value = "addnewconsumable")
     @ApiOperation("添加消耗品")
     public Dto addNewConsumable(@RequestBody AddNewConsumable addNewConsumable,HttpServletRequest request){
         return goodsService.addNewConsumable(addNewConsumable,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "wxofflinepay")
     @ApiOperation("线下微信支付")
     public Dto wxOfflinePay(@RequestBody ReceivedOrderNumber receivedOrderNumber,HttpServletRequest request){
         return goodsService.wxOfflinePay(receivedOrderNumber,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "aliofflinepay")
     @ApiOperation("线下支付宝支付")
     public Dto aliOfflinePay(@RequestBody ReceivedOrderNumber receivedOrderNumber,HttpServletRequest request){
         return goodsService.aliOfflinePay(receivedOrderNumber,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getgoodstracking")
     @ApiOperation("出货跟踪")
     public Dto getGoodsTracking(@RequestBody GetGoodsTracking getGoodsTracking ,HttpServletRequest request){
         return goodsService.getGoodsTracking(getGoodsTracking,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getgoodstrackinginstore")
     @ApiOperation("出货跟踪商店")
     public Dto getGoodsTrackingInStore(@RequestBody GetGoodsTrackingInStore getGoodsTrackingInStore, HttpServletRequest request){
         return goodsService.getGoodsTrackingInStore(getGoodsTrackingInStore,request.getHeader("token"));
     }
 
+    @Safety
     @PostMapping(value = "getmanagegoods")
     @ApiOperation("获取商品管理主界面")
     public Dto getManageGoods(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
