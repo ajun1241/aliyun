@@ -39,7 +39,7 @@ public class GoodsController {
 
     @Safety
     @PostMapping(value = "getgoodsstocklist")
-    @ApiOperation("获取我的商品库存列表()")
+    @ApiOperation("获取我的商品库存列表")
     public Dto getGoodsStockList(@RequestBody GetGoodsStockList getGoodsStockList, HttpServletRequest request){
         return goodsService.getGoodsStockList(getGoodsStockList,request.getHeader("token"));
     }
@@ -246,5 +246,33 @@ public class GoodsController {
     @ApiOperation("获取商品管理主界面")
     public Dto getManageGoods(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
         return goodsService.getManageGoods(receivedStoreId,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "getmanagegoodsbytype")
+    @ApiOperation("根据类型获取商品管理列表")
+    public Dto getManageGoodsByType(@RequestBody GetManageGoodsByType getManageGoodsByType,HttpServletRequest request){
+        return goodsService.getManageGoodsByType(getManageGoodsByType,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "getmanagegoodsgroupbygoodstype")
+    @ApiOperation("根据商品类型分类查询")
+    public Dto getManageGoodsGroupByGoodsType(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
+        return goodsService.getManageGoodsGroupByGoodsType(receivedStoreId,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "getmanagegoodswithgoodstype")
+    @ApiOperation("根据商品类型获取商品列表")
+    public Dto getManageGoodsWithGoodsType(@RequestBody GetManageGoodsWithGoodsType getManageGoodsWithGoodsType,HttpServletRequest request){
+        return goodsService.getManageGoodsWithGoodsType(getManageGoodsWithGoodsType,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "getmanagepricebytype")
+    @ApiOperation("根据查看类型获取商品价格列表")
+    public Dto getManagePriceByType(@RequestBody GetManagePriceByType getManagePriceByType,HttpServletRequest request){
+        return goodsService.getManagePriceByType(getManagePriceByType,request.getHeader("token"));
     }
 }

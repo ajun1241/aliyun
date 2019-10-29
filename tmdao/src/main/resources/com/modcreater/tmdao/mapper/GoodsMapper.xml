@@ -405,4 +405,40 @@
     <select id="getSoldOutGoodsNum" resultType="java.lang.Long">
         select count(1) from store_goods_stock where storeId = #{storeId} and stockNum = 0
     </select>
+    <select id="getForSaleGoodsList" resultType="java.util.Map">
+        select sg.id goodsId,sg.goodsPicture,sg.goodsName,sgt.type,sgs.goodsPrice,sg.goodsUnit,sgs.stockNum
+        from store_goods sg,store_goods_type sgt,store_goods_stock sgs
+        where sg.id = sgs.goodsId and sgt.id = sg.goodsTypeId and sgs.storeId = #{storeId} and sgs.goodsStatus = 1 and sgs.stockNum &gt;= 1
+        limit #{pageNum},#{pageSize}
+    </select>
+    <select id="getSoldOutGoodsList" resultType="java.util.Map">
+        select sg.id goodsId,sg.goodsPicture,sg.goodsName,sgt.type,sgs.goodsPrice,sg.goodsUnit,sgs.stockNum
+        from store_goods sg,store_goods_type sgt,store_goods_stock sgs
+        where sg.id = sgs.goodsId and sgt.id = sg.goodsTypeId and sgs.storeId = #{storeId} and sgs.stockNum &lt;= 0
+        limit #{pageNum},#{pageSize}
+    </select>
+    <select id="getMyGoodsTypes" resultType="java.lang.Long">
+        select sgt.id from store_goods_type sgt,store_goods sg ,store_goods_stock sgs
+        where sgt.id = sg.goodsTypeId and sgs.goodsId = sg.id and sgs.storeId = #{storeId} and sgs.goodsStatus = 1 group by sg.goodsTypeId
+    </select>
+    <select id="getManageGoodsGroupByGoodsTypeId" resultType="java.util.Map">
+        select sg.id goodsId,sg.goodsPicture,sg.goodsName,sgs.goodsPrice,sg.goodsUnit,sgs.stockNum,sgt.type,sg.goodsTypeId
+        from store_goods sg,store_goods_stock sgs,store_goods_type sgt
+        where sgt.id = sg.goodsTypeId and sg.id = sgs.goodsId and sgs.storeId = #{storeId} and sg.goodsTypeId = #{typeId}
+    </select>
+    <select id="getTypeName" resultType="java.lang.String">
+        select type from store_goods_type where id = #{typeId}
+    </select>
+    <select id="getPricedGoodsList" resultType="java.util.Map">
+        select sg.id goodsId,sg.goodsPicture,sg.goodsName,sg.goodsUnit,sgs.goodsPrice,sgs.stockNum
+        from store_goods sg,store_goods_stock sgs
+        where sg.id = sgs.goodsId and sgs.storeId = #{storeId} and sgs.goodsStatus = 1
+        limit #{pageNum},#{pageSize}
+    </select>
+    <select id="getNoPricingGoodsList" resultType="java.util.Map">
+        select sg.id goodsId,sg.goodsPicture,sg.goodsName,sg.goodsUnit,sgs.goodsPrice,sgs.stockNum
+        from store_goods sg,store_goods_stock sgs
+        where sg.id = sgs.goodsId and sgs.storeId = #{storeId} and sgs.goodsStatus = 3
+        limit #{pageNum},#{pageSize}
+    </select>
 </mapper>

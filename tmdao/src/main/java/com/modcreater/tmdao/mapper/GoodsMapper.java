@@ -543,4 +543,62 @@ public interface GoodsMapper {
      * @return
      */
     Long getSoldOutGoodsNum(String storeId);
+
+    /**
+     * 分页查询正在出售的商品
+     * @param storeId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    List<Map<String, Object>> getForSaleGoodsList(@Param("storeId") String storeId,@Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
+
+    /**
+     * 分页查询已售空的商品
+     * @param storeId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    List<Map<String, Object>> getSoldOutGoodsList(String storeId, Long pageNum, Long pageSize);
+
+    /**
+     * 获取已有商品的类型Id
+     * @param storeId
+     * @return
+     */
+    List<Long> getMyGoodsTypes(String storeId);
+
+    /**
+     * 根据类型Id查询商品列表
+     * @param storeId
+     * @param typeId
+     * @return
+     */
+    List<Map<String, Object>> getManageGoodsGroupByGoodsTypeId(@Param("storeId") String storeId,@Param("typeId") Long typeId);
+
+    /**
+     * 获取商品类型名称
+     * @param typeId
+     * @return
+     */
+    String getTypeName(Long typeId);
+
+    /**
+     * 获取已定价的商品信息
+     * @param storeId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    List<Map<String, Object>> getPricedGoodsList(@Param("storeId") String storeId,@Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
+
+    /**
+     * 获取未定价的商品信息
+     * @param storeId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    List<Map<String, Object>> getNoPricingGoodsList(@Param("storeId") String storeId,@Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
 }

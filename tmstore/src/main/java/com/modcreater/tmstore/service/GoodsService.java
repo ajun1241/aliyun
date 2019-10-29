@@ -261,4 +261,36 @@ public interface GoodsService {
      * @return
      */
     Dto getManageGoods(ReceivedStoreId receivedStoreId, String token);
+
+    /**
+     * 根据类型查询管理商品列表
+     * @param getManageGoodsByType
+     * @param token
+     * @return
+     */
+    Dto getManageGoodsByType(GetManageGoodsByType getManageGoodsByType, String token);
+
+    /**
+     * 根据商品类型分组查询商品列表
+     * @param receivedStoreId
+     * @param token
+     * @return
+     */
+    Dto getManageGoodsGroupByGoodsType(ReceivedStoreId receivedStoreId, String token);
+
+    /**
+     * 根据商品类型查新商品列表
+     * @param getManageGoodsWithGoodsType
+     * @param token
+     * @return
+     */
+    Dto getManageGoodsWithGoodsType(GetManageGoodsWithGoodsType getManageGoodsWithGoodsType, String token);
+
+    /**
+     * 根据查看类型获取商品价格列表
+     * @param getManagePriceByType
+     * @param token
+     * @return
+     */
+    Dto getManagePriceByType(GetManagePriceByType getManagePriceByType, String token);
 }

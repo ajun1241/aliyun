@@ -688,6 +688,104 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    public Dto getManageGoodsByType(GetManageGoodsByType getManageGoodsByType, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getManageGoodsByType.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(getManageGoodsByType.getUserId(), getManageGoodsByType.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        getManageGoodsByType.setPageNum(getManageGoodsByType.getPageNum() - 1);
+        if ("forSale".equals(getManageGoodsByType.getGetType())){
+            List<Map<String,Object>> list = goodsMapper.getForSaleGoodsList(getManageGoodsByType.getStoreId(),getManageGoodsByType.getPageNum(),
+                    getManageGoodsByType.getPageSize());
+            if (list.size() == 0){
+                return DtoUtil.getSuccessDto("暂无数据",200000);
+            }
+            return DtoUtil.getSuccesWithDataDto("查询成功",list,100000);
+        }else if ("soldOut".equals(getManageGoodsByType.getGetType())){
+            List<Map<String,Object>> list = goodsMapper.getSoldOutGoodsList(getManageGoodsByType.getStoreId(),getManageGoodsByType.getPageNum(),
+                    getManageGoodsByType.getPageSize());
+            if (list.size() == 0){
+                return DtoUtil.getSuccessDto("暂无数据",200000);
+            }
+            return DtoUtil.getSuccesWithDataDto("查询成功",list,100000);
+        }else {
+            return DtoUtil.getFalseDto("缺少参数gt",90016);
+        }
+    }
+
+    @Override
+    public Dto getManageGoodsGroupByGoodsType(ReceivedStoreId receivedStoreId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedStoreId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(receivedStoreId.getUserId(), receivedStoreId.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        List<Long> typeIds = goodsMapper.getMyGoodsTypes(receivedStoreId.getStoreId());
+        if (typeIds.size() == 0){
+            return DtoUtil.getSuccessDto("暂无数据",200000);
+        }
+        List<Map<String,Object>> result = new ArrayList<>();
+        for (int i = 0; i < typeIds.size(); i++) {
+            Long typeId = typeIds.get(i);
+            Map<String,Object> type = new HashMap<>();
+            List<Map<String, Object>> list = goodsMapper.getManageGoodsGroupByGoodsTypeId(receivedStoreId.getStoreId(), typeId);
+            type.put("typeName",goodsMapper.getTypeName(typeId));
+            type.put("num",list.size());
+            if (i == 0){
+                type.put("firstList",list);
+            }
+            result.add(type);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
+    @Override
+    public Dto getManageGoodsWithGoodsType(GetManageGoodsWithGoodsType getManageGoodsWithGoodsType, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getManageGoodsWithGoodsType.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(getManageGoodsWithGoodsType.getUserId(), getManageGoodsWithGoodsType.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        List<Map<String, Object>> manageGoodsGroupByGoodsTypeId = goodsMapper.getManageGoodsGroupByGoodsTypeId(getManageGoodsWithGoodsType.getStoreId(), Long.valueOf(getManageGoodsWithGoodsType.getGoodsTypeId()));
+        if (manageGoodsGroupByGoodsTypeId.size() == 0){
+            return DtoUtil.getSuccessDto("暂无数据",200000);
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",manageGoodsGroupByGoodsTypeId,100000);
+    }
+
+    @Override
+    public Dto getManagePriceByType(GetManagePriceByType getManagePriceByType, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getManagePriceByType.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(getManagePriceByType.getUserId(), getManagePriceByType.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        getManagePriceByType.setPageNum(getManagePriceByType.getPageNum() - 1);
+        if ("priced".equals(getManagePriceByType.getGetType())){
+            List<Map<String,Object>> list = goodsMapper.getPricedGoodsList(getManagePriceByType.getStoreId(),getManagePriceByType.getPageNum(),
+                    getManagePriceByType.getPageSize());
+            if (list.size() == 0){
+                return DtoUtil.getSuccessDto("暂无数据",200000);
+            }
+            return DtoUtil.getSuccesWithDataDto("查询成功",list,100000);
+        }else if ("noPricing".equals(getManagePriceByType.getGetType())){
+            List<Map<String,Object>> list = goodsMapper.getNoPricingGoodsList(getManagePriceByType.getStoreId(),getManagePriceByType.getPageNum(),
+                    getManagePriceByType.getPageSize());
+            if (list.size() == 0){
+                return DtoUtil.getSuccessDto("暂无数据",200000);
+            }
+            return DtoUtil.getSuccesWithDataDto("查询成功",list,100000);
+        }else {
+            return DtoUtil.getFalseDto("缺少参数gt",90016);
+        }
+    }
+
+    @Override
     public Dto getGoodsStockList(GetGoodsStockList getGoodsStockList, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(getGoodsStockList.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
