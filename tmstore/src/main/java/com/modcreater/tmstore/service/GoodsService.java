@@ -293,4 +293,12 @@ public interface GoodsService {
      * @return
      */
     Dto getManagePriceByType(GetManagePriceByType getManagePriceByType, String token);
+
+    /**
+     * 删除商品
+     * @param deleteGoods
+     * @param token
+     * @return
+     */
+    Dto deleteGoods(DeleteGoods deleteGoods, String token);
 }

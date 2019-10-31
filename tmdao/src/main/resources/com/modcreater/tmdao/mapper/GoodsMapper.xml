@@ -69,6 +69,9 @@
     <delete id="deleteCorRelation">
         delete from store_goods_correlation where goodsParentId = #{goodsParentId}
     </delete>
+    <delete id="deleteGoods">
+        delete from store_goods_stock where storeId = #{storeId} and goodsId = #{goodsId}
+    </delete>
     <select id="getGoodsList" resultType="java.util.Map">
         SELECT sg.*,sgs.`goodsPrice`,sgs.`stockNum` FROM store_goods sg
         INNER JOIN store_goods_stock sgs
@@ -409,12 +412,18 @@
         select sg.id goodsId,sg.goodsPicture,sg.goodsName,sgt.type,sgs.goodsPrice,sg.goodsUnit,sgs.stockNum
         from store_goods sg,store_goods_type sgt,store_goods_stock sgs
         where sg.id = sgs.goodsId and sgt.id = sg.goodsTypeId and sgs.storeId = #{storeId} and sgs.goodsStatus = 1 and sgs.stockNum &gt;= 1
+        <if test="goodsName != '' and goodsName != null">
+            and (sg.goodsName like "%"#{goodsName}"%" or sg.goodsBrand like "%"#{goodsName}"%")
+        </if>
         limit #{pageNum},#{pageSize}
     </select>
     <select id="getSoldOutGoodsList" resultType="java.util.Map">
         select sg.id goodsId,sg.goodsPicture,sg.goodsName,sgt.type,sgs.goodsPrice,sg.goodsUnit,sgs.stockNum
         from store_goods sg,store_goods_type sgt,store_goods_stock sgs
         where sg.id = sgs.goodsId and sgt.id = sg.goodsTypeId and sgs.storeId = #{storeId} and sgs.stockNum &lt;= 0
+        <if test="goodsName != '' and goodsName != null">
+            and (sg.goodsName like "%"#{goodsName}"%" or sg.goodsBrand like "%"#{goodsName}"%")
+        </if>
         limit #{pageNum},#{pageSize}
     </select>
     <select id="getMyGoodsTypes" resultType="java.lang.Long">

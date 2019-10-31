@@ -275,4 +275,11 @@ public class GoodsController {
     public Dto getManagePriceByType(@RequestBody GetManagePriceByType getManagePriceByType,HttpServletRequest request){
         return goodsService.getManagePriceByType(getManagePriceByType,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping(value = "deletegoods")
+    @ApiOperation("删除商品")
+    public Dto deleteGoods(@RequestBody DeleteGoods deleteGoods,HttpServletRequest request){
+        return goodsService.deleteGoods(deleteGoods,request.getHeader("token"));
+    }
 }

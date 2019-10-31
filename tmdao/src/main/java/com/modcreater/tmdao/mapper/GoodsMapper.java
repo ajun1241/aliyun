@@ -549,18 +549,22 @@ public interface GoodsMapper {
      * @param storeId
      * @param pageNum
      * @param pageSize
+     * @param goodsName
      * @return
      */
-    List<Map<String, Object>> getForSaleGoodsList(@Param("storeId") String storeId,@Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
+    List<Map<String, Object>> getForSaleGoodsList(@Param("storeId") String storeId,@Param("pageNum") Long pageNum,
+                                                  @Param("pageSize") Long pageSize,@Param("goodsName") String goodsName);
 
     /**
      * 分页查询已售空的商品
      * @param storeId
      * @param pageNum
      * @param pageSize
+     * @param goodsName
      * @return
      */
-    List<Map<String, Object>> getSoldOutGoodsList(String storeId, Long pageNum, Long pageSize);
+    List<Map<String, Object>> getSoldOutGoodsList(@Param("storeId") String storeId,@Param("pageNum") Long pageNum,
+                                                  @Param("pageSize") Long pageSize,@Param("goodsName") String goodsName);
 
     /**
      * 获取已有商品的类型Id
@@ -601,4 +605,12 @@ public interface GoodsMapper {
      * @return
      */
     List<Map<String, Object>> getNoPricingGoodsList(@Param("storeId") String storeId,@Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
+
+    /**
+     * 删除商品
+     * @param storeId
+     * @param goodsId
+     * @return
+     */
+    int deleteGoods(@Param("storeId") String storeId,@Param("goodsId") String goodsId);
 }

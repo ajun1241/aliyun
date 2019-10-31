@@ -34,6 +34,10 @@ public class GetManageGoodsByType {
      */
     private String getType;
     /**
+     * 商品名称(查询条件,模糊搜索)
+     */
+    private String goodsName;
+    /**
      *
      */
     private String appType;

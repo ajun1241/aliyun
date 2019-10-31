@@ -698,14 +698,14 @@ public class GoodsServiceImpl implements GoodsService {
         getManageGoodsByType.setPageNum(getManageGoodsByType.getPageNum() - 1);
         if ("forSale".equals(getManageGoodsByType.getGetType())){
             List<Map<String,Object>> list = goodsMapper.getForSaleGoodsList(getManageGoodsByType.getStoreId(),getManageGoodsByType.getPageNum(),
-                    getManageGoodsByType.getPageSize());
+                    getManageGoodsByType.getPageSize(),getManageGoodsByType.getGoodsName());
             if (list.size() == 0){
                 return DtoUtil.getSuccessDto("暂无数据",200000);
             }
             return DtoUtil.getSuccesWithDataDto("查询成功",list,100000);
         }else if ("soldOut".equals(getManageGoodsByType.getGetType())){
             List<Map<String,Object>> list = goodsMapper.getSoldOutGoodsList(getManageGoodsByType.getStoreId(),getManageGoodsByType.getPageNum(),
-                    getManageGoodsByType.getPageSize());
+                    getManageGoodsByType.getPageSize(),getManageGoodsByType.getGoodsName());
             if (list.size() == 0){
                 return DtoUtil.getSuccessDto("暂无数据",200000);
             }
@@ -783,6 +783,23 @@ public class GoodsServiceImpl implements GoodsService {
         }else {
             return DtoUtil.getFalseDto("缺少参数gt",90016);
         }
+    }
+
+    @Override
+    public synchronized Dto deleteGoods(DeleteGoods deleteGoods, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(deleteGoods.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(deleteGoods.getUserId(), deleteGoods.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        for (String goodsId : deleteGoods.getGoodsId()){
+            if (goodsMapper.deleteGoods(deleteGoods.getStoreId(),goodsId) != 1){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("删除失败",90017);
+            }
+        }
+        return DtoUtil.getSuccessDto("删除成功",100000);
     }
 
     @Override
