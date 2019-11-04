@@ -613,4 +613,12 @@ public interface GoodsMapper {
      * @return
      */
     int deleteGoods(@Param("storeId") String storeId,@Param("goodsId") String goodsId);
+
+    /**
+     * 根据类型Id查询商品列表
+     * @param storeId
+     * @param typeId
+     * @return
+     */
+    int getManageGoodsGroupByGoodsTypeIdNum(@Param("storeId") String storeId,@Param("typeId") Long typeId);
 }

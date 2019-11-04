@@ -731,12 +731,9 @@ public class GoodsServiceImpl implements GoodsService {
         for (int i = 0; i < typeIds.size(); i++) {
             Long typeId = typeIds.get(i);
             Map<String,Object> type = new HashMap<>();
-            List<Map<String, Object>> list = goodsMapper.getManageGoodsGroupByGoodsTypeId(receivedStoreId.getStoreId(), typeId);
             type.put("typeName",goodsMapper.getTypeName(typeId));
-            type.put("num",list.size());
-            if (i == 0){
-                type.put("firstList",list);
-            }
+            type.put("goodsTypeId",typeId);
+            type.put("num",goodsMapper.getManageGoodsGroupByGoodsTypeIdNum(receivedStoreId.getStoreId(), typeId));
             result.add(type);
         }
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);

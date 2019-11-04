@@ -435,6 +435,11 @@
         from store_goods sg,store_goods_stock sgs,store_goods_type sgt
         where sgt.id = sg.goodsTypeId and sg.id = sgs.goodsId and sgs.storeId = #{storeId} and sg.goodsTypeId = #{typeId}
     </select>
+    <select id="getManageGoodsGroupByGoodsTypeIdNum" resultType="java.lang.Integer">
+        select count(1)
+        from store_goods sg,store_goods_stock sgs,store_goods_type sgt
+        where sgt.id = sg.goodsTypeId and sg.id = sgs.goodsId and sgs.storeId = #{storeId} and sg.goodsTypeId = #{typeId}
+    </select>
     <select id="getTypeName" resultType="java.lang.String">
         select type from store_goods_type where id = #{typeId}
     </select>
