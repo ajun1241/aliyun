@@ -109,6 +109,12 @@
     <insert id="addNewSalesVolume">
         insert into store_sales_volume (orderNumber, storeId, goodsId, num) values (#{orderNumber},#{storeId},#{goodsId},#{num})
     </insert>
+    <insert id="addNewGoodsPromoteSales">
+        <foreach collection="goodsId" item="id" index="index" separator=";">
+            insert into store_goods_discount (bindingId, goodsId, discountedType, value) values
+            (#{bindingId},#{id},#{discountedType},#{value})
+        </foreach>
+    </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
     </select>
@@ -252,6 +258,11 @@
     </update>
     <update id="resumeStock">
         update store_goods_stock set stockNum = stockNum + #{num} where storeId = #{storeId} and goodsBarCode = #{goodsBarCode}
+    </update>
+    <update id="updateGoodsStockDiscountedType">
+        <foreach collection="goodsId" item="id" separator=";">
+            update store_goods_stock set discountedType = #{discountedType} where goodsId = #{id} and storeId = #{storeId}
+        </foreach>
     </update>
     <select id="getOfflineOrder" resultType="com.modcreater.tmbeans.pojo.StoreOfflineOrders">
         select * from store_offline_orders where orderNumber = #{tradeNo}
@@ -454,5 +465,11 @@
         from store_goods sg,store_goods_stock sgs
         where sg.id = sgs.goodsId and sgs.storeId = #{storeId} and sgs.goodsStatus = 3
         limit #{pageNum},#{pageSize}
+    </select>
+    <select id="verifyGoodsExistInSGD" resultType="java.lang.Integer">
+        select count(1) from store_goods_discount where goodsId in
+        <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </select>
 </mapper>

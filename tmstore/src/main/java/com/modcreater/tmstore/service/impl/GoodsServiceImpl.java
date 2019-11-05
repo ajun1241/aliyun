@@ -731,6 +731,11 @@ public class GoodsServiceImpl implements GoodsService {
         for (int i = 0; i < typeIds.size(); i++) {
             Long typeId = typeIds.get(i);
             Map<String,Object> type = new HashMap<>();
+            if (i == 0){
+                type.put("selected",true);
+            }else {
+                type.put("selected",false);
+            }
             type.put("typeName",goodsMapper.getTypeName(typeId));
             type.put("goodsTypeId",typeId);
             type.put("num",goodsMapper.getManageGoodsGroupByGoodsTypeIdNum(receivedStoreId.getStoreId(), typeId));
@@ -797,6 +802,44 @@ public class GoodsServiceImpl implements GoodsService {
             }
         }
         return DtoUtil.getSuccessDto("删除成功",100000);
+    }
+
+    @Override
+    public Dto goodsDiscountPromoteSales(GoodsDiscountPromoteSales goodsDiscountPromoteSales, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(goodsDiscountPromoteSales.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(goodsDiscountPromoteSales.getUserId(), goodsDiscountPromoteSales.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        if (goodsDiscountPromoteSales.getValue() >= 1){
+            return DtoUtil.getFalseDto("请输入有效的折扣",90020);
+        }
+        int i1 = goodsMapper.updateGoodsStockDiscountedType(goodsDiscountPromoteSales.getGoodsId(),goodsDiscountPromoteSales.getStoreId(),1);
+        if (i1 != 1){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            //tuf:type updating failed
+            return DtoUtil.getFalseDto("修改失败tuf",90018);
+        }
+        int i2 = goodsMapper.addNewGoodsPromoteSales(goodsDiscountPromoteSales.getGoodsId(),goodsDiscountPromoteSales.getValue(),
+                goodsDiscountPromoteSales.getGoodsId()[0],1);
+        if (i2 != 1){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            //angdf:adding new goods discount failed
+            return DtoUtil.getFalseDto("修改失败angdf",90019);
+        }
+        return DtoUtil.getSuccessDto("商品促销成功",100000);
+    }
+
+    @Override
+    public Dto goodsFullReductionPromoteSales(GoodsFullReductionPromoteSales goodsFullReductionPromoteSales, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(goodsFullReductionPromoteSales.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(goodsFullReductionPromoteSales.getUserId(), goodsFullReductionPromoteSales.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        return null;
     }
 
     @Override

@@ -301,4 +301,20 @@ public interface GoodsService {
      * @return
      */
     Dto deleteGoods(DeleteGoods deleteGoods, String token);
+
+    /**
+     * 商品折扣促销
+     * @param goodsDiscountPromoteSales
+     * @param token
+     * @return
+     */
+    Dto goodsDiscountPromoteSales(GoodsDiscountPromoteSales goodsDiscountPromoteSales, String token);
+
+    /**
+     * 商品满减促销
+     * @param goodsFullReductionPromoteSales
+     * @param token
+     * @return
+     */
+    Dto goodsFullReductionPromoteSales(GoodsFullReductionPromoteSales goodsFullReductionPromoteSales, String token);
 }

@@ -621,4 +621,31 @@ public interface GoodsMapper {
      * @return
      */
     int getManageGoodsGroupByGoodsTypeIdNum(@Param("storeId") String storeId,@Param("typeId") Long typeId);
+
+    /**
+     * 修改商品折扣类型
+     * @param goodsId
+     * @param storeId
+     * @param discountedType
+     * @return
+     */
+    int updateGoodsStockDiscountedType(@Param("goodsId") String[] goodsId,@Param("storeId") String storeId,@Param("discountedType") int discountedType);
+
+    /**
+     * 验证商品优惠表中是否已存在即将参与促销的商品
+     * @param goodsId
+     * @return
+     */
+    int verifyGoodsExistInSGD(String[] goodsId);
+
+    /**
+     * 添加商品促销信息
+     * @param goodsId
+     * @param value
+     * @param bindingId
+     * @param discountedType
+     * @return
+     */
+    int addNewGoodsPromoteSales(@Param("goodsId") String[] goodsId,@Param("value") double value,
+                                @Param("bindingId") String bindingId,@Param("discountedType") int discountedType);
 }

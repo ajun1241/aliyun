@@ -282,4 +282,18 @@ public class GoodsController {
     public Dto deleteGoods(@RequestBody DeleteGoods deleteGoods,HttpServletRequest request){
         return goodsService.deleteGoods(deleteGoods,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping(value = "goodsdiscountpromotesales")
+    @ApiOperation("商品折扣促销")
+    public Dto goodsDiscountPromoteSales(@RequestBody GoodsDiscountPromoteSales goodsDiscountPromoteSales, HttpServletRequest request){
+        return goodsService.goodsDiscountPromoteSales(goodsDiscountPromoteSales,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "goodsfullreductionpromotesales")
+    @ApiOperation("商品满减促销")
+    public Dto goodsFullReductionPromoteSales(@RequestBody GoodsFullReductionPromoteSales goodsFullReductionPromoteSales, HttpServletRequest request){
+        return goodsService.goodsFullReductionPromoteSales(goodsFullReductionPromoteSales,request.getHeader("token"));
+    }
 }
