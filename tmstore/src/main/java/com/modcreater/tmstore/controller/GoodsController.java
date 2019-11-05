@@ -284,6 +284,13 @@ public class GoodsController {
     }
 
     @Safety
+    @PostMapping(value = "goodspromotesalesverify")
+    @ApiOperation("商品促销验证")
+    public Dto goodsPromoteSalesVerify(@RequestBody GoodsPromoteSalesVerify goodsPromoteSalesVerify,HttpServletRequest request){
+        return goodsService.goodsPromoteSalesVerify(goodsPromoteSalesVerify,request.getHeader("token"));
+    }
+
+    @Safety
     @PostMapping(value = "goodsdiscountpromotesales")
     @ApiOperation("商品折扣促销")
     public Dto goodsDiscountPromoteSales(@RequestBody GoodsDiscountPromoteSales goodsDiscountPromoteSales, HttpServletRequest request){

@@ -8,10 +8,10 @@ import lombok.Data;
  *
  * @Author: Goku_yi
  * @Date: 2019-11-05
- * Time: 10:34
+ * Time: 14:11
  */
 @Data
-public class GoodsDiscountPromoteSales {
+public class GoodsPromoteSalesVerify {
 
     private String userId;
 
@@ -20,11 +20,5 @@ public class GoodsDiscountPromoteSales {
     private String storeId;
 
     private String[] goodsId;
-
-    private double value;
-
-    private Long startTime;
-
-    private Long endTime;
 
 }

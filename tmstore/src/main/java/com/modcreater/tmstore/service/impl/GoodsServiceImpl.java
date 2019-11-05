@@ -819,16 +819,16 @@ public class GoodsServiceImpl implements GoodsService {
         if (i1 != 1){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             //tuf:type updating failed
-            return DtoUtil.getFalseDto("修改失败tuf",90018);
+            return DtoUtil.getFalseDto("操作失败tuf",90018);
         }
-        int i2 = goodsMapper.addNewGoodsPromoteSales(goodsDiscountPromoteSales.getGoodsId(),goodsDiscountPromoteSales.getValue(),
-                goodsDiscountPromoteSales.getGoodsId()[0],1);
+        int i2 = goodsMapper.addNewGoodsPromoteSales(goodsDiscountPromoteSales.getGoodsId(),goodsDiscountPromoteSales.getValue()+"",
+                goodsDiscountPromoteSales.getGoodsId()[0],1,goodsDiscountPromoteSales.getStartTime(),goodsDiscountPromoteSales.getEndTime());
         if (i2 != 1){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             //angdf:adding new goods discount failed
-            return DtoUtil.getFalseDto("修改失败angdf",90019);
+            return DtoUtil.getFalseDto("操作失败angdf",90019);
         }
-        return DtoUtil.getSuccessDto("商品促销成功",100000);
+        return DtoUtil.getSuccessDto("操作成功",100000);
     }
 
     @Override
@@ -839,7 +839,51 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(goodsFullReductionPromoteSales.getUserId(), goodsFullReductionPromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        return null;
+        Double[] fullValues = goodsFullReductionPromoteSales.getFullValue();
+        Double[] disValues = goodsFullReductionPromoteSales.getDisValue();
+        for (int i = 0; i < fullValues.length; i++) {
+            if (disValues[i] > fullValues[i]){
+                return DtoUtil.getFalseDto("折扣金额不能大于消费金额",90022);
+            }
+        }
+        int i1 = goodsMapper.updateGoodsStockDiscountedType(goodsFullReductionPromoteSales.getGoodsId(),
+                goodsFullReductionPromoteSales.getStoreId(),2);
+        if (i1 != 1){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            //tuf:type updating failed
+            return DtoUtil.getFalseDto("操作失败tuf",90018);
+        }
+        int i2 = goodsMapper.addNewGoodsPromoteSales(goodsFullReductionPromoteSales.getGoodsId(),goodsFullReductionPromoteSales.getGoodsId()[0],
+                goodsFullReductionPromoteSales.getGoodsId()[0],1,goodsFullReductionPromoteSales.getStartTime(),goodsFullReductionPromoteSales.getEndTime());
+        if (i2 != 1){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            //angdf:adding new goods discount failed
+            return DtoUtil.getFalseDto("操作失败angdf",90019);
+        }
+        for (int i = 0; i < fullValues.length; i++) {
+            int i3 = goodsMapper.addNewFullReduction(goodsFullReductionPromoteSales.getGoodsId()[0],fullValues[i],disValues[i],
+                    goodsFullReductionPromoteSales.getStartTime(),goodsFullReductionPromoteSales.getEndTime());
+            if (i3 != 1){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                //angdf:adding new goods full reduction
+                return DtoUtil.getFalseDto("操作失败angfr",90023);
+            }
+        }
+        return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
+    @Override
+    public Dto goodsPromoteSalesVerify(GoodsPromoteSalesVerify goodsPromoteSalesVerify, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(goodsPromoteSalesVerify.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(goodsPromoteSalesVerify.getUserId(), goodsPromoteSalesVerify.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        if (goodsMapper.verifyGoodsExistInSGD(goodsPromoteSalesVerify.getGoodsId(),System.currentTimeMillis()/1000) >= 1){
+            return DtoUtil.getFalseDto("存在促销中的商品,请重新选择",90021);
+        }
+        return DtoUtil.getSuccessDto("请求成功",100000);
     }
 
     @Override

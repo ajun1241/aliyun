@@ -317,4 +317,12 @@ public interface GoodsService {
      * @return
      */
     Dto goodsFullReductionPromoteSales(GoodsFullReductionPromoteSales goodsFullReductionPromoteSales, String token);
+
+    /**
+     * 商品促销验证(验证商品是否已存在)
+     * @param goodsPromoteSalesVerify
+     * @param token
+     * @return
+     */
+    Dto goodsPromoteSalesVerify(GoodsPromoteSalesVerify goodsPromoteSalesVerify, String token);
 }

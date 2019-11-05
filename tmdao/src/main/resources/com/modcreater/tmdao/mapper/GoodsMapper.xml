@@ -111,9 +111,13 @@
     </insert>
     <insert id="addNewGoodsPromoteSales">
         <foreach collection="goodsId" item="id" index="index" separator=";">
-            insert into store_goods_discount (bindingId, goodsId, discountedType, value) values
-            (#{bindingId},#{id},#{discountedType},#{value})
+            insert into store_goods_discount (bindingId, goodsId, discountedType, value, startTime, endTime) values
+            (#{bindingId},#{id},#{discountedType},#{value},#{startTime},#{endTime})
         </foreach>
+    </insert>
+    <insert id="addNewFullReduction">
+        insert into store_goods_full_reduction (fullValue, disValue, bindingId, startTime, endTime) values
+        (#{fullValue},#{disValue},#{bindingId},#{startTime},#{endTime})
     </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
@@ -468,8 +472,9 @@
     </select>
     <select id="verifyGoodsExistInSGD" resultType="java.lang.Integer">
         select count(1) from store_goods_discount where goodsId in
-        <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+        <foreach collection="goodsId" item="id" index="index" open="(" close=")" separator=",">
             #{id}
         </foreach>
+        and endTime > #{curTime}
     </select>
 </mapper>

@@ -21,8 +21,12 @@ public class GoodsFullReductionPromoteSales {
 
     private String[] goodsId;
 
-    private Double fullValue;
+    private Double[] fullValue;
 
-    private Double disValue;
+    private Double[] disValue;
+
+    private Long startTime;
+
+    private Long endTime;
 
 }
