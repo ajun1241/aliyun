@@ -24,8 +24,12 @@
         insert into  store_my_favorite(userId, storeId) values (#{userId},#{storeId})
     </insert>
     <insert id="addNewStoreFullReduction">
-        insert into store_full_reduction (storeId, fullValue, disValue, startTime, endTime, share)
-        values (#{storeId},#{fullValue},#{disValue},#{startTime},#{endTime},#{share})
+        insert into store_full_reduction (storeId, fullValue, disValue, startTime, endTime, share, discountedType)
+        values (#{storeId},#{fullValue},#{disValue},#{startTime},#{endTime},#{share},2)
+    </insert>
+    <insert id="addNewStoreDiscountPromoteSales">
+        insert into store_full_reduction (storeId, fullValue, disValue, startTime, endTime, share, discountedType)
+        values (#{storeId},#{value},0,#{startTime},#{endTime},1,1)
     </insert>
     <update id="updWallet">
         update store_info set wallet=wallet+#{paymentAmount} where id=#{storeId}
@@ -115,5 +119,8 @@
     </select>
     <select id="getStoreWeekSalesVolume" resultType="java.lang.Long">
         select IFNULL(sum(num), 0) from store_sales_volume where storeId=#{storeId} and createTime between #{toDay} and #{targetDay}
+    </select>
+    <select id="verifyStoreExistInSFR" resultType="java.lang.Integer">
+        select count(1) from store_full_reduction where storeId = #{storeId} and endTime > #{curTime}
     </select>
 </mapper>

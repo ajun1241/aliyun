@@ -111,13 +111,13 @@
     </insert>
     <insert id="addNewGoodsPromoteSales">
         <foreach collection="goodsId" item="id" index="index" separator=";">
-            insert into store_goods_discount (bindingId, goodsId, discountedType, value, startTime, endTime) values
-            (#{bindingId},#{id},#{discountedType},#{value},#{startTime},#{endTime})
+            insert into store_goods_discount (bindingId, goodsId, discountedType, value, startTime, endTime, storeId) values
+            (#{bindingId},#{id},#{discountedType},#{value},#{startTime},#{endTime},#{storeId})
         </foreach>
     </insert>
     <insert id="addNewFullReduction">
-        insert into store_goods_full_reduction (fullValue, disValue, bindingId, startTime, endTime) values
-        (#{fullValue},#{disValue},#{bindingId},#{startTime},#{endTime})
+        insert into store_goods_full_reduction (fullValue, disValue, bindingId, startTime, endTime, storeId) values
+        (#{fullValue},#{disValue},#{bindingId},#{startTime},#{endTime},#{storeId})
     </insert>
     <select id="getGoodsInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
         select * from store_goods where id = #{goodsId}
@@ -258,7 +258,7 @@
         update store_goods_stock set stockNum = #{stockNum} where storeId = #{storeId} and goodsId = #{goodsId}
     </update>
     <update id="makeOrderFailed">
-        update store_offline_orders set orderStatus = 3 where orderNumber = #{orderNum} and orderStatus = 0 and now() - createDate >= #{seconds}
+        update store_offline_orders set orderStatus = 3 where orderNumber = #{or derNum} and orderStatus = 0 and now() - createDate >= #{seconds}
     </update>
     <update id="resumeStock">
         update store_goods_stock set stockNum = stockNum + #{num} where storeId = #{storeId} and goodsBarCode = #{goodsBarCode}
@@ -471,7 +471,7 @@
         limit #{pageNum},#{pageSize}
     </select>
     <select id="verifyGoodsExistInSGD" resultType="java.lang.Integer">
-        select count(1) from store_goods_discount where goodsId in
+        select count(1) from store_goods_discount where storeId = #{storeId} and goodsId in
         <foreach collection="goodsId" item="id" index="index" open="(" close=")" separator=",">
             #{id}
         </foreach>

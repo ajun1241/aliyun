@@ -182,4 +182,23 @@ public interface StoreMapper {
      */
     int addNewStoreFullReduction(@Param("storeId") String storeId, @Param("fullValue") Double fullValue, @Param("disValue") Double disValue,
                                  @Param("startTime") Long startTime, @Param("endTime") Long endTime, @Param("share") String share);
+
+    /**
+     * 添加新的商铺打折促销
+     * @param storeId
+     * @param value
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int addNewStoreDiscountPromoteSales(@Param("storeId") String storeId,@Param("value") String value,
+                                        @Param("startTime") Long startTime,@Param("endTime") Long endTime);
+
+    /**
+     * 查看商家是否正在做促销
+     * @param storeId
+     * @param curTime
+     * @return
+     */
+    int verifyStoreExistInSFR(@Param("storeId") String storeId,@Param("curTime") Long curTime);
 }

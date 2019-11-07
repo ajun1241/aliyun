@@ -822,7 +822,8 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("操作失败tuf",90018);
         }
         int i2 = goodsMapper.addNewGoodsPromoteSales(goodsDiscountPromoteSales.getGoodsId(),goodsDiscountPromoteSales.getValue()+"",
-                goodsDiscountPromoteSales.getGoodsId()[0],1,goodsDiscountPromoteSales.getStartTime(),goodsDiscountPromoteSales.getEndTime());
+                goodsDiscountPromoteSales.getGoodsId()[0],1,goodsDiscountPromoteSales.getStartTime(),
+                goodsDiscountPromoteSales.getEndTime(),goodsDiscountPromoteSales.getStoreId());
         if (i2 != 1){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             //angdf:adding new goods discount failed
@@ -858,7 +859,8 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("操作失败tuf",90018);
         }
         int i2 = goodsMapper.addNewGoodsPromoteSales(goodsFullReductionPromoteSales.getGoodsId(),goodsFullReductionPromoteSales.getGoodsId()[0],
-                goodsFullReductionPromoteSales.getGoodsId()[0],1,goodsFullReductionPromoteSales.getStartTime(),goodsFullReductionPromoteSales.getEndTime());
+                goodsFullReductionPromoteSales.getGoodsId()[0],1,goodsFullReductionPromoteSales.getStartTime(),
+                goodsFullReductionPromoteSales.getEndTime(),goodsFullReductionPromoteSales.getStoreId());
         if (i2 != 1){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             //angdf:adding new goods discount failed
@@ -866,7 +868,8 @@ public class GoodsServiceImpl implements GoodsService {
         }
         for (int i = 0; i < fullValues.length; i++) {
             int i3 = goodsMapper.addNewFullReduction(goodsFullReductionPromoteSales.getGoodsId()[0],fullValues[i],disValues[i],
-                    goodsFullReductionPromoteSales.getStartTime(),goodsFullReductionPromoteSales.getEndTime());
+                    goodsFullReductionPromoteSales.getStartTime(),goodsFullReductionPromoteSales.getEndTime(),
+                    goodsFullReductionPromoteSales.getStoreId());
             if (i3 != 1){
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 //angfrf:adding new goods full reduction failed
@@ -884,7 +887,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(goodsPromoteSalesVerify.getUserId(), goodsPromoteSalesVerify.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        if (goodsMapper.verifyGoodsExistInSGD(goodsPromoteSalesVerify.getGoodsId(),System.currentTimeMillis()/1000) >= 1){
+        if (goodsMapper.verifyGoodsExistInSGD(goodsPromoteSalesVerify.getGoodsId(),System.currentTimeMillis()/1000,goodsPromoteSalesVerify.getStoreId()) >= 1){
             return DtoUtil.getFalseDto("存在促销中的商品,请重新选择",90021);
         }
         return DtoUtil.getSuccessDto("请求成功",100000);

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
+import com.modcreater.tmbeans.vo.goods.ReceivedStoreId;
 import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AccountMapper;
@@ -766,6 +767,36 @@ public class StoreServiceImpl implements StoreService {
             }
         }
         return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
+    @Override
+    public Dto storeDiscountPromoteSales(StoreDiscountPromoteSales storeDiscountPromoteSales, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(storeDiscountPromoteSales.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(storeDiscountPromoteSales.getUserId(), storeDiscountPromoteSales.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        int i = storeMapper.addNewStoreDiscountPromoteSales(storeDiscountPromoteSales.getStoreId(),storeDiscountPromoteSales.getValue(),
+                storeDiscountPromoteSales.getStartTime(),storeDiscountPromoteSales.getEndTime());
+        if (i != 1){
+            return DtoUtil.getFalseDto("操作失败",90026);
+        }
+        return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
+    @Override
+    public Dto storePromoteSalesVerify(ReceivedStoreId receivedStoreId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedStoreId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(receivedStoreId.getUserId(), receivedStoreId.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        if (storeMapper.verifyStoreExistInSFR(receivedStoreId.getStoreId(),System.currentTimeMillis()/1000) >= 1){
+            return DtoUtil.getFalseDto("商店正在进行促销,请勿重复操作",90021);
+        }
+        return DtoUtil.getSuccessDto("",100000);
     }
 
     /**

@@ -635,9 +635,10 @@ public interface GoodsMapper {
      * 验证商品优惠表中是否已存在即将参与促销的商品
      * @param goodsId
      * @param curTime
+     * @param storeId
      * @return
      */
-    int verifyGoodsExistInSGD(@Param("goodsId") String[] goodsId,@Param("curTime") Long curTime);
+    int verifyGoodsExistInSGD(@Param("goodsId") String[] goodsId,@Param("curTime") Long curTime,@Param("storeId") String storeId);
 
     /**
      * 添加商品促销信息
@@ -647,11 +648,12 @@ public interface GoodsMapper {
      * @param discountedType
      * @param startTime
      * @param endTime
+     * @param storeId
      * @return
      */
     int addNewGoodsPromoteSales(@Param("goodsId") String[] goodsId,@Param("value") String value,
                                 @Param("bindingId") String bindingId,@Param("discountedType") int discountedType,
-                                @Param("startTime") Long startTime,@Param("endTime") Long endTime);
+                                @Param("startTime") Long startTime,@Param("endTime") Long endTime,@Param("storeId") String storeId);
 
     /**
      * 添加商品满减
@@ -660,8 +662,10 @@ public interface GoodsMapper {
      * @param disValue
      * @param startTime
      * @param endTime
+     * @param storeId
      * @return
      */
     int addNewFullReduction(@Param("bindingId") String bindingId,@Param("fullValue") Double fullValue,
-                            @Param("disValue") Double disValue,@Param("startTime") Long startTime,@Param("endTime") Long endTime);
+                            @Param("disValue") Double disValue,@Param("startTime") Long startTime,
+                            @Param("endTime") Long endTime,@Param("storeId") String storeId);
 }

@@ -2,6 +2,7 @@ package com.modcreater.tmstore.controller;
 
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.goods.ReceivedStoreId;
 import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmstore.config.annotation.Safety;
@@ -120,6 +121,20 @@ public class StoreController {
     @ApiOperation("店铺满减促销")
     public Dto storeFullReductionPromoteSales(@RequestBody StoreFullReductionPromoteSales storeFullReductionPromoteSales, HttpServletRequest request){
         return storeService.storeFullReductionPromoteSales(storeFullReductionPromoteSales,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "storediscountpromotesales")
+    @ApiOperation("店铺折扣促销")
+    public Dto storeDiscountPromoteSales(@RequestBody StoreDiscountPromoteSales storeDiscountPromoteSales,HttpServletRequest request){
+        return storeService.storeDiscountPromoteSales(storeDiscountPromoteSales,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "storepromotesalesverify")
+    @ApiOperation("店铺促销验证(是否正在做促销)")
+    public Dto storePromoteSalesVerify(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
+        return storeService.storePromoteSalesVerify(receivedStoreId,request.getHeader("token"));
     }
 
 }

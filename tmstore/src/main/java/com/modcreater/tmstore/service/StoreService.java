@@ -1,6 +1,7 @@
 package com.modcreater.tmstore.service;
 
 import com.modcreater.tmbeans.dto.Dto;
+import com.modcreater.tmbeans.vo.goods.ReceivedStoreId;
 import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 
@@ -128,4 +129,20 @@ public interface StoreService {
      * @return
      */
     Dto storeFullReductionPromoteSales(StoreFullReductionPromoteSales storeFullReductionPromoteSales, String token);
+
+    /**
+     * 商铺折扣促销
+     * @param storeDiscountPromoteSales
+     * @param token
+     * @return
+     */
+    Dto storeDiscountPromoteSales(StoreDiscountPromoteSales storeDiscountPromoteSales, String token);
+
+    /**
+     * 商铺促销验证(是否正在做促销)
+     * @param receivedStoreId
+     * @param token
+     * @return
+     */
+    Dto storePromoteSalesVerify(ReceivedStoreId receivedStoreId, String token);
 }
