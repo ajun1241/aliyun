@@ -841,6 +841,10 @@ public class GoodsServiceImpl implements GoodsService {
         }
         Double[] fullValues = goodsFullReductionPromoteSales.getFullValue();
         Double[] disValues = goodsFullReductionPromoteSales.getDisValue();
+        if (fullValues.length != disValues.length){
+            //plau:params length are unequal
+            return DtoUtil.getFalseDto("操作失败plau",90024);
+        }
         for (int i = 0; i < fullValues.length; i++) {
             if (disValues[i] > fullValues[i]){
                 return DtoUtil.getFalseDto("折扣金额不能大于消费金额",90022);
@@ -865,8 +869,8 @@ public class GoodsServiceImpl implements GoodsService {
                     goodsFullReductionPromoteSales.getStartTime(),goodsFullReductionPromoteSales.getEndTime());
             if (i3 != 1){
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                //angdf:adding new goods full reduction
-                return DtoUtil.getFalseDto("操作失败angfr",90023);
+                //angfrf:adding new goods full reduction failed
+                return DtoUtil.getFalseDto("操作失败angfrf",90023);
             }
         }
         return DtoUtil.getSuccessDto("操作成功",100000);

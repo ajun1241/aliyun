@@ -2,10 +2,7 @@ package com.modcreater.tmstore.controller;
 
 
 import com.modcreater.tmbeans.dto.Dto;
-import com.modcreater.tmbeans.vo.store.ApproveInfoVo;
-import com.modcreater.tmbeans.vo.store.CollectStoreVo;
-import com.modcreater.tmbeans.vo.store.DiscoverInfoVo;
-import com.modcreater.tmbeans.vo.store.SearchDiscoverVo;
+import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmstore.config.annotation.Safety;
 import com.modcreater.tmstore.service.StoreService;
@@ -116,6 +113,13 @@ public class StoreController {
     @ApiOperation("查询商铺筛选条件")
     public Dto getStoreScreenList(@RequestBody ReceivedId receivedId, HttpServletRequest request){
         return storeService.getStoreScreenList(receivedId,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "storefullreductionpromotesales")
+    @ApiOperation("店铺满减促销")
+    public Dto storeFullReductionPromoteSales(@RequestBody StoreFullReductionPromoteSales storeFullReductionPromoteSales, HttpServletRequest request){
+        return storeService.storeFullReductionPromoteSales(storeFullReductionPromoteSales,request.getHeader("token"));
     }
 
 }

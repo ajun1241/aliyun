@@ -23,6 +23,10 @@
     <insert id="collectStore">
         insert into  store_my_favorite(userId, storeId) values (#{userId},#{storeId})
     </insert>
+    <insert id="addNewStoreFullReduction">
+        insert into store_full_reduction (storeId, fullValue, disValue, startTime, endTime, share)
+        values (#{storeId},#{fullValue},#{disValue},#{startTime},#{endTime},#{share})
+    </insert>
     <update id="updWallet">
         update store_info set wallet=wallet+#{paymentAmount} where id=#{storeId}
     </update>

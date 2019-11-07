@@ -2,6 +2,7 @@ package com.modcreater.tmdao.mapper;
 
 import com.alipay.api.domain.GoodsInfo;
 import com.modcreater.tmbeans.pojo.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -168,4 +169,17 @@ public interface StoreMapper {
      * @return
      */
     Long getStoreWeekSalesVolume(String storeId, String toDay, String targetDay);
+
+    /**
+     * 添加新的商铺满减促销
+     * @param storeId
+     * @param fullValue
+     * @param disValue
+     * @param startTime
+     * @param endTime
+     * @param share
+     * @return
+     */
+    int addNewStoreFullReduction(@Param("storeId") String storeId, @Param("fullValue") Double fullValue, @Param("disValue") Double disValue,
+                                 @Param("startTime") Long startTime, @Param("endTime") Long endTime, @Param("share") String share);
 }

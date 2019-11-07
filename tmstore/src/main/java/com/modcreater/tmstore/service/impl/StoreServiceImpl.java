@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
-import com.modcreater.tmbeans.vo.store.ApproveInfoVo;
-import com.modcreater.tmbeans.vo.store.CollectStoreVo;
-import com.modcreater.tmbeans.vo.store.DiscoverInfoVo;
-import com.modcreater.tmbeans.vo.store.SearchDiscoverVo;
+import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmdao.mapper.AccountMapper;
 import com.modcreater.tmdao.mapper.GoodsMapper;
@@ -21,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -740,4 +738,43 @@ public class StoreServiceImpl implements StoreService {
         return DtoUtil.getSuccesWithDataDto("查询成功",mapList,100000);
     }
 
+    @Override
+    public Dto storeFullReductionPromoteSales(StoreFullReductionPromoteSales storeFullReductionPromoteSales, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(storeFullReductionPromoteSales.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(storeFullReductionPromoteSales.getUserId(), storeFullReductionPromoteSales.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        Double[] fullValues = storeFullReductionPromoteSales.getFullValue();
+        Double[] disValues = storeFullReductionPromoteSales.getDisValue();
+        if (fullValues.length != disValues.length){
+            //plau:params length are unequal
+            return DtoUtil.getFalseDto("操作失败plau",90024);
+        }
+        for (int i = 0; i < fullValues.length; i++) {
+            if (disValues[i] > fullValues[i]){
+                return DtoUtil.getFalseDto("折扣金额不能大于消费金额",90022);
+            }
+            int a = storeMapper.addNewStoreFullReduction(storeFullReductionPromoteSales.getStoreId(),storeFullReductionPromoteSales.getFullValue()[i],
+                    storeFullReductionPromoteSales.getDisValue()[i],storeFullReductionPromoteSales.getStartTime(),
+                    storeFullReductionPromoteSales.getEndTime(),storeFullReductionPromoteSales.getShare());
+            if (a != 1){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                //ansfrf:adding new store full reduction failed
+                return DtoUtil.getFalseDto("操作失败ansfrf",90025);
+            }
+        }
+        return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
+    /**
+     * 返回false为不符合
+     * @param userId
+     * @param storeId
+     * @return
+     */
+    private boolean reg(String userId, String storeId) {
+        return goodsMapper.getStoreMaster(userId, storeId) == 1;
+    }
 }
