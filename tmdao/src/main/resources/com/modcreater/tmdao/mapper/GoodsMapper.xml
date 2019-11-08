@@ -477,4 +477,26 @@
         </foreach>
         and endTime > #{curTime}
     </select>
+    <select id="verGoodsPromoteSales" resultType="java.lang.Integer">
+        select count(1) from store_goods_discount
+        where storeId = #{storeId} and endTime >= #{curTime} and goodsId in
+        <foreach collection="goodsIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and (
+        (endTime &gt; #{startTime} and startTime &lt; #{endTime})
+        or (startTime &lt; #{endTime} and endTime &gt; #{startTime})
+        or ((startTime &gt;= #{startTime}) and (endTime &lt;= #{endTime})))
+    </select>
+    <select id="verGoodsPromoteSalesRepetitive" resultType="java.lang.Integer">
+        select count(1) from store_goods_discount
+        where storeId = #{storeId} and endTime >= #{curTime} and discountedType = #{type} and goodsId in
+        <foreach collection="goodsIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and (
+        (endTime &gt; #{startTime} and startTime &lt; #{endTime})
+        or (startTime &lt; #{endTime} and endTime &gt; #{startTime})
+        or ((startTime &gt;= #{startTime}) and (endTime &lt;= #{endTime})))
+    </select>
 </mapper>

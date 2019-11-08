@@ -668,4 +668,31 @@ public interface GoodsMapper {
     int addNewFullReduction(@Param("bindingId") String bindingId,@Param("fullValue") Double fullValue,
                             @Param("disValue") Double disValue,@Param("startTime") Long startTime,
                             @Param("endTime") Long endTime,@Param("storeId") String storeId);
+
+    /**
+     * 查询和传入goodsIds数组中相同的优惠信息
+     * @param goodsIds
+     * @param startTime
+     * @param endTime
+     * @param storeId
+     * @param curTime
+     * @return
+     */
+    int verGoodsPromoteSales(@Param("goodsIds") String[] goodsIds,@Param("startTime") Long startTime,
+                                                  @Param("endTime") Long endTime,@Param("storeId") String storeId,
+                                                  @Param("curTime") long curTime);
+
+    /**
+     * 验证商品折扣促销重复
+     * @param goodsIds
+     * @param startTime
+     * @param endTime
+     * @param storeId
+     * @param curTime
+     * @param type
+     * @return
+     */
+    int verGoodsPromoteSalesRepetitive(@Param("goodsIds") String[] goodsIds,@Param("startTime") Long startTime,
+                                               @Param("endTime") Long endTime,@Param("storeId") String storeId,
+                                               @Param("curTime") long curTime,@Param("type") int type);
 }

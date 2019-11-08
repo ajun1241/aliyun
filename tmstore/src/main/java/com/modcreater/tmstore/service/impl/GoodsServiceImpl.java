@@ -812,6 +812,16 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(goodsDiscountPromoteSales.getUserId(), goodsDiscountPromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
+        if (!verGoodsPromoteSales(goodsDiscountPromoteSales.getGoodsId(),goodsDiscountPromoteSales.getStartTime(),
+                goodsDiscountPromoteSales.getEndTime(),goodsDiscountPromoteSales.getStoreId())){
+            return DtoUtil.getFalseDto("请合理安排商品及促销时间!",90027);
+        }
+        int verValue = goodsMapper.verGoodsPromoteSalesRepetitive(goodsDiscountPromoteSales.getGoodsId(),goodsDiscountPromoteSales.getStartTime(),
+                goodsDiscountPromoteSales.getEndTime(),goodsDiscountPromoteSales.getStoreId(),
+                System.currentTimeMillis()/1000,2);
+        if (verValue >= 1){
+            return DtoUtil.getFalseDto("同一商品只能参与一种折扣方式,请勿重复添加",90028);
+        }
         NumberFormat nf = NumberFormat.getNumberInstance();
         nf.setRoundingMode(RoundingMode.HALF_UP);
         nf.setMaximumFractionDigits(2);
@@ -843,6 +853,16 @@ public class GoodsServiceImpl implements GoodsService {
         }
         if (!reg(goodsFullReductionPromoteSales.getUserId(), goodsFullReductionPromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        if (!verGoodsPromoteSales(goodsFullReductionPromoteSales.getGoodsId(),goodsFullReductionPromoteSales.getStartTime(),
+                goodsFullReductionPromoteSales.getEndTime(),goodsFullReductionPromoteSales.getStoreId())){
+            return DtoUtil.getFalseDto("请合理安排商品及促销时间!",90027);
+        }
+        int verValue = goodsMapper.verGoodsPromoteSalesRepetitive(goodsFullReductionPromoteSales.getGoodsId(),goodsFullReductionPromoteSales.getStartTime(),
+                goodsFullReductionPromoteSales.getEndTime(),goodsFullReductionPromoteSales.getStoreId(),
+                System.currentTimeMillis()/1000,2);
+        if (verValue >= 1){
+            return DtoUtil.getFalseDto("同一商品只能参与一种折扣方式,请勿重复添加",90028);
         }
         Double[] fullValues = goodsFullReductionPromoteSales.getFullValue();
         Double[] disValues = goodsFullReductionPromoteSales.getDisValue();
@@ -895,6 +915,23 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("存在促销中的商品,请重新选择",90021);
         }
         return DtoUtil.getSuccessDto("请求成功",100000);
+    }
+
+    /**
+     * 验证选中的商品和选中的促销时间是否与已添加过的冲突
+     * @param goodsIds
+     * @param startTime
+     * @param endTime
+     * @param storeId
+     * @return false:存在冲突
+     */
+    private boolean verGoodsPromoteSales(String[] goodsIds, Long startTime, Long endTime, String storeId){
+        int i = goodsMapper.verGoodsPromoteSales(goodsIds,startTime,endTime,storeId,System.currentTimeMillis()/1000);
+        if (i >= 1){
+            return false;
+        }else {
+            return true;
+        }
     }
 
     @Override

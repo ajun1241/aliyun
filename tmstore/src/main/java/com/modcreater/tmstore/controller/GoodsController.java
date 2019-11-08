@@ -6,6 +6,7 @@ import com.modcreater.tmbeans.vo.store.*;
 import com.modcreater.tmbeans.vo.userinfovo.ReceivedId;
 import com.modcreater.tmstore.config.annotation.Safety;
 import com.modcreater.tmstore.service.GoodsService;
+import com.modcreater.tmutils.DtoUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -287,7 +288,8 @@ public class GoodsController {
     @PostMapping(value = "goodspromotesalesverify")
     @ApiOperation("商品促销验证")
     public Dto goodsPromoteSalesVerify(@RequestBody GoodsPromoteSalesVerify goodsPromoteSalesVerify,HttpServletRequest request){
-        return goodsService.goodsPromoteSalesVerify(goodsPromoteSalesVerify,request.getHeader("token"));
+        /*return goodsService.goodsPromoteSalesVerify(goodsPromoteSalesVerify,request.getHeader("token"));*/
+        return DtoUtil.getSuccessDto("请求成功",100000);
     }
 
     @Safety
