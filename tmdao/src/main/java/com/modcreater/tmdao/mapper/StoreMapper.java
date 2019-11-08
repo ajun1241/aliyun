@@ -201,4 +201,15 @@ public interface StoreMapper {
      * @return
      */
     int verifyStoreExistInSFR(@Param("storeId") String storeId,@Param("curTime") Long curTime);
+
+    /**
+     * 验证商店促销时间冲突
+     * @param startTime
+     * @param endTime
+     * @param storeId
+     * @param curTime
+     * @return
+     */
+    int verStorePromoteSales(@Param("startTime") Long startTime,@Param("endTime") Long endTime,
+                             @Param("storeId") String storeId,@Param("curTime") long curTime);
 }
