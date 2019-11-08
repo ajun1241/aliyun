@@ -829,12 +829,6 @@ public class GoodsServiceImpl implements GoodsService {
         if (goodsDiscountPromoteSales.getValue() >= 1){
             return DtoUtil.getFalseDto("请输入有效的折扣",90020);
         }
-        int i1 = goodsMapper.updateGoodsStockDiscountedType(goodsDiscountPromoteSales.getGoodsId(),goodsDiscountPromoteSales.getStoreId(),1);
-        if (i1 != 1){
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            //tuf:type updating failed
-            return DtoUtil.getFalseDto("操作失败tuf",90018);
-        }
         int i2 = goodsMapper.addNewGoodsPromoteSales(goodsDiscountPromoteSales.getGoodsId(),goodsDiscountPromoteSales.getValue()+"",
                 goodsDiscountPromoteSales.getGoodsId()[0],1,goodsDiscountPromoteSales.getStartTime(),
                 goodsDiscountPromoteSales.getEndTime(),goodsDiscountPromoteSales.getStoreId());

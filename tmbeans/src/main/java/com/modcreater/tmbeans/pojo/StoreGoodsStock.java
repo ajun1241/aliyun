@@ -12,6 +12,5 @@ public class StoreGoodsStock {
   private Long stockNum;
   private Long goodsStatus;
   private String goodsBarCode;
-  private String discountedType;
 
 }

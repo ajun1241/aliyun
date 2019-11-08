@@ -499,4 +499,7 @@
         or (startTime &lt; #{endTime} and endTime &gt; #{startTime})
         or ((startTime &gt;= #{startTime}) and (endTime &lt;= #{endTime})))
     </select>
+    <select id="getCurrentGoodsPromoteSales" resultType="com.modcreater.tmbeans.pojo.StoreGoodsDiscount">
+        select * from store_goods_discount where startTime = #{curTime}
+    </select>
 </mapper>

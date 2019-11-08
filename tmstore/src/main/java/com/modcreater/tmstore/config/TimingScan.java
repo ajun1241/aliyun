@@ -3,6 +3,7 @@ package com.modcreater.tmstore.config;
 import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.pojo.StoreOfflineOrders;
 import com.modcreater.tmdao.mapper.GoodsMapper;
+import com.modcreater.tmutils.DtoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import java.util.*;
