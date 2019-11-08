@@ -12,6 +12,7 @@ public class StoreInfo {
   private String storeAddress;
   private Double longitude;
   private Double latitude;
+  private String locationAddress;
   private Long businessScope;
   private Double wallet;
   private String createDate;

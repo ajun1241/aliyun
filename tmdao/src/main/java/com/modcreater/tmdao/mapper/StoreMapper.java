@@ -142,7 +142,7 @@ public interface StoreMapper {
      * @param storeStatusId
      * @return
      */
-    List<StoreInfo> getStoreListByCondition(String storeTypeId, String storeStatusId);
+    List<StoreInfo> getStoreListByCondition(String storeTypeId, String storeStatusId,String city);
 
     /**
      * 通过搜索条件获取​​商店列表

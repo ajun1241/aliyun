@@ -14,6 +14,7 @@ public class StoreAttestation {
   private String address;
   private Double longitude;
   private Double latitude;
+  private String locationAddress;
   private String createDate;
   private Long modifiDate;
   private Long disposeDate;

@@ -24,6 +24,7 @@ public class DiscoverInfoVo {
      * 商铺筛选条件编号
      */
     private String screenTypeId;
+    private String city;
     private Double longitude;
     private Double latitude;
 }

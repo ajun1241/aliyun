@@ -35,6 +35,10 @@ public class SearchDiscoverVo {
      *     16  其他 ）
      */
     private String sortType;
+    /**
+     * 活动类型
+     */
+    private String activityType;
     private Double longitude;
     private Double latitude;
 }

@@ -18,6 +18,7 @@ import com.modcreater.tmutils.RongCloudMethodUtil;
 import com.modcreater.tmutils.SingleEventUtil;
 import com.modcreater.tmutils.messageutil.RefreshMsg;
 import com.modcreater.tmutils.pay.PayUtil;
+import com.modcreater.tmutils.pay.PaymentCodeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -297,7 +298,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (i>0){
             return DtoUtil.getSuccesWithDataDto("请求成功",map,100000);
         }
-        return DtoUtil.getFalseDto("亲求失败",91011);
+        return DtoUtil.getFalseDto("请求失败",91011);
     }
 
     /**
@@ -484,19 +485,18 @@ public class GoodsServiceImpl implements GoodsService {
         int i=goodsMapper.saveQrCode(storeQrCode);
         //生成订单信息
         StoreOfflineOrders storeOfflineOrders=new StoreOfflineOrders();
-        storeOfflineOrders.setOrderNumber("sot"+createOfflineOrderVo.getUserId()+System.currentTimeMillis());
+        storeOfflineOrders.setOrderNumber("sot"+createOfflineOrderVo.getStoreId()+createOfflineOrderVo.getUserId()+System.currentTimeMillis());
         storeOfflineOrders.setSourceStoreId(Long.valueOf(createOfflineOrderVo.getStoreId()));
         storeOfflineOrders.setUserId(Long.valueOf(createOfflineOrderVo.getUserId()));
         storeOfflineOrders.setGoodsListId(storeQrCode.getId());
         storeOfflineOrders.setPaymentAmount(Double.valueOf(createOfflineOrderVo.getPaymentAmount()));
         int j=goodsMapper.saveStoreOfflineOrders(storeOfflineOrders);
-        //商品添加进购物车
+        //商品添加进购物车并扣减库存
         String result=makeGoodsStockReduce(storeOfflineOrders.getOrderNumber(),storeQrCode.getCodeContent());
         if ("success".equals(result)){
             Map<String,String> map=new HashMap<>(1);
             map.put("code",storeQrCode.getId());
             map.put("orderNumber",storeOfflineOrders.getOrderNumber());
-            //发送自定义消息给商家
             if ( i>0 && j>0 ){
                 return DtoUtil.getSuccesWithDataDto("下单成功",map,100000);
             }
@@ -505,7 +505,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     /**
-     * 商家确认商品信息
+     * 商家扫码确认商品信息
      * @param orderInfoVo
      * @param token
      * @return
@@ -550,6 +550,86 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("发送消息失败",95400);
         }
         return DtoUtil.getSuccessDto("发送成功",100000);
+    }
+
+    /**
+     * 商家扫描付款码完成交易
+     * @param merchantGatheringVo
+     * @param token
+     * @return
+     */
+    @Override
+    public Dto merchantGathering(MerchantGatheringVo merchantGatheringVo, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(merchantGatheringVo.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        StoreOfflineOrders offlineOrders = goodsMapper.getOfflineOrderByGoodsCode(merchantGatheringVo.getCode());
+        boolean flag=false;
+        String payType=null;
+        Dto dto=null;
+        try {
+            if (offlineOrders.getOrderStatus()!=0){
+                return DtoUtil.getFalseDto("订单号无效请重新下单",26410);
+            }
+            StoreInfo storeInfo=storeMapper.getStoreInfo(offlineOrders.getSourceStoreId().toString());
+            int authCode=Integer.valueOf(merchantGatheringVo.getAuthCode().substring(0,2));
+            if (authCode>=25 && authCode<=30){
+                //支付宝
+                dto=PaymentCodeUtil.aliPaymentCodeToPay(merchantGatheringVo.getAuthCode(),offlineOrders.getOrderNumber(),offlineOrders.getPaymentAmount(),storeInfo.getStoreName(),offlineOrders.getSourceStoreId().toString());
+                if (dto.getResCode()==100000){
+                    flag=true;
+                }
+                payType="支付宝支付";
+            }else if (authCode>=10 && authCode<=15){
+                //微信
+                dto=PaymentCodeUtil.wxPaymentCodeToPay(merchantGatheringVo.getAuthCode(),offlineOrders.getOrderNumber(),offlineOrders.getPaymentAmount(),storeInfo.getStoreName());
+                if (dto.getResCode()==100000){
+                    flag=true;
+                }
+                payType="微信支付";
+            }else {
+                return DtoUtil.getFalseDto("付款码错误",22301);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        //如果支付成功
+        if (flag){
+            //修改订单状态
+            //此处处理商铺模块用户线下扫码支付
+            offlineOrders.setOrderStatus(2L);
+            offlineOrders.setPayTime(System.currentTimeMillis());
+            offlineOrders.setPayChannel(payType);
+            offlineOrders.setOutTradeNo(offlineOrders.getOrderNumber());
+            goodsMapper.updateOfflineOrder(offlineOrders);
+            //支付成功增加商铺余额
+            storeMapper.updWallet(offlineOrders.getPaymentAmount(),offlineOrders.getSourceStoreId());
+            //订单成功后解析已卖出商品并将数量记录到销量表中
+            //(因为要根据时间计算商品销量,所以该表中同一商铺下会有多个商品及对应数量)
+            List<Map> goodsList = JSONObject.parseArray(goodsMapper.getTemStock(offlineOrders.getOrderNumber()),Map.class);
+            for (Map goods : goodsList){
+                StoreSalesVolume storeSalesVolume = new StoreSalesVolume();
+                storeSalesVolume.setGoodsId(goodsMapper.getGoodsStockByGoodsBarCode(offlineOrders.getSourceStoreId().toString(),goods.get("goodsBarCode").toString()).getGoodsId().toString());
+                storeSalesVolume.setNum(Long.valueOf(goods.get("num").toString()));
+                storeSalesVolume.setStoreId(offlineOrders.getSourceStoreId().toString());
+                storeSalesVolume.setOrderNumber(offlineOrders.getOrderNumber());
+                goodsMapper.addNewSalesVolume(storeSalesVolume);
+            }
+            return DtoUtil.getFalseDto("支付成功",100000);
+        }else {
+            //返还库存
+            String temStock = goodsMapper.getTemStock(offlineOrders.getOrderNumber());
+            List<Map> result = JSONObject.parseArray(temStock,Map.class);
+            for (Map map : result){
+                String storeId = (String) map.get("storeId");
+                String goodsBarCode = (String) map.get("goodsBarCode");
+                Object num = map.get("num");
+                goodsMapper.resumeStock(storeId,goodsBarCode,num);
+            }
+            //修改订单状态
+            goodsMapper.updateOfflineOrderStatus(offlineOrders.getOrderNumber(),5);
+            return DtoUtil.getFalseDto("支付失败，请重新下单",23202);
+        }
     }
 
 
@@ -1151,7 +1231,7 @@ public class GoodsServiceImpl implements GoodsService {
                         storeGoodsStock.setStoreId(Long.valueOf(targetStoreId));
                         storeGoodsStock.setStockNum(num);
                         storeGoodsStock.setGoodsBarCode(storeGoods.getGoodsBarCode());
-                        storeGoodsStock.setGoodsStatus(1L);
+                        storeGoodsStock.setGoodsStatus(3L);
                         a=goodsMapper.insertStoreGoodsStock(storeGoodsStock);
                     }else {
                         //修改
@@ -1168,7 +1248,7 @@ public class GoodsServiceImpl implements GoodsService {
                         storeGoodsStock.setGoodsId(goodsId);
                         storeGoodsStock.setStoreId(Long.valueOf(targetStoreId));
                         storeGoodsStock.setStockNum(num);
-                        storeGoodsStock.setGoodsStatus(1L);
+                        storeGoodsStock.setGoodsStatus(3L);
                         a=goodsMapper.insertStoreGoodsStock(storeGoodsStock);
                     }else {
                         //修改
@@ -1194,13 +1274,11 @@ public class GoodsServiceImpl implements GoodsService {
             return "订单未找到";
         }
         String storeId = offlineOrders.getSourceStoreId().toString();
-//        String codeContent = goodsMapper.getCodeContent(offlineOrders.getGoodsListId());
         Map goods=JSONObject.parseObject(goodsList,Map.class);
         List<Map> result = JSONObject.parseArray(JSON.toJSONString(goods.get("goodsBeanArray")),Map.class);
         List<Map<String,Object>> temStocks = new ArrayList<>();
         for (Map map : result){
             String goodsId = map.get("goodsId").toString();
-//            StoreGoods goodsInfo = goodsMapper.getGoodsInfo(goodsId);
             Long num = Long.valueOf(map.get("num").toString());
             StoreGoodsStock goodsStock = goodsMapper.getGoodsStock(goodsId,storeId);
             List<StoreGoodsConsumable> consumablesList = goodsMapper.getGoodsAllConsumablesList(goodsId);

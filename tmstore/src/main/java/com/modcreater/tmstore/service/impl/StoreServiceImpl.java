@@ -28,6 +28,8 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @Author: AJun
@@ -39,7 +41,7 @@ public class StoreServiceImpl implements StoreService {
     private static final String SYSTEMID = "100000";
     private static final String ANDROID = "android";
     private static final String IOS = "ios";
-    private static final Integer LIMIT_SCOPE = 300000;
+    private static final Integer LIMIT_SCOPE = 5000;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -108,6 +110,7 @@ public class StoreServiceImpl implements StoreService {
         storeAttestation.setAddress(approveInfoVo.getAddress());
         storeAttestation.setLongitude(Double.valueOf(approveInfoVo.getLongitude()));
         storeAttestation.setLatitude(Double.valueOf(approveInfoVo.getLatitude()));
+        storeAttestation.setLocationAddress(DistanceUtil.getAddressByamap(Double.valueOf(approveInfoVo.getLongitude()),Double.valueOf(approveInfoVo.getLatitude())).get("detailAddress"));
         storeAttestation.setBusinessScope(Long.valueOf(approveInfoVo.getBusinessScope()));
         storeAttestation.setDetailAddress(approveInfoVo.getDetailAddress());
         storeAttestation.setStoreName(approveInfoVo.getStoreName());
@@ -190,20 +193,31 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Dto discoverInfo(DiscoverInfoVo discoverInfoVo, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(discoverInfoVo.getUserId()))){
-            return DtoUtil.getFalseDto("请重新登录",21014);
+            return DtoUtil.getFalseDto("请先登录",21014);
         }
         /**
-         * 查询目标30km范围内所有店铺
+         * 查询目标3km范围内所有店铺
          * 店名、logo、联系方式、地址、距离
          */
-        List<StoreInfo> storeList=storeMapper.getStoreListByCondition(discoverInfoVo.getStoreTypeId(),discoverInfoVo.getStoreStatusId());
+        List<StoreInfo> storeList=storeMapper.getStoreListByCondition(discoverInfoVo.getStoreTypeId(),discoverInfoVo.getStoreStatusId(),discoverInfoVo.getCity());
         List<Map<String,String>> mapList=new ArrayList<>();
+        Map<String,String> addressMap=DistanceUtil.getAddressByamap(discoverInfoVo.getLongitude(),discoverInfoVo.getLatitude());
+        logger.info("1==> "+addressMap);
+        if (ObjectUtils.isEmpty(addressMap)){
+            return DtoUtil.getFalseDto("查询失败",28541);
+        }
+        String city;
+        if (StringUtils.isEmpty(discoverInfoVo.getCity())){
+            city=StringUtils.isEmpty(addressMap.get("province")+addressMap.get("city")) ? "-1" : addressMap.get("province")+addressMap.get("city");
+        }else {
+            city=discoverInfoVo.getCity();
+        }
+        Map<String,String> map=null;
         for (StoreInfo storeInfo:storeList) {
-            String distance=DistanceUtil.getDistanceByamap(storeInfo.getLongitude(),storeInfo.getLatitude(),discoverInfoVo.getLongitude(),discoverInfoVo.getLatitude(),"3");
-            if (Integer.parseInt(distance)==-1){
-                return DtoUtil.getFalseDto("查询失败",28541);
-            }else if (Integer.parseInt(distance)<=LIMIT_SCOPE){
-                Map<String,String> map=new HashMap<>(10);
+            logger.info(storeInfo.getLocationAddress());
+            logger.info(city);
+            if (storeInfo.getLocationAddress().contains(city)){
+                map=new HashMap<>(10);
                 map.put("storeId",storeInfo.getId().toString());
                 map.put("storeName",storeInfo.getStoreName());
                 map.put("storePicture",storeInfo.getStorePicture());
@@ -213,7 +227,7 @@ public class StoreServiceImpl implements StoreService {
                 map.put("storeAddress",storeInfo.getStoreAddress());
                 map.put("longitude",storeInfo.getLongitude().toString());
                 map.put("latitude",storeInfo.getLatitude().toString());
-                map.put("distance",distance);
+                map.put("distance",DistanceUtil.getDistanceByamap(discoverInfoVo.getLongitude(),discoverInfoVo.getLatitude(),storeInfo.getLongitude(),storeInfo.getLatitude(),"3"));
                 //查询该店铺收藏状态
                 map.put("collectStatus", String.valueOf(storeMapper.getStoreCollectStatus(discoverInfoVo.getUserId(),storeInfo.getId())));
                 //查询该店铺收藏数量
@@ -225,6 +239,17 @@ public class StoreServiceImpl implements StoreService {
                 mapList.add(map);
             }
         }
+        //按距离排序
+        Collections.sort(mapList, new Comparator<Map<String, String>>() {
+            @Override
+            public int compare(Map<String, String> o1, Map<String, String> o2) {
+                //name1是从你list里面拿出来的一个
+                Double distance1 = Double.valueOf(o1.get("distance")) ;
+                //name1是从你list里面拿出来的第二个name
+                Double distance2 = Double.valueOf(o2.get("distance")) ;
+                return distance1.compareTo(distance2);
+            }
+        });
         //排序方式:
         //1、销量最多
         //2、收藏最多
@@ -265,15 +290,16 @@ public class StoreServiceImpl implements StoreService {
      */
     @Override
     public Dto hotProducts(SearchDiscoverVo searchDiscoverVo, String token) {
-        if (!token.equals(stringRedisTemplate.opsForValue().get(searchDiscoverVo.getUserId()))){
+        if (!token.equals(stringRedisTemplate.opsForValue().get(searchDiscoverVo. getUserId()))){
             return DtoUtil.getFalseDto("请重新登录",21014);
         }
         //查询商品列表
         Map<String,Object> resultMap=new HashMap<>(2);
         List<StoreGoods> goodsList=storeMapper.getGoodsAllType(searchDiscoverVo.getGoodsKeyWords(),searchDiscoverVo.getScreenType());
         List<Map<String,Object>> goodsMapList=new ArrayList<>();
+        Map<String,Object> goodsMap=null;
         for (StoreGoods goodsInfo:goodsList) {
-            Map<String,Object> goodsMap=new HashMap<>();
+            goodsMap=new HashMap<>();
             StoreGoodsStock goodsStock=goodsMapper.getGoodsStock(goodsInfo.getId().toString(),goodsInfo.getStoreId().toString());
             goodsMap.put("goodsId",goodsInfo.getId().toString());
             goodsMap.put("goodsName",goodsInfo.getGoodsName());
@@ -282,57 +308,65 @@ public class StoreServiceImpl implements StoreService {
             goodsMap.put("goodsUnit",goodsInfo.getGoodsUnit());
             //推荐指数
             goodsMap.put("goodsScore","4.7");
+            goodsMap.put("goodsAllergen",StringUtils.isEmpty(goodsInfo.getGoodsAllergen()) ? "无一般过敏成分" : goodsInfo.getGoodsAllergen());
+            goodsMap.put("activeTags","");
             Long sumWeekSalesVolume=0L;
             Long collectNum=0L;
             Long sumGoodsStock=0L;
             //查询包含此商品指定范围内的店铺
             List<Map<String,String>> storeList=storeMapper.getStoreListByGoods(goodsInfo.getId());
             List<Map<String,Object>> storeMapList=new ArrayList<>();
+            Map<String,Object> storeMap=null;
             for (Map map:storeList) {
-                Map<String,Object> storeMap=new HashMap<>();
-                storeMap.put("storeId",map.get("id"));
-                storeMap.put("storeName",map.get("storeName"));
-                storeMap.put("storePicture",map.get("storePicture"));
-                storeMap.put("address",map.get("storeAddress"));
                 String distance=DistanceUtil.getDistanceByamap(searchDiscoverVo.getLongitude(),searchDiscoverVo.getLatitude(),Double.parseDouble(map.get("longitude").toString()),Double.parseDouble(map.get("latitude").toString()),"3");
-                storeMap.put("longitude",map.get("longitude"));
-                storeMap.put("latitude",map.get("latitude"));
-                //查询该店铺此商品的周销量
-                Long weekSalesVolume=goodsMapper.getGoodsSalesVolume(map.get("id").toString(),goodsInfo.getId().toString(),new SimpleDateFormat("yyyyMMdd").format(new Date()),DateUtil.getDay(-7));
-                sumWeekSalesVolume=sumWeekSalesVolume+weekSalesVolume;
-                storeMap.put("weekSalesVolume",weekSalesVolume.toString());
-                //查询该店铺收藏数量
-                collectNum=collectNum+storeMapper.getStoreCollectNum(Long.parseLong(map.get("id").toString()));
-                goodsMap.put("collectNum", String.valueOf(storeMapper.getStoreCollectNum(Long.parseLong(map.get("id").toString()))));
-                //查询该商铺该商品的库存
-                Long goodsStockNum=goodsMapper.getGoodsStockNum(goodsInfo.getId().toString(),map.get("id").toString());
-                sumGoodsStock=sumGoodsStock+goodsStockNum;
-                storeMap.put("goodsStock",goodsStockNum);
-                storeMap.put("distance",distance);
-                storeMap.put("status",map.get("status"));
-                storeMap.put("businessScope",map.get("businessScope"));
-                storeMap.put("businessHouse",map.get("openStoreHours")+"-"+map.get("closeStoreHours"));
-                storeMap.put("detailAddress",map.get("detailAddress"));
-                //营业时间
-                storeMapList.add(storeMap);
+                if (Double.valueOf(distance)<=LIMIT_SCOPE){
+                    storeMap=new HashMap<>();
+                    storeMap.put("storeId",map.get("id"));
+                    storeMap.put("storeName",map.get("storeName"));
+                    storeMap.put("storePicture",map.get("storePicture"));
+                    storeMap.put("goodsUnit","份");
+                    storeMap.put("storeAddress",map.get("storeAddress"));
+                    storeMap.put("longitude",map.get("longitude"));
+                    storeMap.put("latitude",map.get("latitude"));
+                    //查询该店铺此商品的周销量
+                    Long weekSalesVolume=goodsMapper.getGoodsSalesVolume(map.get("id").toString(),goodsInfo.getId().toString(),new SimpleDateFormat("yyyyMMdd").format(new Date()),DateUtil.getDay(-7));
+                    sumWeekSalesVolume=sumWeekSalesVolume+weekSalesVolume;
+                    storeMap.put("weekSalesVolume",weekSalesVolume.toString());
+                    //查询该店铺收藏数量
+                    collectNum=collectNum+storeMapper.getStoreCollectNum(Long.parseLong(map.get("id").toString()));
+                    goodsMap.put("collectNum", String.valueOf(storeMapper.getStoreCollectNum(Long.parseLong(map.get("id").toString()))));
+                    //查询该商铺该商品的库存
+                    Long goodsStockNum=goodsMapper.getGoodsStockNum(goodsInfo.getId().toString(),map.get("id").toString());
+                    sumGoodsStock=sumGoodsStock+goodsStockNum;
+                    storeMap.put("goodsStock",goodsStockNum);
+                    storeMap.put("distance",StringUtils.isEmpty(distance)?"0":distance);
+                    storeMap.put("status",map.get("status"));
+                    storeMap.put("businessScope",map.get("businessScope"));
+                    //营业时间
+                    storeMap.put("businessHouse",map.get("openStoreHours")+"-"+map.get("closeStoreHours"));
+                    storeMap.put("detailAddress",map.get("detailAddress"));
+                    storeMapList.add(storeMap);
+                }
             }
             //查询总周销量
             goodsMap.put("weekSalesVolume",sumWeekSalesVolume.toString());
             goodsMap.put("collectNum",collectNum);
             goodsMap.put("goodsStock",sumGoodsStock);
-            goodsMap.put("goodsAllergen",goodsInfo.getGoodsAllergen());
             goodsMap.put("storeList",storeMapList);
-            Collections.sort(storeMapList, new Comparator<Map<String, Object>>() {
-                @Override
-                public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                    //name1是从你list里面拿出来的一个
-                    Integer distance1 = Integer.valueOf(o1.get("distance").toString()) ;
-                    //name1是从你list里面拿出来的第二个name
-                    Integer distance2 = Integer.valueOf(o2.get("distance").toString()) ;
-                    return distance1.compareTo(distance2);
-                }
-            });
-            goodsMapList.add(goodsMap);
+            List a=JSONObject.parseObject(JSON.toJSONString(goodsMap.get("storeList")),List.class);
+            if (a.size()>0) {
+                Collections.sort(storeMapList, new Comparator<Map<String, Object>>() {
+                    @Override
+                    public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                        //name1是从你list里面拿出来的一个
+                        Double distance1 = Double.valueOf(o1.get("distance").toString());
+                        //name1是从你list里面拿出来的第二个name
+                        Double distance2 = Double.valueOf(o2.get("distance").toString());
+                        return distance1.compareTo(distance2);
+                    }
+                });
+                goodsMapList.add(goodsMap);
+            }
         }
         //排序方式:
         //1、库存数量
@@ -347,11 +381,9 @@ public class StoreServiceImpl implements StoreService {
                     @Override
                     public int compare(Map<String, Object> o1, Map<String, Object> o2) {
                         //name1是从你list里面拿出来的一个
-                        List<Map<String,Object>> list1=JSONObject.parseObject(o1.get("storeList").toString(),ArrayList.class);
-                        Integer distance1 = Integer.valueOf(list1.get(0).get("distance").toString()) ;
+                        Double distance1 = Double.valueOf(o1.get("goodsStock").toString()) ;
                         //name1是从你list里面拿出来的第二个name
-                        List<Map<String,Object>> list2=JSONObject.parseObject(o2.get("storeList").toString(),ArrayList.class);
-                        Integer distance2 = Integer.valueOf(list2.get(0).get("distance").toString()) ;
+                        Double distance2 = Double.valueOf(o2.get("goodsStock").toString()) ;
                         return distance1.compareTo(distance2);
                     }
                 });
@@ -360,20 +392,45 @@ public class StoreServiceImpl implements StoreService {
                     @Override
                     public int compare(Map<String, Object> o1, Map<String, Object> o2) {
                         //name1是从你list里面拿出来的一个
-                        Integer distance1 = Integer.valueOf(o1.get("distance").toString()) ;
+                        List<Map<String,Object>> list1=JSONObject.parseObject(JSON.toJSONString(o1.get("storeList")),ArrayList.class);
+                        Integer distance1 = Integer.valueOf(list1.get(0).get("distance").toString()) ;
                         //name1是从你list里面拿出来的第二个name
-                        Integer distance2 = Integer.valueOf(o2.get("distance").toString()) ;
+                        List<Map<String,Object>> list2=JSONObject.parseObject(JSON.toJSONString(o2.get("storeList")),ArrayList.class);
+                        Integer distance2 = Integer.valueOf(list2.get(0).get("distance").toString()) ;
                         return distance1.compareTo(distance2);
                     }
                 });
             }else if(type == 3){
+                //综合排序1.销量2.距离3.收藏
                 Collections.sort(goodsMapList, new Comparator<Map<String, Object>>() {
                     @Override
                     public int compare(Map<String, Object> o1, Map<String, Object> o2) {
                         //name1是从你list里面拿出来的一个
-                        Double distance1 = Double.valueOf(o1.get("goodsPrice").toString()) ;
+                        Integer distance1 = Integer.valueOf(o1.get("weekSalesVolume").toString()) ;
                         //name1是从你list里面拿出来的第二个name
-                        Double distance2 = Double.valueOf(o2.get("goodsPrice").toString()) ;
+                        Integer distance2 = Integer.valueOf(o2.get("weekSalesVolume").toString()) ;
+                        return distance1.compareTo(distance2);
+                    }
+                });
+                Collections.sort(goodsMapList, new Comparator<Map<String, Object>>() {
+                    @Override
+                    public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                        //name1是从你list里面拿出来的一个
+                        List<Map<String,Object>> list1=JSONObject.parseObject(JSON.toJSONString(o1.get("storeList")),ArrayList.class);
+                        Integer distance1 = Integer.valueOf(list1.get(0).get("distance").toString()) ;
+                        //name1是从你list里面拿出来的第二个name
+                        List<Map<String,Object>> list2=JSONObject.parseObject(JSON.toJSONString(o2.get("storeList")),ArrayList.class);
+                        Integer distance2 = Integer.valueOf(list2.get(0).get("distance").toString()) ;
+                        return distance1.compareTo(distance2);
+                    }
+                });
+                Collections.sort(goodsMapList, new Comparator<Map<String, Object>>() {
+                    @Override
+                    public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                        //name1是从你list里面拿出来的一个
+                        Integer distance1 = Integer.valueOf(o1.get("collectNum").toString()) ;
+                        //name1是从你list里面拿出来的第二个name
+                        Integer distance2 = Integer.valueOf(o2.get("collectNum").toString()) ;
                         return distance1.compareTo(distance2);
                     }
                 });
@@ -421,14 +478,15 @@ public class StoreServiceImpl implements StoreService {
         List<Map<String,Object>> storeMapList=new ArrayList<>();
         List<Map<String,String>> storeList=storeMapper.getStoreListBySearch(searchDiscoverVo.getGoodsKeyWords(),searchDiscoverVo.getScreenType());
         //查询包含此商品指定范围内的店铺
+        Map<String,Object> storeMap=null;
         for (Map map:storeList) {
-            Map<String,Object> storeMap=new HashMap<>();
+            storeMap=new HashMap<>();
             storeMap.put("storeId",map.get("id"));
             storeMap.put("storeName",map.get("storeName"));
             storeMap.put("storePicture",map.get("storePicture"));
-            storeMap.put("address",map.get("storeAddress"));
+            storeMap.put("storeAddress",map.get("storeAddress"));
             String distance=DistanceUtil.getDistanceByamap(searchDiscoverVo.getLongitude(),searchDiscoverVo.getLatitude(),Double.parseDouble(map.get("longitude").toString()),Double.parseDouble(map.get("latitude").toString()),"3");
-            storeMap.put("distance",distance);
+            storeMap.put("distance",StringUtils.isEmpty(distance)?"":distance);
             storeMap.put("longitude",map.get("longitude"));
             storeMap.put("latitude",map.get("latitude"));
             storeMap.put("storeScore","4.8");
@@ -436,33 +494,42 @@ public class StoreServiceImpl implements StoreService {
             storeMap.put("status",map.get("status"));
             Long weekSalesVolume=0L;
             Long sumGoodsStock=0L;
-            String goodsUnit="";
             //查询商品列表
             List<Map<String,String>> goodsMapList=new ArrayList<>();
             List<StoreGoods> goodsList=storeMapper.getGoodsListBySearch(searchDiscoverVo.getGoodsKeyWords(),searchDiscoverVo.getScreenType(),map.get("id").toString());
+            Map<String,String> goodsMap=null;
             for (StoreGoods storeGoods:goodsList) {
-                Map<String,String> goodsMap=new HashMap<>();
+                goodsMap=new HashMap<>();
                 goodsMap.put("goodsId",storeGoods.getId().toString());
                 goodsMap.put("goodsName",storeGoods.getGoodsName());
                 goodsMap.put("goodsPicture",storeGoods.getGoodsPicture());
-                StoreGoodsStock goodsStock=goodsMapper.getGoodsStock(storeGoods.getId().toString(),map.get("id").toString());
+                StoreGoodsStock goodsStock=goodsMapper.getGoodsStock(storeGoods.getId().toString(),storeGoods.getStoreId().toString());
                 goodsMap.put("goodsPrice",goodsStock.getGoodsPrice().toString());
                 goodsMap.put("goodsUnit",storeGoods.getGoodsUnit());
-                goodsUnit=goodsUnit+storeGoods.getGoodsUnit();
                 //查询销量
-                weekSalesVolume=goodsMapper.getGoodsSalesVolume(map.get("id").toString(),storeGoods.getId().toString(),new SimpleDateFormat("yyyyMMdd").format(new Date()),DateUtil.getDay(-7));
+                weekSalesVolume=goodsMapper.getGoodsSalesVolume(storeGoods.getStoreId().toString(),storeGoods.getId().toString(),new SimpleDateFormat("yyyyMMdd").format(new Date()),DateUtil.getDay(-7));
                 //查询该商铺该商品的库存
-                Long goodsStockNum=goodsMapper.getGoodsStockNum(storeGoods.getId().toString(),map.get("id").toString());
+                Long goodsStockNum=goodsMapper.getGoodsStockNum(storeGoods.getId().toString(),storeGoods.getStoreId().toString());
                 sumGoodsStock=sumGoodsStock+goodsStockNum;
                 goodsMapList.add(goodsMap);
             }
             storeMap.put("weekSalesVolume",weekSalesVolume);
-            storeMap.put("goodsUnit",goodsUnit);
+            storeMap.put("goodsUnit","份");
             storeMap.put("goodsStock",sumGoodsStock);
             storeMap.put("goodsList",goodsMapList);
             storeMapList.add(storeMap);
         }
-
+        //按距离排序
+        Collections.sort(storeMapList, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                //name1是从你list里面拿出来的一个
+                Double distance1 = Double.valueOf(o1.get("distance").toString()) ;
+                //name1是从你list里面拿出来的第二个name
+                Double distance2 = Double.valueOf(o2.get("distance").toString()) ;
+                return distance1.compareTo(distance2);
+            }
+        });
         //排序方式:
         //1、库存数量
         //2、距离最近
@@ -487,9 +554,9 @@ public class StoreServiceImpl implements StoreService {
                     @Override
                     public int compare(Map<String, Object> o1, Map<String, Object> o2) {
                         //name1是从你list里面拿出来的一个
-                        Integer distance1 = Integer.valueOf(o1.get("distance").toString());
+                        Double distance1 = Double.valueOf(o1.get("distance").toString());
                         //name1是从你list里面拿出来的第二个name
-                        Integer distance2 = Integer.valueOf(o2.get("distance").toString());
+                        Double distance2 = Double.valueOf(o2.get("distance").toString());
                         return distance1.compareTo(distance2);
                     }
                 });
@@ -570,6 +637,7 @@ public class StoreServiceImpl implements StoreService {
         if (!token.equals(stringRedisTemplate.opsForValue().get(receivedId.getUserId()))){
             return DtoUtil.getFalseDto("请重新登录",21014);
         }
+        Map<String,Object> resultMap=new HashMap<>();
         List<Map<String,String>> mapList=goodsMapper.getGoodsAllTypeList();
         mapList.remove(0);
         mapList.remove(1);
@@ -582,8 +650,22 @@ public class StoreServiceImpl implements StoreService {
             map1.put("select","false");
             resultMapList.add(map1);
         }
+        resultMap.put("goodsTypeList",resultMapList);
 
-        return DtoUtil.getSuccesWithDataDto("查询成功",resultMapList,100000);
+        List<Map> list=new ArrayList<>();
+        Map<String,String> map1=new HashMap<>();
+        map1.put("screenTypeId","1");
+        map1.put("screenType","优惠满减");
+        map1.put("select","false");
+        Map<String,String> map2=new HashMap<>();
+        map2.put("screenTypeId","2");
+        map2.put("screenType","活动促销");
+        map2.put("select","false");
+        list.add(map1);
+        list.add(map2);
+        resultMap.put("activeList",list);
+
+        return DtoUtil.getSuccesWithDataDto("查询成功",resultMap,100000);
     }
 
     /**
@@ -640,7 +722,7 @@ public class StoreServiceImpl implements StoreService {
         List<Map<String,String>> mapList=new ArrayList<>();
         for (StoreInfo storeInfo:storeList) {
             String distance=DistanceUtil.getDistanceByamap(storeInfo.getLongitude(),storeInfo.getLatitude(),collectStoreVo.getLongitude(),collectStoreVo.getLatitude(),"3");
-            if (Integer.parseInt(distance)==-1){
+            if (StringUtils.isEmpty(distance) || Integer.parseInt(distance)==-1){
                 return DtoUtil.getFalseDto("查询失败",28541);
             }else if (Integer.parseInt(distance)<=LIMIT_SCOPE){
                 Map<String,String> map=new HashMap<>(10);

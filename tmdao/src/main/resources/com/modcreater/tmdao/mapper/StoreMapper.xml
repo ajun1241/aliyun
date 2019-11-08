@@ -47,7 +47,7 @@
         select * from store_info where attestationId=#{attestationId}
     </select>
     <select id="getStoreInfoByBarCode" resultType="java.util.Map">
-        SELECT g.*,s.* FROM  store_goods g INNER JOIN  store_goods_stock s ON g.id=s.goodsId WHERE s.goodsBarCode=#{goodsBarCode} AND s.storeId=#{storeId}
+        SELECT g.id,g.goodsName,g.goodsPicture,s.* FROM  store_goods g INNER JOIN  store_goods_stock s ON g.id=s.goodsId WHERE s.goodsBarCode=#{goodsBarCode} AND s.storeId=#{storeId} and s.goodsStatus=1
     </select>
     <select id="getStoreList" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
         select * from store_info where status &lt;&gt; 0
@@ -56,15 +56,13 @@
         select id from store_info where userId = #{userId}
     </select>
     <select id="getGoodsAllType" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
-        select * from store_goods
-        <where>
-            <if test="goodsKeyWords != null and goodsKeyWords != '' ">
-                and goodsName like concat('%',#{goodsKeyWords},'%')
-            </if>
-            <if test="screenType != null and screenType != '' and screenType >= 0 ">
-                and goodsTypeId = #{screenType}
-            </if>
-        </where>
+        select * from store_goods where  id in (select goodsId from store_goods_stock)
+        <if test="goodsKeyWords != null and goodsKeyWords != '' ">
+            and goodsName like concat('%',#{goodsKeyWords},'%')
+        </if>
+        <if test="screenType != null and screenType != '' and screenType >= 0 ">
+            and goodsTypeId = #{screenType}
+        </if>
     </select>
     <select id="getStoreListByGoods" resultType="java.util.Map">
         select si.*,sgs.goodsId,sgs.goodsPrice,sgs.storeId,sgs.stockNum,sgs.goodsStatus,sgs.goodsBarCode
@@ -89,6 +87,9 @@
             <if test="storeStatusId != null and storeStatusId != '' and storeStatusId >= 0">
                 and status=#{storeStatusId}
             </if>
+            <if test="city != null and city != ''">
+                and locationAddress like concat('%',#{city},'%')
+            </if>
         </where>
     </select>
     <select id="getStoreListBySearch" resultType="java.util.Map">
@@ -106,16 +107,13 @@
         and si.status &lt;&gt; 0 group by si.id
     </select>
     <select id="getGoodsListBySearch" resultType="com.modcreater.tmbeans.pojo.StoreGoods">
-        select * from store_goods
-        <where>
-            <if test="goodsKeyWords != null and goodsKeyWords != '' ">
-                and goodsName like concat('%',#{goodsKeyWords},'%')
-            </if>
-            <if test="screenType != null and screenType != '' and screenType >= 0 ">
-                and goodsTypeId = #{screenType}
-            </if>
-            and storeId=#{storeId}
-        </where>
+        SELECT * FROM store_goods  WHERE id IN (SELECT goodsId FROM store_goods_stock WHERE storeId=#{storeId} and goodsStatus=1)
+        <if test="goodsKeyWords != null and goodsKeyWords != '' ">
+            and goodsName like concat('%',#{goodsKeyWords},'%')
+        </if>
+        <if test="screenType != null and screenType != '' and screenType >= 0 ">
+            and goodsTypeId = #{screenType}
+        </if>
     </select>
     <select id="getStoreWeekSalesVolume" resultType="java.lang.Long">
         select IFNULL(sum(num), 0) from store_sales_volume where storeId=#{storeId} and createTime between #{toDay} and #{targetDay}

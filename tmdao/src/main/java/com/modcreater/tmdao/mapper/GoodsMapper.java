@@ -347,6 +347,13 @@ public interface GoodsMapper {
     StoreOfflineOrders getOfflineOrder(String tradeNo);
 
     /**
+     * 根据goodsCode查询订单
+     * @param code
+     * @return
+     */
+    StoreOfflineOrders getOfflineOrderByGoodsCode(String code);
+
+    /**
      * 修改订单信息
      * @param offlineOrder
      * @return
@@ -668,6 +675,14 @@ public interface GoodsMapper {
     int addNewFullReduction(@Param("bindingId") String bindingId,@Param("fullValue") Double fullValue,
                             @Param("disValue") Double disValue,@Param("startTime") Long startTime,
                             @Param("endTime") Long endTime,@Param("storeId") String storeId);
+
+    /**
+     * 修改订单状态
+     * @param orderNumber
+     * @param status
+     * @return
+     */
+    int updateOfflineOrderStatus(String orderNumber, int status);
 
     /**
      * 查询和传入goodsIds数组中相同的优惠信息

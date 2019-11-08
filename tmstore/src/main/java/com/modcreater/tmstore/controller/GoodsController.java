@@ -206,6 +206,13 @@ public class GoodsController {
         return goodsService.checkOrder(checkOrderVo,request.getHeader("token"));
     }
 
+    @Safety
+    @PostMapping(value = "merchantgathering")
+    @ApiOperation("商家扫描付款码完成交易")
+    public Dto merchantGathering(@RequestBody MerchantGatheringVo merchantGatheringVo, HttpServletRequest request){
+        return goodsService.merchantGathering(merchantGatheringVo,request.getHeader("token"));
+    }
+
 
     @Safety
     @PostMapping(value = "addnewconsumable")

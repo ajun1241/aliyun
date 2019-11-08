@@ -213,6 +213,13 @@ public interface GoodsService {
      */
     Dto checkOrder(CheckOrderVo checkOrderVo, String token);
 
+    /**
+     * 商家扫描付款码完成交易
+     * @param merchantGatheringVo
+     * @param token
+     * @return
+     */
+    Dto merchantGathering(MerchantGatheringVo merchantGatheringVo,String token);
 
     /**
      * 添加消耗品

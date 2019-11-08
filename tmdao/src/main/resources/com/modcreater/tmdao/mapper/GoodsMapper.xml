@@ -258,7 +258,7 @@
         update store_goods_stock set stockNum = #{stockNum} where storeId = #{storeId} and goodsId = #{goodsId}
     </update>
     <update id="makeOrderFailed">
-        update store_offline_orders set orderStatus = 3 where orderNumber = #{or derNum} and orderStatus = 0 and now() - createDate >= #{seconds}
+        update store_offline_orders set orderStatus = 3 where orderNumber = #{orderNum} and orderStatus = 0 and now() - createDate >= #{seconds}
     </update>
     <update id="resumeStock">
         update store_goods_stock set stockNum = stockNum + #{num} where storeId = #{storeId} and goodsBarCode = #{goodsBarCode}
@@ -267,6 +267,9 @@
         <foreach collection="goodsId" item="id" separator=";">
             update store_goods_stock set discountedType = #{discountedType} where goodsId = #{id} and storeId = #{storeId}
         </foreach>
+    </update>
+    <update id="updateOfflineOrderStatus">
+        update store_offline_orders set orderStatus = #{status} where orderNumber=#{orderNumber};
     </update>
     <select id="getOfflineOrder" resultType="com.modcreater.tmbeans.pojo.StoreOfflineOrders">
         select * from store_offline_orders where orderNumber = #{tradeNo}
@@ -499,7 +502,7 @@
         or (startTime &lt; #{endTime} and endTime &gt; #{startTime})
         or ((startTime &gt;= #{startTime}) and (endTime &lt;= #{endTime})))
     </select>
-    <select id="getCurrentGoodsPromoteSales" resultType="com.modcreater.tmbeans.pojo.StoreGoodsDiscount">
-        select * from store_goods_discount where startTime = #{curTime}
+    <select id="getOfflineOrderByGoodsCode" resultType="com.modcreater.tmbeans.pojo.StoreOfflineOrders">
+        select * from store_offline_orders where goodsListId=#{code}
     </select>
 </mapper>
