@@ -831,6 +831,9 @@ public class StoreServiceImpl implements StoreService {
         if (!reg(storeFullReductionPromoteSales.getUserId(), storeFullReductionPromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
+        if (!verStorePromoteSales(storeFullReductionPromoteSales.getStartTime(),storeFullReductionPromoteSales.getEndTime(),storeFullReductionPromoteSales.getStoreId())){
+            return DtoUtil.getFalseDto("请合理安排店铺促销时间!", 90029);
+        }
         Double[] fullValues = storeFullReductionPromoteSales.getFullValue();
         Double[] disValues = storeFullReductionPromoteSales.getDisValue();
         if (fullValues.length != disValues.length){
@@ -860,6 +863,9 @@ public class StoreServiceImpl implements StoreService {
         }
         if (!reg(storeDiscountPromoteSales.getUserId(), storeDiscountPromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        if (!verStorePromoteSales(storeDiscountPromoteSales.getStartTime(),storeDiscountPromoteSales.getEndTime(),storeDiscountPromoteSales.getStoreId())){
+            return DtoUtil.getFalseDto("请合理安排店铺促销时间!", 90029);
         }
         NumberFormat nf = NumberFormat.getNumberInstance();
         nf.setRoundingMode(RoundingMode.HALF_UP);
@@ -895,5 +901,21 @@ public class StoreServiceImpl implements StoreService {
      */
     private boolean reg(String userId, String storeId) {
         return goodsMapper.getStoreMaster(userId, storeId) == 1;
+    }
+
+    /**
+     * 验证商店促销时间冲突
+     * @param startTime
+     * @param endTime
+     * @param storeId
+     * @return
+     */
+    private boolean verStorePromoteSales(Long startTime, Long endTime, String storeId){
+        int i = storeMapper.verStorePromoteSales(startTime,endTime,storeId,System.currentTimeMillis()/1000);
+        if (i >= 1){
+            return false;
+        }else {
+            return true;
+        }
     }
 }

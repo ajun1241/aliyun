@@ -121,4 +121,11 @@
     <select id="verifyStoreExistInSFR" resultType="java.lang.Integer">
         select count(1) from store_full_reduction where storeId = #{storeId} and endTime > #{curTime}
     </select>
+    <select id="verStorePromoteSales" resultType="java.lang.Integer">
+        select count(1) from store_full_reduction where storeId = #{storeId} and endTime >= #{curTime}
+        and (
+        (endTime &gt; #{startTime} and startTime &lt; #{endTime})
+        or (startTime &lt; #{endTime} and endTime &gt; #{startTime})
+        or ((startTime &gt;= #{startTime}) and (endTime &lt;= #{endTime})))
+    </select>
 </mapper>
