@@ -24,6 +24,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -777,6 +779,10 @@ public class StoreServiceImpl implements StoreService {
         if (!reg(storeDiscountPromoteSales.getUserId(), storeDiscountPromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setRoundingMode(RoundingMode.HALF_UP);
+        nf.setMaximumFractionDigits(2);
+        storeDiscountPromoteSales.setValue(Double.valueOf(nf.format(storeDiscountPromoteSales.getValue() / 10)));
         int i = storeMapper.addNewStoreDiscountPromoteSales(storeDiscountPromoteSales.getStoreId(),storeDiscountPromoteSales.getValue(),
                 storeDiscountPromoteSales.getStartTime(),storeDiscountPromoteSales.getEndTime());
         if (i != 1){

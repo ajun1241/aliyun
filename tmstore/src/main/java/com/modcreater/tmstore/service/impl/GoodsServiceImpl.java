@@ -812,6 +812,10 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(goodsDiscountPromoteSales.getUserId(), goodsDiscountPromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setRoundingMode(RoundingMode.HALF_UP);
+        nf.setMaximumFractionDigits(2);
+        goodsDiscountPromoteSales.setValue(Double.valueOf(nf.format(goodsDiscountPromoteSales.getValue() / 10)));
         if (goodsDiscountPromoteSales.getValue() >= 1){
             return DtoUtil.getFalseDto("请输入有效的折扣",90020);
         }

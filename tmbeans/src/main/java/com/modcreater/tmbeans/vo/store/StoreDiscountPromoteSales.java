@@ -19,7 +19,7 @@ public class StoreDiscountPromoteSales {
 
     private String storeId;
 
-    private String value;
+    private Double value;
 
     private Long startTime;
 

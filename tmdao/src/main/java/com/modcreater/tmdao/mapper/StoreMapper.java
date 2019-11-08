@@ -191,7 +191,7 @@ public interface StoreMapper {
      * @param endTime
      * @return
      */
-    int addNewStoreDiscountPromoteSales(@Param("storeId") String storeId,@Param("value") String value,
+    int addNewStoreDiscountPromoteSales(@Param("storeId") String storeId,@Param("value") Double value,
                                         @Param("startTime") Long startTime,@Param("endTime") Long endTime);
 
     /**
