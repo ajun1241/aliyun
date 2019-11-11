@@ -505,4 +505,13 @@
     <select id="getOfflineOrderByGoodsCode" resultType="com.modcreater.tmbeans.pojo.StoreOfflineOrders">
         select * from store_offline_orders where goodsListId=#{code}
     </select>
+    <select id="getGoodsPromoteSalesTimes" resultType="java.lang.String">
+        select startTime from store_goods_discount where storeId = #{storeId} and endTime &gt; #{curTime} group by startTime
+    </select>
+    <select id="getGoodsPromoteSalesInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoodsDiscount">
+        select * from store_goods_discount where storeId = #{storeId} and startTime = #{time}
+    </select>
+    <select id="getGoodsFullReduction" resultType="com.modcreater.tmbeans.pojo.StoreGoodsFullReduction">
+        select * from store_goods_full_reduction where storeId = #{storeId} and startTime = #{time}
+    </select>
 </mapper>

@@ -137,4 +137,10 @@ public class StoreController {
         return storeService.storePromoteSalesVerify(receivedStoreId,request.getHeader("token"));
     }
 
+    @Safety
+    @PostMapping(value = "showstorepromotesales")
+    @ApiOperation("展示商铺促销")
+    public Dto showStorePromoteSales(@RequestBody ReceivedStoreId receivedStoreId ,HttpServletRequest request){
+        return storeService.showStorePromoteSales(receivedStoreId,request.getHeader("token"));
+    }
 }

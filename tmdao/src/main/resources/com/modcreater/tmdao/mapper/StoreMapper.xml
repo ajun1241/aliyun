@@ -128,4 +128,11 @@
         or (startTime &lt; #{endTime} and endTime &gt; #{startTime})
         or ((startTime &gt;= #{startTime}) and (endTime &lt;= #{endTime})))
     </select>
+    <select id="getStorePromoteSalesTimes" resultType="java.lang.String">
+        select startTime
+        from store_full_reduction where storeId = #{storeId} and endTime &gt; #{curTime} group by startTime
+    </select>
+    <select id="getStorePromoteSalesInfo" resultType="com.modcreater.tmbeans.pojo.StoreFullReduction">
+        select * from store_full_reduction where storeId = #{storeId} and startTime = #{time}
+    </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.modcreater.tmdao.mapper;
 
 import com.alipay.api.domain.GoodsInfo;
 import com.modcreater.tmbeans.pojo.*;
+import com.modcreater.tmbeans.show.store.ShowPromoteSalesInfo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -212,4 +213,20 @@ public interface StoreMapper {
      */
     int verStorePromoteSales(@Param("startTime") Long startTime,@Param("endTime") Long endTime,
                              @Param("storeId") String storeId,@Param("curTime") long curTime);
+
+    /**
+     * 获取促销信息
+     * @param storeId
+     * @param curTime
+     * @return
+     */
+    List<String> getStorePromoteSalesTimes(@Param("storeId") String storeId,@Param("curTime") long curTime);
+
+    /**
+     * 根据促销开始时间查询促销信息
+     * @param storeId
+     * @param time
+     * @return
+     */
+    List<StoreFullReduction> getStorePromoteSalesInfo(@Param("storeId") String storeId,@Param("time") String time);
 }

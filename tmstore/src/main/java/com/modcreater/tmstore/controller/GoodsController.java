@@ -312,4 +312,11 @@ public class GoodsController {
     public Dto goodsFullReductionPromoteSales(@RequestBody GoodsFullReductionPromoteSales goodsFullReductionPromoteSales, HttpServletRequest request){
         return goodsService.goodsFullReductionPromoteSales(goodsFullReductionPromoteSales,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping(value = "showgoodspromotesales")
+    @ApiOperation("展示商品促销")
+    public Dto showGoodsPromoteSales(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
+        return goodsService.showGoodsPromoteSales(receivedStoreId,request.getHeader("token"));
+    }
 }

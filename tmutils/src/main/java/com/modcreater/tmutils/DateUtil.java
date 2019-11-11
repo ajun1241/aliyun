@@ -161,4 +161,16 @@ public class DateUtil {
         StringBuffer stringBuffer = new StringBuffer(getDay(0));
         return stringBuffer.substring(6);
     }
+
+    /**
+     * 将传入的时间戳
+     * @param stamp
+     * @return
+     */
+    public static String stampToDefinedFormat(Long stamp,String format){
+        Date date = new Date();
+        date.setTime(stamp * 1000);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.format(date);
+    }
 }

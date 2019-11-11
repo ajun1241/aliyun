@@ -710,4 +710,28 @@ public interface GoodsMapper {
     int verGoodsPromoteSalesRepetitive(@Param("goodsIds") String[] goodsIds,@Param("startTime") Long startTime,
                                                @Param("endTime") Long endTime,@Param("storeId") String storeId,
                                                @Param("curTime") long curTime,@Param("type") int type);
+
+    /**
+     * 获取商品折扣开始时间
+     * @param storeId
+     * @param curTime
+     * @return
+     */
+    List<String> getGoodsPromoteSalesTimes(@Param("storeId") String storeId,@Param("curTime") long curTime);
+
+    /**
+     * 获取商品折扣信息
+     * @param storeId
+     * @param time
+     * @return
+     */
+    List<StoreGoodsDiscount> getGoodsPromoteSalesInfo(@Param("storeId") String storeId,@Param("time") String time);
+
+    /**
+     * 获取商品满减折扣信息
+     * @param storeId
+     * @param time
+     * @return
+     */
+    List<StoreGoodsFullReduction> getGoodsFullReduction(@Param("storeId") String storeId,@Param("time") String time);
 }

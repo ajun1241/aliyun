@@ -25,4 +25,8 @@ public class StoreFullReduction {
 
     private Long endTime;
 
+    private Integer share;
+
+    private Integer discountType;
+
 }

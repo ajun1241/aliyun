@@ -332,4 +332,12 @@ public interface GoodsService {
      * @return
      */
     Dto goodsPromoteSalesVerify(GoodsPromoteSalesVerify goodsPromoteSalesVerify, String token);
+
+    /**
+     * 展示商品促销
+     * @param receivedStoreId
+     * @param token
+     * @return
+     */
+    Dto showGoodsPromoteSales(ReceivedStoreId receivedStoreId, String token);
 }

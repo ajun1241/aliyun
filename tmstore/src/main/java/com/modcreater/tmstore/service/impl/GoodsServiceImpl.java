@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.modcreater.tmbeans.dto.Dto;
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.goods.*;
+import com.modcreater.tmbeans.show.store.ShowPromoteSalesInfo;
 import com.modcreater.tmbeans.utils.GetBarcode;
 import com.modcreater.tmbeans.vo.goods.*;
 import com.modcreater.tmbeans.vo.store.*;
@@ -989,6 +990,52 @@ public class GoodsServiceImpl implements GoodsService {
             return DtoUtil.getFalseDto("存在促销中的商品,请重新选择",90021);
         }
         return DtoUtil.getSuccessDto("请求成功",100000);
+    }
+
+    @Override
+    public Dto showGoodsPromoteSales(ReceivedStoreId receivedStoreId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedStoreId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(receivedStoreId.getUserId(), receivedStoreId.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        List<String> times = goodsMapper.getGoodsPromoteSalesTimes(receivedStoreId.getStoreId(),System.currentTimeMillis()/1000);
+        if (times.size() == 0){
+            return DtoUtil.getSuccessDto("暂无数据",200000);
+        }
+        List<ShowPromoteSalesInfo> result = new ArrayList<>();
+        for (String time : times){
+            List<StoreGoodsDiscount> discounts = goodsMapper.getGoodsPromoteSalesInfo(receivedStoreId.getStoreId(),time);
+            if (discounts.size() == 0){
+                return DtoUtil.getFalseDto("数据异常",90029);
+            }
+            StoreGoodsDiscount sample = discounts.get(0);
+            ShowPromoteSalesInfo salesInfo = new ShowPromoteSalesInfo();
+            salesInfo.setPromoteSalesId(sample.getId());
+            if (sample.getDiscountedType() == 2){
+                StringBuffer disInfo = new StringBuffer();
+                List<StoreGoodsFullReduction> reductions = goodsMapper.getGoodsFullReduction(receivedStoreId.getStoreId(),time);
+                for (int i = 0; i < reductions.size(); i++) {
+                    StoreGoodsFullReduction reduction = reductions.get(i);
+                    if (i != 0){
+                        disInfo.append(",");
+                    }
+                    disInfo.append("满").append(reduction.getFullValue()).append("减").append(reduction.getDisValue());
+                }
+                salesInfo.setDisInfo(disInfo.toString());
+                salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品参加" + "满减" + "活动");
+                salesInfo.setType("1");
+            }else if (sample.getDiscountedType() == 1){
+                salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品" + sample.getValue() * 10 + "折");
+                salesInfo.setType("2");
+            }
+            salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setStatus(sample.getStartTime() >= System.currentTimeMillis()/1000 ? "0" : "1");
+            result.add(salesInfo);
+        }
+        return DtoUtil.getSuccesWithDataDto("success",result,100000);
     }
 
     /**

@@ -145,4 +145,12 @@ public interface StoreService {
      * @return
      */
     Dto storePromoteSalesVerify(ReceivedStoreId receivedStoreId, String token);
+
+    /**
+     * 展示商铺促销
+     * @param receivedStoreId
+     * @param token
+     * @return
+     */
+    Dto showStorePromoteSales(ReceivedStoreId receivedStoreId, String token);
 }
