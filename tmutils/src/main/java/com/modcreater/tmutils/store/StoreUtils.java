@@ -36,7 +36,15 @@ public class StoreUtils {
         });
     }
 
-    public static void sortPromoteSalesInfoWithoutStatus(List<ShowPromoteSalesInfo> infos){
+    public static void sortAllOverduePromoteSalesInfo(List<ShowPromoteSalesInfo> infos){
+        infos.sort(new Comparator<ShowPromoteSalesInfo>() {
+            @Override
+            public int compare(ShowPromoteSalesInfo o1, ShowPromoteSalesInfo o2) {
+                Long promoteType1 = Long.valueOf(o1.getPromoteType());
+                Long promoteType2 = Long.valueOf(o2.getPromoteType());
+                return promoteType2.compareTo(promoteType1);
+            }
+        });
         infos.sort(new Comparator<ShowPromoteSalesInfo>() {
             @Override
             public int compare(ShowPromoteSalesInfo o1, ShowPromoteSalesInfo o2) {
@@ -45,6 +53,43 @@ public class StoreUtils {
                 return startTime1.compareTo(startTime2);
             }
         });
+    }
 
+    public static void main(String[] args) {
+        ShowPromoteSalesInfo info1 = new ShowPromoteSalesInfo();
+        info1.setPromoteSalesId(1L);
+        info1.setPromoteType("3");
+        info1.setStartTime("1");
+        ShowPromoteSalesInfo info2 = new ShowPromoteSalesInfo();
+        info2.setPromoteSalesId(2L);
+        info2.setPromoteType("1");
+        info2.setStartTime("2");
+        ShowPromoteSalesInfo info3 = new ShowPromoteSalesInfo();
+        info3.setPromoteSalesId(3L);
+        info3.setPromoteType("2");
+        info3.setStartTime("3");
+        ShowPromoteSalesInfo info4 = new ShowPromoteSalesInfo();
+        info4.setPromoteSalesId(4L);
+        info4.setPromoteType("3");
+        info4.setStartTime("3");
+        ShowPromoteSalesInfo info5 = new ShowPromoteSalesInfo();
+        info5.setPromoteSalesId(5L);
+        info5.setPromoteType("1");
+        info5.setStartTime("4");
+        ShowPromoteSalesInfo info6 = new ShowPromoteSalesInfo();
+        info6.setPromoteSalesId(6L);
+        info6.setPromoteType("4");
+        info6.setStartTime("8");
+        List<ShowPromoteSalesInfo> list = new ArrayList<>();
+        list.add(info1);
+        list.add(info3);
+        list.add(info2);
+        list.add(info4);
+        list.add(info6);
+        list.add(info5);
+        sortAllOverduePromoteSalesInfo(list);
+        for (ShowPromoteSalesInfo info : list){
+            System.out.println(info.getPromoteSalesId() + ":" + info.getPromoteType() + ":" + info.getStartTime());
+        }
     }
 }

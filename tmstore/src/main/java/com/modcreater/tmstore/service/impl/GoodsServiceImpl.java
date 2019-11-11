@@ -1085,12 +1085,12 @@ public class GoodsServiceImpl implements GoodsService {
             salesInfo.setPromoteType("2");
             result.add(salesInfo);
         }
-        List<String> storeTimes = storeMapper.getStorePromoteSalesTimes(receivedStoreId.getStoreId(),System.currentTimeMillis()/1000);
+        List<String> storeTimes = storeMapper.getStoreOverduePromoteSalesTimes(receivedStoreId.getStoreId(),System.currentTimeMillis()/1000);
         if (storeTimes.size() == 0){
             return DtoUtil.getFalseDto("暂无数据",200000);
         }
         for (String time : storeTimes){
-            List<StoreFullReduction> reductions = storeMapper.getStoreOverduePromoteSalesInfo(receivedStoreId.getStoreId(),time);
+            List<StoreFullReduction> reductions = storeMapper.getStorePromoteSalesInfo(receivedStoreId.getStoreId(),time);
             ShowPromoteSalesInfo salesInfo = new ShowPromoteSalesInfo();
             if (reductions.size() == 0){
                 return DtoUtil.getFalseDto("数据异常",90029);
@@ -1117,8 +1117,8 @@ public class GoodsServiceImpl implements GoodsService {
             salesInfo.setPromoteType("1");
             result.add(salesInfo);
         }
-
-        return null;
+        StoreUtils.sortAllOverduePromoteSalesInfo(result);
+        return DtoUtil.getSuccesWithDataDto("success",result,100000);
     }
 
     /**
