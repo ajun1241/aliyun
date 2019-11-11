@@ -1025,10 +1025,10 @@ public class GoodsServiceImpl implements GoodsService {
                 }
                 salesInfo.setDisInfo(disInfo.toString());
                 salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品参加" + "满减" + "活动");
-                salesInfo.setType("3");
+                salesInfo.setType("4");
             }else if (sample.getDiscountedType() == 1){
                 salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品" + sample.getValue() * 10 + "折");
-                salesInfo.setType("4");
+                salesInfo.setType("3");
             }
             salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
             salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
