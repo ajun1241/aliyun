@@ -229,4 +229,12 @@ public interface StoreMapper {
      * @return
      */
     List<StoreFullReduction> getStorePromoteSalesInfo(@Param("storeId") String storeId,@Param("time") String time);
+
+    /**
+     * 获取已过期的促销信息
+     * @param storeId
+     * @param time
+     * @return
+     */
+    List<StoreFullReduction> getStoreOverduePromoteSalesInfo(String storeId, String time);
 }

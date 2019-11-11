@@ -37,8 +37,11 @@ public class ShowPromoteSalesInfo {
      */
     private String type = "";
     /**
-     * 状态
+     * 状态(0:未开始;1:进行中;2:已过期;)
      */
     private String status = "";
-
+    /**
+     * 促销类型(1:商铺;2:商品)
+     */
+    private String promoteType = "";
 }

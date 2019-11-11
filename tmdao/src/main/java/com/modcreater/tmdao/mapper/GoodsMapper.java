@@ -734,4 +734,12 @@ public interface GoodsMapper {
      * @return
      */
     List<StoreGoodsFullReduction> getGoodsFullReduction(@Param("storeId") String storeId,@Param("time") String time);
+
+    /**
+     * 获取商品已过期的折扣信息
+     * @param storeId
+     * @param curTime
+     * @return
+     */
+    List<String> getGoodsOverduePromoteSalesTimes(@Param("storeId") String storeId,@Param("curTime") long curTime);
 }

@@ -14,6 +14,7 @@ import com.modcreater.tmdao.mapper.StoreMapper;
 import com.modcreater.tmdao.mapper.SuperAdminMapper;
 import com.modcreater.tmstore.service.StoreService;
 import com.modcreater.tmutils.*;
+import com.modcreater.tmutils.store.StoreUtils;
 import org.apache.commons.codec.StringEncoderComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -932,8 +933,10 @@ public class StoreServiceImpl implements StoreService {
             salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
             salesInfo.setStatus(sample.getStartTime() >= System.currentTimeMillis()/1000 ? "0" : "1");
             salesInfo.setType(sample.getDiscountType().toString());
+            salesInfo.setPromoteType("1");
             result.add(salesInfo);
         }
+        StoreUtils.sortPromoteSalesInfo(result);
         return DtoUtil.getSuccesWithDataDto("success",result,100000);
     }
 

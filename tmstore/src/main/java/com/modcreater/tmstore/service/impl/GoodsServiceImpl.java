@@ -20,6 +20,7 @@ import com.modcreater.tmutils.SingleEventUtil;
 import com.modcreater.tmutils.messageutil.RefreshMsg;
 import com.modcreater.tmutils.pay.PayUtil;
 import com.modcreater.tmutils.pay.PaymentCodeUtil;
+import com.modcreater.tmutils.store.StoreUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -1033,13 +1034,90 @@ public class GoodsServiceImpl implements GoodsService {
             salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
             salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
             salesInfo.setStatus(sample.getStartTime() >= System.currentTimeMillis()/1000 ? "0" : "1");
+            salesInfo.setPromoteType("2");
             result.add(salesInfo);
         }
+        StoreUtils.sortPromoteSalesInfo(result);
         return DtoUtil.getSuccesWithDataDto("success",result,100000);
     }
 
     @Override
     public Dto showAllOverduePromoteSales(ReceivedStoreId receivedStoreId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedStoreId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(receivedStoreId.getUserId(), receivedStoreId.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        List<String> goodsTimes = goodsMapper.getGoodsOverduePromoteSalesTimes(receivedStoreId.getStoreId(),System.currentTimeMillis()/1000);
+        if (goodsTimes.size() == 0){
+            return DtoUtil.getSuccessDto("暂无数据",200000);
+        }
+        List<ShowPromoteSalesInfo> result = new ArrayList<>();
+        for (String time : goodsTimes){
+            List<StoreGoodsDiscount> discounts = goodsMapper.getGoodsPromoteSalesInfo(receivedStoreId.getStoreId(),time);
+            if (discounts.size() == 0){
+                return DtoUtil.getFalseDto("数据异常",90029);
+            }
+            StoreGoodsDiscount sample = discounts.get(0);
+            ShowPromoteSalesInfo salesInfo = new ShowPromoteSalesInfo();
+            salesInfo.setPromoteSalesId(sample.getId());
+            if (sample.getDiscountedType() == 2){
+                StringBuffer disInfo = new StringBuffer();
+                List<StoreGoodsFullReduction> reductions = goodsMapper.getGoodsFullReduction(receivedStoreId.getStoreId(),time);
+                for (int i = 0; i < reductions.size(); i++) {
+                    StoreGoodsFullReduction reduction = reductions.get(i);
+                    if (i != 0){
+                        disInfo.append(",");
+                    }
+                    disInfo.append("满").append(reduction.getFullValue()).append("减").append(reduction.getDisValue());
+                }
+                salesInfo.setDisInfo(disInfo.toString());
+                salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品参加" + "满减" + "活动");
+                salesInfo.setType("4");
+            }else if (sample.getDiscountedType() == 1){
+                salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品" + sample.getValue() * 10 + "折");
+                salesInfo.setType("3");
+            }
+            salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setStatus("2");
+            salesInfo.setPromoteType("2");
+            result.add(salesInfo);
+        }
+        List<String> storeTimes = storeMapper.getStorePromoteSalesTimes(receivedStoreId.getStoreId(),System.currentTimeMillis()/1000);
+        if (storeTimes.size() == 0){
+            return DtoUtil.getFalseDto("暂无数据",200000);
+        }
+        for (String time : storeTimes){
+            List<StoreFullReduction> reductions = storeMapper.getStoreOverduePromoteSalesInfo(receivedStoreId.getStoreId(),time);
+            ShowPromoteSalesInfo salesInfo = new ShowPromoteSalesInfo();
+            if (reductions.size() == 0){
+                return DtoUtil.getFalseDto("数据异常",90029);
+            }
+            StoreFullReduction sample = reductions.get(0);
+            salesInfo.setPromoteSalesId(sample.getId());
+            if (sample.getDiscountType() == 2){
+                StringBuffer disInfo = new StringBuffer();
+                for (int i = 0; i < reductions.size(); i++) {
+                    StoreFullReduction reduction = reductions.get(i);
+                    if (i != 0){
+                        disInfo.append(",");
+                    }
+                    disInfo.append("满").append(reduction.getFullValue()).append("减").append(reduction.getDisValue());
+                }
+                salesInfo.setDisInfo(disInfo.toString());
+            }else if (sample.getDiscountType() == 1){
+                salesInfo.setDisInfo("全场商品" + sample.getFullValue() * 10 + "折");
+            }
+            salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setStatus("2");
+            salesInfo.setType(sample.getDiscountType().toString());
+            salesInfo.setPromoteType("1");
+            result.add(salesInfo);
+        }
+
         return null;
     }
 
