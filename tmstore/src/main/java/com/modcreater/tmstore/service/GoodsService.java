@@ -340,4 +340,12 @@ public interface GoodsService {
      * @return
      */
     Dto showGoodsPromoteSales(ReceivedStoreId receivedStoreId, String token);
+
+    /**
+     * 展示所有已过期的促销
+     * @param receivedStoreId
+     * @param token
+     * @return
+     */
+    Dto showAllOverduePromoteSales(ReceivedStoreId receivedStoreId, String token);
 }

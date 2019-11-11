@@ -1025,10 +1025,10 @@ public class GoodsServiceImpl implements GoodsService {
                 }
                 salesInfo.setDisInfo(disInfo.toString());
                 salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品参加" + "满减" + "活动");
-                salesInfo.setType("1");
+                salesInfo.setType("3");
             }else if (sample.getDiscountedType() == 1){
                 salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品" + sample.getValue() * 10 + "折");
-                salesInfo.setType("2");
+                salesInfo.setType("4");
             }
             salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
             salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
@@ -1036,6 +1036,11 @@ public class GoodsServiceImpl implements GoodsService {
             result.add(salesInfo);
         }
         return DtoUtil.getSuccesWithDataDto("success",result,100000);
+    }
+
+    @Override
+    public Dto showAllOverduePromoteSales(ReceivedStoreId receivedStoreId, String token) {
+        return null;
     }
 
     /**

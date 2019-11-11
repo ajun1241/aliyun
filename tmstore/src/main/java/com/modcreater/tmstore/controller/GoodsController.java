@@ -319,4 +319,11 @@ public class GoodsController {
     public Dto showGoodsPromoteSales(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
         return goodsService.showGoodsPromoteSales(receivedStoreId,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping(value = "showalloverduepromotesales")
+    @ApiOperation("展示所有已过期的促销")
+    public Dto showAllOverduePromoteSales(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
+        return goodsService.showAllOverduePromoteSales(receivedStoreId,request.getHeader("token"));
+    }
 }
