@@ -34,6 +34,15 @@
     <update id="updWallet">
         update store_info set wallet=wallet+#{paymentAmount} where id=#{storeId}
     </update>
+    <update id="updateStoreDiscountPromoteSales">
+        update store_full_reduction set
+        fullValue = #{value},
+        startTime = #{startTime},
+        endTime = #{endTime},
+        share = #{share},
+        discountedType = 1
+        where id = #{promoteSalesId}
+    </update>
     <delete id="deleteCollectStore">
         delete from store_my_favorite where userId=#{userId} and storeId=#{storeId}
     </delete>
@@ -130,6 +139,17 @@
         (endTime &gt; #{startTime} and startTime &lt; #{endTime})
         or (startTime &lt; #{endTime} and endTime &gt; #{startTime})
         or ((startTime &gt;= #{startTime}) and (endTime &lt;= #{endTime})))
+    </select>
+    <select id="verUpdateStorePromoteSales" resultType="java.lang.Integer">
+        select count(1) from store_full_reduction where storeId = #{storeId} and endTime >= #{curTime}
+        and (
+        (endTime &gt; #{startTime} and startTime &lt; #{endTime})
+        or (startTime &lt; #{endTime} and endTime &gt; #{startTime})
+        or ((startTime &gt;= #{startTime}) and (endTime &lt;= #{endTime})))
+        and id not in
+        <foreach collection="promoteSalesId" index="index" item="salesId" open="(" close=")" separator=",">
+            #{salesId}
+        </foreach>
     </select>
     <select id="getStorePromoteSalesTimes" resultType="java.lang.String">
         select startTime

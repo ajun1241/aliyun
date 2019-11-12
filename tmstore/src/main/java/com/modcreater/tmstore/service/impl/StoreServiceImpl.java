@@ -979,7 +979,9 @@ public class StoreServiceImpl implements StoreService {
         }
         List<StoreFullReduction> storeFullReductions = storeMapper.getStoreFullReduction(times.get(0),getUpdateStorePromoteSales.getStoreId());
         StoreFullReduction storeFullReduction = storeFullReductions.get(0);
+        result.put("promoteSalesId",getUpdateStorePromoteSales.getPromoteSalesId());
         result.put("discountedType",storeFullReduction.getDiscountedType());
+        result.put("selectedInfo","");
         if (storeFullReduction.getDiscountedType() == 1){
             result.put("value",storeFullReduction.getFullValue());
             result.put("fullValues",new ArrayList<>());
@@ -1009,7 +1011,22 @@ public class StoreServiceImpl implements StoreService {
         if (!reg(updateStorePromoteSales.getUserId(), updateStorePromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        return null;
+        if (!verUpdateStorePromoteSales(updateStorePromoteSales.getStartTime(),updateStorePromoteSales.getEndTime(),updateStorePromoteSales.getStoreId(),
+                new String[]{updateStorePromoteSales.getPromoteSalesId()})){
+            return DtoUtil.getFalseDto("请合理安排店铺促销时间!", 90029);
+        }
+        if (updateStorePromoteSales.getDiscountedType() == 1){
+            int i = storeMapper.updateStoreDiscountPromoteSales(updateStorePromoteSales);
+            if (i == 0){
+                return DtoUtil.getFalseDto("修改失败",90032);
+            }
+        }else if (updateStorePromoteSales.getDiscountedType() == 2){
+
+        }else {
+            //discountedType is wrong
+            return DtoUtil.getFalseDto("参数有误diw",90033);
+        }
+        return DtoUtil.getSuccessDto("修改成功",100000);
     }
 
     /**
@@ -1027,14 +1044,22 @@ public class StoreServiceImpl implements StoreService {
      * @param startTime
      * @param endTime
      * @param storeId
-     * @return
+     * @return 返回true则不冲突
      */
     private boolean verStorePromoteSales(Long startTime, Long endTime, String storeId){
         int i = storeMapper.verStorePromoteSales(startTime,endTime,storeId,System.currentTimeMillis()/1000);
-        if (i >= 1){
-            return false;
-        }else {
-            return true;
-        }
+        return i < 1;
+    }
+
+    /**
+     * 验证商店促销时间冲突
+     * @param startTime
+     * @param endTime
+     * @param storeId
+     * @return 返回true则不冲突
+     */
+    private boolean verUpdateStorePromoteSales(Long startTime, Long endTime, String storeId, String[] promoteSalesId){
+        int i = storeMapper.verUpdateStorePromoteSales(startTime,endTime,storeId,System.currentTimeMillis()/1000,promoteSalesId);
+        return i < 1;
     }
 }

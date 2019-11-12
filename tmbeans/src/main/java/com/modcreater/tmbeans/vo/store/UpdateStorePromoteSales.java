@@ -19,6 +19,20 @@ public class UpdateStorePromoteSales {
 
     private String storeId;
 
+    private String promoteSalesId;
 
+    private Integer discountedType;
+
+    private Double value;
+
+    private Double[] fullValues;
+
+    private Double[] disValues;
+
+    private Integer share;
+
+    private Long startTime;
+
+    private Long endTime;
 
 }
