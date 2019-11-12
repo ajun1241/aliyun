@@ -161,4 +161,20 @@ public interface StoreService {
      * @return
      */
     Dto deletePromoteSales(DeleteStorePromoteSales deleteStorePromoteSales, String token);
+
+    /**
+     * 获取修改商铺促销活动
+     * @param getUpdateStorePromoteSales
+     * @param token
+     * @return
+     */
+    Dto getUpdateStorePromoteSales(GetUpdateStorePromoteSales getUpdateStorePromoteSales, String token);
+
+    /**
+     * 修改商铺促销活动
+     * @param updateStorePromoteSales
+     * @param token
+     * @return
+     */
+    Dto updateStorePromoteSales(UpdateStorePromoteSales updateStorePromoteSales, String token);
 }

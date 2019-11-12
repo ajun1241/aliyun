@@ -38,7 +38,7 @@
         delete from store_my_favorite where userId=#{userId} and storeId=#{storeId}
     </delete>
     <delete id="deletePromoteSales">
-        delete from store_full_reduction where id = #{promoteSalesId}
+        delete from store_full_reduction where storeId = #{storeId} and startTime = #{startTime}
     </delete>
     <select id="getStoreInfo" resultType="com.modcreater.tmbeans.pojo.StoreInfo">
         select * from store_info where id = #{storeId}
@@ -143,6 +143,9 @@
         from store_full_reduction where storeId = #{storeId} and endTime &lt;= #{curTime} group by startTime
     </select>
     <select id="getStoreFullReduction" resultType="com.modcreater.tmbeans.pojo.StoreFullReduction">
-        select * from store_full_reduction where id = #{promoteSalesId}
+        select * from store_full_reduction where storeId = #{storeId} and startTime = #{time}
+    </select>
+    <select id="getStoreFullReductionTime" resultType="java.lang.String">
+        select startTime from store_full_reduction where id = #{promoteSalesId}
     </select>
 </mapper>

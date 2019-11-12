@@ -916,7 +916,6 @@ public class StoreServiceImpl implements StoreService {
             }
             StoreFullReduction sample = reductions.get(0);
             salesInfo.setPromoteSalesId(sample.getId());
-            System.out.println(sample.toString());
             if (sample.getDiscountedType() == 2){
                 StringBuffer disInfo = new StringBuffer();
                 for (int i = 0; i < reductions.size(); i++) {
@@ -949,15 +948,68 @@ public class StoreServiceImpl implements StoreService {
         if (!reg(deleteStorePromoteSales.getUserId(), deleteStorePromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        StoreFullReduction storeFullReduction = storeMapper.getStoreFullReduction(deleteStorePromoteSales.getPromoteSalesId());
+        List<String> times = storeMapper.getStoreFullReductionTime(deleteStorePromoteSales.getPromoteSalesId());
+        if (times.size() == 0){
+            return DtoUtil.getSuccessDto("未检测到数据",200000);
+        }
+        List<StoreFullReduction> storeFullReductions = storeMapper.getStoreFullReduction(times.get(0),deleteStorePromoteSales.getStoreId());
+        StoreFullReduction storeFullReduction = storeFullReductions.get(0);
         if (storeFullReduction.getEndTime() < System.currentTimeMillis()/1000){
             return DtoUtil.getFalseDto("促销已过期,无法删除",90030);
         }
-        int i = storeMapper.deletePromoteSales(deleteStorePromoteSales.getPromoteSalesId());
+        int i = storeMapper.deletePromoteSales(storeFullReduction.getStartTime(),deleteStorePromoteSales.getStoreId());
         if (i == 0){
             return DtoUtil.getFalseDto("删除失败",90031);
         }
         return DtoUtil.getSuccessDto("删除成功",100000);
+    }
+
+    @Override
+    public Dto getUpdateStorePromoteSales(GetUpdateStorePromoteSales getUpdateStorePromoteSales, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getUpdateStorePromoteSales.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(getUpdateStorePromoteSales.getUserId(), getUpdateStorePromoteSales.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        Map<String,Object> result = new HashMap<>();
+        List<String> times = storeMapper.getStoreFullReductionTime(getUpdateStorePromoteSales.getPromoteSalesId());
+        if (times.size() == 0){
+            return DtoUtil.getSuccessDto("未检测到数据",200000);
+        }
+        List<StoreFullReduction> storeFullReductions = storeMapper.getStoreFullReduction(times.get(0),getUpdateStorePromoteSales.getStoreId());
+        StoreFullReduction storeFullReduction = storeFullReductions.get(0);
+        result.put("discountedType",storeFullReduction.getDiscountedType());
+        if (storeFullReduction.getDiscountedType() == 1){
+            result.put("value",storeFullReduction.getFullValue());
+            result.put("fullValues",new ArrayList<>());
+            result.put("disValues",new ArrayList<>());
+        }else if (storeFullReduction.getDiscountedType() == 2){
+            result.put("value",0);
+            List<Double> fullValues = new ArrayList<>();
+            List<Double> disValues = new ArrayList<>();
+            for (StoreFullReduction reduction : storeFullReductions){
+                fullValues.add(reduction.getFullValue());
+                disValues.add(reduction.getDisValue());
+            }
+            result.put("fullValues",fullValues);
+            result.put("disValues",disValues);
+        }
+        result.put("share",storeFullReduction.getShare());
+        result.put("startTime",storeFullReduction.getStartTime());
+        result.put("endTime",storeFullReduction.getEndTime());
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
+    @Override
+    public Dto updateStorePromoteSales(UpdateStorePromoteSales updateStorePromoteSales, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(updateStorePromoteSales.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(updateStorePromoteSales.getUserId(), updateStorePromoteSales.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        return null;
     }
 
     /**

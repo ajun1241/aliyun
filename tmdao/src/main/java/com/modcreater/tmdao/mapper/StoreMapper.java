@@ -240,15 +240,24 @@ public interface StoreMapper {
 
     /**
      * 根据Id查询店铺促销信息
-     * @param promoteSalesId
+     * @param time
+     * @param storeId
      * @return
      */
-    StoreFullReduction getStoreFullReduction(String promoteSalesId);
+    List<StoreFullReduction> getStoreFullReduction(@Param("time") String time,@Param("storeId") String storeId);
 
     /**
      * 删除
+     * @param startTime
+     * @param storeId
+     * @return
+     */
+    int deletePromoteSales(@Param("startTime") Long startTime,@Param("storeId") String storeId);
+
+    /**
+     * 根据促销Id查询促销开始时间
      * @param promoteSalesId
      * @return
      */
-    int deletePromoteSales(String promoteSalesId);
+    List<String> getStoreFullReductionTime(String promoteSalesId);
 }

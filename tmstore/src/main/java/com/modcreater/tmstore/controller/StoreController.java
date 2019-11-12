@@ -150,4 +150,18 @@ public class StoreController {
     public Dto deletePromoteSales(@RequestBody DeleteStorePromoteSales deleteStorePromoteSales, HttpServletRequest request){
         return storeService.deletePromoteSales(deleteStorePromoteSales,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping(value = "getupdatestorepromotesales")
+    @ApiOperation("获取修改商铺促销信息")
+    public Dto getUpdateStorePromoteSales(@RequestBody GetUpdateStorePromoteSales getUpdateStorePromoteSales, HttpServletRequest request){
+        return storeService.getUpdateStorePromoteSales(getUpdateStorePromoteSales,request.getHeader("token"));
+    }
+
+    @Safety
+    @PostMapping(value = "udpatestorepromotesales")
+    @ApiOperation("修改商铺促销活动")
+    public Dto updateStorePromoteSales(@RequestBody UpdateStorePromoteSales updateStorePromoteSales, HttpServletRequest request){
+        return storeService.updateStorePromoteSales(updateStorePromoteSales,request.getHeader("token"));
+    }
 }
