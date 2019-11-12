@@ -168,4 +168,8 @@
     <select id="getStoreFullReductionTime" resultType="java.lang.String">
         select startTime from store_full_reduction where id = #{promoteSalesId}
     </select>
+    <select id="getStoreFullReductions" resultType="com.modcreater.tmbeans.pojo.StoreFullReduction">
+        select * from store_full_reduction where storeId = #{storeId} and startTime =
+        (select startTime from store_full_reduction where id = #{promoteSalesId})
+    </select>
 </mapper>

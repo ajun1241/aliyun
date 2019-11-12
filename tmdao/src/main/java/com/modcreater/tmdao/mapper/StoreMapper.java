@@ -225,7 +225,7 @@ public interface StoreMapper {
      * @return
      */
     int verUpdateStorePromoteSales(@Param("startTime") Long startTime,@Param("endTime") Long endTime,
-                                   @Param("storeId") String storeId,@Param("curTime") long curTime, @Param("promoteSalesId") String[] promoteSalesId);
+                                   @Param("storeId") String storeId,@Param("curTime") long curTime, @Param("promoteSalesId") List<String> promoteSalesId);
 
     /**
      * 获取促销信息
@@ -280,4 +280,12 @@ public interface StoreMapper {
      * @return
      */
     int updateStoreDiscountPromoteSales(UpdateStorePromoteSales updateStorePromoteSales);
+
+    /**
+     * 获取商铺满减促销Id
+     * @param promoteSalesId
+     * @param storeId
+     * @return
+     */
+    List<StoreFullReduction> getStoreFullReductions(@Param("promoteSalesId") String promoteSalesId,@Param("storeId") String storeId);
 }

@@ -826,7 +826,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Dto storeFullReductionPromoteSales(StoreFullReductionPromoteSales storeFullReductionPromoteSales, String token) {
+    public synchronized Dto storeFullReductionPromoteSales(StoreFullReductionPromoteSales storeFullReductionPromoteSales, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(storeFullReductionPromoteSales.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -859,7 +859,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Dto storeDiscountPromoteSales(StoreDiscountPromoteSales storeDiscountPromoteSales, String token) {
+    public synchronized Dto storeDiscountPromoteSales(StoreDiscountPromoteSales storeDiscountPromoteSales, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(storeDiscountPromoteSales.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -941,7 +941,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Dto deletePromoteSales(DeleteStorePromoteSales deleteStorePromoteSales, String token) {
+    public synchronized Dto deletePromoteSales(DeleteStorePromoteSales deleteStorePromoteSales, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(deleteStorePromoteSales.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
@@ -983,7 +983,7 @@ public class StoreServiceImpl implements StoreService {
         result.put("discountedType",storeFullReduction.getDiscountedType());
         result.put("selectedInfo","");
         if (storeFullReduction.getDiscountedType() == 1){
-            result.put("value",storeFullReduction.getFullValue());
+            result.put("value",storeFullReduction.getFullValue() * 10);
             result.put("fullValues",new ArrayList<>());
             result.put("disValues",new ArrayList<>());
         }else if (storeFullReduction.getDiscountedType() == 2){
@@ -1004,24 +1004,51 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Dto updateStorePromoteSales(UpdateStorePromoteSales updateStorePromoteSales, String token) {
+    public synchronized Dto updateStorePromoteSales(UpdateStorePromoteSales updateStorePromoteSales, String token) {
         if (!token.equals(stringRedisTemplate.opsForValue().get(updateStorePromoteSales.getUserId()))) {
             return DtoUtil.getFalseDto("请重新登录", 21014);
         }
         if (!reg(updateStorePromoteSales.getUserId(), updateStorePromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        if (!verUpdateStorePromoteSales(updateStorePromoteSales.getStartTime(),updateStorePromoteSales.getEndTime(),updateStorePromoteSales.getStoreId(),
-                new String[]{updateStorePromoteSales.getPromoteSalesId()})){
-            return DtoUtil.getFalseDto("请合理安排店铺促销时间!", 90029);
-        }
-        if (updateStorePromoteSales.getDiscountedType() == 1){
+        if (updateStorePromoteSales.getDiscountedType() == 1) {
+            List<String> ids = new ArrayList<>();
+            ids.add(updateStorePromoteSales.getPromoteSalesId());
+            if (!verUpdateStorePromoteSales(updateStorePromoteSales.getStartTime(), updateStorePromoteSales.getEndTime(), updateStorePromoteSales.getStoreId(),
+                    ids)) {
+                return DtoUtil.getFalseDto("请合理安排店铺促销时间!", 90029);
+            }
+            updateStorePromoteSales.setValue(updateStorePromoteSales.getValue() / 10);
             int i = storeMapper.updateStoreDiscountPromoteSales(updateStorePromoteSales);
-            if (i == 0){
-                return DtoUtil.getFalseDto("修改失败",90032);
+            if (i == 0) {
+                return DtoUtil.getFalseDto("修改失败", 90032);
             }
         }else if (updateStorePromoteSales.getDiscountedType() == 2){
-
+            List<StoreFullReduction> storeFullReductions = storeMapper.getStoreFullReductions(updateStorePromoteSales.getPromoteSalesId(),updateStorePromoteSales.getStoreId());
+            List<String> ids = new ArrayList<>();
+            for (StoreFullReduction reduction : storeFullReductions){
+                ids.add(reduction.getId().toString());
+            }
+            if (!verUpdateStorePromoteSales(updateStorePromoteSales.getStartTime(), updateStorePromoteSales.getEndTime(), updateStorePromoteSales.getStoreId(),
+                    ids)) {
+                return DtoUtil.getFalseDto("请合理安排店铺促销时间!", 90029);
+            }
+            int i = storeMapper.deletePromoteSales(storeFullReductions.get(0).getStartTime(),updateStorePromoteSales.getStoreId());
+            if (i != storeFullReductions.size()){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                //delete full reduction failed
+                return DtoUtil.getFalseDto("操作失败dfrf",90033);
+            }
+            for (int i1 = 0; i1 < storeFullReductions.size(); i1++) {
+                StoreFullReduction reduction = storeFullReductions.get(i1);
+                int d = storeMapper.addNewStoreFullReduction(updateStorePromoteSales.getStoreId(),updateStorePromoteSales.getFullValues()[i1],
+                        updateStorePromoteSales.getDisValues()[i1], reduction.getStartTime(),reduction.getEndTime(),reduction.getShare().toString());
+                if (d != 1){
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    //add new full reduction failed
+                    return DtoUtil.getFalseDto("操作失败anfrf",90034);
+                }
+            }
         }else {
             //discountedType is wrong
             return DtoUtil.getFalseDto("参数有误diw",90033);
@@ -1058,7 +1085,7 @@ public class StoreServiceImpl implements StoreService {
      * @param storeId
      * @return 返回true则不冲突
      */
-    private boolean verUpdateStorePromoteSales(Long startTime, Long endTime, String storeId, String[] promoteSalesId){
+    private boolean verUpdateStorePromoteSales(Long startTime, Long endTime, String storeId, List<String> promoteSalesId){
         int i = storeMapper.verUpdateStorePromoteSales(startTime,endTime,storeId,System.currentTimeMillis()/1000,promoteSalesId);
         return i < 1;
     }
