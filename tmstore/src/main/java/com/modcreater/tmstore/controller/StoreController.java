@@ -143,4 +143,11 @@ public class StoreController {
     public Dto showStorePromoteSales(@RequestBody ReceivedStoreId receivedStoreId ,HttpServletRequest request){
         return storeService.showStorePromoteSales(receivedStoreId,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping(value = "deletepromotesales")
+    @ApiOperation("删除店铺促销活动")
+    public Dto deletePromoteSales(@RequestBody DeleteStorePromoteSales deleteStorePromoteSales, HttpServletRequest request){
+        return storeService.deletePromoteSales(deleteStorePromoteSales,request.getHeader("token"));
+    }
 }

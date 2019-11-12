@@ -326,4 +326,11 @@ public class GoodsController {
     public Dto showAllOverduePromoteSales(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
         return goodsService.showAllOverduePromoteSales(receivedStoreId,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping(value = "deletegoodspromotesales")
+    @ApiOperation("删除商品促销活动")
+    public Dto deleteGoodsPromoteSales(@RequestBody DeleteGoodsPromoteSales deleteGoodsPromoteSales,HttpServletRequest request){
+        return goodsService.deleteGoodsPromoteSales(deleteGoodsPromoteSales,request.getHeader("token"));
+    }
 }

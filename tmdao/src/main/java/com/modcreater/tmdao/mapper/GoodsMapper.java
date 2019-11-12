@@ -731,9 +731,11 @@ public interface GoodsMapper {
      * 获取商品满减折扣信息
      * @param storeId
      * @param time
+     * @param bindingId
      * @return
      */
-    List<StoreGoodsFullReduction> getGoodsFullReduction(@Param("storeId") String storeId,@Param("time") String time);
+    List<StoreGoodsFullReduction> getGoodsFullReduction(@Param("storeId") String storeId,@Param("time") String time,
+                                                        @Param("bindingId") Long bindingId);
 
     /**
      * 获取商品已过期的折扣信息
@@ -742,4 +744,28 @@ public interface GoodsMapper {
      * @return
      */
     List<String> getGoodsOverduePromoteSalesTimes(@Param("storeId") String storeId,@Param("curTime") long curTime);
+
+    /**
+     * 根据Id查询商品促销信息
+     * @param promoteSalesId
+     * @return
+     */
+    StoreGoodsDiscount getStoreGoodsDiscount(String promoteSalesId);
+
+    /**
+     * 根据Id删除商品促销活动
+     * @param promoteSalesId
+     * @return
+     */
+    int deleteGoodsPromoteSales(String promoteSalesId);
+
+    /**
+     * 删除满减促销
+     * @param startTime
+     * @param storeId
+     * @param bindingId
+     * @return
+     */
+    int deleteStoreGoodsFullReduction(@Param("startTime") long startTime,@Param("storeId") String storeId,
+                                      @Param("bindingId") Long bindingId);
 }

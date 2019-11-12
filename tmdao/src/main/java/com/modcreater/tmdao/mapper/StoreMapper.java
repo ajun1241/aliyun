@@ -237,4 +237,18 @@ public interface StoreMapper {
      * @return
      */
     List<String> getStoreOverduePromoteSalesTimes(@Param("storeId") String storeId,@Param("curTime") Long curTime);
+
+    /**
+     * 根据Id查询店铺促销信息
+     * @param promoteSalesId
+     * @return
+     */
+    StoreFullReduction getStoreFullReduction(String promoteSalesId);
+
+    /**
+     * 删除
+     * @param promoteSalesId
+     * @return
+     */
+    int deletePromoteSales(String promoteSalesId);
 }

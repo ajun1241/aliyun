@@ -27,6 +27,6 @@ public class StoreFullReduction {
 
     private Integer share;
 
-    private Integer discountType;
+    private Integer discountedType;
 
 }

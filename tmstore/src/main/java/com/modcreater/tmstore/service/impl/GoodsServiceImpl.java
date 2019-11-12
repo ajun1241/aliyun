@@ -1016,7 +1016,7 @@ public class GoodsServiceImpl implements GoodsService {
             salesInfo.setPromoteSalesId(sample.getId());
             if (sample.getDiscountedType() == 2){
                 StringBuffer disInfo = new StringBuffer();
-                List<StoreGoodsFullReduction> reductions = goodsMapper.getGoodsFullReduction(receivedStoreId.getStoreId(),time);
+                List<StoreGoodsFullReduction> reductions = goodsMapper.getGoodsFullReduction(receivedStoreId.getStoreId(),time,sample.getBindingId());
                 for (int i = 0; i < reductions.size(); i++) {
                     StoreGoodsFullReduction reduction = reductions.get(i);
                     if (i != 0){
@@ -1031,8 +1031,8 @@ public class GoodsServiceImpl implements GoodsService {
                 salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品" + sample.getValue() * 10 + "折");
                 salesInfo.setType("3");
             }
-            salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
-            salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setStartTime(sample.getStartTime());
+            salesInfo.setEndTime(sample.getEndTime());
             salesInfo.setStatus(sample.getStartTime() >= System.currentTimeMillis()/1000 ? "0" : "1");
             salesInfo.setPromoteType("2");
             result.add(salesInfo);
@@ -1064,7 +1064,7 @@ public class GoodsServiceImpl implements GoodsService {
             salesInfo.setPromoteSalesId(sample.getId());
             if (sample.getDiscountedType() == 2){
                 StringBuffer disInfo = new StringBuffer();
-                List<StoreGoodsFullReduction> reductions = goodsMapper.getGoodsFullReduction(receivedStoreId.getStoreId(),time);
+                List<StoreGoodsFullReduction> reductions = goodsMapper.getGoodsFullReduction(receivedStoreId.getStoreId(),time,sample.getBindingId());
                 for (int i = 0; i < reductions.size(); i++) {
                     StoreGoodsFullReduction reduction = reductions.get(i);
                     if (i != 0){
@@ -1079,8 +1079,8 @@ public class GoodsServiceImpl implements GoodsService {
                 salesInfo.setSelectedInfo("已选" + discounts.size() + "件商品" + sample.getValue() * 10 + "折");
                 salesInfo.setType("3");
             }
-            salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
-            salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setStartTime(sample.getStartTime());
+            salesInfo.setEndTime(sample.getEndTime());
             salesInfo.setStatus("2");
             salesInfo.setPromoteType("2");
             result.add(salesInfo);
@@ -1097,7 +1097,7 @@ public class GoodsServiceImpl implements GoodsService {
             }
             StoreFullReduction sample = reductions.get(0);
             salesInfo.setPromoteSalesId(sample.getId());
-            if (sample.getDiscountType() == 2){
+            if (sample.getDiscountedType() == 2){
                 StringBuffer disInfo = new StringBuffer();
                 for (int i = 0; i < reductions.size(); i++) {
                     StoreFullReduction reduction = reductions.get(i);
@@ -1107,18 +1107,44 @@ public class GoodsServiceImpl implements GoodsService {
                     disInfo.append("满").append(reduction.getFullValue()).append("减").append(reduction.getDisValue());
                 }
                 salesInfo.setDisInfo(disInfo.toString());
-            }else if (sample.getDiscountType() == 1){
+            }else if (sample.getDiscountedType() == 1){
                 salesInfo.setDisInfo("全场商品" + sample.getFullValue() * 10 + "折");
             }
-            salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
-            salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setStartTime(sample.getStartTime());
+            salesInfo.setEndTime(sample.getEndTime());
             salesInfo.setStatus("2");
-            salesInfo.setType(sample.getDiscountType().toString());
+            salesInfo.setType(sample.getDiscountedType().toString());
             salesInfo.setPromoteType("1");
             result.add(salesInfo);
         }
         StoreUtils.sortAllOverduePromoteSalesInfo(result);
         return DtoUtil.getSuccesWithDataDto("success",result,100000);
+    }
+
+    @Override
+    public Dto deleteGoodsPromoteSales(DeleteGoodsPromoteSales deleteGoodsPromoteSales, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(deleteGoodsPromoteSales.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(deleteGoodsPromoteSales.getUserId(), deleteGoodsPromoteSales.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        StoreGoodsDiscount discount = goodsMapper.getStoreGoodsDiscount(deleteGoodsPromoteSales.getPromoteSalesId());
+        if (discount.getEndTime() < System.currentTimeMillis()/1000){
+            return DtoUtil.getFalseDto("促销已过期,无法删除",90030);
+        }
+        int i1 = goodsMapper.deleteGoodsPromoteSales(deleteGoodsPromoteSales.getPromoteSalesId());
+        if (i1 == 0){
+            return DtoUtil.getFalseDto("删除失败",90031);
+        }
+        if (discount.getDiscountedType() == 2){
+            int i2 = goodsMapper.deleteStoreGoodsFullReduction(discount.getStartTime(),deleteGoodsPromoteSales.getStoreId(),discount.getBindingId());
+            if (i2 == 0){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return DtoUtil.getFalseDto("删除失败",90031);
+            }
+        }
+        return DtoUtil.getSuccessDto("删除成功",100000);
     }
 
     /**

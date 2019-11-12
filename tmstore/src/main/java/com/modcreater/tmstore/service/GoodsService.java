@@ -348,4 +348,12 @@ public interface GoodsService {
      * @return
      */
     Dto showAllOverduePromoteSales(ReceivedStoreId receivedStoreId, String token);
+
+    /**
+     * 删除商品促销活动
+     * @param deleteGoodsPromoteSales
+     * @param token
+     * @return
+     */
+    Dto deleteGoodsPromoteSales(DeleteGoodsPromoteSales deleteGoodsPromoteSales, String token);
 }

@@ -916,7 +916,8 @@ public class StoreServiceImpl implements StoreService {
             }
             StoreFullReduction sample = reductions.get(0);
             salesInfo.setPromoteSalesId(sample.getId());
-            if (sample.getDiscountType() == 2){
+            System.out.println(sample.toString());
+            if (sample.getDiscountedType() == 2){
                 StringBuffer disInfo = new StringBuffer();
                 for (int i = 0; i < reductions.size(); i++) {
                     StoreFullReduction reduction = reductions.get(i);
@@ -926,18 +927,37 @@ public class StoreServiceImpl implements StoreService {
                     disInfo.append("满").append(reduction.getFullValue()).append("减").append(reduction.getDisValue());
                 }
                 salesInfo.setDisInfo(disInfo.toString());
-            }else if (sample.getDiscountType() == 1){
+            }else if (sample.getDiscountedType() == 1){
                 salesInfo.setDisInfo("全场商品" + sample.getFullValue() * 10 + "折");
             }
-            salesInfo.setStartTime("活动开始时间：" + DateUtil.stampToDefinedFormat(sample.getStartTime(),"yyyy.MM.dd HH:mm"));
-            salesInfo.setEndTime("活动结束时间：" + DateUtil.stampToDefinedFormat(sample.getEndTime(),"yyyy.MM.dd HH:mm"));
+            salesInfo.setStartTime(sample.getStartTime());
+            salesInfo.setEndTime(sample.getEndTime());
             salesInfo.setStatus(sample.getStartTime() >= System.currentTimeMillis()/1000 ? "0" : "1");
-            salesInfo.setType(sample.getDiscountType().toString());
+            salesInfo.setType(sample.getDiscountedType().toString());
             salesInfo.setPromoteType("1");
             result.add(salesInfo);
         }
         StoreUtils.sortPromoteSalesInfo(result);
         return DtoUtil.getSuccesWithDataDto("success",result,100000);
+    }
+
+    @Override
+    public Dto deletePromoteSales(DeleteStorePromoteSales deleteStorePromoteSales, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(deleteStorePromoteSales.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(deleteStorePromoteSales.getUserId(), deleteStorePromoteSales.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        StoreFullReduction storeFullReduction = storeMapper.getStoreFullReduction(deleteStorePromoteSales.getPromoteSalesId());
+        if (storeFullReduction.getEndTime() < System.currentTimeMillis()/1000){
+            return DtoUtil.getFalseDto("促销已过期,无法删除",90030);
+        }
+        int i = storeMapper.deletePromoteSales(deleteStorePromoteSales.getPromoteSalesId());
+        if (i == 0){
+            return DtoUtil.getFalseDto("删除失败",90031);
+        }
+        return DtoUtil.getSuccessDto("删除成功",100000);
     }
 
     /**

@@ -21,8 +21,8 @@ public class StoreUtils {
         infos.sort(new Comparator<ShowPromoteSalesInfo>() {
             @Override
             public int compare(ShowPromoteSalesInfo o1, ShowPromoteSalesInfo o2) {
-                Long startTime1 = Long.valueOf(o1.getStartTime());
-                Long startTime2 = Long.valueOf(o2.getStartTime());
+                Long startTime1 = o1.getStartTime();
+                Long startTime2 = o2.getStartTime();
                 return startTime1.compareTo(startTime2);
             }
         });
@@ -48,14 +48,14 @@ public class StoreUtils {
         infos.sort(new Comparator<ShowPromoteSalesInfo>() {
             @Override
             public int compare(ShowPromoteSalesInfo o1, ShowPromoteSalesInfo o2) {
-                Long startTime1 = Long.valueOf(o1.getStartTime());
-                Long startTime2 = Long.valueOf(o2.getStartTime());
+                Long startTime1 = o1.getStartTime();
+                Long startTime2 = o2.getStartTime();
                 return startTime1.compareTo(startTime2);
             }
         });
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         ShowPromoteSalesInfo info1 = new ShowPromoteSalesInfo();
         info1.setPromoteSalesId(1L);
         info1.setPromoteType("3");
@@ -91,5 +91,5 @@ public class StoreUtils {
         for (ShowPromoteSalesInfo info : list){
             System.out.println(info.getPromoteSalesId() + ":" + info.getPromoteType() + ":" + info.getStartTime());
         }
-    }
+    }*/
 }

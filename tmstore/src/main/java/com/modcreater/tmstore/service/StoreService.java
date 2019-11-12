@@ -153,4 +153,12 @@ public interface StoreService {
      * @return
      */
     Dto showStorePromoteSales(ReceivedStoreId receivedStoreId, String token);
+
+    /**
+     * 删除店铺促销
+     * @param deleteStorePromoteSales
+     * @param token
+     * @return
+     */
+    Dto deletePromoteSales(DeleteStorePromoteSales deleteStorePromoteSales, String token);
 }
