@@ -996,6 +996,9 @@ public class StoreServiceImpl implements StoreService {
             }
             result.put("fullValues",fullValues);
             result.put("disValues",disValues);
+        }else {
+            //discountedType is wrong
+            return DtoUtil.getFalseDto("参数有误diw",90033);
         }
         result.put("share",storeFullReduction.getShare());
         result.put("startTime",storeFullReduction.getStartTime());
@@ -1040,9 +1043,9 @@ public class StoreServiceImpl implements StoreService {
                 return DtoUtil.getFalseDto("操作失败dfrf",90033);
             }
             for (int i1 = 0; i1 < storeFullReductions.size(); i1++) {
-                StoreFullReduction reduction = storeFullReductions.get(i1);
                 int d = storeMapper.addNewStoreFullReduction(updateStorePromoteSales.getStoreId(),updateStorePromoteSales.getFullValues()[i1],
-                        updateStorePromoteSales.getDisValues()[i1], reduction.getStartTime(),reduction.getEndTime(),reduction.getShare().toString());
+                        updateStorePromoteSales.getDisValues()[i1], updateStorePromoteSales.getStartTime(),updateStorePromoteSales.getEndTime(),
+                        updateStorePromoteSales.getShare().toString());
                 if (d != 1){
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     //add new full reduction failed

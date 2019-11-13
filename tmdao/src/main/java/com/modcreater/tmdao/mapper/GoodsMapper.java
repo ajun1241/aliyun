@@ -697,6 +697,20 @@ public interface GoodsMapper {
                                                   @Param("curTime") long curTime);
 
     /**
+     * 查询和传入goodsIds数组中相同的优惠信息(除bindingId外的)
+     * @param goodsIds
+     * @param startTime
+     * @param endTime
+     * @param storeId
+     * @param curTime
+     * @param bindingId
+     * @return
+     */
+    int verUpdateGoodsPromoteSales(@Param("goodsIds") String[] goodsIds,@Param("startTime") Long startTime,
+                             @Param("endTime") Long endTime,@Param("storeId") String storeId,
+                             @Param("curTime") long curTime,@Param("bindingId") String bindingId);
+
+    /**
      * 验证商品折扣促销重复
      * @param goodsIds
      * @param startTime
@@ -709,6 +723,21 @@ public interface GoodsMapper {
     int verGoodsPromoteSalesRepetitive(@Param("goodsIds") String[] goodsIds,@Param("startTime") Long startTime,
                                                @Param("endTime") Long endTime,@Param("storeId") String storeId,
                                                @Param("curTime") long curTime,@Param("type") int type);
+
+    /**
+     * 验证商品折扣促销重复
+     * @param goodsIds
+     * @param startTime
+     * @param endTime
+     * @param storeId
+     * @param curTime
+     * @param type
+     * @param bindingId
+     * @return
+     */
+    int verUpdateGoodsPromoteSalesRepetitive(@Param("goodsIds") String[] goodsIds,@Param("startTime") Long startTime,
+                                       @Param("endTime") Long endTime,@Param("storeId") String storeId,
+                                       @Param("curTime") long curTime,@Param("type") int type,@Param("bindingId") String bindingId);
 
     /**
      * 获取商品折扣开始时间
@@ -768,4 +797,11 @@ public interface GoodsMapper {
      * @return
      */
     int addBindingIdToGoodsDiscount(@Param("bindingId") String bindingId,@Param("id") String id);
+
+    /**
+     * 修改商品折扣表
+     * @param updateGoodsPromoteSales
+     * @return
+     */
+    int updateStoreGoodsDiscount(UpdateGoodsPromoteSales updateGoodsPromoteSales);
 }
