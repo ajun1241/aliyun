@@ -1,5 +1,6 @@
 package com.modcreater.tmdao.mapper;
 
+import com.modcreater.tmbeans.databaseparam.goods.AddNewGoodsPromoteSales;
 import com.modcreater.tmbeans.pojo.*;
 import com.modcreater.tmbeans.show.goods.*;
 import com.modcreater.tmbeans.vo.goods.*;
@@ -630,15 +631,6 @@ public interface GoodsMapper {
     int getManageGoodsGroupByGoodsTypeIdNum(@Param("storeId") String storeId,@Param("typeId") Long typeId);
 
     /**
-     * 修改商品折扣类型
-     * @param goodsId
-     * @param storeId
-     * @param discountedType
-     * @return
-     */
-    int updateGoodsStockDiscountedType(@Param("goodsId") String[] goodsId,@Param("storeId") String storeId,@Param("discountedType") int discountedType);
-
-    /**
      * 验证商品优惠表中是否已存在即将参与促销的商品
      * @param goodsId
      * @param curTime
@@ -646,6 +638,13 @@ public interface GoodsMapper {
      * @return
      */
     int verifyGoodsExistInSGD(@Param("goodsId") String[] goodsId,@Param("curTime") Long curTime,@Param("storeId") String storeId);
+
+    /**
+     * 添加商品促销信息
+     * @param addNewGoodsPromoteSales
+     * @return
+     */
+    int addNewGoodsPromoteSales(AddNewGoodsPromoteSales addNewGoodsPromoteSales);
 
     /**
      * 添加商品促销信息
@@ -658,7 +657,7 @@ public interface GoodsMapper {
      * @param storeId
      * @return
      */
-    int addNewGoodsPromoteSales(@Param("goodsId") String[] goodsId,@Param("value") String value,
+    int addNewGoodsDiscountPromoteSales(@Param("goodsId") String[] goodsId,@Param("value") String value,
                                 @Param("bindingId") String bindingId,@Param("discountedType") int discountedType,
                                 @Param("startTime") Long startTime,@Param("endTime") Long endTime,@Param("storeId") String storeId);
 
@@ -717,25 +716,21 @@ public interface GoodsMapper {
      * @param curTime
      * @return
      */
-    List<String> getGoodsPromoteSalesTimes(@Param("storeId") String storeId,@Param("curTime") long curTime);
+    List<String> getGoodsPromoteSalesBindingIds(@Param("storeId") String storeId,@Param("curTime") long curTime);
 
     /**
      * 获取商品折扣信息
-     * @param storeId
-     * @param time
-     * @return
-     */
-    List<StoreGoodsDiscount> getGoodsPromoteSalesInfo(@Param("storeId") String storeId,@Param("time") String time);
-
-    /**
-     * 获取商品满减折扣信息
-     * @param storeId
-     * @param time
      * @param bindingId
      * @return
      */
-    List<StoreGoodsFullReduction> getGoodsFullReduction(@Param("storeId") String storeId,@Param("time") String time,
-                                                        @Param("bindingId") Long bindingId);
+    List<StoreGoodsDiscount> getGoodsPromoteSalesInfo(String bindingId);
+
+    /**
+     * 获取商品满减折扣信息
+     * @param bindingId
+     * @return
+     */
+    List<StoreGoodsFullReduction> getGoodsFullReduction(String bindingId);
 
     /**
      * 获取商品已过期的折扣信息
@@ -743,7 +738,7 @@ public interface GoodsMapper {
      * @param curTime
      * @return
      */
-    List<String> getGoodsOverduePromoteSalesTimes(@Param("storeId") String storeId,@Param("curTime") long curTime);
+    List<String> getGoodsOverduePromoteSalesBindingIds(@Param("storeId") String storeId,@Param("curTime") long curTime);
 
     /**
      * 根据Id查询商品促销信息
@@ -761,11 +756,16 @@ public interface GoodsMapper {
 
     /**
      * 删除满减促销
-     * @param startTime
-     * @param storeId
      * @param bindingId
      * @return
      */
-    int deleteStoreGoodsFullReduction(@Param("startTime") long startTime,@Param("storeId") String storeId,
-                                      @Param("bindingId") Long bindingId);
+    int deleteStoreGoodsFullReduction(Long bindingId);
+
+    /**
+     * 给同组促销商品添加绑定
+     * @param bindingId
+     * @param id
+     * @return
+     */
+    int addBindingIdToGoodsDiscount(@Param("bindingId") String bindingId,@Param("id") String id);
 }

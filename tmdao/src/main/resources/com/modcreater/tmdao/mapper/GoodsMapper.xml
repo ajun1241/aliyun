@@ -73,10 +73,10 @@
         delete from store_goods_stock where storeId = #{storeId} and goodsId = #{goodsId}
     </delete>
     <delete id="deleteGoodsPromoteSales">
-        delete from store_goods_discount where id = #{promoteSalesId}
+        delete from store_goods_discount where bindingId = #{promoteSalesId}
     </delete>
     <delete id="deleteStoreGoodsFullReduction">
-        delete from store_goods_full_reduction where storeId = #{storeId} and startTime = #{startTime} and bindingId = #{bindingId}
+        delete from store_goods_full_reduction where bindingId = #{bindingId}
     </delete>
     <select id="getGoodsList" resultType="java.util.Map">
         SELECT sg.*,sgs.`goodsPrice`,sgs.`stockNum` FROM store_goods sg
@@ -115,7 +115,11 @@
     <insert id="addNewSalesVolume">
         insert into store_sales_volume (orderNumber, storeId, goodsId, num) values (#{orderNumber},#{storeId},#{goodsId},#{num})
     </insert>
-    <insert id="addNewGoodsPromoteSales">
+    <insert id="addNewGoodsPromoteSales" useGeneratedKeys="true" keyProperty="id">
+        insert into store_goods_discount (goodsId, discountedType, value, startTime, endTime, storeId) values
+        (#{goodsId},#{discountedType},#{value},#{startTime},#{endTime},#{storeId})
+    </insert>
+    <insert id="addNewGoodsDiscountPromoteSales">
         <foreach collection="goodsId" item="id" index="index" separator=";">
             insert into store_goods_discount (bindingId, goodsId, discountedType, value, startTime, endTime, storeId) values
             (#{bindingId},#{id},#{discountedType},#{value},#{startTime},#{endTime},#{storeId})
@@ -269,13 +273,11 @@
     <update id="resumeStock">
         update store_goods_stock set stockNum = stockNum + #{num} where storeId = #{storeId} and goodsBarCode = #{goodsBarCode}
     </update>
-    <update id="updateGoodsStockDiscountedType">
-        <foreach collection="goodsId" item="id" separator=";">
-            update store_goods_stock set discountedType = #{discountedType} where goodsId = #{id} and storeId = #{storeId}
-        </foreach>
-    </update>
     <update id="updateOfflineOrderStatus">
         update store_offline_orders set orderStatus = #{status} where orderNumber=#{orderNumber};
+    </update>
+    <update id="addBindingIdToGoodsDiscount">
+        update store_goods_discount set bindingId = #{bindingId} where id = #{id}
     </update>
     <select id="getOfflineOrder" resultType="com.modcreater.tmbeans.pojo.StoreOfflineOrders">
         select * from store_offline_orders where orderNumber = #{tradeNo}
@@ -511,17 +513,17 @@
     <select id="getOfflineOrderByGoodsCode" resultType="com.modcreater.tmbeans.pojo.StoreOfflineOrders">
         select * from store_offline_orders where goodsListId=#{code}
     </select>
-    <select id="getGoodsPromoteSalesTimes" resultType="java.lang.String">
-        select startTime from store_goods_discount where storeId = #{storeId} and endTime &gt; #{curTime} group by startTime
+    <select id="getGoodsPromoteSalesBindingIds" resultType="java.lang.String">
+        select bindingId from store_goods_discount where storeId = #{storeId} and endTime &gt; #{curTime} group by bindingId
     </select>
     <select id="getGoodsPromoteSalesInfo" resultType="com.modcreater.tmbeans.pojo.StoreGoodsDiscount">
-        select * from store_goods_discount where storeId = #{storeId} and startTime = #{time}
+        select * from store_goods_discount where bindingId = #{bindingId}
     </select>
     <select id="getGoodsFullReduction" resultType="com.modcreater.tmbeans.pojo.StoreGoodsFullReduction">
-        select * from store_goods_full_reduction where storeId = #{storeId} and startTime = #{time} and bindingId = #{bindingId}
+        select * from store_goods_full_reduction where bindingId = #{bindingId}
     </select>
-    <select id="getGoodsOverduePromoteSalesTimes" resultType="java.lang.String">
-        select startTime from store_goods_discount where storeId = #{storeId} and endTime &lt;= #{curTime} group by startTime
+    <select id="getGoodsOverduePromoteSalesBindingIds" resultType="java.lang.String">
+        select bindingId from store_goods_discount where storeId = #{storeId} and endTime &lt;= #{curTime} group by bindingId
     </select>
     <select id="getStoreGoodsDiscount" resultType="com.modcreater.tmbeans.pojo.StoreGoodsDiscount">
         select * from store_goods_discount where id = #{promoteSalesId}

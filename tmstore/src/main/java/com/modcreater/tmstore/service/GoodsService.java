@@ -356,4 +356,12 @@ public interface GoodsService {
      * @return
      */
     Dto deleteGoodsPromoteSales(DeleteGoodsPromoteSales deleteGoodsPromoteSales, String token);
+
+    /**
+     * 获取修改商品促销信息
+     * @param getUpdateGoodsPromoteSales
+     * @param token
+     * @return
+     */
+    Dto getUpdateGoodsPromoteSales(GetUpdateGoodsPromoteSales getUpdateGoodsPromoteSales, String token);
 }
