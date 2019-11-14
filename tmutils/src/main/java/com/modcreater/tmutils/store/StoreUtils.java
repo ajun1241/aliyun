@@ -1,5 +1,6 @@
 package com.modcreater.tmutils.store;
 
+import com.modcreater.tmbeans.show.goods.ShowGetUpdatePromoteSalesGoodsList;
 import com.modcreater.tmbeans.show.store.ShowPromoteSalesInfo;
 
 import java.util.ArrayList;
@@ -51,6 +52,21 @@ public class StoreUtils {
                 Long startTime1 = o1.getStartTime();
                 Long startTime2 = o2.getStartTime();
                 return startTime1.compareTo(startTime2);
+            }
+        });
+    }
+
+    public static void sortGoodsListBySelectStatus(List<ShowGetUpdatePromoteSalesGoodsList> lists){
+        lists.sort(new Comparator<ShowGetUpdatePromoteSalesGoodsList>() {
+            @Override
+            public int compare(ShowGetUpdatePromoteSalesGoodsList o1, ShowGetUpdatePromoteSalesGoodsList o2) {
+                boolean b1 = o1.getSelectStatus();
+                boolean b2 = o2.getSelectStatus();
+                if (b1 ^ b2) {
+                    return b1 ? -1 : 1;
+                } else {
+                    return 0;
+                }
             }
         });
     }

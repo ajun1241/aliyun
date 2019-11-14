@@ -1307,6 +1307,7 @@ public class GoodsServiceImpl implements GoodsService {
                 }
             }
         }
+        StoreUtils.sortGoodsListBySelectStatus(result);
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 

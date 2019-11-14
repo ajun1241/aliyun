@@ -19,7 +19,7 @@ public class ShowGetUpdatePromoteSalesGoodsList {
     private String goodsPrice;
     private String goodsUnit;
     private String stockNum;
-    private boolean selectStatus = false;
+    private Boolean selectStatus = false;
 
 
 }
