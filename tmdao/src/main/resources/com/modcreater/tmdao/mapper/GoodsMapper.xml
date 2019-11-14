@@ -560,4 +560,13 @@
     <select id="getStoreGoodsDiscount" resultType="com.modcreater.tmbeans.pojo.StoreGoodsDiscount">
         select * from store_goods_discount where id = #{promoteSalesId}
     </select>
+    <select id="getUpdatePromoteSalesGoodsList" resultType="com.modcreater.tmbeans.show.goods.ShowGetUpdatePromoteSalesGoodsList">
+        select sg.id goodsId,sg.goodsPicture,sg.goodsName,sgs.goodsPrice,sg.goodsUnit,sgs.stockNum
+        from store_goods sg,store_goods_type sgt,store_goods_stock sgs
+        where sg.id = sgs.goodsId and sgt.id = sg.goodsTypeId and sgs.storeId = #{storeId} and sgs.goodsStatus = 1 and sgs.stockNum &gt;= 1
+        <if test="goodsName != '' and goodsName != null">
+            and (sg.goodsName like "%"#{goodsName}"%" or sg.goodsBrand like "%"#{goodsName}"%")
+        </if>
+        limit #{pageNum},#{pageSize}
+    </select>
 </mapper>

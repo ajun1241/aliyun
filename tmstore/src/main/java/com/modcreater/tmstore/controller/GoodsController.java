@@ -347,4 +347,11 @@ public class GoodsController {
     public Dto updateGoodsPromoteSales(@RequestBody UpdateGoodsPromoteSales updateGoodsPromoteSales,HttpServletRequest request){
         return goodsService.updateGoodsPromoteSales(updateGoodsPromoteSales,request.getHeader("token"));
     }
+
+    @Safety
+    @PostMapping(value = "getupdatepromotesalesgoodslist")
+    @ApiOperation("获取修改商品折扣的商品列表")
+    public Dto getUpdatePromoteSalesGoodsList(@RequestBody GetUpdatePromoteSalesGoodsList getUpdatePromoteSalesGoodsList ,HttpServletRequest request){
+        return goodsService.getUpdatePromoteSalesGoodsList(getUpdatePromoteSalesGoodsList,request.getHeader("token"));
+    }
 }

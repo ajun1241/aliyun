@@ -1014,35 +1014,34 @@ public class StoreServiceImpl implements StoreService {
         if (!reg(updateStorePromoteSales.getUserId(), updateStorePromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
+        List<StoreFullReduction> storeFullReductions = storeMapper.getStoreFullReductions(updateStorePromoteSales.getPromoteSalesId(),updateStorePromoteSales.getStoreId());
+        List<String> ids = new ArrayList<>();
+        for (StoreFullReduction reduction : storeFullReductions){
+            ids.add(reduction.getId().toString());
+        }
+        if (!verUpdateStorePromoteSales(updateStorePromoteSales.getStartTime(), updateStorePromoteSales.getEndTime(), updateStorePromoteSales.getStoreId(),
+                ids)) {
+            return DtoUtil.getFalseDto("请合理安排店铺促销时间!", 90029);
+        }
         if (updateStorePromoteSales.getDiscountedType() == 1) {
-            List<String> ids = new ArrayList<>();
-            ids.add(updateStorePromoteSales.getPromoteSalesId());
-            if (!verUpdateStorePromoteSales(updateStorePromoteSales.getStartTime(), updateStorePromoteSales.getEndTime(), updateStorePromoteSales.getStoreId(),
-                    ids)) {
-                return DtoUtil.getFalseDto("请合理安排店铺促销时间!", 90029);
-            }
             updateStorePromoteSales.setValue(updateStorePromoteSales.getValue() / 10);
-            int i = storeMapper.updateStoreDiscountPromoteSales(updateStorePromoteSales);
-            if (i == 0) {
-                return DtoUtil.getFalseDto("修改失败", 90032);
+            int d = storeMapper.deletePromoteSales(storeFullReductions.get(0).getStartTime(),updateStorePromoteSales.getStoreId());
+            if (d == 0) {
+                return DtoUtil.getFalseDto("操作失败dpsf", 90032);
+            }
+            int i = storeMapper.addNewStoreFullReduction(updateStorePromoteSales.getStoreId(),updateStorePromoteSales.getValue(),0d,
+                    updateStorePromoteSales.getStartTime(),updateStorePromoteSales.getEndTime(),"1");
+            if (i == 0){
+                return DtoUtil.getFalseDto("修改失败",90034);
             }
         }else if (updateStorePromoteSales.getDiscountedType() == 2){
-            List<StoreFullReduction> storeFullReductions = storeMapper.getStoreFullReductions(updateStorePromoteSales.getPromoteSalesId(),updateStorePromoteSales.getStoreId());
-            List<String> ids = new ArrayList<>();
-            for (StoreFullReduction reduction : storeFullReductions){
-                ids.add(reduction.getId().toString());
-            }
-            if (!verUpdateStorePromoteSales(updateStorePromoteSales.getStartTime(), updateStorePromoteSales.getEndTime(), updateStorePromoteSales.getStoreId(),
-                    ids)) {
-                return DtoUtil.getFalseDto("请合理安排店铺促销时间!", 90029);
-            }
             int i = storeMapper.deletePromoteSales(storeFullReductions.get(0).getStartTime(),updateStorePromoteSales.getStoreId());
             if (i != storeFullReductions.size()){
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 //delete full reduction failed
                 return DtoUtil.getFalseDto("操作失败dfrf",90033);
             }
-            for (int i1 = 0; i1 < storeFullReductions.size(); i1++) {
+            for (int i1 = 0; i1 < updateStorePromoteSales.getFullValues().length; i1++) {
                 int d = storeMapper.addNewStoreFullReduction(updateStorePromoteSales.getStoreId(),updateStorePromoteSales.getFullValues()[i1],
                         updateStorePromoteSales.getDisValues()[i1], updateStorePromoteSales.getStartTime(),updateStorePromoteSales.getEndTime(),
                         updateStorePromoteSales.getShare().toString());

@@ -804,4 +804,15 @@ public interface GoodsMapper {
      * @return
      */
     int updateStoreGoodsDiscount(UpdateGoodsPromoteSales updateGoodsPromoteSales);
+
+    /**
+     * 查询修改商品促销商品列表
+     * @param storeId
+     * @param goodsName
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    List<ShowGetUpdatePromoteSalesGoodsList> getUpdatePromoteSalesGoodsList(@Param("storeId") String storeId,@Param("goodsName") String goodsName,
+                                                            @Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
 }

@@ -372,4 +372,12 @@ public interface GoodsService {
      * @return
      */
     Dto updateGoodsPromoteSales(UpdateGoodsPromoteSales updateGoodsPromoteSales, String token);
+
+    /**
+     * 获取修改商品促销商品列表
+     * @param getUpdatePromoteSalesGoodsList
+     * @param token
+     * @return
+     */
+    Dto getUpdatePromoteSalesGoodsList(GetUpdatePromoteSalesGoodsList getUpdatePromoteSalesGoodsList, String token);
 }

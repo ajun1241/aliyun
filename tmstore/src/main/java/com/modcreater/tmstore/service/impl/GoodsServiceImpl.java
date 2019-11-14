@@ -1229,123 +1229,85 @@ public class GoodsServiceImpl implements GoodsService {
         if (!reg(updateGoodsPromoteSales.getUserId(), updateGoodsPromoteSales.getStoreId())) {
             return DtoUtil.getFalseDto("违规操作!", 90001);
         }
-        if (updateGoodsPromoteSales.getGoodsId().length != 0){
-            if (!verUpdateGoodsPromoteSales(updateGoodsPromoteSales.getGoodsId(),updateGoodsPromoteSales.getStartTime(),
-                    updateGoodsPromoteSales.getEndTime(),updateGoodsPromoteSales.getStoreId(),updateGoodsPromoteSales.getPromoteSalesId())){
-                return DtoUtil.getFalseDto("请合理安排商品及促销时间!",90027);
+        List<String> totalGoodsIds = new ArrayList<>();
+        if (updateGoodsPromoteSales.getGoodsId().length == 0){
+            List<StoreGoodsDiscount> discounts = goodsMapper.getGoodsPromoteSalesInfo(updateGoodsPromoteSales.getPromoteSalesId());
+            for (StoreGoodsDiscount t : discounts){
+                totalGoodsIds.add(t.getGoodsId()+"");
             }
-            int verValue = goodsMapper.verUpdateGoodsPromoteSalesRepetitive(updateGoodsPromoteSales.getGoodsId(),updateGoodsPromoteSales.getStartTime(),
-                    updateGoodsPromoteSales.getEndTime(),updateGoodsPromoteSales.getStoreId(),
-                    System.currentTimeMillis()/1000,updateGoodsPromoteSales.getDiscountedType() == 2 ? 1 : 2,updateGoodsPromoteSales.getPromoteSalesId());
-            if (verValue >= 1){
-                return DtoUtil.getFalseDto("同一商品只能参与一种折扣方式,请勿重复添加",90028);
-            }
+        }else {
+            totalGoodsIds.addAll(Arrays.asList(updateGoodsPromoteSales.getGoodsId()));
         }
-        updateGoodsPromoteSales.setValue(updateGoodsPromoteSales.getValue() / 10);
+        if (!verUpdateGoodsPromoteSales(totalGoodsIds.toArray(new String[totalGoodsIds.size()]), updateGoodsPromoteSales.getStartTime(),
+                updateGoodsPromoteSales.getEndTime(), updateGoodsPromoteSales.getStoreId(), updateGoodsPromoteSales.getPromoteSalesId())) {
+            return DtoUtil.getFalseDto("请合理安排商品及促销时间!", 90027);
+        }
+        int verValue = goodsMapper.verUpdateGoodsPromoteSalesRepetitive(totalGoodsIds.toArray(new String[totalGoodsIds.size()]), updateGoodsPromoteSales.getStartTime(),
+                updateGoodsPromoteSales.getEndTime(), updateGoodsPromoteSales.getStoreId(),
+                System.currentTimeMillis() / 1000, updateGoodsPromoteSales.getDiscountedType() == 2 ? 1 : 2, updateGoodsPromoteSales.getPromoteSalesId());
+        if (verValue >= 1) {
+            return DtoUtil.getFalseDto("同一商品只能参与一种折扣方式,请勿重复添加", 90028);
+        }
+        int d = goodsMapper.deleteGoodsPromoteSales(updateGoodsPromoteSales.getPromoteSalesId());
+        if (d == 0){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            //delete promote sales failed
+            return DtoUtil.getFalseDto("操作失败dpsf",90033);
+        }
+        goodsMapper.deleteStoreGoodsFullReduction(Long.valueOf(updateGoodsPromoteSales.getPromoteSalesId()));
         if (updateGoodsPromoteSales.getDiscountedType() == 1){
-            if (updateGoodsPromoteSales.getGoodsId().length == 0){
-                int i = goodsMapper.updateStoreGoodsDiscount(updateGoodsPromoteSales);
-                if (i == 0){
-                    //update store goods discount failed
-                    return DtoUtil.getFalseDto("操作失败usgdf",90032);
-                }
-            }else {
-                int d = goodsMapper.deleteGoodsPromoteSales(updateGoodsPromoteSales.getPromoteSalesId());
-                if (d == 0){
-                    //delete promote sales failed
-                    return DtoUtil.getFalseDto("操作失败dpsf",90033);
-                }
-                String id = null;
-                String[] goodsId1 = updateGoodsPromoteSales.getGoodsId();
-                for (int i = 0; i < goodsId1.length; i++) {
-                    String goodsId = goodsId1[i];
-                    AddNewGoodsPromoteSales addNewGoodsPromoteSales = new AddNewGoodsPromoteSales();
-                    addNewGoodsPromoteSales.setGoodsId(goodsId);
-                    addNewGoodsPromoteSales.setValue(updateGoodsPromoteSales.getValue() + "");
-                    addNewGoodsPromoteSales.setDiscountedType(1);
-                    addNewGoodsPromoteSales.setStartTime(updateGoodsPromoteSales.getStartTime());
-                    addNewGoodsPromoteSales.setEndTime(updateGoodsPromoteSales.getEndTime());
-                    addNewGoodsPromoteSales.setStoreId(updateGoodsPromoteSales.getStoreId());
-                    int i2 = goodsMapper.addNewGoodsPromoteSales(addNewGoodsPromoteSales);
-                    if (i2 != 1) {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        //angdf:adding new goods discount failed
-                        return DtoUtil.getFalseDto("操作失败angdf", 90019);
-                    }
-                    if (i == 0) {
-                        id = addNewGoodsPromoteSales.getId();
-                    }
-                    int i2_1 = goodsMapper.addBindingIdToGoodsDiscount(id,addNewGoodsPromoteSales.getId());
-                    if (i2_1 == 0) {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        //angdf:adding binding goods discount failed
-                        return DtoUtil.getFalseDto("操作失败abgdf", 90019);
-                    }
-                }
-            }
+            GoodsDiscountPromoteSales discount = new GoodsDiscountPromoteSales();
+            discount.setValue(updateGoodsPromoteSales.getValue());
+            discount.setEndTime(updateGoodsPromoteSales.getEndTime());
+            discount.setGoodsId(totalGoodsIds.toArray(new String[totalGoodsIds.size()]));
+            discount.setStartTime(updateGoodsPromoteSales.getStartTime());
+            discount.setStoreId(updateGoodsPromoteSales.getStoreId());
+            discount.setUserId(updateGoodsPromoteSales.getUserId());
+            return goodsDiscountPromoteSales(discount,token);
         }else if (updateGoodsPromoteSales.getDiscountedType() == 2){
-            List<String> goodsIds = new ArrayList<>();
-            if (updateGoodsPromoteSales.getGoodsId().length == 0){
-                List<StoreGoodsDiscount> discounts = goodsMapper.getGoodsPromoteSalesInfo(updateGoodsPromoteSales.getPromoteSalesId());
-                for (StoreGoodsDiscount t : discounts){
-                    goodsIds.add(t.getGoodsId()+"");
-                }
-            }else {
-                goodsIds.addAll(Arrays.asList(updateGoodsPromoteSales.getGoodsId()));
-            }
-            Double[] fullValues = updateGoodsPromoteSales.getFullValues();
-            Double[] disValues = updateGoodsPromoteSales.getDisValues();
-            int d1 = goodsMapper.deleteGoodsPromoteSales(updateGoodsPromoteSales.getPromoteSalesId());
-            if (d1 == 0){
-                //delete promote sales failed
-                return DtoUtil.getFalseDto("操作失败dpsf",90033);
-            }
-            int d2 = goodsMapper.deleteStoreGoodsFullReduction(Long.valueOf(updateGoodsPromoteSales.getPromoteSalesId()));
-            if (d2 == 0){
-                //delete fill reduction failed
-                return DtoUtil.getFalseDto("操作失败dfrf",90033);
-            }
-            String id = null;
-            for (int i = 0; i < goodsIds.size(); i++) {
-                String goodsId = goodsIds.get(i);
-                AddNewGoodsPromoteSales addNewGoodsPromoteSales = new AddNewGoodsPromoteSales();
-                addNewGoodsPromoteSales.setGoodsId(goodsId);
-                addNewGoodsPromoteSales.setValue("-1");
-                addNewGoodsPromoteSales.setDiscountedType(2);
-                addNewGoodsPromoteSales.setStartTime(updateGoodsPromoteSales.getStartTime());
-                addNewGoodsPromoteSales.setEndTime(updateGoodsPromoteSales.getEndTime());
-                addNewGoodsPromoteSales.setStoreId(updateGoodsPromoteSales.getStoreId());
-                int i2 = goodsMapper.addNewGoodsPromoteSales(addNewGoodsPromoteSales);
-                if (i2 != 1) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    //angdf:adding new goods discount failed
-                    return DtoUtil.getFalseDto("操作失败angdf", 90019);
-                }
-                if (i == 0){
-                    id = addNewGoodsPromoteSales.getId();
-                }
-                int i2_1 = goodsMapper.addBindingIdToGoodsDiscount(id,addNewGoodsPromoteSales.getId());
-                if (i2_1 == 0){
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    //angdf:adding binding goods discount failed
-                    return DtoUtil.getFalseDto("操作失败abgdf", 90019);
-                }
-            }
-            for (int i = 0; i < fullValues.length; i++) {
-                int i3 = goodsMapper.addNewFullReduction(id,fullValues[i],disValues[i],
-                        updateGoodsPromoteSales.getStartTime(),updateGoodsPromoteSales.getEndTime(),
-                        updateGoodsPromoteSales.getStoreId());
-                if (i3 != 1){
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    //angfrf:adding new goods full reduction failed
-                    return DtoUtil.getFalseDto("操作失败angfrf",90023);
-                }
-            }
+            GoodsFullReductionPromoteSales reduction = new GoodsFullReductionPromoteSales();
+            reduction.setEndTime(updateGoodsPromoteSales.getEndTime());
+            reduction.setGoodsId(totalGoodsIds.toArray(new String[totalGoodsIds.size()]));
+            reduction.setStartTime(updateGoodsPromoteSales.getStartTime());
+            reduction.setStoreId(updateGoodsPromoteSales.getStoreId());
+            reduction.setUserId(updateGoodsPromoteSales.getUserId());
+            reduction.setFullValue(updateGoodsPromoteSales.getFullValues());
+            reduction.setDisValue(updateGoodsPromoteSales.getDisValues());
+            return goodsFullReductionPromoteSales(reduction,token);
         }else {
             //discountedType is wrong
             return DtoUtil.getFalseDto("参数有误diw",90033);
         }
-        return DtoUtil.getSuccessDto("操作成功",100000);
+    }
+
+    @Override
+    public Dto getUpdatePromoteSalesGoodsList(GetUpdatePromoteSalesGoodsList getUpdatePromoteSalesGoodsList, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(getUpdatePromoteSalesGoodsList.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(getUpdatePromoteSalesGoodsList.getUserId(), getUpdatePromoteSalesGoodsList.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        List<String> goodsIds = new ArrayList<>();
+        List<StoreGoodsDiscount> discounts = goodsMapper.getGoodsPromoteSalesInfo(getUpdatePromoteSalesGoodsList.getPromoteSalesId());
+        for (StoreGoodsDiscount t : discounts){
+            goodsIds.add(t.getGoodsId()+"");
+        }
+        getUpdatePromoteSalesGoodsList.setPageNum(getUpdatePromoteSalesGoodsList.getPageNum() - 1);
+        List<ShowGetUpdatePromoteSalesGoodsList> result = goodsMapper.getUpdatePromoteSalesGoodsList(getUpdatePromoteSalesGoodsList.getStoreId(),getUpdatePromoteSalesGoodsList.getGoodsName(),
+                getUpdatePromoteSalesGoodsList.getPageNum(),getUpdatePromoteSalesGoodsList.getPageSize());
+        if (result.size() == 0){
+            return DtoUtil.getFalseDto("未检测到数据",200000);
+        }
+        for (String goodsId : goodsIds){
+            for (ShowGetUpdatePromoteSalesGoodsList list : result){
+                if (list.getGoodsId().equals(goodsId)){
+                    list.setSelectStatus(true);
+                    break;
+                }
+            }
+        }
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
     /**
