@@ -1029,8 +1029,8 @@ public class StoreServiceImpl implements StoreService {
             if (d == 0) {
                 return DtoUtil.getFalseDto("操作失败dpsf", 90032);
             }
-            int i = storeMapper.addNewStoreFullReduction(updateStorePromoteSales.getStoreId(),updateStorePromoteSales.getValue(),0d,
-                    updateStorePromoteSales.getStartTime(),updateStorePromoteSales.getEndTime(),"1");
+            int i = storeMapper.addNewStoreDiscountPromoteSales(updateStorePromoteSales.getStoreId(),updateStorePromoteSales.getValue(),
+                    updateStorePromoteSales.getStartTime(),updateStorePromoteSales.getEndTime());
             if (i == 0){
                 return DtoUtil.getFalseDto("修改失败",90034);
             }
