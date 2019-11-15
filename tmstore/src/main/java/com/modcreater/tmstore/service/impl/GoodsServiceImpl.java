@@ -1311,6 +1311,20 @@ public class GoodsServiceImpl implements GoodsService {
         return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
     }
 
+    @Override
+    public Dto getManagePriceNum(ReceivedStoreId receivedStoreId, String token) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(receivedStoreId.getUserId()))) {
+            return DtoUtil.getFalseDto("请重新登录", 21014);
+        }
+        if (!reg(receivedStoreId.getUserId(), receivedStoreId.getStoreId())) {
+            return DtoUtil.getFalseDto("违规操作!", 90001);
+        }
+        Map<String,Long> result = new HashMap<>();
+        result.put("priced",goodsMapper.getPricedGoodsNumByStatus(receivedStoreId.getStoreId(), 1));
+        result.put("noPricing",goodsMapper.getPricedGoodsNumByStatus(receivedStoreId.getStoreId(), 3));
+        return DtoUtil.getSuccesWithDataDto("查询成功",result,100000);
+    }
+
     /**
      * 验证选中的商品和选中的促销时间是否与已添加过的冲突
      * @param goodsIds

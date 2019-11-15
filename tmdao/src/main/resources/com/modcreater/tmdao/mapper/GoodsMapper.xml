@@ -569,4 +569,9 @@
         </if>
         limit #{pageNum},#{pageSize}
     </select>
+    <select id="getPricedGoodsNumByStatus" resultType="java.lang.Long">
+        select count(1)
+        from store_goods_stock
+        where storeId = #{storeId} and goodsStatus = #{status}
+    </select>
 </mapper>

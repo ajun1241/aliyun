@@ -815,4 +815,12 @@ public interface GoodsMapper {
      */
     List<ShowGetUpdatePromoteSalesGoodsList> getUpdatePromoteSalesGoodsList(@Param("storeId") String storeId,@Param("goodsName") String goodsName,
                                                             @Param("pageNum") Long pageNum,@Param("pageSize") Long pageSize);
+
+    /**
+     * 根据商品价格状态或获取商品数量
+     * @param storeId
+     * @param status
+     * @return
+     */
+    Long getPricedGoodsNumByStatus(@Param("storeId") String storeId,@Param("status") int status);
 }

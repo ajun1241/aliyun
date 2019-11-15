@@ -285,6 +285,13 @@ public class GoodsController {
     }
 
     @Safety
+    @PostMapping(value = "getmanagepricenum")
+    @ApiOperation("获取价格管理数量")
+    public Dto getManagePriceNum(@RequestBody ReceivedStoreId receivedStoreId,HttpServletRequest request){
+        return goodsService.getManagePriceNum(receivedStoreId,request.getHeader("token"));
+    }
+
+    @Safety
     @PostMapping(value = "deletegoods")
     @ApiOperation("删除商品")
     public Dto deleteGoods(@RequestBody DeleteGoods deleteGoods,HttpServletRequest request){

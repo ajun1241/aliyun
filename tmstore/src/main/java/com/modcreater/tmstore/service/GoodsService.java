@@ -380,4 +380,12 @@ public interface GoodsService {
      * @return
      */
     Dto getUpdatePromoteSalesGoodsList(GetUpdatePromoteSalesGoodsList getUpdatePromoteSalesGoodsList, String token);
+
+    /**
+     * 获取价格管理数量
+     * @param receivedStoreId
+     * @param token
+     * @return
+     */
+    Dto getManagePriceNum(ReceivedStoreId receivedStoreId, String token);
 }
